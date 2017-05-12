@@ -1,0 +1,64 @@
+README for Apache::LogFiler 0.03
+
+WHATIS
+
+Apache::LogIgnore is a mod_perl log handler can be used to ignore connections 
+which match certain criteria.
+
+INSTALLING
+
+Apache::LogIgnore can be installed easily by using the CPAN module.
+
+perl -MCPAN -e"install Apache::LogIgnore"
+
+or manually by untarring the archive and running the following commands.
+
+    perl Makefile.PM
+    make
+    make test
+    make install
+
+You'll then need to edit your httpd.conf (or appropriate Apache config file)
+
+<Location /path>
+PerlLogHandler Apache::LogIgnore
+PerlSetVar     DebugFlag 1
+PerlSetVar     IgnoreHost 192.168.0.2
+PerlSetVar     IgnoreAgent Moz
+PerlSetVar     IgnoreReferer 192.168.0.2
+PerlSetVar     IgnoreFrom foo@bar.com
+PerlSetVar     IgnoreMinSize 100
+PerlSetVar     IgnoreMaxSize 400000
+PerlSetVar     IgnoreType Image
+PerlSetVar     IgnoreStatus 403
+</Location>
+
+Any of those PerlSetVar statements can be left out.
+/path is the directory you wish to apply Apache::LogIgnore on.
+
+Negating
+You can negate all of the above values with a ! (except DebugFlag).
+Example would be :
+
+IgnoreStatus !200
+
+Don't log any request beside the ones resulting in a 200 status.
+
+TESTING
+
+This module has been tested on Linux 2.4.x (x86) with Perl 5.6.1
+
+REQUIREMENTS
+
+Apache::LogIgnore requires
+
+    mod_perl    
+
+    Apache ofcourse
+
+AUTHOR
+
+Apache::LogIgnore was written by Hendrik Van Belleghem. Suggestions & Questions
+are welcome at   beatnik - at - quickndirty - dot - org.
+
+Yes, I love fanmail! No, I don't like spam.

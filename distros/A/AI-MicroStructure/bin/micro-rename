@@ -1,0 +1,27 @@
+#!/bin/bash
+IFS_BAK=$IFS;
+IFS=$'\n';
+
+# blank-rename.sh
+#
+# Substitutes underscores for blanks in all the filenames in a directory.
+filename=$1
+ONE=1                     # For getting singular/plural right (see below).
+number=0                  # Keeps track of how many files actually renamed.
+FOUND=0                   # Successful return value.
+
+fname=$1                      # Yes, this filename needs work.
+n=`echo $fname | sed -e "s/ /_/g" | sed -e "s/'//g" | sed -e "s/&/and/g"  | tr A-Z a-z | sed -e "s/)/_/g"  | sed -e "s/(/_/g" | sed -e "s/\[//g" | sed -e "s/\]//g"  | sed -e "s/\,//g" | sed -e "s/\;//g"`   #
+#        | sed -e "s/[/_/g" | sed -e "s/]//g" | sed -e "s/)//g" | sed -e "s/(//g"`
+
+mv "$1" "$n"       > /dev/null;
+
+
+
+
+
+IFS=$IFS_BAK;
+
+
+
+exit 0

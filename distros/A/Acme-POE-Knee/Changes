@@ -1,0 +1,16 @@
+==============================
+2011-07-13 12:19:01 +0100 1.12
+==============================
+
+  commit 17a487d54656d22457886bff22b0f56f1a4a9cd5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Jul 13 12:12:40 2011 +0100
+  
+    Change build system to dzil, added POE as a PREREQ
+
+    Addresses [rt.cpan.org #69430] "Missing dependeny: POE.pm" reported
+    by Tommy Stanton 
+
+====================================
+End of changes in the last 1825 days
+====================================

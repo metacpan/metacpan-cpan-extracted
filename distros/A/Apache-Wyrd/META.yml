@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:                Apache-Wyrd
+version:             0.98
+abstract:            ~
+license:             ~
+author:              
+    - barry king <wyrd@nospam.wyrdwright.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Apache:                        1.26
+    Apache::Constants:             0
+    Apache::Cookie:                0
+    Apache::Request:               0
+    Apache::URI:                   0
+    Apache::Util:                  0
+    BerkeleyDB:                    0.23
+    Class::Singleton:              0
+    Crypt::Blowfish:               0
+    DBI:                           0
+    Digest::SHA:                   0
+    HTML::Entities:                0
+    HTTP::Request::Common:         0
+    LWP::UserAgent:                0
+    MIME::Base64:                  0
+    XML::Dumper:                   0.67
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

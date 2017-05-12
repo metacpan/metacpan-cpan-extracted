@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+
+<title>Generic page of Site: <: $site_name :>. Design: <: $design_name :></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="stylesheet" type="text/css" href="<: $yui_url :>/build/treeview/assets/skins/sam/treeview.css">
+
+<script type="text/javascript" src="<: $yui_url :>/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/event/event-min.js"></script>
+<script type="text/javascript" src="<: $yui_url :>/build/treeview/treeview.js"></script>
+
+<script type="text/javascript">
+var page_tree = null;
+
+function build_menu()
+{
+	if (page_tree != null)
+	{
+		page_tree.destroy();
+	}
+
+	page_tree = new YAHOO.widget.TreeView("page_tree_div",
+[
+<: $menu :>
+]);
+
+	page_tree.render();
+}
+
+function init()
+{
+	build_menu();
+}
+
+YAHOO.util.Event.onDOMReady(init);
+</script>
+
+<: $head_text :>
+
+</head>
+
+<body class="yui-skin-sam">
+
+<h1 align="center">Site: <: $site_name :> - Design: <: $design_name :> - Page: <: $page_name :></h1>
+
+<table border="1">
+<tr>
+<td><div id="page_tree_div"></div></td>
+<td><: $body_text :></td>
+</tr>
+</table>
+
+</body>
+</html>
+

@@ -1,0 +1,15 @@
+Changes
+lib/Array/Each.pm
+lib/Array/Each/Tutorial.pod
+MANIFEST
+Makefile.PL
+README
+t/01-AE-pod_examples.t
+t/02-AE-attributes.t
+t/03-AE-methods.t
+t/04-AE-validate.t
+t/05-AE-parms_combos.t
+t/06-AE-one_off.t
+t/07-AE-tut_examples.t
+t/08-AE-count_combos.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,39 @@
+Revision history for Authorization-RBAC
+
+0.10 2015-12-08
+  - removing unnecessary dependencies
+  - takes the schema from outside
+
+0.09 2015-08-01
+  - it works with perl 5.8.9
+
+0.08 2015-07-31
+  - update dependencies to pass tests
+
+0.07 2015-07-30
+  - update pod in french
+  - test database in memory
+  - removes unnecessary method
+
+0.06 2015-07-02
+  - Delete Backend::File
+  - Add some tests
+  - change method name
+
+0.05
+  - rewriting code to find the permissions recursively
+  - Backend::File no monger works
+
+0.04
+  - Add 'get_perms'
+
+0.03
+  - Tested on sqlite / mysql
+  - Delete table Object
+
+0.02    2014-01-26 15:11:02
+  - Add 'parent' in dbix
+  - Can use all fields to search subject (field_unique)
+
+0.01    2014-01-25 11:59:02
+  -  Initial Release

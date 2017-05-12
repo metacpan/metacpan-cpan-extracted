@@ -1,0 +1,6 @@
+This example includes a very simple service example.
+
+The service is just a subclass of App::Standby::Service::HTTP and
+sends the whole queue while the endpoint is implemented as
+a very simple CGI script that decodes the queue and inserts it
+into a queue in a MySQL database.

@@ -1,0 +1,14 @@
+Changes
+Ipkg.pm
+Makefile
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.skip
+META.yml
+README
+t/1_use.t
+t/2_properties.t
+t/3_strict_properties.t
+t/4_add_files.t
+t/pod-coverage.t
+t/pod.t

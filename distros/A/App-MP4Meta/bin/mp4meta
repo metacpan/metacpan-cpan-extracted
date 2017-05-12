@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use App::MP4Meta;
+
+$main::VERSION = $App::MP4Meta::VERSION;
+
+# PODNAME:  mp4meta
+# ABSTRACT: Apply iTunes-like meta data to an mp4 file.
+
+App::MP4Meta->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mp4meta - Apply iTunes-like meta data to an mp4 file.
+
+=head1 VERSION
+
+version 1.153340
+
+=head1 OVERVIEW
+
+For help with App::MP4Meta, run "mp4meta commands".
+
+=head1 AUTHOR
+
+Andrew Jones <andrew@arjones.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Andrew Jones.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

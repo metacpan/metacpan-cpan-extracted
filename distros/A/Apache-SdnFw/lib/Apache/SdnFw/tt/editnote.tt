@@ -1,0 +1,16 @@
+<div class="floatleft">
+<table>
+	<caption>Edit Note</caption>
+	<tbody>
+	<tr>
+		<td>
+<form method="POST" action="[% s.ubase %]/note/save">
+<input type="hidden" name="note_id" value="[% s.in.note_id %]">
+<textarea name="note_text" cols="60" rows="10">[% s.escape(hash.note_text) %]</textarea><br>
+<input type="submit" value="Save">
+</form>
+		</td>
+	</tr>
+	</tbody>
+</table>
+</div>

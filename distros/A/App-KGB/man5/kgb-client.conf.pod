@@ -1,0 +1,215 @@
+# vim: ts=4:sw=4:et:ai:sts=4
+#
+# KGB - an IRC bot helping collaboration
+# Copyright © 2012 Damyan Ivanov
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=head1 NAME
+
+kgb-client.conf -- KGB client configuration file
+
+=head1 DESCRIPTION
+
+L<kgb-client(1)> can be configured via command line options and/or via a
+configuration file (via the B<--conf> option). Most of the settings can use
+either way, with command line options overriding settings from the
+configuration file.
+
+The file format is YAML. Elaborate example configuration is at the end of this
+document.
+
+=head1 Server connection configuration
+
+=head2 repo-id
+
+Unique project identifier on the server. B<Mandatory>.
+
+=head2 password
+
+Pass phrase string. Used together with B<repo-id> to authenticate the request
+to the servers. Per-server configuration overrides this setting.
+
+=head2 timeout
+
+Request timeout in seconds. Defaults to C<15>.
+
+=head2 servers
+
+A list of maps, describing the servers to try to send ntifications to. Each server map
+can have the following members:
+
+=over
+
+=item B<uri>
+
+The URI of the server. Something like C<http://kgb.server.org:port/>.
+
+=item B<proxy>
+
+SOAP proxy to use. Mandatory if using SOAP protocol. Defaults to to the value
+of the B<uri> setting, with C<?session=KGB> appended.
+
+=item B<password>
+
+Per-server pass phrase. Defaults to the global B<password> setting.
+
+=item B<timeout>
+
+Timeout of the request. Defaults to the global B<timeout> setting.
+
+=back
+
+=head2 B<status_dir>
+
+Directory to store information about the last successfuly contacted server. If
+the request is soon after the last contact, the last server is tried first.
+This way related notifications tend to come out of the same server.
+
+=head1 Content configuration
+
+=head2 B<branch-and-module-re>
+
+A list of regular expressions. These are matched against the path of the
+modified files and should have two captures in them -- the first capture is for
+the branch and the second capture is for the module.
+
+This is useful with Subversion repositories where there is a single repository
+for the project, with all the modules and branches.
+
+=head2 B<module-and-branch-re>
+
+Same as B<branch-and-module-re>, but captures are in reverse order -- module
+first and branch second.
+
+=head2 B<ignore-branch>
+
+A name of a branch to ignore. All changes in that branch are sent without
+branch info. Useful if most of the branches are made in one branch (e.g. trunk,
+master).
+
+=head2 B<web-link>
+
+URL containing information about the commit (e.g. gitweb, viewvcs).
+C<${commit}>, C<${branch}>, C<${module}> and C<${project}> in that string are
+substituted with the commit ID, the branch name, the module name and the
+project ID respectively.
+
+See L<App::KGB::Client> for examples.
+
+=head2 B<short-url-service>
+
+The name of the URL shortening service to use. If given, the service is used to
+shorten the result of B<web-link> substitution.
+
+See L<WWW::Shorten> for the list of available services. Note that B<kgb-client>
+comes with an additional service called C<Debli>, which is primarily useful for
+clients running on Debian's collaboration server, alioth.
+
+=head2 B<single-line-commits>
+
+Send only a single line of the commit message to the channel.
+Possible values: auto|force|off.
+
+=over
+
+=item B<auto>
+
+B<(default)> Uses single line notification if the commit log's second line is
+an empty string. Otherwise uses the whole commit log (as if set to B<off>).
+
+=item B<force>
+
+Uses only the first line of the commit log, ignoring the rest.
+
+=item B<off>
+
+Uses the whole commit log, ignoring any empty lines.
+
+=back
+
+=head2 B<use-irc-notices>
+
+If set to a true value will make the IRC bot use IRC C<notice> messages instead
+of the ordinary C<privmsg> messages.
+
+=head2 B<use-color>
+
+If set to a false value will make the IRC bot use no color in the
+notifications.
+
+=head2 Repository-specific configuration options
+
+Some of the backends may support additional configuration options. See
+L<App::KGB::Client::Git>, L<App::KGB::Client::Subversion> and
+L<App::KGB::Client::CVS>.
+
+=head1 EXAMPLE CONFGURATION
+
+ # vim: filetype=yaml
+ ---
+ repo-id: 'kgb'
+ password: 'notknown'
+ timeout: 7
+ status-dir: '/home/proj/kgb-client/status'
+ module-and-branch-re:
+  - '^/([^/]+)/(trunk|tags/(?:[^/]+))/'
+  - '^/([^/]+)/branches/([^/]+)/'
+  - '^/(website)/()'
+ web-link: 'http://svn.debian.org/viewvc/${project}?view=revision&revision=${commit}'
+ # web-link: 'http://anonscm.debian.org/gitweb/?p=${project}/${module}.git;a=commitdiff;h=${commit}'
+ #short-url-service: 'Metamark'
+ short-url-service: 'Debli'
+ ignore-branch: 'trunk'
+ use-irc-notices: 0
+ use-color: 1
+ servers:
+  - uri: 'http://kgb.server.org:9418/'
+  - uri: 'http://another.kgb.server.org:9418/'
+    timeout: 3
+    password: 'notknowneither'
+
+=head1 SEE ALSO
+
+L<kgb-client(1)>, L<App::KGB::Client>, L<WWW::Shorten>, L<WWW::Shorten::Debli>,
+L<kgb-bot(1)>
+
+=head1 AUTHOR
+
+=over
+
+=item Damyan Ivanov L<dmn@debian.org>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2012, 2013 Damyan Ivanov
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 51
+Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=cut

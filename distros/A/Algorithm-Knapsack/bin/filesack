@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+#
+# $Id: filesack,v 1.7 2004/10/23 18:51:49 alex Exp $
+
+use Algorithm::Knapsack;
+
+use strict;
+
+my $capacity = shift;
+$capacity =   665_600 if $capacity eq '-c';
+$capacity = 4_589_843 if $capacity eq '-d';
+die "Usage: filesack { size | -c | -d } file ...\n" unless $capacity;
+
+my @files = @ARGV;
+
+die "$capacity\n" unless @files;
+
+#TODO: rewrite du -sk in perl
+my @weights = map { int(`du -sk "$_"`) or die "$_, ($!)" } @files;
+
+my $knapsack = Algorithm::Knapsack->new(
+    capacity => $capacity,
+    weights  => \@weights,
+);
+$knapsack->compute();
+foreach my $solution ($knapsack->solutions()) {
+    print join("\n\t", $capacity - $knapsack->{emptiness},
+                       map { $files[$_] } @{$solution}),
+          "\n";
+}
+
+__END__
+
+=head1 NAME
+
+B<filesack> - pack a medium with files to the maximum
+
+=head1 SYNOPSIS
+
+B<filesack> { size | B<-c> | B<-d> } F<file> ...
+
+=head1 DESCRIPTION
+
+The B<filesack> program finds one or more subsets of files or directories
+with the maximum total size not exceeding a given size. Its output looks
+as follows:
+
+    size
+        file
+        file
+        file
+    size
+        file
+        file
+    ...
+
+The total size of files under each size adds up to the size printed
+immediately before the file names, and all sizes are the same and as large
+as possible, yet no larger than the maximum total size.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<size>
+
+Maximum total size (in kilobytes).
+
+=item B<-c>
+
+Use the size of a CD, which is 665600 Kb (which equals 650 Mb).
+
+=item B<-d>
+
+Use the size of a DVD, which is 4589843 Kb. This value is the closest to
+4,700,000,000 bytes, which is close to the actual capacity of a 4.7 GB
+DVD media.
+
+=back
+
+=head1 EXAMPLES
+
+Suppose you have a collection of MP3 albums, and you want to burn them to a
+CD, and you want to fill up the CD as much as possible. 
+
+    filesack -c Albums/*
+
+But if you have a 700 Mb CD-R:
+
+    filesack 716800 Albums/*
+
+=head1 REQUIRES
+
+The du(1) utility.
+
+=head1 AUTHOR
+
+Alexander Anderson E<lt>a.anderson@utoronto.caE<gt>
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2004 Alexander Anderson. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+=cut

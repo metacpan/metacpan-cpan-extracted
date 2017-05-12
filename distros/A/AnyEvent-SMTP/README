@@ -1,0 +1,40 @@
+NAME
+    AnyEvent::SMTP - SMTP client and server
+
+SYNOPSIS
+        use AnyEvent::SMTP 'sendmail';
+
+        sendmail
+        from => 'mons@cpan.org',
+        to   => 'mons@cpan.org', # SMTP host will be detected from addres by MX record
+        data => 'Test message '.time().' '.$$,
+        cb   => sub {
+            if (my $ok = shift) {
+            warn "Successfully sent";
+            }
+            if (my $err = shift) {
+            warn "Failed to send: $err";
+            }
+        }
+        ;
+
+        use AnyEvent::SMTP 'smtp_server';
+
+        smtp_server undef, 2525, sub {
+        my $mail = shift;
+        warn "Received mail from $mail->{from} to $mail->{to}\n$mail->{data}\n";
+        };
+
+EXPORT
+    By default doesn't export anything. When requested, uses Client or
+    Server exports.
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2009-2011 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

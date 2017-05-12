@@ -1,0 +1,280 @@
+#!/usr/bin/perl -T
+
+use 5.008008;
+use utf8;
+use warnings FATAL => 'all';
+use threads;
+use threads::shared;
+use Thread::Queue;
+use Getopt::Long;
+use Scalar::Util qw(looks_like_number);
+use Time::HiRes qw(sleep);
+
+BEGIN {
+    $ENV{PATH} = '/bin:/usr/bin';
+}
+
+$|++;
+
+our $VERSION = 0.1;
+
+my %option;
+Getopt::Long::Configure('bundling');
+GetOptions(
+    'f|filename=s' => \$option{filename},
+    'i|interval=s' => \$option{interval},
+    'h|help'       => sub { show_help(); exit 3; },
+    'v|version'    => sub { show_version(); exit 0; },
+) or do { show_help(); exit 3; };
+
+if ( defined $option{interval} ) {
+    check_interval( $option{interval} ) or exit 3;
+}
+
+my @hosts = parse_hosts( $option{filename} );
+
+exit 3 unless @hosts;
+
+my @workers;
+foreach my $host (@hosts) {
+    my $status_queue = Thread::Queue->new;
+    my $count_queue  = Thread::Queue->new;
+    my $rtt_queue    = Thread::Queue->new;
+    my $worker       = threads->create(
+        'ping_host',
+        $status_queue,
+        $count_queue,
+        $rtt_queue,
+        $host,
+        $option{interval}
+    );
+    push(
+        @workers, {
+            thread       => $worker,
+            status_queue => $status_queue,
+            count_queue  => $count_queue,
+            rtt_queue    => $rtt_queue,
+            host         => $host,
+        }
+    );
+}
+threads->create( 'show_report', \@workers, $option{interval} )->join;
+
+exit 0;
+
+sub show_help {
+    print <<HELP;
+Usage: mhping [options] [systems...]
+  -f,--filename file    read list of targets from a file
+  -i,--interval n       interval between sending ping packets (default: 1s)
+  -v,--version          show version
+HELP
+
+    return;
+}
+
+sub show_version {
+    print <<VERSION;
+mhping : Version $VERSION
+VERSION
+
+    return;
+}
+
+sub check_interval {
+    my $interval = shift;
+    if ( looks_like_number($interval) ) {
+        return 1;
+    }
+    else {
+        print "mhping: Bad timing interval!\n";
+        return;
+    }
+}
+
+sub parse_hosts {
+    my $hosts_file = shift;
+
+    return @ARGV if scalar @ARGV;
+
+    my $hosts_fh;
+    if ( not defined $hosts_file ) {
+        if ( -t STDIN ) {
+            print "mhping: Write one host per line. ";
+            print "End with CTRL-d or an empty line.\n";
+        }
+        $hosts_fh = 'STDIN';
+    }
+    elsif ( $hosts_file eq '-' ) {
+        $hosts_fh = 'STDIN';
+    }
+    else {
+        open( $hosts_fh, '<', $hosts_file )
+          or die "mhping: Can't open file hosts file '$hosts_file'!\n";
+    }
+    my @hosts;
+    while (<$hosts_fh>) {
+        chomp;
+        if (/^\s*$/) {
+            last;
+        }
+        elsif (/^[a-z0-9\.]+$/i) {
+            push( @hosts, $_ );
+        }
+        else {
+            print "mhping: Bad host format $_\n";
+            return;
+        }
+    }
+
+    return @hosts;
+}
+
+sub show_report {
+    my $workers = shift;
+    my $interval = shift || 1;
+
+    my $tty_clear = qx( clear );
+
+    my %stat;
+    my $display_count = 0;
+    while (1) {
+        my @report_lines;
+        my $worker_count;
+        foreach my $worker ( @{$workers} ) {
+            my $host = $worker->{host};
+            my $status
+              = $worker->{status_queue}->pending
+              ? $worker->{status_queue}->dequeue
+              : 'BLOCK';
+            my $count
+              = $worker->{count_queue}->pending
+              ? $worker->{count_queue}->dequeue
+              : undef;
+            my $rtt
+              = $worker->{rtt_queue}->pending
+              ? $worker->{rtt_queue}->dequeue
+              : '';
+
+            $worker_count++;
+
+            if ( $worker->{thread}->is_running ) {
+                my $tid = $worker->{thread}->tid;
+                $stat{$tid}->{count} = $count if defined $count;
+
+                if ( looks_like_number($rtt) ) {
+                    $stat{$tid}->{last} = $rtt;
+
+                    if ( not defined $stat{$tid}->{min} ) {
+                        $stat{$tid}->{min} = $rtt;
+                    }
+                    else {
+                        $stat{$tid}->{min} = $rtt
+                          if $rtt <= $stat{$tid}->{min};
+                    }
+
+                    if ( not defined $stat{$tid}->{max} ) {
+                        $stat{$tid}->{max} = $rtt;
+                    }
+                    else {
+                        $stat{$tid}->{max} = $rtt
+                          if $rtt >= $stat{$tid}->{max};
+                    }
+                }
+
+                if ( $status eq 'BLOCK' and $display_count >= 2 ) {
+                    $rtt
+                      = $stat{$tid}->{last}
+                      ? $stat{$tid}->{last}
+                      : '-';
+                }
+
+                my $line_format
+                  = '%2d. %-30s %10d'
+                  . ( looks_like_number($rtt) ? ' %6.1f' : ' %6s' )
+                  . " %6.1f %6.1f\n";
+
+                push(
+                    @report_lines,
+                    sprintf(
+                        $line_format,
+                        $worker_count,
+                        $host,
+                        $stat{$tid}->{count} || 0,
+                        $rtt,
+                        $stat{$tid}->{min} || 0,
+                        $stat{$tid}->{max} || 0,
+                    )
+                );
+            }
+            elsif ( $status eq 'BAD_HOST' ) {
+                terminate_all_threads();
+                print "mhping: Unknown host $host\n";
+                exit 3;
+            }
+        }
+
+        $display_count++;
+
+        print $tty_clear;
+        printf " %4s %39s %6s %6s %6s\n", 'Host', 'Snt', 'Last', 'Min', 'Max';
+        print '-' x 66, "\n";
+        print foreach @report_lines;
+
+        sleep $interval;
+    }
+
+    return;
+}
+
+sub ping_host {
+    my $status_queue = shift;
+    my $count_queue  = shift;
+    my $rtt_queue    = shift;
+    my $host         = shift;
+    my $interval     = shift || 1;
+
+    local $SIG{TERM} = sub { threads->exit };
+
+    $host     = ( $host     =~ /^([a-z0-9\.]+)$/i ) ? $1 : return;
+    $interval = ( $interval =~ /^([0-9\.]+)$/ )     ? $1 : return;
+
+    open( my $ping, '-|', "ping -i $interval $host 2>&1" );
+    while (<$ping>) {
+        my $status;
+        my $count = 0;
+        my $rtt;
+        if (m/icmp_(?:req|seq)=(\d+).+time=(.+)\sms$/) {
+            $status = 'ECHO_REPLY';
+            $count  = $1;
+            $rtt    = $2;
+        }
+        elsif (m/unknown\shost/) {
+            $status = 'BAD_HOST';
+        }
+        else {
+            $status = 'UNKNOWN';
+            $rtt    = '???';
+        }
+        $status_queue->enqueue($status);
+        $count_queue->enqueue($count);
+        $rtt_queue->enqueue($rtt);
+    }
+
+    return;
+}
+
+sub terminate_all_threads {
+    foreach my $thread ( threads->list ) {
+        if ( $thread->is_running ) {
+            $thread->kill('SIGTERM')->detach;
+        }
+        else {
+            $thread->join;
+        }
+    }
+
+    return;
+}
+
+# vim: set ts=4 sw=4 et:

@@ -1,0 +1,18 @@
+Changelog for App-cpantested
+
+0.003 2014-06-28T17:07:40
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - Using Task::DualLived for test reference (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Sergey Romanov)
+
+0.002 2013-01-25T13:28:02
+ - less weird check (Stanislaw Pusep)
+ - less harsh test (Stanislaw Pusep)
+
+0.001 2013-01-22T18:46:36
+ - no Test::Script::Run dependency (Stanislaw Pusep)
+ - tests & refactor (Stanislaw Pusep)
+ - better description (Stanislaw Pusep)
+ - documentation (Stanislaw Pusep)
+ - INIT (Stanislaw Pusep)
+

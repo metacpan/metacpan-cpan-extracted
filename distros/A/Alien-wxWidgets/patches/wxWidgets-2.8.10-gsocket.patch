@@ -1,0 +1,14 @@
+diff -r -u src/gtk/gsockgtk.cpp src/gtk/gsockgtk.cpp
+--- src/gtk/gsockgtk.cpp	2009-10-12 12:31:05.852113325 +0200
++++ src/gtk/gsockgtk.cpp	2009-10-12 12:31:30.832115248 +0200
+@@ -15,8 +15,10 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ 
++#define GSocket GlibGSocket
+ #include <gdk/gdk.h>
+ #include <glib.h>
++#undef GSocket
+ 
+ #include "wx/gsocket.h"
+ #include "wx/unix/gsockunx.h"

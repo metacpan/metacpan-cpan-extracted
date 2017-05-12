@@ -1,0 +1,237 @@
+=encoding utf8
+
+=head1 NAME
+
+Apache::Solr::Result - Apache Solr (Lucene) result container
+
+=head1 SYNOPSIS
+
+  # All operations return a ::Result object
+  my $result = $solr->select(...);
+
+  $result or die $result->solrError; # error reported by Solr
+  $result or die $result->errors;    # any error caught by this object
+
+  # Lots of trace information included
+  $result->showTimings;
+
+  # ::Document containing the requested fields from a select() search
+  my $doc1   = $result->selected(0);
+
+  # ::Document containing the highlight info from a selected document
+  my $hl1    = $result->highlighted($doc1);
+
+  # Some operations have helper methods
+  my $result = $solr->queryTerm(...);
+  print Dumper $result->terms;
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Apache::Solr::Result-E<gt>B<new>(%options)
+
+ -Option  --Default
+  core      undef
+  endpoint  <required>
+  params    <required>
+  request   undef
+  response  undef
+
+=over 2
+
+=item core => L<Apache::Solr|Apache::Solr> object
+
+=item endpoint => URI
+
+=item params => ARRAY
+
+=item request => HTTP::Request object
+
+=item response => HTTP::Response object
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<core>()
+
+[0.95] May return the L<Apache::Solr|Apache::Solr> object which created this result.
+
+=item $obj-E<gt>B<decoded>( [HASH] )
+
+=item $obj-E<gt>B<elapse>()
+
+Number of seconds used to receive a decoded answer.
+
+=item $obj-E<gt>B<endpoint>()
+
+The URI where the request is sent to.
+
+=item $obj-E<gt>B<errors>()
+
+All errors collected by this object into one string.
+
+=item $obj-E<gt>B<httpError>()
+
+=item $obj-E<gt>B<params>()
+
+List of (expanded) parameters used to call the solr server.
+
+=item $obj-E<gt>B<request>( [$request] )
+
+=item $obj-E<gt>B<response>( [$response] )
+
+=item $obj-E<gt>B<serverError>()
+
+=item $obj-E<gt>B<solrError>()
+
+=item $obj-E<gt>B<solrQTime>()
+
+Elapse (as reported by the server) to handle the request.  In seconds!
+
+=item $obj-E<gt>B<solrStatus>()
+
+=item $obj-E<gt>B<start>()
+
+The timestamp of the moment the call has started, including the creation of
+the message to be sent.
+
+=item $obj-E<gt>B<success>()
+
+Returns true if the command has successfully completed.  
+
+example: 
+
+   my $result = $sorl->commit;
+   $result->success or die;
+   $result or die;          # same, via overloading
+   $solr->commit or die;    # same, also overloading
+
+=back
+
+=head2 Response information
+
+=head3 in response to a select()
+
+=over 4
+
+=item $obj-E<gt>B<highlighted>($document)
+
+Return information which relates to the selected $document.
+
+=item $obj-E<gt>B<nextSelected>()
+
+[0.95] Produces the next document, or C<undef> when all have been produced.
+
+example: 
+
+  my $result = $solr->select(q => ...);
+  while(my $doc = $result->nextSelected)
+  {   my $hl = $result->highlighted($doc);
+  }
+
+=item $obj-E<gt>B<nrSelected>()
+
+Returns the number of selected documents, as result of a
+L<Apache::Solr::select()|Apache::Solr/"Search"> call.  Probably many of those documents are
+not loaded (yet).
+
+example: 
+
+  print $result->nrSelected, " results\n";
+
+  for(my $docnr = 0; $docnr < $result->nrSelected; $docnr++)
+  {   my $doc = $result->selected($docnr);
+      ...
+  }
+  # easier:
+  while(my $doc = $result->nextSelected) ...
+
+=item $obj-E<gt>B<selected>($rank)
+
+Returns information about the query by L<Apache::Solr::select()|Apache::Solr/"Search"> on
+position $rank (count starts at 0)  Returned is a L<Apache::Solr::Document|Apache::Solr::Document>
+object.
+
+The first request will take a certain number of "rows".  This routine
+will automatically collect more of the selected answers, when you address
+results outside the first "page" of "rows".  The results of these other
+requests are cached as well.
+
+example: 
+
+   my $r = $solr->select(rows => 10, ...);
+   $r or die $r->errors;
+
+   if(my $last = $r->selected(9)) {...}
+   my $elf = $r->selected(11);         # auto-request more
+
+=back
+
+=head3 in response to a queryTerms()
+
+=over 4
+
+=item $obj-E<gt>B<terms>( $field, [$terms] )
+
+Returns the results of a 'terms' query (see L<Apache::Solr::queryTerms()|Apache::Solr/"Search">),
+which is a HASH.  When $terms are specified, a new table is set.
+
+In Solr XML (at least upto v4.0) the results are presented as lst, not arr
+So: their sort order is lost.
+
+=back
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<replaceParams>(HASH, $oldparams)
+
+=item $obj-E<gt>B<selectedPage>($pagenr)
+
+=item $obj-E<gt>B<selectedPageLoad>($rank, $client)
+
+=item $obj-E<gt>B<selectedPageNr>($rank)
+
+=item $obj-E<gt>B<selectedPageSize>()
+
+=item $obj-E<gt>B<selectedPages>()
+
+=item $obj-E<gt>B<showTimings>( [$fh] )
+
+Print timing informat to the $fh, by default the selected
+file-handle (probably STDOUT).
+
+=back
+
+=head1 OVERLOADING
+
+=over 4
+
+=item overload: B<stringification >
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Apache-Solr distribution version 1.04,
+built on May 23, 2016. Website: F<http://perl.overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2012-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

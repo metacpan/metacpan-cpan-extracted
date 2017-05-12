@@ -1,0 +1,6 @@
+name = "App-CPANfile2OPML"
+# badges = ["travis"]
+authority="cpan:HITODE"
+
+module_maker="ModuleBuildTiny"
+

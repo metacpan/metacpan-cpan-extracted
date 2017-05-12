@@ -1,0 +1,20 @@
+---
+abstract: 'App::Rad plugin for providing extra help info.'
+author:
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Rad-Plugin-MoreHelp
+requires:
+  App::Rad: 0
+resources:
+  bugtracker: http://github.com/ironcamel/App-Rad-Plugin-MoreHelp/issues
+  repository: git://github.com/ironcamel/App-Rad-Plugin-MoreHelp.git
+version: 0.0001

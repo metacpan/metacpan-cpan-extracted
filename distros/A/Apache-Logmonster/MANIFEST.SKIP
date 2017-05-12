@@ -1,0 +1,7 @@
+.svn
+.git
+.tar.gz
+.DS_Store
+blib
+trash
+MANIFEST.bak

@@ -1,0 +1,118 @@
+Apache::OWA Module README
+=========================
+
+This module makes it possible to run scripts written using Oracle's PL/SQL 
+Web Toolkit under Apache. This code is copyright Svante Sörmark, 
+svinto@ita.chalmers.se, and distributable under the same terms as Apache.
+Available from http://www.ita.chalmers.se/~svinto/
+
+REQUIREMENTS: 
+============
+
+Apache
+mod_perl
+DBI 
+DBD::Oracle
+Apache::Request (it's called libapreq on CPAN)
+Oracle PL/SQL Web Toolkit, any version should work. Tested with 1.1, 3.0 and 
+4,0. Check owa.initialize to find the version-number.
+Apache::DBI is optional, but highly recommended.
+
+This module has only been tested (by me) on Solaris 2.6, Oracle 8.0.5, 8.1.5, 8.1.6.
+
+INSTALLATION
+============
+
+Unpack the file, run "perl Makefile.PL", "make" and then "make install".
+"make test" does nothing useful at the moment.
+
+Next you need to edit your httpd.conf. Here is a sample configuration where
+the database user and password is provided. Use this for applications that use
+their own authentication-mechanisms, or that don't need any authenticaton. 
+
+<Location /dir/> can be anything you want. Example:
+
+<Location /scott/ >
+	SetHandler perl-script
+	PerlHandler Apache::OWA
+	PerlSetVar DAD oracle1:scott:tiger
+</Location>
+
+This means that calling "http://server/scott/print_cgi_env" executes the 
+pl/sql procedure "scott.print_cgi_env". If you write:
+
+<Location /scott/ >
+	SetHandler perl-script
+	PerlHandler Apache::OWA
+	PerlSetVar DAD oracle1:scott:tiger
+	PerlSetVar SCHEMA oas_public
+</Location>
+
+the same url would now execute "oas_public.cgi_print_env".
+
+
+Next, a configuration where all users have to log in using their Oracle 
+user-id and password, and applications are executed under their user-id in the 
+database, but the schema works the same as adbove. This means that they need 
+execute permissions on the application, proper synonyms set up and "create 
+session" priveliges.
+
+<Location /ows_db_auth/ >
+        AuthName ows_db_auth
+        AuthType Basic
+        PerlAuthenHandler Apache::OWA
+        Require valid-user
+        PerlSetVar DB oracle1            # defaults to $ORACLE_SID
+	PerlSetVar SCHEMA oas_public
+	PerlSetVar DB_AUTH true
+</Location>
+
+The final method is authentication using a custom database function that takes
+the username and password as arguments and then returns zero for success and 
+non-zero for failure. The format of the DB_PROC_AUTH variable is: 
+<schema>.<function>. Remember that the user in the DAD-string needs permission
+to execute this function.
+
+<Location /ows_db_proc_auth/*>
+        AuthName db_proc_auth
+        AuthType Basic
+        PerlAuthenHandler Apache::OWA
+        Require valid-user
+
+        PerlSetVar DAD oracle:user:password
+	PerlSetVar DB_PROC_AUTH user.authen
+</Location>
+
+To get verbose errors sent to the brovser, use "PerlSetVar DEBUG 1" in your
+<Location ...>. To debug Apache::OWA itself set DEBUS to 2.
+
+BUGS
+====
+
+Probably lots. Here's the ones I know about.
+- Headers get screwed up sometimes. I don't know if this is my fault, Oracle's 
+or mod_perl's fault.
+- Url -> pl/sql procedure-name translation is a bit flaky.
+
+
+TODO
+====
+Contributions are welcome!
+- owa.auth_scheme and owa.protection_realm checking not implemented.
+- No transaction support. I've never used it and don't know how it works.
+Maybe Apache::SESSION could be used for this?
+- Maybe my authentication-stuff could be merged wuth Apache::AuthDBI ?
+
+CREDITS
+=======
+Support for owa_util.point and ICX_OWA_PARMS.ARRAY added by
+Gunnar Hellekson, <g.hellekson@trilux.com> and 
+Erich Morisse <e.morisse@trilux.com>
+of Trilux Internet Group, Ltd.
+Good work!
+
+Many thanks to Marcelo F. Ochoa and Martin Kuzela for writing OWSKiller 
+(http://www.adela.sk/kuzela/OWSKiller/), which gave me the inspiration to 
+write this. If you need support for any of the things not implemented in this 
+module, have a look at OWSKiller. It is much more complete.
+

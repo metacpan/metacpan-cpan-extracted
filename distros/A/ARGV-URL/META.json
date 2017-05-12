@@ -1,0 +1,40 @@
+{
+   "abstract" : "Wrap URLs from @ARGV for fetching and content consumption with <>",
+   "author" : [
+      "Olivier Mengu\u00c3\u00a9 <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ARGV-URL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP" : "5",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dolmen/p5-ARGV-URL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dolmen/p5-ARGV-URL.git",
+         "web" : "https://github.com/dolmen/p5-ARGV-URL"
+      }
+   },
+   "version" : "0.93"
+}
+

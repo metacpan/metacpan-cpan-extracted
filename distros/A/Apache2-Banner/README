@@ -1,0 +1,60 @@
+NAME
+    Apache2::Banner - a patch for Apache2::ServerUtil
+
+SYNOPSIS
+     use Apache2::Banner ();
+
+     $banner=Apache2::Banner::banner;
+     $description=Apache2::Banner::description;
+     $datestr=Apache2::Banner::date $time;
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DESCRIPTION
+    "Apache2::Banner" reimplements a few functions that Apache2::ServerUtil
+    didn't get right at least up to mod_perl 2.0.5.
+
+    Future mod_perl versions may fix the problem.
+
+  $banner=Apache2::Banner::banner
+    "Apache2::ServerUtil::get_server_banner" should do the trick. But it
+    calls the Apache API function only once when Apache2::ServerUtil is
+    loaded. That is not correct because the module may be loaded very early,
+    for example in a "<Perl>" container in the httpd.conf. Modules may
+    register components later. Hence, the Apache2::ServerUtil notion of the
+    banner is wrong.
+
+    The *server banner* is influenced by the "ServerTokens" directive.
+
+  $banner=Apache2::Banner::description
+    The same here, "Apache2::ServerUtil::get_server_banner" should do it but
+    doesn't.
+
+    The *server banner* is not influenced by the "ServerTokens" directive.
+
+    With "ServerTokens Full" banner and description are equal.
+
+  $datestr=Apache2::Banner::date $time
+    returns $datestr exactly the same way as the HTTP "Date" header would be
+    formatted.
+
+  EXPORT
+    None.
+
+SEE ALSO
+    Apache2::ServerUtil
+
+AUTHOR
+    Torsten Förtsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Torsten Förtsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

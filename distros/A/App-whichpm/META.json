@@ -1,0 +1,60 @@
+{
+   "abstract" : "locate a Perl module and it's version",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4202",
+   "keywords" : [
+      "app",
+      "which",
+      "perl",
+      "module"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-whichpm",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::whichpm" : {
+         "file" : "lib/App/whichpm.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/App-whichpm/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jozef/App-whichpm/"
+      }
+   },
+   "version" : "0.05"
+}

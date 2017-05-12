@@ -1,0 +1,9 @@
+Build.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+lib/Acme/VerySign.pm
+t/01basic.t
+t/02plugin.t
+t/03example.t
+Makefile.PL
+META.yml

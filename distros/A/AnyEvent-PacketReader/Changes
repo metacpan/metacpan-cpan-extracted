@@ -1,0 +1,6 @@
+Revision history for Perl extension AnyEvent::PacketReader.
+
+0.01  Wed Sep 11 11:55:03 2013
+	- original version; created by h2xs 1.23 with options
+		-AXn AnyEvent::PacketReader
+

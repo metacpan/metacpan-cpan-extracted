@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Acme::PM::Paris::Meetings;
+
+if (@ARGV) {
+    if ($ARGV[0] =~ /^(?:-V|--version)$/) {
+        print "Acme::PM::Paris::Meetings $Acme::PM::Paris::Meetings::VERSION\n";
+    } elsif ($ARGV[0] =~ /^-([1-9]\d*)$/) {
+        print map { "$_\n" } next_meeting($1);
+    } else {
+        print "syntaxe: paris-pm [-V|--version] [-<nombre>]\n";
+        exit 2;
+    }
+} else {
+    print next_meeting, "\n";
+}
+
+__END__
+=head1 NAME
+
+paris-pm - Get Paris.pm meetings dates
+
+=head1 SYNOPSIS
+
+paris-pm [-V|--version] [-<nnn>]
+
+=head1 EXAMPLES
+
+Get the next meeting date, in the french locale:
+
+    paris-pm
+
+Get the dates of the next 3 planned meetings:
+
+    paris-pm -3
+
+Check Acme::PM::Paris::Meetings version:
+
+    paris-pm -V
+
+=head1 AUTHOR
+
+Olivier MenguE<eacute> C<<dolmen@cpan.org>>, Paris.pm.
+
+=cut

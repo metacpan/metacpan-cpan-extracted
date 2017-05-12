@@ -1,0 +1,43 @@
+Revision history for Algorithm-Cron
+
+0.10    2015/05/29 18:45:54
+        [BUGFIXES]
+         * Fix t/90rt84352.t that fails in some timezones (RT103111)
+
+0.09    2014/05/14 17:27:49
+        [CHANGES]
+         * Sanity-check time fields in the constructor and reject attempts to
+           specify a list of no values for any field
+
+        [BUGFIXES]
+         * Space-trim crontab string before parsing, so leading space doesn't
+           upset the seconds field (RT95454)
+
+0.08    2013/11/06 18:07:40
+        [BUGFIXES]
+         * Declare dependency on perl >= 5.008 for 'use constant'
+         * Perl 5.18 ignores 'wday' field to POSIX::strftime(); need to use
+           mday adjustments for generating %WDAY hash (RT89947)
+
+0.07    BUGFIXES:
+         * Need to pass explicit -1, -1, -1 to mktime() on some platforms to
+           override tm_isdst detection (RT84352)
+
+0.06    BUGFIXES:
+         * More robust checking of 'crontab' argument to avoid undef values
+           causing an infinite loop. (thanks Tyler Riddle) (RT82115)
+
+0.05    BUGFIXES:
+         * Bugfix to mday+month rollover logic (thanks Nic Sandfield)
+
+0.04    BUGFIXES:
+         * Bugfix to mon */skip globbing (thanks Nic Sandfield)
+
+0.03    BUGFIXES:
+         * Bugfix to month rollover logic (thanks Nic Sandfield)
+
+0.02    BUGFIXES:
+         * Generate mday and wday names in C locale
+
+0.01    First version, released on an unsuspecting world.
+

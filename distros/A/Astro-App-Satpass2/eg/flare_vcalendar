@@ -1,0 +1,58 @@
+# Astro::App::Satpass2 source file. Invoke as (e.g.)
+# satpass2> source eg/flare_vcalendar
+#
+# Do iridium flare calculations, displaying the results in vCalendar
+# format. The output may be redirected to a .vcal file. Any arguments
+# passed to the source statement will in turn be passed to the flare
+# command.
+#
+# This whole thing (less the comments) could be wrapped up as a macro
+# if desired.
+
+#	CAVEAT: My ancient Palm desktop software appears not to properly
+#	handle the switch between normal and daylight-saving  time
+#	(a.k.a. summer time), in that predictions made before the switch
+#	for events after the switch get assigned the wrong time, even
+#	though the UT event time is correct in the emitted file. I have
+#	not changed the event times to local time eg/flare_vcalendar
+#	because the vcalendar standard specifies UT.
+
+localize formatter
+
+# We intend to use date(units='z') to format the event begin and end. We
+# truncate the time to the previous minute.
+
+formatter date_format %Y%m%dT%H%M00Z
+
+# We intend to use time() to format the individual event times.
+
+formatter time_format %I:%M:%S
+
+# Template to provide output in vCalendar format.
+
+formatter template flare <<'EOD'
+BEGIN:VCALENDAR
+[%- FOREACH item IN data %]
+[%- CALL item.fixed_width( 0 ) %]
+BEGIN:VEVENT
+DTSTART:[% item.date( units = 'z' ) %]
+DALARM:[% item.date( delta = -360, units = 'z' ) %]
+DALARM:[% item.date( delta = -60, units = 'z' ) %]
+SUMMARY:[% item.name( units = 'title_case', width = '' ) %]
+    [%= item.time %] Az [% item.azimuth(
+    places = 0, bearing = 2 ) %] Ele [% item.elevation(
+    places = 0 ) %] Mag [% item.magnitude %]
+    [%- IF 'day' == item.type %]
+	[%= item.appulse.angle %] deg from Sun
+    [%- ELSE =%]
+	night
+    [%- END %]
+DTEND:[% item.date( delta = 60, units = 'z' ) %]
+END:VEVENT
+[%- END %]
+END:VCALENDAR
+EOD
+
+# Do the flare calculation.
+
+flare "$@"

@@ -1,0 +1,67 @@
+Revision history for Authen-NZRealMe
+
+1.16      2016-05-01 11:51:32 Pacific/Auckland
+    - expunge the given/when keywords to avoid 'experimental' warnings
+    - revise make-certs command to not use self-signed certs in ITE
+    - add workaround for X509Certificate data with no newlines
+
+1.15      2014-06-15 14:37:14 Pacific/Auckland
+    - fix dependency for MIME::Base64 v3.11 for (en|de)code_base64url functions
+    - add missing dependency for Date::Parse
+
+1.14      2014-06-13 10:56:23 Pacific/Auckland
+    - remove one more 5.14ism from XMLSig.pm (and test on 5.10 this time)
+
+1.13      2014-06-12 21:40:23 Pacific/Auckland
+    - remove a 5.14ism from XMLSig.pm
+
+1.12      2014-06-12 10:53:59 Pacific/Auckland
+    - POD updates
+    - metadata update to designate github issues for bugtracker
+
+1.11      2014-06-12 08:56:46 Pacific/Auckland
+    - first release to CPAN with assertion service and iCMS support
+    - implement cryptographically random ID tokens
+    - add verification of IdP SSL cert on back-channel + option to skip
+
+1.10      2014-04-10 16:34:08 Pacific/Auckland
+    - don't attempt to resolve the opaque token to an FLT on error responses
+
+1.09      2014-03-05 15:42:28 Pacific/Auckland
+    - initial (pre)release with iCMS support - added by Haydn Newport
+
+1.08      2013-11-29 16:43:06 Pacific/Auckland
+    - initial (pre)release with support for assertion service (no iCMS yet)
+
+1.07      2013-08-06 09:47:11 Pacific/Auckland
+    - switch dependency from Digest::SHA1 to Digest::SHA
+
+1.06      2013-07-25 14:42:11 Pacific/Auckland
+    - update metadata builder for changed spec (digital signature removed,
+      various other parameters added and removed)
+    - add note to confirm module works with RealMe
+
+1.05      2012-04-27 12:32:49 Pacific/Auckland
+    - add skip_signature_check option to support IdP cert change
+
+1.04      2011-08-17 20:55:04 Pacific/Auckland
+    - fix broken handling of ForceAuthn parameter in AuthnRequest
+    - add tests for metadata and request classes
+
+1.03      2011-07-06 13:47:10 Pacific/Auckland
+    - support arbitrary suffix on cert subject (eg: /C=NZ)
+    - add --allow-create flag on request
+    - add 'version' command
+    - make subject_suffix optional when generating certs
+    - make single logout URL option when generating metadata
+
+1.02      2011-06-20 11:41:22 Pacific/Auckland
+    - add shortcut service_provider method to main module
+    - implement make-certs command
+    - implement make-bundle command
+    - lots of documentation improvements
+    - add Dist::Zilla configs for managing CPAN releases
+
+1.00     2011-02-14 12:00:00 Pacific/Auckland
+    - in-house 'release'
+

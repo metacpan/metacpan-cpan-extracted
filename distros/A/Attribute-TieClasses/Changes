@@ -1,0 +1,36 @@
+Revision history for Perl extension Attribute-TieClasses
+
+1.101700  2010-06-19 11:12:00 Europe/Vienna
+    - converted tabs to spaces
+
+1.100710  2010-03-12 16:07:34 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+    - requires perl 5.8
+    - Used clearer names for subroutines, also to keep pod-spell happy.
+
+0.05  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.04  Thu, 29 May 2008 12:00:26 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.03  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+     - added t/perlcriticrc
+
+0.02  Sun, 09 Sep 2007 00:17:49 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - converted to new-style distro (ShipIt, Module::Install)
+     - fixed documentation
+     - moved files to where they should be
+
+0.01  Fri, 18 May 2001 13:44:20 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

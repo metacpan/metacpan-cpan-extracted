@@ -1,0 +1,10 @@
+Revision history for Perl extension App::CLI::Plugin::DBI
+
+1.1     Mon Sep 19 10:45:49 JST 2011
+        - change dependencies module Class::Accessor::Grouped (before Class::Data::Accessor)
+1.02    Sun Jun 27 23:33:54 2010
+        - pod mini fix
+1.01    Thu May 27 01:17:17 2010
+        - mini fix
+1.0     Mon May 24 00:25:46 2010
+        - original version

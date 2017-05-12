@@ -1,0 +1,4 @@
+# variant of log that was causing a method-called-on-undefined-value exception
+#
+# 2012/12/21
+2012 12 21 17 34 13::doing something

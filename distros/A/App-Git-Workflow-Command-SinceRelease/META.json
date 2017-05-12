@@ -1,0 +1,56 @@
+{
+   "abstract" : "Finds out how many commits a branch is since latest release",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Git-Workflow-Command-SinceRelease",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Git::Workflow::Command" : "0.8",
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Git::Workflow" : "0.8",
+            "App::Git::Workflow::Command" : "0.8",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::Git::Workflow::Command::SinceRelease" : {
+         "file" : "lib/App/Git/Workflow/Command/SinceRelease.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Git-Workflow-Command-SinceRelease"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/App-Git-Workflow-Command-SinceRelease.git"
+      }
+   },
+   "version" : "0.3"
+}

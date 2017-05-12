@@ -1,0 +1,32 @@
+#!/bin/sh
+
+if [ $# -le 0 ]; then
+    echo "No version specified!" 1>&2
+    exit 1
+elif [ $# -le 1 ]; then
+    echo "No branch specified!" 1>&2
+    exit 1
+elif [ $# -le 2 ]; then
+    echo "No file specified!" 1>&2
+    exit 1
+fi
+VERSION=$1
+BRANCH=$2
+FILE=$3
+set -e
+function death {
+    echo "Error updating $BRANCH branch!" 1>&2
+    exit 1;
+}
+trap death ERR
+FILE_HASH=$(git hash-object -t blob -w $FILE)
+TREE_HASH=$(echo "100755 blob $FILE_HASH	$FILE" | git mktree)
+if PARENT_HASH=$(git rev-parse --verify refs/heads/$BRANCH 2> /dev/null); then
+    PARENTS="-p $PARENT_HASH"
+else
+    PARENT_HASH="0000000000000000000000000000000000000000"
+fi
+COMMIT_HASH=$(git commit-tree $PARENTS -m "version $VERSION" $TREE_HASH)
+git update-ref refs/heads/$BRANCH $COMMIT_HASH $PARENT_HASH
+echo "Successfully updated $BRANCH branch."
+

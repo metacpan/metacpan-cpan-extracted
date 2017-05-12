@@ -1,0 +1,195 @@
+#!perl
+
+our $DATE = '2017-04-03'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %Opts = (
+    ignore_case => 0,
+    #ignore_cyclic => 0,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'ignore-case|i'    => \$Opts{ignore_case},
+        'help|h'           => sub {
+            print <<USAGE;
+Usage:
+  toposort [OPTIONS]... [INPUT ...]
+  toposort --help
+Options:
+  --ignore-case, -i
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my %item_seen;
+    my %canon_form;
+    my @unsorted;
+    my %deps;
+
+    while (<>) {
+        chomp;
+        if (/\A(.+?)\s*:\s*(.*?)\s*\z/) {
+            if ($Opts{ignore_case}) {
+                my $lc1 = lc $1;
+                $canon_form{$lc1} //= $1;
+                $deps{$lc1} //= [];
+                push @unsorted, $lc1 unless $item_seen{$lc1}++;
+                if (length $2) {
+                    my $lc2 = lc $2;
+                    $canon_form{$lc2} //= $2;
+                    push @{ $deps{$lc1} }, $lc2;
+                    push @unsorted, $lc2 unless $item_seen{$lc2}++;
+                }
+            } else {
+                $deps{$1} //= [];
+                push @unsorted, $1 unless $item_seen{$1}++;
+                if (length $2) {
+                    push @{ $deps{$1} }, $2;
+                    push @unsorted, $2 unless $item_seen{$2}++;
+                }
+            }
+        } else {
+            if ($Opts{ignore_case}) {
+                my $lc = lc;
+                $canon_form{$lc} //= $_;
+                $deps{$lc} //= [];
+                push @unsorted, $lc unless $item_seen{$lc}++;
+            } else {
+                $deps{$_} //= [];
+                push @unsorted, $_ unless $item_seen{$_}++;
+            }
+        }
+    }
+
+    exit 0 unless @unsorted;
+
+    require Data::Graph::Util;
+    my @sorted;
+    eval {
+        @sorted = Data::Graph::Util::toposort(\%deps, \@unsorted);
+    };
+    die "toposort: Cannot sort: graph is cyclic\n" if $@;
+
+    #use DD; dd \%deps;
+    #use DD; dd \@sorted;
+    for (@sorted) {
+        if ($Opts{ignore_case}) {
+            print $canon_form{$_}, "\n";
+        } else {
+            print "$_\n";
+        }
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Sort topologically
+# PODNAME: toposort
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+toposort - Sort topologically
+
+=head1 VERSION
+
+This document describes version 0.001 of toposort (from Perl distribution App-toposort), released on 2017-04-03.
+
+=head1 SYNOPSIS
+
+ toposort [OPTION]... [INPUT]...
+
+Sample input:
+
+ c: a
+ c: b
+ b: a
+ d: c
+
+Sample output:
+
+ d
+ c
+ b
+ a
+
+=head1 DESCRIPTION
+
+This utility accepts items from input lines. If input line is in the form of:
+
+ A: B
+
+then it means A must come before B (or you may also read it as "B depends on
+A"). After all input is read, this utility will perform topological sort on the
+dependency graph and print the items in order. Cyclic graph will result in an
+error.
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item --ignore-case, -i
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-toposort>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-toposort>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-toposort>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

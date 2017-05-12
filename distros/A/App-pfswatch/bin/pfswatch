@@ -1,0 +1,53 @@
+#!perl
+
+use strict;
+use warnings;
+use App::pfswatch;
+
+App::pfswatch->new_with_options(@ARGV)->run;
+
+=head1 NAME
+
+pfswatch - a simple utility that detects changes in a filesystem and run given command
+
+=head1 SYNOPSIS
+
+pfswatch [-h] [path ...] -e COMMAND
+
+    --exec | -e COMMAND
+        Run COMMAND when detects changes in a filesystem under given path.
+
+    --pipe | -p
+        If this option enabled, path names that were changed are passed into STDIN of your command.
+
+    --quiet | -q
+        Run in quiet mode. only print COMMAND output.
+
+    --help | -h 
+        Show this message.
+
+=head1 EXAMPLE
+
+    $ pfswatch t/ lib/ -e prove -lr t/
+    $ pfswatch t/ lib/ --pipe -e xargs prove -l
+
+=head2 DEBUG
+
+If you want to know which file is changed, set C<PFSWATCH_DEBUG=1>.
+
+    $ PFSWATCH_DEBUG=1 pfswatch lib -e ls -l lib
+
+=head1 AUTHOR
+
+Yoshihiro Sasaki E<lt>ysasaki at cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+Copyright 2011 Yoshihiro Sasaki All rights reserved.
+
+=cut

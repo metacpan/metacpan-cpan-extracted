@@ -1,0 +1,7 @@
+credentials:
+  - testuser
+  - testpass
+source:
+  type: config
+  databases:
+    - ww_test

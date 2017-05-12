@@ -1,0 +1,362 @@
+Changes
+=======
+
+    0.98   April 15, 2008
+
+           Converted two-argument forms of open() to three-argument forms
+
+           Modified some tests to reflect current state of test smokers,
+           alterations to Makefile.PL
+
+           Removed obsolete Wyrds from the official dist
+
+    0.97   April 14, 2008
+
+           Minor changes to Inputs and Form interaction to allow zero non-null
+           values where they would normally be forbidden
+
+           Security enhancement where any submitted data containing a string
+           that can be interpreted as a Wyrd is dropped unless an exception is
+           explicitly made for it in the initialization data passed to
+           Apache::Wyrd::DBL by Apache::Wyrd::Handler.  This is to prevent
+           user-submitted data from being executed if it is displayed on a page
+
+           Setting the environment variables WYRD_USE_CGI and WYRD_USE_APR can
+           be used to force the use of either CGI and CGI::Cookie or
+           Apache::Request and Apache::Cookie as the underlying modules in the
+           wrapper classes Apache::Wyrd::Request and Apache::Wyrd::Cookie
+
+           Apache::Wyrd::Input & Apache::Wyrd::Input::Set more CSS and Java-
+           Script friendly
+
+           Apache::DBL now relies on DBI's connect_cached connection rather
+           than doing its own caching
+
+           Fixed a bug in Apache::Wyrd::Interfaces::Setter where interpolated
+           variables were not being sorted in some _set_xxxx functions
+
+           Fixed a bug in Apache::Wyrd::Interfaces::Setter where defined undef-
+           equivalent but defined values were being interpreted as undefined
+
+           Apache::Wyrd::Site::GDButton now accepts a template base-image gif
+           or png
+
+           Apache::Wyrd::Services::Auth now allows an authentication session
+           to go ahead directly when the connection is on a secure port, with
+           some limits on passed variables
+
+           Apache::Wyrd::Services::Auth now passes through POST requests on
+           "DECLINED".  This allows it to be used with non-wyrd applications
+
+           Documentation changes
+
+    0.96   May 1, 2007
+
+           Apache::Wyrd::Site::IndexBot uses basefile for index date tracking
+
+           Documentation audit changes
+
+    0.95   April 30, 2007
+
+           Module cleanup: removed some example & undocumented Wyrds from
+           the core distribution: CSSGene, Site:EditablePage,
+           Site::SearchResults, Site::WidgetControl.  Added missing Version
+           Wyrd.  Consolidated Lattice Wyrds into single file
+
+           Added View Wyrd for displaying contents of enclosing Wyrds
+
+           Added a FileCacheTimeout to Apache::Wyrd::Services::FileCache
+
+           Apache::Wyrd::Redirect can now use "href" conventions.  New
+           normalize_href Apache::Wyrd::Services::SAK function for this
+
+           Apache::Form & Apache::Wyrd::Input has more passthrough of valid
+           attributes for their base tags (enctype, onkeydown, etc.)
+
+           Wyrds now accept hyphen in the attribute-name as a valid
+           character, to allow for compatibility with valid HTML
+           attributes such as "accept-charset"
+
+           Apache::Wyrd::Services::Index now feature-frozen and depreciated
+           in favor of Apache::Wyrd::Services::MySQLIndex. This is due to
+           locking and DB File corruption issues which could not be resolved
+
+           Documentation changes
+
+    0.94   October 22, 2006
+
+           Indexer now requires perl 5.8 for Unicode support
+
+           New interoperatable objects for building complex sites now
+           available under Apache::Wyrd::Site::XXX
+
+           New _cleanup method to complement the _setup method
+
+           Lookup has new "nojoin" flag for formatted repeating queries
+
+           New self_url method for DBL
+
+           GIF support for Chart
+
+           New Loop Wyrd for convenient iteration through SQL query results
+
+           New View Wyrd as a data placemarker
+
+           New PreAuth Handler Object for immediate (pre-denial) logons
+           using Apache:::Wyrd::Site::Login Wyrds
+
+           New MySQLIndex object to give Index a MySQL back-end
+
+           Fixed bug where DBL was not passing its loglevel to newly created
+           Wyrds
+
+           Closed an open-database bug when the Wyrd::Apache::Services::Index
+           was using the "bigfile" option. More explicit untie-ing of databases
+
+           Index more efficient in the re-indexing of data attribute under
+           the "bigfile" option
+
+           Index no longer considers "_" punctuation
+
+           Index now supports concurrency and transactions options to
+           support Sleepycat Berkeley DB CDS and TXN modes when version 4+
+           of the library is used
+
+           Fixed a bug where Apache::Wyrd::Form objects would not properly
+           carry on a chain of forms spanning multiple pages
+
+           Index bug removed: non-reverse-indexed indexes update properly
+
+           Index lookups have optimization options, allowing more granular
+           data retreival
+
+           Form Inputs now handle enctype attributes
+
+           Form Inputs now handle the triggers attribute correctly
+
+           Checkbox and radio button opts now handle style attributes
+
+           Checkbox sets now properly handle removing all checks if there is
+           no "null" option
+
+           Input Set objects now properly handle literal '0' values
+
+           Using a different param from the input name now works properly on
+           Input wyrds
+
+           Escaped Form Inputs now also escape '<' and '>'
+
+           Setter interface now supports a _template_hash method
+
+           Limited support for internal redirects method via the
+           abort_redirect method.  Apache::Wyrd::Request attempts to recover
+           the CGI environment after explicit calls to Apache's
+           internal_redirect method
+
+           The mother interface can now act on any attribute of a Wyrd, not
+           just _data
+
+           Mother interface allows arbitrary child storage and loads the
+           Apache::Wyrd::Interfaces::Setter module itself
+
+           IP addresses can now be checked in Apache::Wyrd::Services::Auth
+           and Apache::Wyrd::Interfaces::GetUser to prevent cookie-theft
+
+           Changed conditional expression interpretation order to behave more
+           intuitively in Apache::Wyrd::Interfaces::Setter. _set now preserves
+           conditionals which may not be addressed by the current _set
+           operation, while clear_set interprets these conditionals as false. 
+           This allows better layering of _set-tings on the same argument
+
+           SAK: file_attribute() now untaints the file path it generates
+           sort_by_[i]key will reverse order on a key if the key is
+           preceeded by a minus sign
+
+           Documentation changes
+
+    0.93   March 25, 2005
+
+           New Wyrd: Apache::Wyrd::Services::Bot for defining a process
+           to be invoked and monitoring that process from a browser
+           window
+
+           Added post_process hook for Handler
+
+           Replaced MD5 with SHA1 for all internal hashing because of
+           UTF problems with Digest::MD5
+
+           Index now defaults to using concurrency instead of locking in
+           BerkeleyDB if version 4 or greater is installed
+
+           Fixed fatal error in Index when exact matching whole phrases
+           with a - or + qualifier
+
+           Improvements to Index: "reversemaps" and "dirty" options for
+           quicker updates, "bigfile" option for large pagesize
+           secondary database for storing wholetext in a separate file,
+           new tests
+
+           Fixed bug where plain options passed to an Input::Set would
+           be reversed between value and name
+
+           Fixed bug where simple attributes composed entirely of
+           non-word characters could cause parsing errors
+
+           Fixed bug where Lookup would have a fatal error on the use of
+           a joiner
+
+           Handler now checks for a set content-type header before
+           defaulting to text/html
+
+           Fixed error reporting problem where unblessed references
+           could be unintentionally treated as objects
+
+           Documentation changes, additional debugging info
+
+    0.92   January 13, 2005
+
+           SearchParser operator precidence change to AND/OR/NOT/DIFF in
+           that order
+
+           Corrected malformed searches in SearchParser
+
+           Changes to Makefile.PL: more checks, compensation for lib
+           error in Apache::Test 1.19, better reporting of software
+           versions
+
+    0.91   January 9, 2005
+
+           Fixed self_path bug where leading slashes were preserved in a
+           path
+
+           Added removal of purged entries' IDs from Index objects.  Bug
+           could allow purged entries to seem extant, but empty
+
+           Fixed Makefile's dependency-test problems
+
+    0.90   December 16, 2004
+
+           Interfaces, standard methods for core modules are now frozen
+           and should be considered stable
+
+           Re-enabled custom responses.  Custom responses via
+           Wyrd->abort() and/or DBL->set_response() will now be
+           permanent features
+
+           Wyrds can now use abort() to hand off the request to another
+           PerlRequestHandler
+
+           Added global flag 'disable' to shut off a given Wyrd and all
+           it's children
+
+           Added file_path attribute, giving the absolute pathname
+           of the file being served
+
+           Minor bug fixes for increased reliability with Index objects
+           and in SAK
+
+           Documentation changes, spelling corrections
+
+    0.87   October 31, 2004
+
+           Added post-procesing hooks to SQLForm
+
+           New sub for SAK
+
+           Fixed a problem causing incorrect sorts on some Set Wyrds
+
+           Returned handling of initial requests to Apache, and decline only
+           non-text/html types
+
+           Improved error reporting when a Wyrd mistakenly calls an
+           undefined method
+
+           Fixed occasional User object loading problems by explicitly checking
+           %INC in GetUser interface
+
+    0.86   (September 22, 2004)
+
+           Minor change in Makefile.PL to allow non-blocking of
+           automated processes
+
+    0.85   (September 22, 2004)
+
+           Wyrd Framework now works with CGI, not just libapreq/
+           Apache::Request
+
+           New Cookie object to work with either CGI or libapreq
+
+           More interactive testing w/survey
+
+           Added auto-preloading of values to SQL Forms
+
+           Turned off debugging line in Apache::Wyrd which was
+           accidentally left on
+
+           No longer interpret null documents as a SERVER_ERROR
+
+           SAK checks for Setter interface on callers to setter-required
+           subroutines
+
+    0.84   (September 3, 2004)
+
+           Default behavior now for Text Datum objects is to trim
+           whitespace
+
+           Established minimum version dependency for XML::Dumper
+
+           Put escaping of HTML entities in proper order for text-type
+           inputs in Apache::Wyrd::Input
+
+           Added hook methods to Datum Objects to allow translation of data
+           from data store to browser and vice versa
+
+           Abstracted template creation for Input Wyrds
+
+           Fixed broken "rounding" value on Number Wyrds
+
+           Wyrds with attributes of value "0" to be interpreted
+           mathmatically rather than as undef
+
+           Wyrds with attributes containing $, %, or @ longer interpret
+           these as special variables under some conditions
+
+           Documentation changes and code cleanup
+
+    0.83   (August 19, 2004)
+
+           New Wyrds: Automatic graphical charts from Query Wyrds
+           (Apache::Wyrd::Chart) English-language Numbers
+           (Apache::Wyrd::Number), File-size (Apache::Wyrd::FileSize), CGI
+           dump (Apache::Wyrd::ShowParams)
+
+           Documentation Changes
+
+           Null-byte string termination in DB file bug in
+           Apache::Wyrd::Services::Key/Auth/LoginServer fix
+
+           Better handling of self_path function in Apache::Wyrd::Handler
+           object
+
+           Apache::Wyrd::Services::FileCache object less strict for
+           non-existent files
+
+           Multiple queries in Apache::Wyrd::Lookup object (primarily to
+           overcome sub-select limitations on some DBAs)
+
+           More functions for Apache::Wyrd::Services::SAK
+
+    0.82   (March 25, 2004)
+
+           Documentation changes
+
+           Fix in Apache::Wyrd::Services::Index for failed tests in libdb4+
+           w/ perl 5.8+
+
+    0.81   (March 18, 2004)
+
+           Documentation/testing changes, March 18, 2004
+
+    0.8    (March 17, 2004)
+
+           First public beta

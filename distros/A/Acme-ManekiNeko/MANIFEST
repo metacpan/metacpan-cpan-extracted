@@ -1,0 +1,5 @@
+MANIFEST			This list of files
+Makefile.PL
+ManekiNeko.pm
+t/Acme-ManekiNeko.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Acme::SDUM::Renew;
+
+=head1 NAME
+
+sdum_renew - Command Line interface to Acme::SDUM::Renew
+
+=head1 USAGE
+
+This program is a command line shortcut to the module.
+Please run the program without arguments to see the synopsis.
+
+=cut
+
+my $username = shift or usage();
+my $password = shift or usage();
+my $email    = shift or usage();
+my $smtp     = shift;
+
+sdum_renew($username, $password, $email, $smtp) if $smtp;
+sdum_renew($username, $password, $email) unless $smtp;
+
+sub usage {
+    print <<EOF;
+sdum_renew "username" "password" "email" ["smtp"]
+
+This program renews all books on SDUM (www.sdum.uminho.pt).
+At the end a report is sent to "email". If you are  experiencing
+problems, try to pass the "smtp" option with your local relay smtp server.
+EOF
+    exit(1);
+}

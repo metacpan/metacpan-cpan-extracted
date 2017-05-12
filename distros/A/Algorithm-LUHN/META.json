@@ -1,0 +1,47 @@
+{
+   "abstract" : "Calculate the Modulus 10 Double Add Double checksum",
+   "author" : [
+      "Tim Ayers <tayers@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Algorithm-LUHN",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Algorithm-LUHN",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Algorithm-LUHN.git",
+         "web" : "https://github.com/neilb/Algorithm-LUHN"
+      }
+   },
+   "version" : "1.02"
+}
+

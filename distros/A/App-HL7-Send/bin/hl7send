@@ -1,0 +1,85 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use App::HL7::Send;
+
+# Version.
+our $VERSION = 0.01;
+
+# Run.
+App::HL7::Send->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+hl7send - Script to send hl7 message file to host.
+
+=head1 SYNOPSIS
+
+ hl7send [-h] [--version] host port hl7_file
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<host>
+
+ Host.
+
+=item * C<port>
+
+ Host port.
+
+=item * C<hl7_file>
+
+ File with HL7 messages.
+
+=back
+
+=head1 EXAMPLE
+
+ hl7send -h
+
+=head1 REPOSITORY
+
+L<https://github.com/tupinek/App-HL7-Send>
+
+=head1 AUTHOR
+
+Michal Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+ © 2016 Michal Špaček
+ BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

@@ -1,0 +1,944 @@
+=head1 NAME
+
+ASNMTAP::Asnmtap::Plugins::WebTransact is a Perl module that provides WebTransact functions used by ASNMTAP-based plugins.
+
+=head1 SYNOPSIS
+
+ use ASNMTAP::Asnmtap::Plugins::WebTransact;
+
+ my @URLS = ();
+ my $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new ( \$objectPlugins, \@URLS );
+
+ @URLS = (
+   { Method => 'GET',  Url => 'http://www.citap.be/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Perfdata Label 1' },
+ );
+
+ $objectWebTransact->check ( { } );
+ undef $objectWebTransact;
+
+=head1 DESCRIPTION
+
+This module implements a check of a Web Transaction.
+
+A Web transaction is a sequence of web pages, often fill out forms, that accomplishes an enquiry or an update.
+Common examples are database searches and registration activities.
+
+A Web transaction is specified by
+
+=over 4
+
+=item * asnmtapInherited
+
+A required reference to an ASNMTAP::Asnmtap::Plugins or ASNMTAP::Asnmtap::Plugins::Nagios subclass
+
+Through this way of working we inherited the command line setting from the proxy.
+
+When we specify at the command prompt I<--proxy=username;password@proxyserver:port|domain[,domain]>, the needed and required proxy settings are automatically set.
+
+The command line options I<--timeout>, I<--debug> and I<--debugfile> are also inherited.
+
+B<debug> writes the string form of the request (including query_string) and the response to STDERR.
+
+I<_browseragent> is inherited and specifies the name that your application should use when it presents itself on the network.
+
+I<_SSLversion> is inherited and specifies the SSL version to use.
+
+=item * a list of URLs where each URL is a page in the transaction
+
+=item * corresponding Query Strings containing the CGI names and value pairs to post the page
+
+=item * a means of determining from the content, whether a response is either OK or a failure (WARNING, CRITICAL or UNKNOWN).
+
+=over 4
+
+=item 'KeepAlive' and 'SSL session reuse'
+
+ Only SSLv3 and TLSv1 are supporting 'KeepAlive' and 'SSL session reuse'.
+
+ To make SSL session reuse possible, 'KeepAlive' need to be on 'On'.
+
+ Verify that your browseragent string on the destination servers don't have someting like a 'nokeepalive', 'downgrade-1.0' or 'force-response-1.0'.
+
+ Verify that the 'SSL Session Cache' on the destination servers are enabled.
+
+=over 4
+
+=item Apache
+
+=over 4
+
+=item httpd.conf
+
+ # KeepAlive: Whether or not to allow persistent connections (more than one request per connection).
+ KeepAlive On
+
+ # The following directives modify normal HTTP response behavior to handle known problems with browser implementations.
+ BrowserMatch "Mozilla/2" nokeepalive
+ BrowserMatch "MSIE 4\.0b2;" nokeepalive downgrade-1.0 force-response-1.0
+
+=item ssl.conf
+
+ # Here I am allowing SSLv3 and TLSv1, I am NOT allowing the old SSLv2.
+ # SSLProtocol all -SSLv2
+ SSLProtocol -all +TLSv1 +SSLv3 
+
+ # Notice: Most problems of broken clients are also related to the HTTP keep-alive facility.
+ SetEnvIf User-Agent ".*MSIE.*" \
+          nokeepalive ssl-unclean-shutdown \
+          downgrade-1.0 force-response-1.0
+
+ # Inter-Process Session Cache:
+ # Configure the SSL Session Cache: First the mechanism to use and second the expiring timeout (in seconds).
+ SSLSessionCache         dbm:/var/cache/mod_ssl/scache(512000)
+ SSLSessionCacheTimeout  300
+
+=back
+
+=back
+
+=back
+
+=back
+
+A new ASNMTAP::Asnmtap::Plugins::WebTransact object must be created with the I<new> method. Once
+this has been done, the check of the Web Transaction is done with the I<check> method.
+
+=over 4
+
+=item ASNMTAP::Asnmtap::Plugins::WebTransact->new (ref_to_array_of_hash_refs)
+
+A new ASNMTAP::Asnmtap::Plugins::WebTransact object must be created with the I<new> method.
+
+A reference to array of hash references ( \@URLS ) is required.
+
+The field urls contains a reference to a list of (hashes) records representing the Web Transaction.
+
+This is the constructor for a ASNMTAP::Asnmtap::Plugins::WebTransact->new object. C<ref_to_array_of_hash_refs> is a reference to an array of records (anon hash refs) in the format :-
+
+I<Structure of the array of hash references:>
+
+ {
+   Method         => HEAD|GET|POST,
+   Url            => 'http://...',
+   Qs_var         => [ cgi_var_name_1 => val_at_run_time, ... ],
+   Qs_fixed       => [ cgi_var_name_1 => val_1, ... ],
+   Exp            => blah,
+   Exp_Fault      => blurb,
+   Exp_Return     => { var_label_1 => EXP_VAR_LABEL_1, ... },
+   Msg            => 'Status error when not all Exp found',
+   Msg_Fault      => 'Status error when Exp_Fault found',
+   Timeout        => 30,
+   Perfdata_Label => 'Label x'
+ }
+
+Qs_fixed and Qs_var are used to generate a query string.
+
+Exp, Exp_Fault and Exp_Return are normal Perl patterns without pattern match delimiters. Most often they are strings.
+
+=over 4
+
+=item Method
+
+scalar, possible values: GET, HEAD or POST
+
+=over 4
+
+=item GET
+
+The GET method means retrieve whatever information (in the form of an entity) is identified by the Request-URI. If the Request-URI refers to a data-producing process, it is the produced data which shall be returned as the entity in the response and not the source text of the process, unless that text happens to be the output of the process. 
+
+=item HEAD
+
+The HEAD method is identical to GET except that the server MUST NOT return a message-body in the response. The metainformation contained in the HTTP headers in response to a HEAD request SHOULD be identical to the information sent in response to a GET request. This method can be used for obtaining metainformation about the entity implied by the request without transferring the entity-body itself. This method is often used for testing hypertext links for validity, accessibility, and recent modification. 
+
+=item POST
+
+The POST method is used to request that the origin server accept the entity enclosed in the request as a new subordinate of the resource identified by the Request-URI in the Request-Line.
+
+=back
+
+=item Url
+
+scalar, any valid URL: RFC 1738
+
+Request for Comments document (RFC) for Uniform Resource Locators (URL).
+
+=item Qs_var
+
+B<Qs_var> contains placeholders for values that are not known until run time.
+
+In both cases, the format of these fields is a reference to an array containing alternating CGI
+variable names and values eg \(name1, v1, name2, v2, ...) produces a query string name1=v1&name2=v2&..
+
+Qs_var allows values to be specified in three ways :-
+
+=over 4
+
+=item *
+
+a string that will be used as a key in the hash of arguments passed to the check method.
+
+=item *
+
+a positive integer (0, 1, ...)
+
+=back
+
+In the latter case, the integer will be used as an index of the array of matches found from the
+last set of patterns with memory (specified by the Exp field). So [ cgi_var_name => 0 ] leads to
+a query string cgi_var_name = <the_first_match_in_the_set_of_Exp_patterns>
+
+=over 4
+
+=item *
+
+an array ref of the form [ match_index => code_ref ]
+
+In this case, the subroutine referred to by coderef is a subroutine with one parameter and it will be called with that parameter set to the first element in the array (the index of a former match). One may choose to do this with very dynamic web systems such as the SAP R3 module for IIS in which the CGI names and values may need to be dragged out of former responses.
+
+An example may make this more comprehensible !
+
+ use constant CmrDetailPat       => [ qw( name="addr1_data-name1\[1\]"\s+value="(.*?)" ) ];
+ use constant Stars              => '*' x 8;
+ my $star_pat = quotemeta( Stars ) . '$';
+ use constant AddStars_to_Name   => [ 'addr1_data-name1[1]' => [0, sub { $_[0] . Stars }] ];
+ use constant DelStars_from_Name => [ 'addr1_data-name1[1]' => [0, sub { $_[0] =~ s#$star_pat##; $_[0] }] ];
+
+If 'CmrDetailPat' is used as an Exp field, then a subsequent GET or POST can make use of
+Qs_var values 'AddStars_to_Name' and 'DelStars_from_Name' to either append some asterisks to the value of the
+web form name addr1_data-name1[1] or remove the stars.
+
+=back
+
+In this case, the subroutine referred to by coderef is a subroutine with one parameter and it will be
+called with that parameter set to the first element in the array (the index of a former match).
+One may choose to do this with very dynamic web systems such as the SAP R3 module for IIS in which the
+CGI names and values may need to be dragged out of former responses.
+
+Is an array reference containing the name value pairs of any parameters whose value is known only at run time.
+
+The format is [ cgi_parm_name => val_at_run_time, ... ] where cgi_parm_name is the name of a fill out form parameter and val_at_run_time is a string used as a key to get the value of the cgi parameter.
+
+Qs_var = [ form_name_1 => 0, form_name_2 => 1 ..] will lead to a query_string like
+form_name_1 = $matches[0], form_name_2 = $matches[1] ... in $self->_make_req() by
+@matches = $self->matches() and using 0, 1 etc as indices of @matches.
+
+=item Qs_fixed
+
+B<Qs_fixed> contains the name value pairs that are known at compile time whereas.
+
+Is an array reference containing name value pairs.
+
+The format is [ cgi_var_name => val, ... ] where cgi_var_name is the name of a fill out form parameter and val is a string with the value of the cgi parameter
+
+=item Exp .
+
+B<Exp> is the pattern that when matched against the respose to the URL (in the same hash) indicates success.
+
+Is an scalar (value is a string) or an array
+
+$objectWebTransact->matches() will updated with the set of matches it finds by matching
+patterns with memory (ie patterns in paren) from the Exp field against the request response.
+
+=item Exp_Fault
+
+B<Exp_Fault> is the pattern that indicates the response is a failure.
+
+If these patterns contain parentheses eg 'match a lot (.*)', then the match is saved for use by
+Qs_var. Note that there should be only B<one> pattern per element of the Exp list. Nested patterns
+( C<yada(blah(.+)blurble(x|y|zz(top.*))> ) will not work as expected.
+
+Is an scalar (value is a string), ex. blurb
+
+=item Exp_Return
+
+B<Exp_Return> is the pattern that indicates the response is a return.
+
+Is an hash, { var_label_1 => EXP_VAR_LABEL_1, ... }
+
+=item Msg .
+
+This message is added to the error field when not all Exp found.
+
+Is an scalar (value is a string), ex. 'Status error when not all Exp found'
+
+=item Msg_Fault
+
+This message is added to the error field when Exp_Fault found.
+
+Is an scalar (value is a string), ex. 'Status error when Exp_Fault found'
+
+=item Timeout
+
+This means that for this URL the specified timeout will be used.
+
+Is an scalar (value is a integer greater then 0), ex. 30
+
+=item Perfdata_Label
+
+This means that for this URL there performance data will be created and the name for the label equals the value from Perfdata_Label.
+
+Is an scalar (value is a string), ex. 'Label x'
+
+=back
+
+I<Example:>
+
+  use ASNMTAP::Asnmtap::Plugins::WebTransact;
+
+  my @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.be/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+  );
+
+  my $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new ( \$objectPlugins, \@URLS );
+
+equals to:
+
+  use ASNMTAP::Asnmtap::Plugins::WebTransact;
+
+  my @URLS = ();
+  my $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new ( \$objectPlugins, \@URLS );
+
+  @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.be/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+  );
+
+  $objectWebTransact->urls( \@URLS );
+
+=item $objectWebTransact->check( CGI_VALUES, OPTIONS )
+
+Performs a check of the Web transaction by getting the sequence or URLs specified in the constructor argument.
+
+  $objectWebTransact->check ( { } );
+
+B<CGI_VALUES> is a reference to a hash whose keys are the values used in the
+Qs_var lists. This allows the check method to get the value of these
+variables at run time (useful if you want to generate web parameters in
+your program, using a random number generator for example [vs]).
+
+This hash ref is B<required> and must be set to {} if there are B<no> variables.
+
+<OPTIONS> are passed in a hash like fashion, using key and value pairs.
+
+I<Structure of the array of hash references:>
+
+ (
+   custom           => undef,
+   perfdataLabel    => undef,
+   newAgent         => undef,
+   timeout          => undef,
+   triesTiming      => '1,3,15',
+   triesCodes       => '408,500,502,503,504',
+   openAppend       => 1,
+   cookies          => 1,
+   protocol         => 1,
+   keepAlive        => 1,
+   download_images  => 0,
+   fail_if_1        => 1
+ )
+
+B<Possible options are:>
+
+=over 4
+
+=item I<custom>
+
+Optionally, you can specify an reference to a function. 
+This function give you a extra control to ASNMTAP::Asnmtap::Plugins::WebTransact
+
+ sub customWebTransact {
+   my ($resp_string) = @_;
+
+   for ( $resp_string ) {
+     /Failure of server APACHE bridge/ &&
+       do { return ( $ERRORS{CRITICAL}, 1, 'Failure of server APACHE bridge' ); last; };
+     /Message from the NSAPI plugin:/ && /No backend server available for connection:/ &&
+       do { return ( $ERRORS{CRITICAL}, 1, "'KBOWI - Message from the NSAPI plugin - No backend server available for connection'" ); last; };
+     /\Q<FRAME NAME="NO_INFO" SRC="submain.html" SCROLLING="No" FRAMEBORDER="0" NORESIZE>\E/ &&
+       do { return ( $ERRORS{CRITICAL}, 0, '+submain+' ); last; };
+     return ( $ERRORS{OK}, 0, undef );
+   }
+ }
+
+Is an scalar, reference to a function, default: undef
+
+=item I<perfdataLabel>
+
+set the performancedata label for a group of URLs
+
+=over 4
+
+=item I<Example>
+
+  my @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.be/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+  );
+
+  $returnCode = $objectWebTransact->check ( { }, custom => \&customWebTransact, perfdataLabel => 'homepage' );
+
+equals to:
+
+  my @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.be/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+  );
+
+  $startTime = $objectPlugins->setEndTime_and_getResponsTime ( $objectPlugins->pluginValue ('endTime') );
+  $returnCode = $objectWebTransact->check ( { }, custom => \&customWebTransact );
+  $responseTime = $objectPlugins->setEndTime_and_getResponsTime ( $startTime );
+  $objectPlugins->appendPerformanceData ( 'homepage='. $responseTime .'ms;'. ($trendline*1000) .';;;' );
+
+=back
+
+=item I<newAgent>
+
+The first time we call $objectWebTransact->check ( { }, ... ), 
+
+is an scalar, value is 0, 1 or undef (default)
+
+ undef: current (browser) session will be used, but at the first 
+        all a new (browser) session will automaticallybe created
+ 0    : current (browser) session will be used
+ 1    : new (browser) session will be created
+
+This means that when you specify newAgent => 0 the first time you call $objectWebTransact->check, it will be treated as newAgent => 1, to ensure that an (browser) session is created.
+
+Every time whel for a following call $objectWebTransact->check ( { }, ... ), newAgent equals 1, then a new (browser) session is created.
+
+When newAgent equals 0, then we using the same (browser) session again.
+
+Optional, is an scalar, value is 0 or 1
+
+=item I<timeout>
+
+Every time we call $objectWebTransact->check ( { }, timeout => 30, ... ),
+
+is an scalar, value greater then 0 or undef (default)
+
+When timeout equals undef, then we using the timeout from the parent object.
+
+Optional, is an scalar, value is greater the 0
+
+=item I<triesTiming>
+
+Every time we call $objectWebTransact->check ( { }, triesTiming => '1,3,15', ... ), to get a web page and run into a possibly-temporary error (like a DNS lookup timeout), it'll wait a few seconds and retry a few times.
+
+is an string that controls how many times it should retry, and how long the pauses should be, values greater then 0 separated by a ',' or undef (default)
+
+When triesTiming equals undef or an empty-string, this means not to retry at all.
+
+If you specify a string with several numbers in it (like '1,3,15'), then that means WebTransact can retry as that many times (i.e., one initial try, plus a maximum of the three retries, because three numbers there), and that it should wait first those numbers of seconds each time.
+
+So triesTiming => '1,3,15' basically means:
+
+  try the request; return it unless it's a temporary-looking error;
+  sleep 1;
+  retry the request; return it unless it's a temporary-looking error;
+  sleep 3;
+  retry the request; return it unless it's a temporary-looking error;
+  sleep 15;
+  retry the request; return it;
+
+=item I<triesCodes>
+
+Is an string of HTTP codes that merit a retry (like 500 and 408, but unlike 404 or 200), values greater then 200 separated by a ',' or '408,500,502,503,504' (default).
+
+  408 Request Timeout: The client did not send a request within the required time period
+
+  500 Can't connect to ..., Connect failed, Proxy connect failed, Server Error, SSL negotiation failed, SSL read timeout or Internal Server Error: The server had some sort of internal error trying to fulfil the request. The client may see a partial page or error message. It's a fault in the server and happens all too frequently.
+
+  502 Bad Gateway: Bad Gateway: a server being used by this Web server has sent an invalid response. The response by an intermediary server was invalid. This may happen if there is a problem with the DNS routing tables.
+
+  503 Service Unavailable: Service temporarily unavailable because of currently/temporary overload or maintenance.
+
+  504 Gateway Timeout: The server did not respond back to the gateway within acceptable time period
+
+=item I<openAppend>
+
+Is an scalar, open debugfile as 'Writes, Appends, and Creates' mode when 1, otherwise open debugfile in 'Creates, Writes, and Truncates' mode.
+
+=item I<cookies>
+
+Is an scalar, value is 0 or 1 (default)
+
+=item I<protocol>
+
+0 = default and 1 = force 'HTTP/1.1'
+
+Is an scalar, value is 0 or 1 (default)
+
+=item I<keepAlive>
+
+0 = default and 1 = 'Keep-Alive'
+
+Is an scalar, value is 0 or 1 (default)
+
+=item I<download_images>
+
+get the images found by HTML::LinkExtor in the page, provided those images have not already been ed.
+
+Is an scalar, value is 0 (default) or 1
+
+=item I<fail_if_1>
+
+B<fail_if_1> if set (the default) causes the check to fail when the first
+web page fails. Clearing this flag is useful if you want to get a bunch of
+pages and return a failure if they B<all> fail.
+
+Is an scalar, value is 0 or 1 (default)
+
+check semantics:
+  $fail_if_1    ?  return $ERRORS{CRITICAL} if any URL fails
+  ! $fail_if_1  ?  return $ERRORS{CRITICAL} if all URLs fail
+                   (same as return $ERRORS{OK} if any URL ok)
+
+=back
+
+I<Example:>
+
+  $objectWebTransact->check ( { } );
+  undef $objectWebTransact;
+
+=item $objectWebTransact->matches()
+
+Set and/or get matches
+
+=item $objectWebTransact->get_matches()
+
+Get the matched values from the last downloaded url
+
+  foreach ( @{ $objectWebTransact->get_matches() } ) { print $_, "\n"; }
+
+=item $objectWebTransact->set_matches()
+
+Set the match values for the next url to download
+
+  $objectWebTransact->set_matches( ['a', 'b', 'c', 1, 2, 3] );
+
+=item $objectWebTransact->returns()
+
+Set and/or get the return keys and values for all urls
+
+=item $objectWebTransact->get_returns()
+
+Get the return keys and values from all downloaded urls
+
+  while ( my ($key, $value) = each %{ $objectWebTransact->get_returns() } ) {
+    if ( ref $value eq 'ARRAY') {
+      foreach ( @{ $value } ) { print "$key => $_\n"; }
+    } else {
+      print "$key => $value\n";
+    }
+  }
+
+=item $objectWebTransact->set_returns()
+
+Set the return keys and values from all next urls to download
+
+  $objectWebTransact->set_returns( { ape => 'lucky' } );
+
+=item $objectWebTransact->urls()
+
+Set and/or get the urls
+
+=item $objectWebTransact->get_urls()
+
+Get the urls
+
+  foreach ( @{ $objectWebTransact->get_urls() } ) {
+    while ( my ($key, $value) = each %{ $_ } ) { print "$key => $value\n"; }
+  };
+
+=item $objectWebTransact->set_urls()
+
+Set the urls used by the next call from $objectWebTransact->check ( { } )
+
+  my @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.be/', Qs_var => [], Qs_fixed => [], Exp => "Consulting Internet Technology Alex Peeters", Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+  );
+
+  $objectWebTransact->urls( \@URLS );
+
+  $returnCode = $objectWebTransact->check ( { } );
+
+=back
+
+=head1 EXAMPLES
+
+This example performs a primitive content check of the ADDS service, getting the page
+specified by the Url field, and if there is a response from the web server, comparing
+the response to the fields Exp and Exp_Fault and returns Exp_Return.
+
+If the response matches the Exp field the check succeeds; if the response matches the
+Exp_Fault field the check fails.
+
+  use ASNMTAP::Asnmtap::Plugins::WebTransact;
+
+  my $ar = [ { Method         => 'GET',
+               Url            => "http://Pericles.IPAustralia.Gov.AU/adds2/ADDS.ADDS_START.intro",
+               Qs_var         => [],
+               Qs_fixed       => [],
+               Exp            => 'Designs Data Searching - Introduction',
+               Exp_Fault      => 'We were unable to process your request at this time',
+               Exp_Return     => {},
+               Msg            => 'Status error when not all Exp found',
+               Msg_Fault      => 'Status error when Exp_Fault found',
+               Timeout        => 30,
+               Perfdata_Label => 'Label x' } ];
+
+  my $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new ( \$objectPlugins, $ar);
+  my $returnCode = $objectWebTransact->check ( { tmno => $tmno } );
+
+  foreach ( @{ $objectWebTransact->get_matches() } ) { print $_, "\n"; }
+
+  undef $objectWebTransact;
+
+This example checks if a complete ATMOSS transaction is successfull by getting a sequence
+of URLs, checking the content where the Qs_fixed and Qs_var fields are non null generating
+a query string for the request.
+
+For example, the POST request for 'http://external/atmoss/Falcon.Result' is accompanied by
+the query string p_tmno1 = <current_value_of_arg_hash{tmno}>
+
+  use ASNMTAP::Asnmtap::Plugins::WebTransact;
+
+  use constant Intro              => 'http://Pericles.IPAustralia.Gov.AU/atmoss/falcon.application_start';
+  use constant ConnectToSearch    => 'http://Pericles.IPAustralia.Gov.AU/atmoss/Falcon_Users_Cookies.Define_User';
+  use constant MultiSessConn      => 'http://Pericles.IPAustralia.Gov.AU/atmoss/Falcon_Users_Cookies.Run_Create';
+  use constant Search             => 'http://Pericles.IPAustralia.Gov.AU/atmoss/Falcon.Result';
+  use constant ResultAbstract     => 'http://Pericles.IPAustralia.Gov.AU/atmoss/falcon_details.show_tm_details';
+  use constant ResultDetails      => 'http://Pericles.IPAustralia.Gov.AU/atmoss/Falcon_Details.Show_TM_Details';
+  use constant DeleteSearches     => 'http://Pericles.IPAustralia.Gov.AU/atmoss/Falcon_Searches.Delete_All_Searches';
+
+  use constant Int                => 'Welcome to ATMOSS';
+  use constant ConnSrch           => 'Connect to Trade Mark Search';
+  use constant MltiSess           => 'Fill in one or more of the fields below';
+  use constant Srch               => 'Your search request retrieved\s+\d+\s+match(es)?';
+  use constant ResAbs             => 'Trade Mark\s+:\s+\d+';
+  use constant ResDet             => ResAbs;
+  use constant DelSrch            => MltiSess;
+
+  use constant MSC_f              => [p_Anon => 'REGISTERED', p_user_type => 'Connect to Existing Extract List', p_extID => 'Foo', p_password => 'Bar'];
+  use constant Srch_v             => [p_tmno1 => 'tmno'];
+  use constant RA_v               => [p_tm_number => 'tmno'];
+  use constant RA_f               => [p_detail => 'QUICK', p_rec_all => 1, p_rec_no => 1, p_search_no => 1, p_ExtDisp => 'D'];
+  use constant RD_v               => RA_v;
+  use constant RD_f               => [p_Detail => 'DETAILED', p_rec_no => 1, p_search_no => 1,  p_ExtDisp => 'D'];
+
+  use constant OraFault           => 'We were unable to process your request at this time';
+
+  use constant URLS               => [
+    {Method => 'GET',  Url => Intro,           Qs_var => [],     Qs_fixed => [], Exp => Int,        Exp_Fault => OraFault, Msg => '', Msg_Fault => ''},
+    {Method => 'GET',  Url => ConnectToSearch, Qs_var => [],     Qs_fixed => [], Exp => ConnSrch,   Exp_Fault => OraFault, Msg => '', Msg_Fault => ''},
+    {Method => 'POST', Url => MultiSessConn,   Qs_var => [],     Qs_fixed => MSC_f,Exp => MltiSess, Exp_Fault => OraFault, Msg => '', Msg_Fault => ''},
+    {Method => 'POST', Url => Search,          Qs_var => Srch_v, Qs_fixed => [], Exp => Srch,       Exp_Fault => OraFault, Msg => '', Msg_Fault => ''},
+    {Method => 'GET',  Url => ResultAbstract,  Qs_var => RA_v,   Qs_fixed => RA_f, Exp => ResAbs,   Exp_Fault => OraFault, Msg => '', Msg_Fault => ''},
+    {Method => 'POST', Url => ResultDetails,   Qs_var => RD_v,   Qs_fixed => RD_f, Exp => ResDet,   Exp_Fault => OraFault, Msg => '', Msg_Fault => ''},
+    {Method => 'POST', Url => DeleteSearches,  Qs_var => [],     Qs_fixed => [], Exp => DelSrch,    Exp_Fault => OraFault, Msg => '', Msg_Fault => ''},
+  ];
+
+  @tmarks = @ARGV ? @ARGV : (3, 100092, 200099, 300006, 400075, 500067, 600076, 700066, 800061);
+  $i = @ARGV == 1 ? 0 : int( rand($#tmarks) + 0.5 );
+  $tmno = $tmarks[$i];
+
+  $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new ( \$objectPlugins, URLS );
+  $returnCode = $objectWebTransact->check ( {tmno => $tmno} )
+
+  foreach ( @{ $objectWebTransact->get_matches() } ) { print $_, "\n"; }
+
+  undef $objectWebTransact;
+
+More examples:
+
+=over 4
+
+=item Example 1
+
+  use constant EXP_NAVIGATION_TOKEN => '<input\s+type="hidden"\s+name="NAVIGATION_TOKEN"\s+value="(-{0,1}\d+)"\s+/>';
+  use constant VAL_NAVIGATION_TOKEN => [0, sub { $_[0] }];
+
+  use constant EXP_TICKETNUMBER     => '<b>N°\s+de\s+ticket\s*:</b>\s*\n*\s*&nbsp;(\w{3}-\w{7}-\w{2}-\w)';
+  use constant VAL_TICKETNUMBER     => [1, sub { $_[0] }];
+
+  @URLS = (
+    { Method => 'GET',  Url => "...", Qs_var => [], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN, EXP_TICKETNUMBER], ... },
+    { Method => 'POST', Url => "...", Qs_var => [NAVIGATION_TOKEN => VAL_NAVIGATION_TOKEN, TICKETNUMBER => VAL_TICKETNUMBER], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN, EXP_TICKETNUMBER], ... },
+  );
+
+equals to:
+
+  use constant EXP_NAVIGATION_TOKEN => '<input\s+type="hidden"\s+name="NAVIGATION_TOKEN"\s+value="(-{0,1}\d+)"\s+/>';
+
+  use constant EXP_TICKETNUMBER     => '<b>N°\s+de\s+ticket\s*:</b>\s*\n*\s*&nbsp;(\w{3}-\w{7}-\w{2}-\w)';
+
+  # [TICKETNUMBER => 1] means get the second match (from the last set of matches) and use it as the value of TICKETNUMBER.
+
+  @URLS = (
+    { Method => 'GET',  Url => "...", Qs_var => [], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN, EXP_TICKETNUMBER], ... },
+    { Method => 'POST', Url => "...", Qs_var => [NAVIGATION_TOKEN => 0, TICKETNUMBER => 1], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN, EXP_TICKETNUMBER], ... },
+  );
+
+=item Example 2
+
+  use constant EXP_NAVIGATION_TOKEN => '<input\s+type="hidden"\s+name="NAVIGATION_TOKEN"\s+value="(-{0,1}\d+)"\s+/>';
+
+  @URLS = (
+    { Method => 'POST', Url => "...", Qs_var => [], Exp => [EXP_NAVIGATION_TOKEN], ... },
+  );
+
+  my $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new( \$objectPlugins, \@URLS );
+  my $returnCode = $objectWebTransact->check( { } );
+
+  my $matches = $objectWebTransact->matches();
+  my $valNavigationToken = @$matches[0];
+  
+  @URLS = (
+    { Method => 'POST', Url => "...", Qs_var => [NAVIGATION_TOKEN => 'valNavigationToken'], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN], ... },
+    { Method => 'POST', Url => "...", Qs_var => [NAVIGATION_TOKEN => 0], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN], ... },
+  );
+
+  $returnCode = $objectWebTransact->check( { valNavigationToken => $valNavigationToken } );
+  print "Navigation Token: $valNavigationToken\n";
+
+equals to:
+
+  use constant EXP_NAVIGATION_TOKEN => '<input\s+type="hidden"\s+name="NAVIGATION_TOKEN"\s+value="(-{0,1}\d+)"\s+/>';
+
+  @URLS = (
+    { Method => 'POST', Url => "...", Qs_var => [], Exp => [EXP_NAVIGATION_TOKEN], ... }, Exp_Return => {valNavigationToken => EXP_NAVIGATION_TOKEN},
+    { Method => 'POST', Url => "...", Qs_var => [NAVIGATION_TOKEN => 0], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN], ... },
+    { Method => 'POST', Url => "...", Qs_var => [NAVIGATION_TOKEN => 0], Qs_fixed => [], Exp => [EXP_NAVIGATION_TOKEN], ... },
+  );
+
+  my $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new( \$objectPlugins, \@URLS );
+  $returnCode = $objectWebTransact->check( { } );
+
+  my %returns =  %{ $objectWebTransact->returns() };
+  print 'Navigation Token: '. $returns{valNavigationToken} ."\n";
+
+=item Example 3
+
+  my $startTime;
+
+  if ( defined $perfData and $perfData ) {
+    ${$objectWebTransact->{asnmtapInherited}}->setEndTime_and_getResponsTime ( ${$objectWebTransact->{asnmtapInherited}}->pluginValue ('endTime') );
+    $startTime = ${$objectWebTransact->{asnmtapInherited}}->pluginValue ('endTime');
+  }
+
+  my $returnCode = $objectWebTransact->check ( { }, newAgent => $newAgent );
+
+  if ( defined $startTime ) {
+    my $responseTime = ${$objectWebTransact->{asnmtapInherited}}->setEndTime_and_getResponsTime ( $startTime );
+    ${$objectWebTransact->{asnmtapInherited}}->appendPerformanceData ( 'Logon='. $responseTime .'ms;;;;' );
+  }
+
+=item Example 4
+
+  my $matches = $objectWebTransact->matches();
+  my ($valNavigationToken, $valTicketnummer, undef) = @$matches[0..$#$matches];
+  print "Navigation Token: ", $valNavigationToken, "\n" if (defined $valNavigationToken);
+  print "Ticketnummer    : ", $valTicketnummer, "\n" if (defined $valTicketnummer);
+
+  and
+
+  my $matches = $objectWebTransact->matches();
+  foreach my $match ( @$matches ) { print "-> $match <-"; }
+
+  equals to:
+
+  foreach my $match ( @{ $objectWebTransact->matches() } ) { print "-> $match <-\n"; }
+
+=item Example 5
+
+  my @URLS = ();
+  my $objectWebTransact = ASNMTAP::Asnmtap::Plugins::WebTransact->new ( \$objectPlugins, \@URLS );
+
+  use constant EXP_TITLE_1 => "\Q<TITLE>\E(Consulting Internet Technology Alex Peeters)\Q</TITLE>\E";
+  use constant EXP_TITLE_2 => "\Q<TITLE>\E(Consulting) (Internet) (Technology) (Alex Peeters)\Q</TITLE>\E";
+
+  use constant EXP_SUBMAIN => "\Q<FRAME NAME=\"NO_INFO\" SRC=\"\E(submain.htm)\Q\" SCROLLING=\"No\" FRAMEBORDER=\"0\" NORESIZE>\E";
+  use constant VAL_SUBMAIN => [0, sub { my %pages = ( 'index.htm' => 'InDeX', 'submain.htm' => 'subMAIN' ); $pages { $_[0] }; } ];
+
+  @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [], Qs_fixed => [], Exp => [EXP_SUBMAIN, 'Consulting Internet Technology Alex Peeters'], Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 2' },
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [parameter => 0], Qs_fixed => [], Exp => [EXP_SUBMAIN, 'Consulting Internet Technology Alex Peeters'], Exp_Fault => ">>>NIHIL<<<", Exp_Return => { title1 => EXP_TITLE_1 }, Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 2' },
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [parameter => VAL_SUBMAIN], Qs_fixed => [], Exp => 'Consulting Internet Technology Alex Peeters', Exp_Fault => ">>>NIHIL<<<", Exp_Return => { title2 => EXP_TITLE_2, submain => EXP_SUBMAIN }, Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 3' },
+  );
+
+  $returnCode = $objectWebTransact->check ( { }, custom => \&customWebTransact );
+
+  foreach ( @{ $objectWebTransact->get_matches() } ) { print $_, "\n"; }
+
+  while ( my ($key, $value) = each %{ $objectWebTransact->get_returns() } ) {
+    if ( ref $value eq 'ARRAY') {
+      foreach ( @{ $value } ) { print "$key => $_\n"; }
+    } else {
+      print "$key => $value\n";
+    }
+  }
+
+  my %returns =  %{ $objectWebTransact->returns() };
+  undef $objectWebTransact;
+
+  print $returns {title1}, "\n";
+  print $returns {submain}, "\n";
+  print $returns {title2}[0], "\n";
+  print $returns {title2}[1], "\n";
+  print $returns {title2}[2], "\n";
+  print $returns {title2}[3], "\n";
+
+=item Example 6
+
+  use constant EXP_TITLE_1 => "\Q<TITLE>\E(Consulting Internet Technology Alex Peeters)\Q</TITLE>\E";
+  use constant EXP_TITLE_2 => "\Q<TITLE>\E(Consulting) (Internet) (Technology) (Alex Peeters)\Q</TITLE>\E";
+
+  use constant EXP_SUBMAIN => "\Q<FRAME NAME=\"NO_INFO\" SRC=\"\E(submain.htm)\Q\" SCROLLING=\"No\" FRAMEBORDER=\"0\" NORESIZE>\E";
+  use constant VAL_SUBMAIN => [0, sub { my %pages = ( 'index.htm' => 'InDeX', 'submain.htm' => 'subMAIN' ); $pages { $_[0] }; } ];
+
+  @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [], Qs_fixed => [], Exp => [EXP_SUBMAIN, 'Consulting Internet Technology Alex Peeters'], Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 2' },
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [parameter => 0], Qs_fixed => [], Exp => [EXP_SUBMAIN, 'Consulting Internet Technology Alex Peeters'], Exp_Fault => ">>>NIHIL<<<", Exp_Return => { title1 => EXP_TITLE_1 }, Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 2' },
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [parameter => VAL_SUBMAIN], Qs_fixed => [], Exp => 'Consulting Internet Technology Alex Peeters', Exp_Fault => ">>>NIHIL<<<", Exp_Return => { title2 => EXP_TITLE_2, submain => EXP_SUBMAIN }, Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 3' },
+  );
+
+  $returnCode = $objectWebTransact->check ( { } );
+  my %returns = %{ $objectWebTransact->returns() };
+  $objectPlugins->pluginValues ( { alert => $returns {title1} .' - '. $returns {submain} .' - '. $returns {title2}[0] .' - '. $returns {title2}[1] .' - '. $returns {title2}[2] .' - '. $returns {title2}[3] }, $TYPE{REPLACE} );
+
+equals to:
+
+  use constant EXP_TITLE_1 => "\Q<TITLE>\E(Consulting Internet Technology Alex Peeters)\Q</TITLE>\E";
+  use constant EXP_TITLE_2 => "\Q<TITLE>\E(Consulting) (Internet) (Technology) (Alex Peeters)\Q</TITLE>\E";
+
+  use constant EXP_SUBMAIN => "\Q<FRAME NAME=\"NO_INFO\" SRC=\"\E(submain.htm)\Q\" SCROLLING=\"No\" FRAMEBORDER=\"0\" NORESIZE>\E";
+  use constant VAL_SUBMAIN => [0, sub { my %pages = ( 'index.htm' => 'InDeX', 'submain.htm' => 'subMAIN' ); $pages { $_[0] }; } ];
+
+  use constant RET_SUBMAIN => [0, sub { my %returns = %{ $objectWebTransact->returns() }; defined $returns { 'submain' } ? $returns { 'submain' } : ''; } ];
+  use constant RET_TITLE1  => [0, sub { my %returns = %{ $objectWebTransact->returns() }; defined $returns { 'title1' } ? $returns { 'title1' } : ''; } ];
+
+  @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [], Qs_fixed => [], Exp => [EXP_SUBMAIN, 'Consulting Internet Technology Alex Peeters'], Exp_Fault => ">>>NIHIL<<<", Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 1' },
+  );
+
+  $returnCode = $objectWebTransact->check ( { } );
+
+  @URLS = (
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [parameter => 0], Qs_fixed => [], Exp => [EXP_SUBMAIN, 'Consulting Internet Technology Alex Peeters'], Exp_Fault => ">>>NIHIL<<<", Exp_Return => { title1 => EXP_TITLE_1 }, Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 2' },
+    { Method => 'GET',  Url => 'http://www.citap.com/', Qs_var => [parameter => VAL_SUBMAIN, submain => RET_SUBMAIN, title1 => RET_TITLE1], Qs_fixed => [], Exp => 'Consulting Internet Technology Alex Peeters', Exp_Fault => ">>>NIHIL<<<", Exp_Return => { title2 => EXP_TITLE_2, submain => EXP_SUBMAIN }, Msg => "Consulting Internet Technology Alex Peeters", Msg_Fault => "Consulting Internet Technology Alex Peeters", Perfdata_Label => 'Label 3' },
+  );
+
+  $returnCode = $objectWebTransact->check ( { } );
+
+=item Example 7
+
+ @URLS = (
+   { Method => 'GET',  Url => 'https://USERNAME:PASSWORD@secure.citap.be/authorization/', Qs_var => [], Qs_fixed => [], Exp => "Testing Client Authorization", Exp_Fault => ">>>NIHIL<<<", Msg => "Testing Client Authorization", Msg_Fault => "Testing Client Authorization" },
+ );
+
+ $returnCode = $objectWebTransact->check ( { } );
+
+equals to:
+
+ @URLS = (
+   { Method => 'GET',  Url => 'https://secure.citap.com/authorization/', Qs_var => [], Qs_fixed => [], Exp => "Testing Client Authorization", Exp_Fault => ">>>NIHIL<<<", Msg => "Testing Client Authorization", Msg_Fault => "Testing Client Authorization" },
+ );
+
+ $objectWebTransact->ua->credentials ( 'secure.citap.com:443', "ASNMTAP's Authorization Access", 'USERNAME', 'PASSWORD' );
+
+ $returnCode = $objectWebTransact->check ( { } );
+
+=back
+
+=head1 TOOLS
+
+=over 4
+
+=item GrinderCaptureConverter.pl
+
+ ./GrinderCaptureConverter.pl -i /opt/grinder-2.8.6/examples/asnmtap/www.citap.be-grinder.proporties -o /opt/grinder-2.8.6/examples/asnmtap/www.citap.com.txt -f WEBTRANSACT
+
+=over 4
+
+=item The Grinder 2
+
+more information can found at: http://grinder.sourceforge.net/
+
+=item Needed to run The Grinder
+
+Java 2 Standard Edition 1.3.1, equivalent, or later
+
+=item How do I start The Grinder to capture?
+
+more information can found at: http://grinder.sourceforge.net/manual/tcpsniffer.html
+
+=item Start an agent process
+
+ mkdir /opt/grinder-2.8.6/capture
+ cd /opt/grinder-2.8.6/capture
+
+ CLASSPATH=/opt/grinder-2.8.6/lib/grinder.jar; export CLASSPATH or CLASSPATH=../../lib/grinder.jar; export CLASSPATH
+ java net.grinder.TCPSniffer -proxy -httpPluginFilter > /opt/grinder-2.8.6/capture/grinder
+ or
+ cd /opt/grinder-2.8.6/examples/asnmtap
+ java -classpath /opt/grinder-2.8.6/lib/grinder.jar net.grinder.TCPSniffer -proxy -httpPluginFilter> /opt/grinder-2.8.6/capture/grinder
+
+=item How do I set Internet Explorer to capture?
+
+Set for internet explorer the proxy setting to 127.0.0.1 with port 8001
+
+=item How do I Capture a website?
+
+Start surfing throug Internet Explorer
+
+=item How do I stop the Capture?
+
+Press 'ctrl C'
+
+=back
+
+=back
+
+=head1 BUGS
+
+B<you> must identify the URLs and the query strings required by the transaction 
+using tools like grinder or by examining the HTML source of the forms.
+
+=head1 AUTHOR
+
+Stanley Hopcroft [Stanley.Hopcroft@IPAustralia.Gov.AU]
+Alex Peeters [alex.peeters@citap.be]
+
+=head1 SEE ALSO
+
+ASNMTAP::Asnmtap, ASNMTAP::Asnmtap::Plugins
+
+  check_template-WebTransact.pl
+  check_template-WebTransact-Perfdata.pl
+  check_template-WebTransact-with-client-authorization.pl
+  check_template-WebTransact-with-client-certificate.pl
+  check_template-WebTransact-XML.pl
+  check_template-WebTransact-XML-Cactus-parser.pl
+  check_template-WebTransact-XML-Monitoring.pl
+  check_template-WebTransact-XML-Monitoring-1.1.pl
+  check_template-WebTransact-XML-Monitoring-1.2.pl
+
+=head1 DEPENDENCIES
+
+  ASNMTAP::Asnmtap::Plugins
+  Bundle::LWP
+  CGI
+  Compress::Zlib
+  Digest::MD5
+  Crypt::SSLeay
+  IO::Socket::SSL
+  MIME::Base64
+  Net::FTP
+  Net::SSLeay
+  URI
+
+=head1 COPYRIGHT NOTICE
+
+(c) Copyright 2003-2004 Stanley.Hopcroft@IPAustralia.Gov.AU
+
+ASNMTAP::Asnmtap::Plugins::WebTransact is based on 'Nagios::WebTransact' v0.14.1 & v0.16 from Stanley Hopcroft [Stanley.Hopcroft@IPAustralia.Gov.AU]

@@ -1,0 +1,11 @@
+drwxr-xr-x  12 marca  admin       0 Jan 15 08:33 [01;34mtest_tar_archive/[0m
+brw-r--r--  0 root   admin    14,0 Jan 14 09:11 [40;33;01mtest_tar_archive/block_device[0m
+crw-r--r--  0 root   admin     0,0 Jan 14 09:10 [40;33;01mtest_tar_archive/char_device[0m
+drwxr-xr-x  2 marca  admin       0 Jan 14 08:57 [01;34mtest_tar_archive/directory/[0m
+-rwxr-xr-x  1 marca  CHEGG\domain users 0 Jan 14 08:59 [01;32mtest_tar_archive/executable[0m
+prw-r--r--  1 marca  admin              0 Jan 14 09:01 [40;33mtest_tar_archive/fifo[0m
+-rw-r--r--  1 marca  CHEGG\domain users 0 Jan 14 08:57 test_tar_archive/normal_file
+-rw-r-Sr--  1 marca  admin              0 Jan 14 09:48 [30;43mtest_tar_archive/setgid_file[0m
+-rwSr--r--  1 marca  admin              0 Jan 14 09:47 [37;41mtest_tar_archive/setuid_file[0m
+-rw-r--r-T  1 marca  admin              0 Jan 14 09:17 test_tar_archive/sticky_file
+lrwxr-xr-x  1 marca  admin              0 Jan 15 08:33 [01;36mtest_tar_archive/symlink[0m -> normal_file

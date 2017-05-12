@@ -1,0 +1,23 @@
+TODO:
+    - Add public/private toggle
+
+0.06 Thursday June 04 21:18:28 PDT 2009:
+    - Added some documentation (install help)
+
+0.05 Friday May 08 12:06:23 PDT 2009:
+    - Let's do this right: refactored in ::Repository object
+    - Added --output option
+    - ->find* will return a stringifiable object
+
+0.04 Friday May 08 10:37:11 PDT 2009:
+    - Handle personal (git@) versus public (git://) URLs
+
+0.03 Friday May 08 10:13:20 PDT 2009:
+    - Fine, now supports robust repository finding over HTML (via LWP or curl). Will fallback to the git protocol otherwise
+
+0.02 Friday May 08 08:54:16 PDT 2009:
+    - Documentation tweaking
+    - Added bash equivalent
+
+0.01 Thursday May 07 23:46:30 PDT 2009:
+    - Initial release

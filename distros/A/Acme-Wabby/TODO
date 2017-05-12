@@ -1,0 +1,5 @@
+ * Be better about normalizing input text.
+ * Fix english assumtions about single-letter words besides I and a.
+ * See about making the parsing into phrases and words more configurable.
+ * Investigate using longer-order chains to improve generation quality.
+ * Try to use less memory!

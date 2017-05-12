@@ -1,0 +1,11 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Acme/constant.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/tests.t

@@ -1,0 +1,36 @@
+DnsZone is a fully functional application for Apache/mod_perl. 
+It implements a web based interface for managing zones with a nameserver 
+running BIND.
+
+DnsZone is released under the Perl Artistic License.
+
+DnsZone aims to not create additional security holes with your current 
+BIND installation and therefore does not have any programs running on 
+the actual nameserver. All updates are done through dyanmic dns updates 
+(RFC: 2136). This is implemented through Michael Fuhrs excellent 
+Net::DNS::Update module. Attached to this module is the following 
+disclaimer: "WARNING: This code is still under development and shouldn't
+be used to maintain a production nameserver." 
+That is why we cannot guarantee that DnsZone will work 100% for you. 
+Furthermore it is advised to read the SECURITY file that is shipped with
+the distribution.
+We have though had pretty good experiences with DnsZone.
+
+If you are aware of any bugs or errors in DnsZone please report them to
+the author.
+When you report bugs please set DnsZoneDebugLevel to 10 and include the 
+output where the error is produced. Patches are of course welcome.
+
+You are very welcome to contribute to DnsZone. Please do so on the users
+list.
+
+For help on how to install DnsZone please look in the INSTALL file with
+this distributions. Additional questions maybe be asked on the DnsZone 
+userlist which you can subscribe to at users-subscribe@dnszone.org.
+
+For more information look at the homepage of DnsZone at:
+
+  http://dnszone.org/
+
+DnsZone is (C) 2001 Thomas Eibner <thomas@stderr.net> 
+(See LICENSE for details)

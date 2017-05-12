@@ -1,0 +1,88 @@
+0.13    2017-01-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with fixed Perinci::CmdLine::POD 0.005 (fix env and
+          config filenames in POD).
+
+
+0.12    2017-01-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] Force upgrade of Perinci::CmdLine::Lite to 1.71 (to get
+          implicit path encoding).
+
+
+0.11    2017-01-13 (PERLANCAR)
+
+	- Remove manual ~ prefix resolving in directory arguments because
+	  they are now handled by Config::IOD::Reader 0.31+.
+
+
+0.10    2017-01-13 (PERLANCAR)
+
+	- Add subcommand: duplicate (to list long directories that have
+	  more than one shorts).
+
+
+0.09    2015-09-12 (PERLANCAR)
+
+	- Allow cds completion to do fuzzy matching.
+
+
+0.08    2015-06-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild, end testing of using Perinci::CmdLine::Any::Lumped.
+          Back to using regular Perinci::CmdLine::Any distribution.
+
+
+0.07    2015-05-15 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Use Perinci::CmdLine::Any::Lumped 0.08.
+
+
+0.06    2015-05-15 (PERLANCAR)
+
+        - No functional changes.
+
+        - Re-upload.
+
+
+0.05    2015-05-15 (PERLANCAR)
+
+        - No functional changes.
+
+        - Tweak dist.ini, rebuild with newer Perinci::CmdLine::Any::Build.
+
+
+0.04    2015-05-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- Try replacing dep to Perinci::CmdLine::Any with
+	  Perinci::CmdLine::Any::Bundled (UPDATE: now ::Lumped).
+
+
+0.03    2015-03-21 (PERLANCAR)
+
+	- Add subcommand: rm.
+
+	- Add --query for ls.
+
+
+0.02    2015-03-19 (PERLANCAR)
+
+        - Add subcommand: add.
+
+        - Add shell function and its completion function 'cds' to quickly cd to
+          a dir using short name.
+
+
+0.01    2015-03-19 (PERLANCAR)
+
+        - First release.

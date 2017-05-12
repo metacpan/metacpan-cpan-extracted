@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: /local/CPAN/AxKit-XSP-Currency/t/htdocs/axkit/symbol_code_options.xsp 1446 2005-03-05T21:52:45.922898Z claco  $ -->
+<xsp:page xmlns:xsp="http://apache.org/xsp/core/v1"
+	xmlns:currency="http://today.icantfocus.com/CPAN/AxKit/XSP/Currency"
+>
+	<body>
+		<symbol>
+			<currency:symbol code="LRD" options="SYM_UTF"/>
+		</symbol>
+	</body>
+</xsp:page>

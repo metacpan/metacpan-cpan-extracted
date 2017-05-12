@@ -1,0 +1,54 @@
+
+                   README for using randomized trees
+                   =================================
+
+
+This README is specifically for the code in the ExamplesRandomizedTrees subdirectory
+of the installation directory.
+
+See the README in the Examples subdirectory of the installation directory for the
+main examples for using the DecisionTree module.
+
+You can solve two different kinds of problems through the RandomizedTreesForBigData
+class:
+
+--- The problems that involve training a decision tree classifier with a dataset that
+    suffers from serious imbalances in the populations available for the different
+    classes.  If what you are facing is a two-class problem, you can directly use the
+    RandomizedTreesForBigData class as currently programmed.  This class will create
+    multiple decision trees for you, each trained with a mixture of training samples
+    that consists of all the minority class samples and randomly drawn majority class
+    samples.  The classification decisions for new data samples are based on majority
+    voting by the individual decision trees.
+
+--- If you are faced with a "big data" problem, in the sense that you have access to
+    a very large training database of samples, you can use the
+    RandomizedTreesForBigData class to create multiple decision trees by drawing
+    training datasets randomly from your database.  Subsequently, the final
+    classification decisions can be made by majority voting by the individual trees.
+
+This directory contains the following scripts that you can use to become more
+familiar with the RandomizedTreesForBigData class:
+
+(1)   randomized_trees_for_classifying_one_test_sample_1.pl
+
+      This illustrates the "looking for a needle in a haystack" function of the
+      ExamplesRandomizedTrees class.
+      
+      
+(2)   randomized_trees_for_classifying_one_test_sample_2.pl
+
+      This illustrates how you may address a big data problem by constructing a set
+      of decision trees, each based on random draw from your large training database.
+
+
+(3)   classify_database_records.pl
+
+      This illustrates evaluating the quality of the ensemble of decision trees
+      constructed by ExamplesRandomizedTrees by aggregating all of the classification
+      information for a reasonable large number of samples drawn randomly from a
+      database.  See the comment block at the beginning of this script for what sort
+      of diagnostic information the script puts out.
+
+
+

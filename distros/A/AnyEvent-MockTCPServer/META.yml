@@ -1,0 +1,27 @@
+---
+abstract: 'Mock TCP Server using AnyEvent'
+author:
+  - 'Mark Hindess <soft-cpan@temporalanomaly.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-MockTCPServer
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  Sub::Name: '0'
+  Test::More: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/beanz/anyevent-mocktcpserver-perl/issues
+  repository: git://github.com/beanz/anyevent-mocktcpserver-perl.git
+version: '1.142230'

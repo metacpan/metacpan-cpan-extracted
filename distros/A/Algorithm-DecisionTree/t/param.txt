@@ -1,0 +1,40 @@
+
+# DO NOT DELETE OR MODIFY THIS FILE. IT IS NEEDED BY THE TEST
+# SCRIPT test.t IN THE t DIRECTORY.
+
+# Use the param.txt in the examples dircectory to change according
+# to your needs
+
+class names:  malignant benign
+class priors: 0.4 0.6
+
+feature: smoking
+values: heavy medium light never
+
+feature: exercising
+values: never occasionally regularly
+
+feature: fatIntake
+values: low medium heavy
+
+feature: videoAddiction
+values:  none low medium heavy
+
+
+bias:  class: malignant 
+
+          smoking:    heavy=0.7
+          exercising: never=0.7 
+          fatIntake:  heavy=0.5
+          videoAddiction: 
+
+bias:  class: benign
+
+          smoking:     heavy=0.1
+          exercising:  regularly=0.7
+          fatIntake:   low=0.6
+          videoAddiction: 
+
+          
+
+

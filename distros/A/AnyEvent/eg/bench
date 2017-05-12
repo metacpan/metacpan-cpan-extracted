@@ -1,0 +1,87 @@
+#!/opt/bin/perl
+
+# ugly code, don't look at it
+
+# ulimit -n 500000
+
+use strict;
+use Event;
+use EV;
+use Socket;
+use AnyEvent;
+use Time::HiRes 'time';
+
+my $nr = $ARGV[0] || 1000;
+my $M = $ARGV[1] || "AnyEvent";
+
+#$nr *= .01;
+
+my $todo;
+
+my $cv;
+
+my (@io, @timer);
+
+AnyEvent::detect;
+
+my $cb = sub {
+   $cv->broadcast unless --$todo;
+};
+
+$| = 1;
+
+print "name $ARGV[2]\n";
+print "watchers ", $nr * 2, "\n";
+
+my $m = qx<ps h -orss $$>;
+my $c = time;
+
+my $fh = \*STDOUT;
+
+for (1..$nr) {
+   if ($M eq "EV") {
+      push @io, EV::io $fh, EV::WRITE, $cb;
+      push @timer, EV::timer 0, 0, $cb;
+   } elsif ($M eq "Event") {
+      push @io, Event->io (fd => $fh, poll => "w", cb => $cb);
+      push @timer, Event->timer (after => 0, cb => $cb);
+   } else {
+      push @io, AnyEvent->io (fh => $fh, poll => "w", cb => $cb);
+      push @timer, AnyEvent->timer (after => 0, cb => $cb);
+   }
+}
+
+$c = (time - $c) / $nr / 2 * 1e6;
+$m = int 0.5 + (qx<ps h -orss $$> - $m) * 1024 / $nr / 2;
+
+printf "bytes %d\n", $m;
+printf "create %.2f\n", $c;
+
+$cv   = AnyEvent->condvar;
+$todo = $nr * 2;
+
+my $i = time;
+
+$cv->wait;
+
+$i = (time - $i) / $nr / 2 * 1e6;
+
+printf "invoke %.2f\n", $i;
+
+my $d = time;
+
+if ($M eq "Event") {
+   $_->cancel for (@io, @timer);
+}
+@io = @timer = ();
+
+{
+   my $w = AnyEvent->timer (after => 0, cb => sub { });
+   AnyEvent->one_event;
+}
+
+$d = (time - $d) / $nr / 2 * 1e6;
+
+printf "destroy %.2f\n", $d;
+
+

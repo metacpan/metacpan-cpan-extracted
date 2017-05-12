@@ -1,0 +1,863 @@
+#!/usr/bin/perl
+#
+# Copyright 2013 Timo Benk
+# 
+# This file is part of nrun.
+# 
+# nrun is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# nrun is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with nrun.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Program: ncopy
+# Author:  Timo Benk <benk@b1-systems.de>
+# Date:    Wed Jul 17 19:44:13 2013 +0200
+# Ident:   e81f2ed28d3a5b52045231c0700113b9349472fe
+# Branch:  master
+#
+# Changelog:--reverse --grep '^tags.*relevant':-1:%an : %ai : %s
+# 
+# Timo Benk : 2013-04-29 18:53:21 +0200 : introducing ncopy
+# Timo Benk : 2013-04-29 19:02:10 +0200 : use Net::Ping instead of the command ping
+# Timo Benk : 2013-04-29 20:39:37 +0200 : File::HomeDir dependency removed
+# Timo Benk : 2013-05-04 07:13:02 +0200 : hostnames can be given at the commandline
+# Timo Benk : 2013-05-05 18:37:46 +0200 : pod docs moved into the code files
+# Timo Benk : 2013-05-05 18:41:11 +0200 : modules were not found when INSTALL_BASE was set
+# Timo Benk : 2013-05-06 09:04:16 +0200 : argument --version added
+# Timo Benk : 2013-05-07 13:15:33 +0200 : package name changed for CPAN
+# Timo Benk : 2013-05-08 10:05:39 +0200 : better signal handling implemented
+# Timo Benk : 2013-05-09 07:31:52 +0200 : fix race condition in semaphore cleanup code
+# Timo Benk : 2013-05-09 07:38:43 +0200 : cleanup on exit
+# Timo Benk : 2013-05-11 13:08:04 +0200 : default to 5 parallel processes
+# Timo Benk : 2013-05-13 11:12:49 +0200 : commandline syntax simplified
+# Timo Benk : 2013-05-13 11:28:17 +0200 : getopt timeout short param removed
+# Timo Benk : 2013-05-13 13:47:10 +0200 : some command abbreviations added
+# Timo Benk : 2013-05-13 15:58:07 +0200 : child processes died before the result was handled
+# Timo Benk : 2013-05-13 19:56:46 +0200 : semaphores will only be deleted in parent process
+# Timo Benk : 2013-05-21 18:47:43 +0200 : parameter --async added
+# Timo Benk : 2013-05-22 08:28:30 +0200 : rc file uses now yaml syntax
+# Timo Benk : 2013-05-22 13:09:13 +0200 : option --no-logfile was broken
+# Timo Benk : 2013-05-22 13:20:36 +0200 : --skip-ping-check and --skip-ns-check enabled
+# Timo Benk : 2013-05-22 13:22:48 +0200 : --copy cleanup will not be logged
+# Timo Benk : 2013-05-22 18:10:55 +0200 : dump the exit code per default in ncopy
+# Timo Benk : 2013-05-22 18:42:06 +0200 : timeout defaults to 60 if not set
+# Timo Benk : 2013-05-23 10:09:31 +0200 : unnecessary wait() call in signal handler removed
+# Timo Benk : 2013-05-24 08:03:19 +0200 : generic mode added
+# Timo Benk : 2013-05-24 08:13:14 +0200 : default mode will be marked in usage string
+# Timo Benk : 2013-05-26 19:41:32 +0200 : print an error when an unknown mode was given
+# Timo Benk : 2013-06-13 13:59:01 +0200 : process output handling refined
+# Timo Benk : 2013-06-13 14:49:43 +0200 : missing File::Path added
+# Timo Benk : 2013-06-14 17:38:58 +0200 : --no-hostname option removed
+# Timo Benk : 2013-06-15 07:47:45 +0200 : use $BASE/ncopy as logdir
+# Timo Benk : 2013-06-20 09:08:16 +0200 : code cleanup
+# Timo Benk : 2013-06-20 13:00:29 +0200 : missing File::Temp add;
+# Timo Benk : 2013-06-20 13:06:40 +0200 : missing sub handler_cleanup() added
+# Timo Benk : 2013-06-20 19:32:58 +0200 : unused sub handler_cleanup() removed
+# Timo Benk : 2013-06-21 09:44:13 +0200 : reverse copy support added
+# Timo Benk : 2013-06-21 11:18:58 +0200 : wait for child processed before exit()
+# Timo Benk : 2013-06-21 13:05:20 +0200 : $options->{ppid} was not set
+# Timo Benk : 2013-06-21 13:41:01 +0200 : handler() was missed sometimes
+# Timo Benk : 2013-06-21 14:03:21 +0200 : do not exit in handler() when in parent context
+# Timo Benk : 2013-07-08 15:59:06 +0200 : hostnames may be given via stdin
+# Timo Benk : 2013-07-12 15:13:08 +0200 : queue targets instead of splitting them
+#
+
+package App::ncopy;
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib/perl5";
+
+use File::Path;
+use File::Basename;
+use File::Temp qw(tempfile);
+use Date::Format;
+use Getopt::Long;
+use POSIX qw(:sys_wait_h);
+
+use NRun::Util;
+use NRun::Version;
+use NRun::Check;
+use NRun::Filter;
+use NRun::Logger;
+use NRun::Worker;
+use NRun::Signal;
+use NRun::Logger;
+use NRun::Pool;
+use NRun::Sink;
+use NRun::Queue;
+
+our $options = {};
+
+###
+# dump a short usage info to stdout.
+sub usage {
+
+    print "usage: " . basename($0) . " -t HOST1[,HOST2,...] -- SOURCE TARGET\n";
+    print "--log-directory DIR         base directory for the log files.\n";
+    print "--parallel,-p MAX           number of parallel connections (defaults to 5).\n";
+    print "--reverse,-r                reverse copy the source file from all target hosts.\n";
+    print "--target,-t HOST1,HOST2     comma separated list of target hosts.\n";
+    print "--timeout SEC               timeout for each command execution (defaults to 60).\n";
+    print "--version,-v                print the version string and exit.\n";
+    print "--mode,-m MODE              remote execution mode:\n";
+
+    my $workers = NRun::Worker::workers();
+    foreach my $name (sort(keys(%$workers))) { 
+
+        if (defined($options->{ncopy}->{arg_mode}) and $options->{ncopy}->{arg_mode} eq $name) {
+
+            print "                          * " . $name . " - " . $workers->{$name}->{DESC} . "\n";
+        } else {
+
+            print "                            " . $name . " - " . $workers->{$name}->{DESC} . "\n";
+        }
+    }
+
+    print "--filter,-f FILTER          output filter to be applied:\n";
+
+    my $filters = NRun::Filter::filters();
+    foreach my $name (sort(keys(%$filters))) { 
+
+        if (defined($options->{ncopy}->{arg_filter}) and $options->{ncopy}->{arg_filter} eq $name) {
+
+            print "                          * " . $name . " - " . $filters->{$name}->{DESC} . "\n";
+        } else {                              
+                                              
+            print "                            " . $name . " - " . $filters->{$name}->{DESC} . "\n";
+        }
+    }
+
+    print "--logger,-l LOGGER1,LOGGER2 logger to be used:\n";
+
+    my $loggers = NRun::Logger::loggers();
+    foreach my $name (sort(keys(%$loggers))) { 
+
+        if (defined($options->{ncopy}->{arg_logger}) and $options->{ncopy}->{arg_logger} =~ /,*$name,*/) {
+
+            print "                          * " . $name . " - " . $loggers->{$name}->{DESC} . "\n";
+        } else {                              
+                                              
+            print "                            " . $name . " - " . $loggers->{$name}->{DESC} . "\n";
+        }
+    }
+
+    print "--check,-c CHECK1,CHECK2    checks to be applied to each host:\n";
+
+    my $checks = NRun::Check::checks();
+    foreach my $name (sort(keys(%$checks))) { 
+
+        if (defined($options->{ncopy}->{arg_check}) and $options->{ncopy}->{arg_check} =~ /,*$name,*/) {
+
+            print "                          * " . $name . " - " . $checks->{$name}->{DESC} . "\n";
+        } else {                              
+                                              
+            print "                            " . $name . " - " . $checks->{$name}->{DESC} . "\n";
+        }
+    }
+
+    exit;
+}
+
+###
+# parse the commandline.
+sub parse_commandline {
+
+    my $arg_target        = $options->{ncopy}->{arg_target};
+    my $arg_parallel      = $options->{ncopy}->{arg_parallel};
+    my $arg_log_directory = $options->{ncopy}->{arg_log_directory};
+    my $arg_mode          = $options->{ncopy}->{arg_mode};
+    my $arg_filter        = $options->{ncopy}->{arg_filter};
+    my $arg_logger        = $options->{ncopy}->{arg_logger};
+    my $arg_check         = $options->{ncopy}->{arg_check};
+    my $arg_version       = $options->{ncopy}->{arg_version};
+    my $arg_rcopy         = $options->{ncopy}->{arg_rcopy};
+    my $arg_timeout       = $options->{ncopy}->{arg_timeout};
+
+    my $ret = GetOptions (
+        "parallel|p=i"    => \$arg_parallel,
+        "target|t=s"      => \$arg_target,
+        "log-directory=s" => \$arg_log_directory,
+        "timeout=i"       => \$arg_timeout,
+        "mode|m=s"        => \$arg_mode,
+        "filter|f=s"      => \$arg_filter,
+        "reverse|r"       => \$arg_rcopy,
+        "logger|l=s"      => \$arg_logger,
+        "check|c=s"       => \$arg_check, 
+        "version|v"       => \$arg_version,
+    );
+
+    usage() if (not $ret);
+
+    if (defined($arg_version)) {
+
+        print basename($0) .  " " . $NRun::Version::VERSION . "\n";
+        exit(0);
+    }
+
+    if (scalar(@ARGV) == 1) {
+
+        print "error: destination file is missing.\n";
+        usage();
+    } elsif (scalar(@ARGV) == 0) {
+
+        print "error: source file is missing.\n";
+        usage();
+    }
+
+    if (not defined($arg_filter)) {
+
+        print "error: parameter --filter is mandatory.\n";
+        usage();
+    }
+
+    if (not defined($arg_logger)) {
+
+        print "error: parameter --logger is mandatory.\n";
+        usage();
+    }
+
+    if (not defined($arg_mode)) {
+
+        print "error: parameter --mode is mandatory.\n";
+        usage();
+    }
+
+    if (not defined($arg_target)) {
+
+        print "error: parameter --target is mandatory.\n";
+        usage();
+    }
+
+    $options->{target}      = $arg_target;
+    $options->{parallel}    = $arg_parallel ? $arg_parallel : 5;
+    $options->{source}      = $ARGV[0];
+    $options->{destination} = $ARGV[1];
+    $options->{timeout}     = $arg_timeout ? $arg_timeout : 60;
+    $options->{rcopy}       = $arg_rcopy;
+    $options->{mode}        = lc($arg_mode);
+    $options->{filter}      = lc($arg_filter);
+    $options->{logger}      = [ map { lc } split(",", $arg_logger) ];
+    $options->{check}       = [ map { lc } split(",", $arg_check) ];
+
+    if (not defined(NRun::Worker::workers()->{$arg_mode})) {
+
+        print "error: unknown mode given - $arg_mode.\n";
+        usage();
+    }
+
+    if (not defined(NRun::Filter::filters()->{$arg_filter})) {
+
+        print "error: unknown filter given - $arg_filter.\n";
+        usage();
+    }
+
+    foreach my $logger (@{$options->{logger}}) {
+
+        if (not defined(NRun::Logger::loggers()->{$logger})) {
+
+            print "error: unknown logger given - $logger.\n";
+            usage();
+        }
+    }
+
+    foreach my $check (@{$options->{check}}) {
+
+        if (not defined(NRun::Check::checks()->{$check})) {
+
+            print "error: unknown check given - $check.\n";
+            usage();
+        }
+    }
+
+    my $date = time2str("%Y%m%d_%H_%M_%S", time);
+
+    $options->{log_directory} = NRun::Util::home() . "/.nrun/ncopy";
+    if (defined($arg_log_directory)) {
+
+        $options->{log_directory} = $arg_log_directory;
+    }
+
+    $options->{log_directory} .= "/$date";
+
+    if (scalar(@{$options->{logger}}) > 0) {
+
+        mkpath("$options->{log_directory}") or die("$options->{log_directory}: $!");
+
+        unlink("$options->{log_directory}/../latest");
+        symlink("$date", "$options->{log_directory}/../latest");
+    }
+
+    if ($options->{parallel} < 1) {
+
+        print "error: parameter --parallel must be bigger than 1.\n";
+        usage();
+    }
+
+    $options->{hosts} = [ NRun::Util::resolve_target($options->{target}, $options->{alias}) ];
+    $options->{hosts} = [ NRun::Util::uniq(@{$options->{hosts}}) ];
+
+    if (scalar(@{$options->{hosts}}) == 0) {
+
+        print "error: no hostnames given.\n";
+        usage();
+    }
+}
+
+###
+# callback function used by the dispatcher (child context)
+sub callback {
+    
+    my $_host = shift;
+
+    # initialize the worker object
+    my $worker = NRun::Worker::workers()->{$options->{mode}}->{NAME}->new();
+
+    $worker->init (
+        {
+            %$options,
+            hostname => $_host,
+        }
+    );
+
+    # initialize the check objects
+    my @checks;
+    foreach my $check (@{$options->{check}}) {
+
+        my $c = NRun::Check::checks()->{$check}->{NAME}->new();
+
+        $c->init (
+            {
+                %$options,
+                hostname => $_host,
+            }
+        );
+
+        push(@checks, $c);
+    }
+
+    # execute all check objects
+    foreach my $check (@checks) {
+
+        if (not $check->execute()) {
+
+            $worker->end();
+            return;
+        }
+    }
+
+    # finally copy the file
+    if (defined($options->{rcopy})) {
+
+        my $dst = "$options->{destination}.$_host";
+        if (-e $options->{destination} and -d $options->{destination}) {
+   
+            $dst = "$options->{destination}/" . basename($options->{source}) . ".$_host";
+        }
+
+        $worker->rcopy($options->{source}, $dst);
+    } else {
+
+        $worker->copy($options->{source}, $options->{destination});
+    }
+
+    $worker->end();
+}
+
+###
+# ensure exit on SIGINT/SIGTERM
+sub handler {
+
+    my $_options = shift;
+
+    if (not $$_options->{ppid} eq $$) {
+
+        exit();
+    }
+
+    while (waitpid(-1, WNOHANG) != -1) { };
+}
+
+###
+# initialize the sink object
+sub sink_init() {
+
+    my $_self = shift;
+
+    my @filters;
+
+    foreach my $logger (@{$options->{logger}}) {
+
+        my $l = NRun::Logger::loggers()->{$logger}->{NAME}->new();
+        $l->init($options);
+        push(@filters, $l);
+    };
+
+    my $filter = NRun::Filter::filters()->{$options->{filter}}->{NAME}->new();
+    $filter->init($options);
+    push(@filters, $filter);
+
+    $options->{sink} = NRun::Sink->new();
+    $options->{sink}->init ( 
+        {
+            filters => \@filters,
+        }
+    );
+}
+
+
+###
+# initialize the queue object
+sub queue_init {
+
+    my $_self = shift;
+
+    $options->{queue} = NRun::Queue->new();
+    $options->{queue}->init (
+        {
+            objects => $options->{hosts},
+        }
+    );
+}
+
+###
+# main
+sub main {
+
+    $options = NRun::Util::read_config_files (
+        [
+            "$FindBin::Bin/../etc/nrunrc",
+            "/etc/nrunrc",
+            NRun::Util::home() . "/.nrunrc" 
+        ]
+    );
+
+    $options->{ppid} = $$;
+
+    NRun::Signal::register('TERM', \&handler, [ \$options ]);
+    NRun::Signal::register('INT',  \&handler, [ \$options ]);
+
+    parse_commandline();
+
+    sink_init();
+    queue_init();
+
+    $options->{pool} = NRun::Pool->new (
+        {
+            nmax    => $options->{parallel},
+            timeout => $options->{timeout},
+
+            sink => $options->{sink},
+            queue => $options->{queue},
+
+            callback => \&callback,
+        }
+    );
+
+    $options->{sink}->process();
+}
+
+main();
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ncopy - copy a file or directory to multiple target servers.
+
+=head1 SYNOPSIS
+
+ncopy -t HOST1[,HOST2,...] [--log-directory]
+[-p MAX] [--timeout SEC] [-v] [-m MODE] [-f FILTER] [-l LOGGER1[,LOGGER2...]] 
+[-c CHECK1[,CHECK2]]  -- SOURCE TARGET
+
+=head1 DESCRIPTION
+
+ncopy will copy a file or directory to multiple target servers synchronously.
+
+the underlying remote access mechanism is exchangeable. as of now, ssh, nsh, rsh
+and local execution modes are implemented.
+
+=head1 OPTIONS
+
+B<--check,-c CHECK1[,CHECK2]>    checks to be applied to each host (see CHECKS)
+
+B<--filter,-f FILTER1>           output filter to be applied (see FILTER).
+
+B<--logger,-l LOGGER1[,LOGGER2]> logger to be applied (see LOGGER).
+
+B<--log-directory,-l DIR>        base directory for the log files.
+
+B<--mode,-m MODE>                remote execution mode (see MODES).
+
+B<--parallel,-p MAX>             number of parallel connections (defaults to 5).
+
+B<--reverse,-r>                  reverse copy the source file from all target hosts.
+
+B<--target,-t HOST1[,HOST2,...]> comma separated list of target hosts (see TARGETS).
+
+B<--timeout SEC>                 timeout for each command execution (defaults to 60).
+
+B<--version,-v>                  print the version string and exit.
+
+=head1 CONFIGURATION
+
+special configuration options for the different modes and additional all
+commandline options can be given in a configuration file.
+
+the following three places will be searched for configuration files (values in the last
+configuration file will overwrite values in the first configuration file). indentation
+does matter (YAML syntax).
+
+- $FindBin::Bin/../etc/nrunrc
+
+- /etc/nrunrc
+
+- $HOME/.nrunrc
+
+    ---
+    # mode ssh options
+    ssh_copy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        SOURCE HOSTNAME:TARGET
+    
+    ssh_rcopy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME:SOURCE TARGET
+    
+    ssh_exec: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME COMMAND ARGUMENTS
+    
+    ssh_delete: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME rm -f "FILE"
+    
+    # additional commandline options
+    nrun:
+        arg_mode: ssh
+        arg_check: ping,ns
+        arg_filter: sync
+        arg_logger: result,output,raw
+        arg_parallel: 5
+        arg_timeout: 60
+    
+    ncopy:
+        arg_mode: ssh
+        arg_check: ping,ns
+        arg_filter: result
+        arg_logger: result,output,raw
+        arg_parallel: 5
+        arg_timeout: 60
+    
+    # alias definitions
+    alias:
+        production:
+            - host1
+            - host2
+        development:
+            - host3
+            - host4
+        all:
+            - production
+            - development
+
+=head1 LOGGING
+
+on each execution run, the command output and exit code will be saved inside the
+logging directory. the default logging directory is $HOME/.nrun. Logging is realized
+by so called loggers (see LOGGERS).
+
+- $LOGDIR/result.log - will contain the exit codes
+
+- $LOGDIR/output.log - will contain the complete command output for all hosts
+
+- $LOGDIR/raw.log - will contain the raw worker output for all hosts
+
+=head1 MODES
+
+=head2 mode ssh
+
+use ssh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'ssh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+
+'ssh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'ssh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'ssh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
+for passwordless login ssh-agent can be used:
+
+	# ssh-keygen
+	# scp .ssh/id_rsa.pub $USER@$HOST:.ssh/authorized_keys
+
+	# eval `ssh-agent`
+	# ssh-add
+
+to prevent any ssh interaction the following ssh command paramters are
+suggested:
+
+	-o User=root
+	-o PreferredAuthentications=hostbased,publickey
+	-o StrictHostKeyChecking=no
+	-o UserKnownHostsFile=/dev/null
+	-o LogLevel=FATAL
+
+=head2 mode rsh
+
+use rsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'rsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+
+'rsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'rsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'rsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
+=head2 mode local
+
+execute the script locally for each host and set the environment variable
+TARGET_HOST on each execution.
+
+'local_exec' - commandline for local execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+
+=head2 mode nsh
+
+use nsh as the underlying remote access mechanism.
+
+the following configuration options must be set in the configuration file:
+
+'nsh_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+
+'nsh_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'nsh_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'nsh_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
+'nsh_check'  - commandline for the agentinfo check command (HOSTNAME will be replaced)
+
+=head2 mode generic
+
+this is a special generic mode the can be used for arbitrary remote execution
+mechanisms.
+
+'generic_exec'   - commandline for remote execution (COMMAND, ARGUMENTS, HOSTNAME will be replaced)
+
+'generic_copy'   - commandline for remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'generic_rcopy'  - commandline for reverse remote copying (SOURCE, TARGET, HOSTNAME will be replaced)
+
+'generic_delete' - commandline for remote deletion (FILE, HOSTNAME will be replaced)
+
+an example that resembles the mode ssh would look the following way:
+
+    generic_copy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        SOURCE HOSTNAME:TARGET
+    
+    generic_rcopy: >
+        /usr/bin/scp
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME:SOURCE TARGET
+    
+    generic_exec: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME COMMAND ARGUMENTS
+    
+    generic_delete: >
+        /usr/bin/ssh
+        -o User=root
+        -o PreferredAuthentications=hostbased,publickey
+        -o StrictHostKeyChecking=no
+        -o UserKnownHostsFile=/dev/null
+        -o LogLevel=FATAL
+        HOSTNAME rm -f "FILE"
+
+=head1 FILTERS
+
+a filter reads the raw output generated by the worker processes and prints this
+output in a filter specific format. 
+
+=head2 filter raw
+
+this filter will just dump the output as it is provided by the worker process. no
+formatting will be done.
+
+format:
+
+	HOSTNAME;[stdout|stderr];TSTAMP;PID;PID(CHILD);[debug|error|exit|output|end];"OUTPUT"
+
+=head2 filter async
+
+this filter dumps the worker process output unsynchronized in the following format. unsynchronised
+means, that output lines from the different worker processes are printed at the same time they are
+generated.
+
+format:
+
+	HOSTNAME: OUTPUT
+
+=head2 filter sync
+
+this filter dumps the worker process output synchronised in the following format. synchronized
+means, that the complete output for a single hosts will be dumped at once when the worker proces
+has finished execution.
+
+format:
+
+	HOSTNAME: OUTPUT
+
+=head2 filter result
+
+this filter will only print the exit codes for the worker processes.
+
+format:
+
+	HOSTNAME: exit code CODE
+
+=head1 LOGGERS
+
+a logger reads the raw output generated by the worker processes and logs this
+output in a specific format. 
+
+=head2 logger output
+
+this logger creates a logfile in the logging directory called output.log which contains the same
+data that the filter sync produces. 
+
+=head2 logger result
+
+this logger creates a logfile in the logging directory called result.log which contains the same
+data that the filter result produces.
+
+=head2 logger raw
+
+this logger creates a logfile in the logging directory called raw.log which contains the same
+data that the filter raw produces.
+
+=head1 checks
+
+a check does a specific check for each hostname. if the check fails, the hostname that failed will
+be removed from the target list and an error message will be printed. multiple checks may be given
+at the command line.
+
+=head2 check ping
+
+checks that the host is pingable.
+
+=head2 check ns
+
+checks that the hostname is resolvable to an ip address.
+
+=head2 check rscd
+
+checks that the rscd agent is alive.
+
+=head1 TARGETS
+
+a target name may be either a filename containing the target hosts, one per line,
+an alias definition in the configuration file or simply a hostname.
+
+if there is a conflict, for example an alias named identically as an existing
+file, the alias will always overrule the filename and the filename will always
+overrule the hostname.
+
+an alias can be defined in the configuration file the following way. an alias
+definition may contain additional alias names, filenames or simply hostnames.
+indentation does matter.
+
+    # alias definitions
+    alias:
+        production:
+            - host1
+            - host2
+        development:
+            - host3
+            - host4
+        all:
+            - production
+            - development
+
+=head1 EXAMPLES
+
+1. copy file test.tar to all hosts in the file HOSTS.LST
+
+	$ ncopy --target HOSTS.LST -- test.tar /tmp 
+
+2. reverse copy file /etc/passwd from all hosts in the file HOSTS.LST
+
+	$ ncopy --target HOSTS.LST --reverse -- /etc/passwd /tmp 
+
+=head1 NOTES
+
+=head2 transferring the public key
+
+the helper script misc/put_pubkey can be used to transfer the ssh public key
+to the target hosts without supplying a password for each login. it is meant
+to be executed by the nrun script in mode local.
+
+	$ nrun -t HOSTS.LST --mode local --timeout 120 -- ./put_pubkey KEY USER PWD
+
+=head1 AUTHOR
+
+Timo Benk <benk@b1-systems.de>
+
+=head1 SEE ALSO
+
+ncopy(1), dsh(1)
+

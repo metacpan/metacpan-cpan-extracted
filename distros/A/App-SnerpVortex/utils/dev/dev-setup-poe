@@ -1,0 +1,12 @@
+BASE=/Volumes/snerp-vortex-workspace
+DUMP=$BASE/poe-svn.dump
+ANALYSIS=$BASE/poe.xml
+
+echo 'Creating RAM disk.'
+time ./mkramdisk_osx
+
+echo 'Copying dump to RAM disk.'
+time cp ../poe-svn.dump $DUMP
+
+echo 'Analyzing dump.'
+time ./snanalyze --dump $DUMP | xmllint -format - > $ANALYSIS

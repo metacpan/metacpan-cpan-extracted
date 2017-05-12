@@ -1,0 +1,23 @@
+Revision history for App-GitHooks-Plugin-ForceRegularUpdate
+
+v1.0.5  2016-05-21
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+        - Cleaned up dependencies.
+        - Relicensed under Perl 5 terms.
+
+v1.0.4  2014-11-15
+        - Fix warnings with Perl 5.21 (GH-1).
+
+v1.0.3  2014-06-08
+        - Bumped git requirement to v1.7.4.1.
+        - Made git test safer to run.
+
+v1.0.2  2014-06-02
+        - Sync manifest.
+
+v1.0.1  2014-06-01
+        - Fix replacing environment variables in the update file path.
+
+v1.0.0  2014-05-31
+        - Public release.

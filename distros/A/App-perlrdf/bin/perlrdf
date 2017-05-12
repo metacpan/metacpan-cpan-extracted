@@ -1,0 +1,275 @@
+#!/usr/bin/env perl
+
+use App::perlrdf;
+App::perlrdf->run;
+
+__END__
+
+=head1 NAME
+
+perlrdf - perlrdf command line utils
+
+=head1 SYNOPSIS
+
+   $ perlrdf make_store --sqlite=mystore.dat
+   Initialized RDF::Trine::Store::DBI::SQLite
+
+   $ perlrdf validate input.rdf
+   1..1
+   ok 1 - file:///tmp/example/input.rdf is valid RDFXML, 9 triples
+
+   $ perlrdf store_load --autograph --sqlite=mystore.dat input.rdf
+   Loading file:///tmp/example/input.rdf
+
+   $ perlrdf store_dump --sqlite=mystore.dat output.nq
+   Writing file:///tmp/example/output.nq
+
+   $ perlrdf translate output.nq output.rdf
+
+   $ perlrdf isomorphic input.rdf output.rdf
+   graphs are isomorphic
+
+=head1 DESCRIPTION
+
+perlrdf is a single front-end to various RDF functionality available for
+Perl. The core distribution includes commands for create and manipulate
+quad stores (i.e. databases for RDF data); and commands to parse, serialise,
+convert and validate RDF data in various formats.
+
+However, perlrdf is pluggable and it is anticipated that plugins on CPAN
+will cover other tasks such as RDF querying, signing, encryption, and
+reasoning.
+
+=head1 COMMANDS
+
+This section describes the commands included with the core App::perlrdf
+distribution. Others are available as plugins. Run C<< perlrdf commands >>
+to see a list of locally installed commands.
+
+=head2 Meta Commands
+
+=head3 C<< perlrdf about >>
+
+Shows the version numbers of all installed perlrdf commands, plus the CPAN
+ID of each command's author.
+
+=head3 C<< perlrdf aliases >>
+
+Many commands have aliases or shortcuts. For example, the following two are
+equivalent:
+
+   $ perlrdf translate input.ttl output.rdf
+   $ perlrdf tr input.ttl output.rdf
+
+C<< perlrdf aliases >> shows a list of available aliases.
+
+=head3 C<< perlrdf commands >>
+
+Shows a list of installed perlrdf commands, along with a brief extract.
+
+=head3 C<< perlrdf filespec >>
+
+Shows help on "File Specifications". FileSpecs are an App::perlrdf-specific
+microsyntax for specifying a filename or URI along with a tiny bit of
+associated key-value metadata. The following are three examples of FileSpecs:
+
+   {format:RDFXML}C:\Data\contacts.xml
+   http://www.example.com/mydata.ttl
+   {format:Turtle,base:"http://example.net/"}stdin:
+
+Running the C<< perlrdf filespec >> command on its own shows some help on
+using FileSpecs. If you run it with additional arguments, these are parsed
+as FileSpecs with debugging information shown.
+
+   $ perlrdf filespec /tmp/foo.rdf
+   {
+      "base" : "file:///tmp/foo.rdf",
+      "format" : "RDF::Trine::Parser::RDFXML",
+      "uri" : "file:///tmp/foo.rdf"
+   }
+
+=head3 C<< perlrdf help >>
+
+Running the C<< perlrdf help >> command on its own shows a list of commands
+with their abstracts. Detailed help for a particular command can be shown
+by providing that as an argument. For example, for help on the
+C<< perlrdf translate >> command, run:
+
+   $ perlrdf help translate
+
+=head2 Parsing and Serialization
+
+In general, parsing and serialization commands take one or more FileSpecs
+as arguments. These can be provided as options, as in:
+
+   $ perlrdf translate --input-spec="in.nt" --output-spec="out.rdf"
+
+Alternatively the first "positional argument" will usually be treated as
+an input FileSpec, and the second as an output FileSpec:
+
+   $ perlrdf translate in.nt out.rdf
+
+Using options rather than positional parameters can often be clearer, and is
+the recommended way of passing parameters, especially when you need to pass
+multiple input files or multiple output files as parameters.
+
+When no inputs are provided as named or positional arguments, STDIN is
+normally used. When no outputs are provided, output normally goes to STDOUT.
+
+=head3 C<< perlrdf canonicalize >>
+
+Given a single FileSpec as input, serializes as canonical N-Triples, which
+is a useful format for SHA1/MD5 digests, graph signing, etc, because it means
+that incidental features of serialization (blank node identifiers, whitespace,
+order of statements) don't affect the output. If no input FileSpec is
+provided, then defaults to STDIN.
+
+A filename or URL (but not a full FileSpec) may be provided for output.
+Otherwise defaults to STDOUT.
+
+=head3 C<< perlrdf translate >>
+
+Parses one or more input FileSpecs into a single RDF graph and serializes
+them to one or more output FileSpecs. Thus this command can be used as a
+translator between different RDF serializations, and also as a graph
+concatenator.
+
+   $ perlrdf translate \
+      --skolem \
+      -i "{format:RDFXML}/tmp/contacts.xml" \
+      -i "http://www.example.com/employees.ttl" \
+      -o "merged-contacts.nt" \
+      -o "merged-contacts.rdf"
+
+The 'skolem' option allows you to generate URIs for any blank nodes in the
+graph. (Not especially fantastic URIs, but URIs all the same.)
+
+=head3 C<< perlrdf validate >>
+
+Parses one or more input FileSpecs (doing nothing with the results), and
+makes sure that each file parses without croaking. Writes output to STDOUT
+in TAP format.
+
+   $ perlrdf validate "foo.ttl" "ftp://acme.example.com/pub/bar.rdf"
+
+It's often a good idea to validate RDF before attempting to load it into a
+store.
+
+=head2 Quad Store Management
+
+RDF::Trine stores can be connected to using DSN-like configuration strings
+such as:
+
+   DBI;mymodel;DBI:mysql:database=rdf;user;password
+
+These configuration strings are passed to the App::perlrdf tool using the
+'store' option:
+
+   $ perlrdf make_store \
+      --store="DBI;mymodel;DBI:mysql:database=rdf;user;password"
+
+For the common case of DBI-backed stores, App::perlrdf offers the ability
+to avoid configuration strings and just specify database type, name, etc:
+
+   $ perlrdf make_store \
+      --database=mysql \
+      --dbname=rdf \
+      --username=user \
+      --password=password \
+      --model=contacts_db
+
+SQLite-backed stores are particularly easy to work with:
+
+   $ perlrdf make_store --sqlite=/tmp/mydatabase.sqlite
+
+If no store is specified on the command line, the C<PERLRDF_STORE>
+environment variable is consulted.
+
+	$ setenv PERLRDF_STORE "DBI;xyz;DBI:mysql:database=rdf;un;pw"
+   $ perlrdf make_store
+
+=head3 C<< perlrdf make_store >>
+
+Initializes the store, creating empty data structures, etc.
+
+If the store already exists this I<should> be non-destructive.
+
+=head3 C<< perlrdf store_describe >>
+
+Describes a resource in the database.
+
+   $ perlrdf store_describe --sqlite=/tmp/mydatabase.sqlite \
+      --output-format=RDFXML \
+      "http://www.example.com/id/alice"
+
+=head3 C<< perlrdf store_dump >>
+
+Dumps the contents of a store to a FileSpec, or to STDOUT. As with the
+C<translate> command, this may take multiple output filenames.
+
+With the 'graph' option, you can limit the dump to specific graphs.
+
+=head3 C<< perlrdf store_load >>
+
+Loads one or more FileSpecs into the store. By default, data is loaded as
+triples (in no graph). You can specify a graph URI for the data using the
+'graph' option; or use the 'autograph' option to indicate that you wish to
+use the FileSpec URIs as graph URIs.
+
+=head3 C<< perlrdf store_truncate >>
+
+Deletes all data from a store.
+
+With the 'graph' option, you can delete specific graphs.
+
+=head2 Other
+
+=head3 C<< perlrdf isomorphic >>
+
+Given two input FileSpecs, checks whether they are isomorphic (i.e. the same
+graph after mapping blank node identifiers). If they are non-isomorphic, it
+will also inform you about them differing in "interesting" ways - i.e. one
+graph being an exact subgraph of the other.
+
+=head3 C<< perlrdf prefix >>
+
+Looks up one or more prefixes using RDF::NS.
+
+   $ perlrdf prefix rdf,rdfs,owl,xsd
+   owl     http://www.w3.org/2002/07/owl#
+   rdf     http://www.w3.org/1999/02/22-rdf-syntax-ns#
+   rdfs    http://www.w3.org/2000/01/rdf-schema#
+   xsd     http://www.w3.org/2001/XMLSchema#
+
+   $ perlrdf prefix --format=turtle foaf,dc
+   @prefix dc: <http://purl.org/dc/elements/1.1/> .
+   @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+=head1 SEE ALSO
+
+L<RDF::Trine>,
+L<RDF::TriN3>,
+L<RDF::Query>,
+L<RDF::Query::Client>,
+L<RDF::NS>.
+
+Find App::perlrdf plugins on MetaCPAN:
+L<https://metacpan.org/search?q=App::perlrdf::Command>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

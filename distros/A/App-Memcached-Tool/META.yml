@@ -1,0 +1,49 @@
+---
+abstract: 'A porting of L<memcached/memcached-tool|https://github.com/memcached/memcached/blob/master/scripts/memcached-tool>'
+author:
+  - 'YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>'
+build_requires:
+  Pod::Markdown::Github: '0.01'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Memcached-Tool
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Memcached::Tool:
+    file: lib/App/Memcached/Tool.pm
+    version: v0.9.4
+  App::Memcached::Tool::CLI:
+    file: lib/App/Memcached/Tool/CLI.pm
+    version: v0.9.4
+  App::Memcached::Tool::Constants:
+    file: lib/App/Memcached/Tool/Constants.pm
+    version: v0.9.4
+  App::Memcached::Tool::DataSource:
+    file: lib/App/Memcached/Tool/DataSource.pm
+  App::Memcached::Tool::Util:
+    file: lib/App/Memcached/Tool/Util.pm
+    version: v0.9.4
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/key-amb/perl5-App-Memcached-Tool/issues
+  homepage: https://github.com/key-amb/perl5-App-Memcached-Tool
+  repository: git://github.com/key-amb/perl5-App-Memcached-Tool.git
+version: v0.9.4
+x_authority: cpan:KEYAMB

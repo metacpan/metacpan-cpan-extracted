@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html  xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<form method="post" action="u" enctype="multipart/form-data">
+Name: [% name %] <br />
+[% SWITCH swit_errors.name %]
+[% CASE 'defined' %]
+Name cannot be empty
+[% CASE 'unique' %]
+This name exists already
+[% CASE 'custom' %]
+custom encode
+[% END %]
+
+Email: [% email %] <br />
+[% SWITCH swit_errors.email %]
+[% CASE 'defined' %]
+Email cannot be empty
+[% CASE 'regexp' %]
+Email is invalid
+[% END %]
+
+<hr />
+[% FOREACH l IN sl %]
+[% l.o %]
+[% IF l.swit_errors.o %]
+o integer
+[% END %]
+[% END %]
+
+[% k1 %]
+[% k2 %]
+[% IF swit_errors.k1 == 'unique' %]
+k1 uq k2
+[% END %]
+
+[% IF swit_errors.k2 == 'unique' %]
+k2 uq k1
+[% END %]
+
+[% klak %]
+[% IF swit_errors.klak == 'unique' %]
+klak error
+[% END %]
+
+[% IF swit_errors.flak == 'unique' %]
+flak error
+[% END %]
+
+[% IF swit_errors.scol == 'unique' %]
+scol error
+[% END %]
+
+<input type="submit" />
+</form>
+</body>
+<html>

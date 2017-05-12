@@ -1,0 +1,6 @@
+0.002
+  - Deal correctly with (and require) Net::RabbitFoot 1.03
+
+0.001
+  - Initial version.
+

@@ -1,0 +1,116 @@
+Revision history for Perl extension App::Daemon.
+
+0.22 (09/23/2014)
+   (ms) Fixed test suite to shut down fork daemon at the end.
+
+0.21 (04/28/2014)
+   (ms) Nicolai Langfeldt added -g option to switch to specified group 
+        when app was started as root.
+   (ms) Makefile.PL now dies on Win32 to save the CPAN smoke testers 
+        some grief with hanging tests ([rt.cpan.org #81980])
+
+0.20 (11/11/2013)
+   (ms) [rt.cpan.org #61428] Fixed bug in detach() which no longer attempts
+        to write to a non-existing pid file.
+
+0.19 (07/07/2013)
+   (ms) [rt.cpan.org #86762] Peter noticed that App::Daemon's fork()
+        check was incorrect. Fixed.
+
+0.18 (10/31/2012)
+   (ms) [rt.cpan.org #75931] Fixed previous release to actually work with
+        Proc::ProcessTable missing.
+
+0.17 (10/30/2012)
+   (ms) [rt.cpan.org #75931] To address problems with Proc::ProcessTable 
+        on some platforms, changed process_is_running() to use POSIX methods
+        only. Proc::ProcessTable is now optional and only required when
+        using process_running_by_name().
+
+0.16 (10/21/2012)
+   (ms) [rt.cpan.org #44462] forked children now don't remove the master's
+        pid file anymore when they exit. Thanks to Felix Ostmann and
+        Vadim Troshchinskiy for proposing the fix.
+
+0.15 (02/22/2012)
+   (ms) [rt.cpan.org #75219] Umask is now set to 0 to allow OS calls 
+        to provide their own permission masks and not to depend on the 
+        umask of the caller.
+
+0.14 (12/25/2011)
+   (ms) [rt.cpan.org #72835] Patch by Peter to fix 'restart'.
+
+0.13 (07/19/2011)
+   (ms) [rt.cpan.org #69561] default log and pid files are now in the
+        current directory, not in /tmp by default because of security 
+        concerns.
+   (ms) [rt.cpan.org #69561] not setting umask anymore
+
+0.12 (07/18/2011)
+   (ms) 'status' now doesn't write to the logfile (suggested by Brian Pitts)
+   (ms) 'stop' now verifies if the process is still up, and retries
+        $App::Daemon::kill_retries times (defaults to 3) times, with 
+        1-second sleeps in between.
+   (ms) Upon successful 'stop', pid file now gets removed (suggested by 
+        Brian Pitts)
+   (ms) 'status' now triggers exit codes
+        in compliance with http://refspecs.freestandards.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html (suggested by Brian Pitts)
+   (ms) using SIGTERM now instead of SIGINT to terminate a process
+
+0.11 (08/28/2010)
+    (ms) Fixed test suite.
+
+0.10 (08/19/2010)
+    (ms) Writing pid file before dropping privileges (just like logfile).
+
+0.09 (04/09/2010)
+    (ms) Fixed find_option example on manual page. Thanks to 
+         Rolf Schaufelberger for pointing it out.
+    (ms) Added github repository link to Makefile.PL
+    (ms) Changed dropping privileges to setuid() 
+         (http://www.perlmonks.org/?node_id=833950)
+
+0.08 (11/05/2009)
+    (ms) [RT 50884] Applied patch by Matthew Byng-Maddick allow overriding
+         app-internal option settings by command line options. Order is now:
+         command line > app-internal > App::Daemon internal
+    (ms) [RT 51066] Applied patch by Mike Whitaker to point stdin/out/err 
+         to /dev/null instead of closing them.
+
+0.07 (10/08/2009)
+    (ms) Applied patch by Sadrak [rt:44513] to check if Log4perl has
+         already been initialized and skip the easy_init call in this
+         case. Note that -v then has to be handled by the user-provided 
+         Log4perl configuration instead.
+    (ms) [RT 50326] Fixed insecure dependency error in tainted mode
+         by untainting the string obtained by appname().
+
+0.06 (03/05/2009)
+    (ms) Added detach() as an importable method for simple daemons.
+
+0.05 (02/17/2009)
+    (ms) Better docs as requested by Tim Appnel
+    (ms) docs on application-specific command line options
+    (ms) Better daemonization according to Stevens (Advanced Programming
+         in the UNIX environment)
+    (ms) Make sure the child isn't killed by a closed session before
+         it is able to detach from the tty.
+    (ms) Better __DIE__ handler as suggested by Karl Rune Nilsen in
+         http://rt.cpan.org/Ticket/Display.html?id=39917.
+
+0.04 10/02/2008
+    (ms) Fixed logfile permissions if daemon starts up at root and
+         then drops priviledges. Added docs.
+
+0.03 08/03/2008
+    (ms) Fixed test suite for Freebsd, which locks tempfiles 
+         exclusively. Thanks to to CPAN tester Slaven Rezic.
+    (ms) Removed restriction on perl-5.8.
+
+0.02 08/01/2008
+    (ms) Added setting logfile and pidfile within the script itself, as
+    suggested by Kimo Rosenbaum.
+    (ms) Fixed OLDERR warnings in test suite.
+
+0.01 07/19/2008
+    (ms) Where it all began.

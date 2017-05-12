@@ -1,0 +1,9 @@
+For this template to work the first two of the following options are a necessity, option three and four only completes the
+design.  Option two should of course be hacked to fit the EXIF from your camera.
+
+Remember to copy the new gallery.css to your DocumentRoot as well.
+
+PerlSetVar  GalleryEXIFMode         'variables'
+PerlSetVar  GalleryInfo             'Model => Model, Timestamp => DateTimeOriginal, Exposure Time => ExposureTime, ISO Speed Rating => ISOSpeedRatings, Focal Length => FocalLength, ApertureValue => ApertureValue, Flash => Flash'
+PerlSetVar  GalleryThumbnailSize    '140x105'
+PerlSetVar  GalleryThumbnailSizeLS  1

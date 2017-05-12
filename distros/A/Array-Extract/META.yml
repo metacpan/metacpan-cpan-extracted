@@ -1,0 +1,27 @@
+---
+abstract: 'extract element from an array'
+author:
+  - 'Written by Mark Fowler <mark@twoshortplanks.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Array-Extract
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/2shortplanks/Array-Extract/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/2shortplanks/Array-Extract.git
+version: 1.00

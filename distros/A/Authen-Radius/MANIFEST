@@ -1,0 +1,33 @@
+Changes
+Makefile.PL
+README
+LICENSE
+MANIFEST
+Radius.pm
+install-radius-db.PL
+t/decode.t
+t/dictionary.t
+t/digest.t
+t/encode.t
+t/error.t
+t/tag.t
+t/vendor.t
+raddb/dictionary
+raddb/dictionary.ascend
+raddb/dictionary.cisco
+raddb/dictionary.compat
+raddb/dictionary.livingston
+raddb/dictionary.quintum
+raddb/dictionary.rfc2865
+raddb/dictionary.rfc2866
+raddb/dictionary.rfc2869
+raddb/dictionary.rfc3162
+raddb/dictionary.shiva
+raddb/dictionary.tunnel
+raddb/dictionary.usr
+raddb/dictionary.versanet
+raddb/dictionary.wimax
+raddb/dictionary.xtradius
+contrib/check_pwd.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="NULL" type="application/x-xsp"?>
+<?xml-stylesheet href="/transforms/index-aggregate.xsl" type="text/xsl"?>
+<?xml-stylesheet href="/transforms/xhtml/index.xsl" type="text/xsl"?>
+
+<xsp:page
+  xmlns:xsp="http://www.apache.org/1999/XSP/Core"
+  xmlns:aggr="http://www.kjetil.kjernsmo.net/software/TABOO/NS/IndexAggr"
+  xmlns:cat="http://www.kjetil.kjernsmo.net/software/TABOO/NS/Category">
+
+  <taboo>
+    <aggr:stories>
+      <aggr:story>/news/unpriv/10</aggr:story>
+    </aggr:stories>
+
+    <cat:get-categories type="categ" onlycontent="true"/>
+  </taboo>
+</xsp:page>
+

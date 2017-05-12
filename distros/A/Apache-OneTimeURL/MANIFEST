@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+t/01-basic.t
+lib/Apache/OneTimeURL.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

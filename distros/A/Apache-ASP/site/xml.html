@@ -1,0 +1,470 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Xml/xslt</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>XML/XSLT</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="changes.html" style="text-decoration:none"><font color=#063678>CHANGES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>XML/XSLT</b></font>
+</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Custom%20Tags%20343d11d8>Custom Tags with XMLSubsMatch</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#References>References</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#XSLT%20Tranfor41f72a4d>XSLT Tranformations</a>
+			</font>
+			</td>
+		<td>&nbsp;</td>					
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Custom%20Tags%20343d11d8></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Custom Tags with XMLSubsMatch</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Before XML, there was the need to make HTML markup smarter.
+Apache::ASP gives you the ability to have a perl
+subroutine handle the execution of any predefined tag,
+taking the tag descriptors, and the text contained between,
+as arguments of the subroutine.  This custom tag
+technology can be used to extend a web developer&#39;s abilities
+to add dynamic pieces without having to visibly use 
+&lt;% %&gt; style code entries.
+<font face="courier new" size=3><pre>
+</pre></font>So, lets say that you have a table that 
+you want to insert for an employee with contact 
+info and the like, you could set up a tag like:
+<font face="courier new" size=3><pre>
+ &lt;my:new-employee name=&quot;Jane&quot; last=&quot;Doe&quot; phone=&quot;555-2222&quot;&gt;
+   Jane Doe has been here since 1998.
+ &lt;/my:new-employee&gt;
+</pre></font>To render it with a custom tag, you would tell 
+the Apache::ASP parser to render the tag with a 
+subroutine:
+<font face="courier new" size=3><pre>
+  PerlSetVar XMLSubsMatch my:new-employee
+</pre></font>Any colons, &#39;:&#39;, in the XML custom tag will turn
+into &#39;::&#39;, a perl package separator, so the my:employee
+tag would translate to the my::employee subroutine, or the 
+employee subroutine in the my package.  Any dash &quot;-&quot; will 
+also be translated to an underscore &quot;_&quot;, as dash is not valid
+in the names of perl subroutines.
+<font face="courier new" size=3><pre>
+</pre></font>Then you would create the my::employee subroutine in the my 
+perl package or whereever like so:
+<font face="courier new" size=3><pre>
+  package my;
+  sub new_employee {
+    my($attributes, $body) = @_;
+    $main::Response-&gt;Include(&#39;new_employee.inc&#39;, $attributes, $body);
+  }
+  1;
+
+  &lt;!-- # new_employee.inc file somewhere else, maybe in Global directory --&gt;
+  &lt;% my($attributes, $body) = @_; %&gt;
+  <table>
+  &lt;% for('name', 'last', 'phone') { %&gt;
+    <tr>
+      <td><b>&lt;%=ucfirst $_ %&gt;</b>:</td>
+      <td>&lt;%= $attributes->{$_} %&gt;</td>
+    </tr>
+  &lt;% } %&gt;
+  <tr><td colspan=2>&lt;%= $body %&gt;</td></tr>
+  </table>
+  &lt;!-- # end new_employee.inc file --&gt;
+</pre></font>The $main::Response-&gt;Include() would then delegate the rendering
+of the new-employee to the new_employee.inc ASP script include.
+<font face="courier new" size=3><pre>
+</pre></font>Though XML purists would not like this custom tag technology
+to be related to XML, the reality is that a careful
+site engineer could render full XML documents with this
+technology, applying all the correct styles that one might
+otherwise do with XSLT. 
+<font face="courier new" size=3><pre>
+</pre></font>Custom tags defined in this way can be used as XML tags
+are defined with both a body and without as it
+<font face="courier new" size=3><pre>
+  &lt;my:new-employee&gt;...&lt;/my:new-employee&gt;
+</pre></font>and just
+<font face="courier new" size=3><pre>
+  &lt;my:new-employee /&gt;
+</pre></font>These tags are very powerful in that they can also
+enclose normal ASP logic, like:
+<font face="courier new" size=3><pre>
+  &lt;my:new-employee&gt;
+    &lt;!-- normal ASP logic --&gt;
+    &lt;% my $birthday = &amp;HTTP::Date::time2str(time - 25 * 86400 * 365); %&gt;
+
+    &lt;!-- ASP inserts --&gt;
+    This employee has been online for &lt;%= int(rand()*600)+1 %&gt;
+    seconds, and was born near &lt;%= $birthday %&gt;.
+  &lt;/my:new-employee&gt;   
+</pre></font>For an example of this custom XML tagging in action, please check 
+out the <a href=eg/xml_subs.asp>./site/eg/xml_subs.asp</a> script.</font>
+	
+	<p>
+	<a name=XSLT%20Tranfor41f72a4d></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>XSLT Tranformations</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>XML is good stuff, but what can you use it for? The principle is
+that by having data and style separated in XML and XSL files, you
+can reformat your data more easily in the future, and you 
+can render your data in multiple formats, just as easily 
+as for your web site, so you might render your site to
+a PDA, or a cell phone just as easily as to a browser, and all
+you have to do is set up the right XSL stylesheets to do the
+transformation (XSLT).
+<font face="courier new" size=3><pre>
+</pre></font>With native <a href=xml.html><font size=-1 face=verdana><b>XML/XSLT</b></font></a> support, Apache::ASP scripts may be the
+source of XML data that the XSL file transforms, and the XSL file
+itself will be first executed as an ASP script also.  The XSLT 
+transformation is handled by <a href=http://xmlxslt.sourceforge.net/><font size=-1 face=verdana><b>XML::XSLT</b></font></a> or XML::Sablotron and you can
+see an example of it in action at the <a href=eg/xslt.xml>./site/eg/xslt.xml</a> XML script.  
+<font face="courier new" size=3><pre>
+</pre></font>To specify a XSL stylesheet, use the setting:
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLT template.xsl
+</pre></font>where template.xsl could be any file.  By default this will
+XSLT transform all ASP scripts so configured, but you can separate xml
+scripts from the rest with the setting:
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLTMatch xml$
+</pre></font>where all files with the ending xml would undergo a XSLT transformation.
+<font face="courier new" size=3><pre>
+</pre></font>Note that XSLT depends on the installation of XML::XSLT,
+which in turn depends on XML::DOM, and XML::Parser.
+As of version 2.11, XML::Sablotron may also be used by
+setting:
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLTParser XML::Sablotron
+</pre></font>and XML::LibXSLT may be used, as of 2.29, by setting
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLTParser XML::LibXSLT
+</pre></font>If you would like to install XML::Sablotron or XML::LibXSLT,
+you will first have to install the libraries that these perl
+modules use, which you can get at:
+<font face="courier new" size=3><pre>
+  <a href="http://xmlsoft.org/XSLT/">libxslt - The XSLT C Library for Gnome</a>
+
+  <a href="http://www.gingerall.com">Sablotron - Ginger Alliance</a>
+</pre></font>For more on XML::XSLT, the default XSLT engine that Apache::ASP
+will use, please see:
+<font face="courier new" size=3><pre>
+  <a href="http://xmlxslt.sourceforge.net/">XML::XSLT</a>
+</pre></font>XML:XSLT was the first supported XSLT engine as has the benefit
+of being written in pure perl so that though while it is slower
+than the other solutions, it is easier to port.
+<font face="courier new" size=3><pre>
+</pre></font>If you would like to cache XSLT tranformations, which
+is highly recommended, just set:
+<font face="courier new" size=3><pre>
+  PerlSetVar XSLTCache 1
+</pre></font>Please see the Cache settings in the <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> section for
+more about how to configure the XSLTCache.</font>
+	
+	<p>
+	<a name=References></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>References</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>For more information about XSLT, please see the standard at:
+<font face="courier new" size=3><pre>
+  <a href=http://www.w3.org/TR/xslt>http://www.w3.org/TR/xslt</a>
+</pre></font>For their huge ground breaking XML efforts, these other XML OSS
+projects need mention:
+<font face="courier new" size=3><pre>
+  <a href="http://cocoon.apache.org/">Cocoon - XML-based web publishing, in Java</a>
+
+  <a href="http://www.axkit.org/">AxKit - XML web publishing with Apache &amp; mod_perl</a>
+</pre></font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

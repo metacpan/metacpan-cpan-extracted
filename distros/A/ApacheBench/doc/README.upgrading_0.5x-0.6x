@@ -1,0 +1,61 @@
+ApacheBench Perl API changes - ver 0.6x
+
+The ApacheBench Perl API has changed since versions 0.5x, such that
+scripts that use the 0.5x API will not work correctly using 0.6x.
+I apologize for the forced upgrade, but the 0.5x API was non-intuitive
+and buggy.  The new 0.6x API will remain stable from now on.  Any future
+changes will be accompanied by backwards compatibility fixes.
+
+To upgrade scripts that were written for ApacheBench 0.5x:
+
+1) When calling configuration methods, 'filesize' has been renamed to
+   'buffersize'.  For individual runs, 'cookie' has been renamed to 'cookies'.
+
+   The fix:
+   - replace all $b->config({ filesize => XXX }) occurrences with
+     $b->config({ buffersize => XXX }), or better yet: $b->buffersize(XXX)
+
+2) The run configuration add() method no longer exists.  You now have to
+   instantiate a new Run object and call add_run() on it.
+
+   The fix:
+   - replace all $b->add({ ... }) occurrences with:
+     my $r = HTTPD::Bench::ApacheBench::Run->new({ ... });
+     $b->add_run($r);
+
+3) The execute() method no longer returns a regression hash, it returns
+   an HTTPD::Bench::ApacheBench::Regression object.  The old regression
+   hash can be found in this object's variable 'regression'.
+
+   The fix:
+   - replace all $re = $b->execute() with:
+     $re = $b->execute();
+     $rhash = $re->{'regression'};
+
+4) The regression hash no longer contains any per-URL information.
+   Half of the data keyed on URL was wrong, and the other half was
+   fairly useless, so it is no longer returned at all.
+
+   The fix:
+   - remove all references to URLs in the regression hash, e.g.
+     anything that looks like $re->{'run0'}->{'http://test.url/'}
+
+5) What was stored in the 'threads' array reference (for each run),
+   is now in the top-level of the regression hash for each run.
+   The term threads was confusing, especially considering an upcoming
+   rewrite will probably include multi-threaded request sending.
+
+   The fix:
+   - replace all $re->{'run0'}->{'threads'} with $rhash->{'run0'}
+
+   Notice that each runI entry in the regression hash is now an ARRAY ref, not
+   a HASH ref.  Your Perl script will fail unless you treat them as such.
+
+6) Read the documentation.  There is a much more intuitive way of
+   getting regression data using object method calls, rather than poking
+   around through the huge regression hash.  Configuration can also now be
+   done with method calls.
+
+--
+Adi Fairbank
+February 23, 2001

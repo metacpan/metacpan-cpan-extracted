@@ -1,0 +1,105 @@
+{
+   "abstract" : "Sinatra-ish framework on Amon2!",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Amon2-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amon2" : "3.25",
+            "Amon2::Config::Simple" : "0",
+            "Amon2::Plugin::Web::CSRFDefender" : "0",
+            "Amon2::Setup::Flavor" : "0",
+            "Amon2::Web" : "0",
+            "Data::Section::Simple" : "0.03",
+            "Plack::App::File" : "0",
+            "Plack::Middleware::Session" : "0",
+            "Plack::Session::State::Cookie" : "0",
+            "Router::Simple" : "0.13",
+            "Text::Xslate" : "2.0010",
+            "Text::Xslate::Bridge::TT2Like" : "0.00010",
+            "parent" : "0",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Prove" : "0",
+            "File::Temp" : "0",
+            "HTTP::Message::PSGI" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Response" : "0",
+            "Plack::Test" : "0",
+            "Plack::Util" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "Test::WWW::Mechanize" : "0",
+            "Tiffany" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Amon2::Lite" : {
+         "file" : "lib/Amon2/Lite.pm",
+         "version" : "0.13"
+      },
+      "Amon2::Setup::Flavor::Lite" : {
+         "file" : "lib/Amon2/Setup/Flavor/Lite.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Amon2-Lite/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Amon2-Lite",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Amon2-Lite.git",
+         "web" : "https://github.com/tokuhirom/Amon2-Lite"
+      }
+   },
+   "version" : "0.13",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Kosuke Asami <tfortress58@gmail.com>",
+      "moznion <moznion@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

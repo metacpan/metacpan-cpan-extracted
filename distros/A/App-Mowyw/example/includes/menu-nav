@@ -1,0 +1,17 @@
+<div id="nav-main">
+<h2>Navigation</h2>
+<ul>
+[[[item home <li><a {{class="active"}} href="index.shtml">Home</a></li>]]]
+[[[item foo <li><a {{class="active"}} href="foo.shtml">foo</a>
+{{
+	<ul>
+		[[[item foo1 <li><a href="foo1.shtml" {{class="active"}}
+		style="margin-left:2em!important">foo1</a></li>]]]
+		[[[item foo2 <li><a href="foo2.shtml" {{class="active"}}
+		style="margin-left:2em!important">foo2</a></li>]]]
+	</ul>
+}}</li>]]]
+[[[item bar <li><a {{class="active"}} href="bar.shtml">bar</a></li>]]]
+</ul>
+</div>
+

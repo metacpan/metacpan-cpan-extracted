@@ -1,0 +1,61 @@
+* 2013-??-?? version 0.22
+
+Added OS and version detection for Amazon Linux. (RT#88412)
+
+* 2011-02-23 version 0.21
+
+Added OS and version detection for Oracle Enterprise Linux
+Fixed version detection for Fedora (reported by tlhackqueATyahoo.com, RT#69671)
+Fixed OS and version detection for CentOS6 (RT#69847)
+Added version detection for Scientific Linux
+
+* 2010-12-05 version 0.20
+
+Fixed version detection for Gentoo
+CentOS detection (modified patch from XSAWYERX)
+Start writing distribution-oriented tests
+Build.PL added
+
+* 2008-11-02 version 0.14_01
+
+Remove bareword filehandles and 2-arg open
+Will not install if not on Linux
+Modernize Makefile.PL
+Fix for 5.10
+Pardus support (by BURAK, RT#27357)
+Fix Fedora recognition (reported by sagarshahATsofthome.net, RT#11996)
+
+* 2005-02-16
+
+Added support for Redflag.
+
+* 2006-01-16
+Thanks to Judith Lebzelter now the module gets advantage of the LSB's /etc/lsb-release file.
+Added support for Ubuntu and version information retrieval for gentoo, debian, suse, fedora,
+redhat and slackware.
+
+* 2005-03-10
+Added support for yoper, arch-linux and libranet.
+
+* 2005-03-09
+Cleaned code.
+
+* 2005-03-08
+Version 0.03.
+Added support for Adamantix and Trustix.
+
+* 2005-03-07
+Reduced needed perl version to 5.6.0.
+Removed copyright line from pod documentation.
+
+* 2005-03-06
+Version 0.02.
+
+* 2005-03-06
+Added support for immunix, conectiva, tinysofa and va-linux.
+
+* 2005-03-06
+Updated changelog
+
+* 2005-03-06 20:14:28 +0100
+Version 0.01.

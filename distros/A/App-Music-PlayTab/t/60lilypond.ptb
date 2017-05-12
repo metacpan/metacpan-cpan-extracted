@@ -1,0 +1,42 @@
+!t Brand (Fire)
+!s Silvia Millecam (Bruce Springsteen)
+!s t = 120 CAPO 1
+!w -5
+!h -3
+!n -3
+!x -5
+!ly
+
+=Intro
+    | g2. | g | g1 | g |
+    | g | g | g | r |
+-V1
+    | g1 | g | g | g |
+    | a1:m | a1:m | g1 | g1 |
+    | a1:m | a1:m | e1:m | e1:m |
+    | c1 | d2. r4 |
+-Fire
+    | g1 | g1 | g1 | r1 |
+
+    | g1 | g1 | g1 | g1 |
+    | a1:m | a1:m | g1 | g1 |
+    | a1:m | a1:m | e1:m | e1:m |
+    | c1 | d2. r4 |
+
+!l 0
+    | G . . . | G . . . | G . . . |
+
+!lilypond
+    | g1 | c1 | g1 | d1 |
+    | g1 | c1 | g1 | a1:7 |
+    | d4 d4:maj7 d2:7 | d1 | r1 | r1 |
+
+
+    | g1 | g1 | g1 | g1 |
+    | a1:m | a1:m | g1 | g1 |
+    | a1:m | a1:m | e1:m | e1:m |
+    | c1 | d2. r4 |
+
+    | g1 | g1 | g1 | g1 |
+    | g1 | g1 | g1 | g1 |
+    | g1 | g1 |

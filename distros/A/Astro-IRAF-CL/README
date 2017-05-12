@@ -1,0 +1,69 @@
+
+Astro::IRAF::CL
+===============
+
+This is a Perl module that provides an object-orientated interface to
+the IRAF CL interactive session, it is built on top of the Perl Expect
+module. You can script almost anything through this module that you
+can do in a normal interactive CL session.
+
+This module provides several improved, and more Perl-like, interfaces
+to various IRAF systems, such as session variables, the management of
+loading/unloading IRAF packages and the session history. It also
+provides the ability to specify maximum run times for commands, and
+the clean handling of these time outs and other types of errors and
+exceptions. All functions are called in an object-orientated fashion
+allowing several concurrent interpreter sessions if desired.
+
+Requirements
+------------
+
+This module requires:
+
+Perl 5.6.1
+Expect 1.15
+
+Expect requires IO::Tty 1.0 and suggests IO::Stty
+
+It also requires a fully working IRAF system, it is known to work with
+version 2.11.3 on Solaris, Linux and Alpha machines. It may work with
+other versions of IRAF on other architectures, let me know if it does!
+
+Installation
+------------
+
+The standard method for installing a Perl module holds here:
+
+perl Makefile.PL
+make
+make install
+
+This will install everything into /usr/local as a default. If you want
+to change this the easiest way is to use the LIB variable when
+creating the makefile, for example:
+
+perl Makefile.PL LIB=/home/foo/perlmods
+
+for more configuration options see " perldoc ExtUtils::MakeMaker"
+
+Note that, at present, there is no test system so "make test" won't do
+anything useful.
+
+License
+-------
+
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 dated June, 1991.
+
+This package is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this package; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+
+Stephen Quinney <irafperl@jadevine.org.uk>  Tue, 23 Jul 2002 14:28:59 +01

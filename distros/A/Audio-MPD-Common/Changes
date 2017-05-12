@@ -1,0 +1,79 @@
+Revision history for Audio-MPD-Common
+
+2.003     2015-11-23 15:04:48+01:00 Europe/Paris
+ - new song attributes (johna)
+
+2.002     2014-06-11 15:03:22+02:00 Europe/Paris
+ - new accessor last_modified for amci::directory
+
+2.001     2014-06-11 14:27:40+02:00 Europe/Paris
+ - default xfade to 0 (help fix rt#91082)
+
+2.000     2014-04-04 13:45:48+02:00 Europe/Paris
+ - moving to @Author::JQUELIN for dzil setup
+ - fix Moose enum (rt#90670)
+
+1.120881  2012-03-28 17:54:21 Europe/Paris
+ - new amci:song attributes: composer, performer
+ - amci:song attribute album_artist renamed to albumartist
+
+1.120880  2012-03-28 10:57:23 Europe/Paris
+ - new amci:song attribute: album_artist (rt#76057)
+ - allow a format to control as_string in amci:song
+
+1.120610  2012-03-01 09:36:00 Europe/Paris
+ - new amci:song attribute: last_modified
+
+1.110550  2011-02-24 16:05:29 Europe/Paris
+ - new object: amc::output
+
+1.100430  2010-02-12 12:55:26 Europe/Paris
+ - WARNING: no more makefile.pl supplied, only a build.pl
+ - sub::exporter no more used internally
+
+1.093190 Sun Nov 15 12:14:23 2009
+ - isolating types in amc:types
+ - sweetening code with moosex::has::sugar
+
+1.093170 Fri Nov 13 17:38:35 2009
+ - volume can be negative (in some error cases)
+
+1.093120 Sun Nov  8 15:15:58 2009
+ - date should be a string, not an int
+
+1.092910 Sun Oct 18 11:55:22 2009
+ - requiring perl 5.008
+
+1.092900 Sat Oct 17 19:28:11 2009
+ - new amci:song accessor: disc
+
+1.092860 Tue Oct 13 17:33:42 2009
+ - track attribute in amci:song can be a string
+ - bumping requirement of moose to 0.92 to get hash traits
+
+1.092840 Sun Oct 11 09:31:23 2009
+ - amci:* accessors should not be readonly (assigned one by one by pococm:conn)
+
+1.092830 Sat Oct 10 18:52:59 2009
+ - migrated to moose
+ - warning: accessors are now read-only!
+ - new song accessor: name (bug reported by thorsten schwinn)
+ - migrated to dist::zilla (raaaaaar!)
+
+**
+
+0.1.4 Tue Jan  6 16:40:08 CET 2009
+ - missing tag last_modified in amci:playlist (new in mpd 0.14)
+
+0.1.3 Tue Sep 23 08:35:42 CEST 2008
+ - [rt#39529] missing tag fields in amci:song
+
+0.1.2 Mon Nov 26 12:55:46 CET 2007
+ - kwalitee/cpants release
+
+0.1.1 Thu May 31 20:42:52 CEST 2007
+ - new accessor for Status: updating_db (bug mantis #546)
+
+0.1.0 Wed May 30 17:39:00 CEST 2007
+ - first version based on poe::component::client::mpd
+ - heavy cleanup

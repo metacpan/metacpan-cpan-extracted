@@ -1,0 +1,401 @@
+
+=head1 NAME
+
+App::installguide::hosted - Instructions on installing the App::Context framework in a web-hosting (non-root) environment
+
+=head1 DESCRIPTION
+
+These are instructions on installing the App::Context framework in a web-hosting (non-root) environment.
+
+=head1 ASSUMPTIONS
+
+ * You get command line access but not root.
+ * You have access to a MySQL database engine (and permissions to create at least 3 databases)
+
+=head1 SET UP THE CPAN SHELL
+
+Installing software from CPAN into a non-system area requires a little setup.
+
+ * Find CPAN/Config.pm and make a local copy of it to MyConfig.pm
+ * Modify MyConfig.pm to use local directories
+
+The first thing to do is to find CPAN/Config.pm.
+
+ > which perl
+ /usr/bin/perl
+
+Since perl is installed in /usr/bin, the perl libraries are most likely stored in /usr/lib/perl5.
+
+ > find /usr/lib/perl5 -name Config.pm -print
+ /usr/lib/perl5/site_perl/5.8.7/x86_64-linux/Template/Config.pm
+ /usr/lib/perl5/site_perl/5.8.7/Apache/Admin/Config.pm
+ /usr/lib/perl5/5.8.5/CPAN/Config.pm
+ /usr/lib/perl5/5.8.5/Net/Config.pm
+ /usr/lib/perl5/5.8.7/x86_64-linux/Encode/Config.pm
+ /usr/lib/perl5/5.8.7/x86_64-linux/Config.pm
+ /usr/lib/perl5/5.8.7/CPAN/Config.pm
+ /usr/lib/perl5/5.8.7/Net/Config.pm
+ 
+Now make a copy of CPAN::Config.
+
+ mkdir ~/.cpan
+ mkdir ~/.cpan/CPAN
+ cp /usr/lib/perl5/5.8.7/CPAN/Config.pm ~/.cpan/CPAN/MyConfig.pm
+
+Now edit it.
+
+ vi ~/.cpan/CPAN/MyConfig.pm
+
+There might be lines like the following.
+
+  'build_dir' => q[/root/.cpan/build],
+  'cpan_home' => q[/root/.cpan],
+  'histfile' => q[/root/.cpan/histfile],
+  'keep_source_where' => q[/root/.cpan/sources],
+  'makepl_arg' => q[],
+  'make_install_arg' => q[UNINST=1],
+  'mbuildpl_arg' => q[],
+
+Change them to something like the following.
+
+  'build_dir' => q[/home/username/.cpan/build],
+  'cpan_home' => q[/home/username/.cpan],
+  'histfile' => q[/home/username/.cpan/histfile],
+  'keep_source_where' => q[/home/username/.cpan/sources],
+  'makepl_arg' => q[PREFIX=/home/username],
+  'make_install_arg' => q[],
+  'mbuildpl_arg' => q[install_base=/home/username],
+
+Then fire up the CPAN shell and install something. Then verify that it installed.
+
+   # perl -MCPAN -e shell
+   cpan> install App::Options
+   cpan> exit
+   # find ~/lib -name Options.pm -print
+   /home/username/lib/perl5/site_perl/5.8.7/App/Options.pm
+
+Yay. Success. We used the CPAN shell to install modules into our private perl
+library directory.
+
+=head1 A REASONABLE DEVELOPMENT PROCESS AND PROMOTION PATH
+
+The advice of this section is highly subject to preference. What is described
+here is a reasonable way to manage the development process of promoting code
+changes and database changes from development through test into production.
+
+We use one development environment. An "environment" is a top-level directory
+which houses an instance of the application completely independent from the
+next instance of the application. (An alternate style for slightly bigger
+projects and teams would be to have one development "sandbox" environment
+per developer, but I'll skip that here.)
+The development environment points to the development database.
+
+All environments that are not development environments are numbered
+releases (or release candidates) (i.e. "1.0.0").  A numbered release
+candidate of a web application is referred to as a test environment.
+It is pointed to the test database until
+all tests are completed and the release candidate is approved.
+Then the release candidate is pointed to the production database, and
+additional tests are performed that are not destructive to the data.
+
+When it passes these final tests, it ceases to be a test environment
+any longer, and it becomes the latest production environment.
+A symbolic link is changed in order to point the "production" web
+application to the latest numbered version.
+
+=head1 PREPARING YOUR SOFTWARE ENVIRONMENT DIRECTORIES
+
+First we choose a base direction where all software environment
+directories will live.
+
+   export PREFIX_BASE=$HOME/app
+
+[Note: If you were doing this on a server where you had access to space
+outside the home directory, you might make this something like
+"/usr/mycompany" instead.]
+
+Next, we prepare the environments.
+We will assume that we are preparing a "devel" environment,
+a single numbered release candidate "1.0.0" environment, and a symbolic
+link for production that points to the "1.0.0" environment.
+
+   mkdir $PREFIX_BASE
+   mkdir $PREFIX_BASE/devel
+   mkdir $PREFIX_BASE/devel/etc
+   mkdir $PREFIX_BASE/devel/etc/app
+   mkdir $PREFIX_BASE/devel/bin
+   mkdir $PREFIX_BASE/devel/lib
+   mkdir $PREFIX_BASE/devel/src
+   mkdir $PREFIX_BASE/devel/data
+   mkdir $PREFIX_BASE/1.0.0
+   mkdir $PREFIX_BASE/1.0.0/etc
+   mkdir $PREFIX_BASE/1.0.0/etc/app
+   mkdir $PREFIX_BASE/1.0.0/bin
+   mkdir $PREFIX_BASE/1.0.0/lib
+   mkdir $PREFIX_BASE/1.0.0/src
+   mkdir $PREFIX_BASE/1.0.0/data
+   ln -s $PREFIX_BASE/1.0.0 $PREFIX_BASE/prod
+
+=head1 CONFIGURE YOUR LOGIN ENVIRONMENT
+
+Investigate what the "lib" directories are on the system and decide which of those
+directories needs to be in the LD_LIBRARY_PATH (search path for libraries).
+
+   # ls -ld /lib /*/lib /*/*/lib /*/*/*/lib
+
+Investigate what the "man" directories are on the system and decide which of those
+directories needs to be in the MANPATH (search path for "man" pages).
+
+   # ls -ld /man /*/man /*/*/man /*/*/*/man
+
+Make sure we have something intelligent for the following variables in "~/.bash_profile".
+
+   export PATH=$PATH:$HOME/bin
+
+   export LD_LIBRARY_PATH=/lib:/usr/lib:/usr/local/lib
+   export MANPATH=/man:/usr/man:/usr/share/man:/usr/local/man:/usr/local/share/man
+   export PERL5LIB=$HOME/lib/perl5:$HOME/lib/perl5/site_perl
+
+   . prefix $HOME/app/devel
+
+   set -o vi
+
+Note: The prefix script comes with the App::Options distribution. It has been
+installed in $HOME/bin.  The "prefix" script is bash-compatible and ksh-compatible.
+It enhances the PATH's that have been set as appropriate.
+
+Note 2: "set -o vi" is a bash setting I like to make command-line editing like
+the vi-style of ksh. Leave this out if you like the default emacs-style
+command-line editing.
+
+Then log out and log back in.  Test that each variable had its desired effect.
+
+   # which prefix
+   # man ls
+   # man App::Options
+   # perl -MApp::Options -e 'print $App::Options::VERSION, "\n";'
+
+=head1 INSTALL THE SOFTWARE
+
+   # perl -MCPAN -e shell
+   cpan> install App::Context
+   cpan> install App::Repository
+   cpan> install App::Widget
+   cpan> exit
+
+If any distribution fails to build (or any of the distributions they depend on),
+exit the CPAN shell immediately and try to build manually.
+
+For instance, App::Context depends on Devel::StackTrace.  If that module fails
+to install, then App::Context will fail.  Exit the CPAN shell and build it by
+hand.
+
+   cd ~/.cpan/build/Devel-StackTrace*
+   perl Makefile.PL PREFIX=/home/username
+   make
+   make test
+   make install
+
+Or if the distribution uses Module::Build, you may do the following.
+
+   perl Build.PL install_base=/home/username
+   ./Build
+   ./Build test
+   ./Build install
+
+Sometimes a distribution fails some of the tests.  If it does, the CPAN shell
+will not install it.  When you build it manually (as shown above), you may
+decide that it is an error in the test suite rather than an error in the
+modules themselves.  In this case, you can continue with the "install" step.
+Then reenter the CPAN shell and install the next module.
+
+IMPORTANT: If anyone discovers problems with these instructions or the
+distributions related to the App::Context framework, please report them to me:
+
+   spadkins@gmail.com
+
+[I want to make this framework dirt simple to set up and use. -- spa]
+
+=head1 SETTING UP A MySQL DATABASE
+
+This will vary depending on your web hosting provider (and presumes they support
+the use of MySQL databases).  I went to a control panel and did all the setup.
+(This is all just an example of how I did it so that I can refer to this in later
+setup documentation.  You will probably do this differently.)
+
+I created three databases: "devel", "test", and "prod".  The control panel
+prepended my hosting username, so they ended up being called "username_devel",
+"username_test", and "username_prod".
+
+Then I created three users: "dbview", "dbuser", and "dbadmin".  Again, the control
+panel prepended my hosting username, so they ended up being called
+"username_dbview", "username_dbuser", and "username_dbadmin".  I gave them
+appropriate passwords and recorded what they were for future reference.
+
+Then I went through each combination of database and database-user to assign
+permissions to each.  I assigned all permissions to "username_dbadmin",
+"select/insert/update/delete" permissions to "username_dbuser" and only "select"
+permissions to "username_dbview".
+
+I was then able to use the web-based database administration tool, "phpMyAdmin".
+However, I prefer to do things from the command line.
+
+The next thing I did was put my MySQL login credentials into the $HOME/.my.cnf file.
+
+   [client]
+   user            = username_dbadmin
+   password        = my_password_here
+   host            = localhost
+
+   [mysql]
+   database        = username_devel
+
+Then it is *very* important to set the permissions on this file.
+
+   chmod 600 $HOME/.my.cnf
+
+This will keep anyone from reading the contents of the file (which contains your 
+database password). Then you should be able to log in directly with the mysql
+command line client.  Some sample commands are shown, but it is assumed that
+you will read the MySQL documentation and know what you are doing.
+
+   # mysql
+   Welcome to the MySQL monitor.  Commands end with ; or \g.
+   Your MySQL connection id is 1742668 to server version: 4.1.20-standard-log
+
+   Type 'help;' or '\h' for help. Type '\c' to clear the buffer.
+
+   mysql> \s                             # show connection status
+   mysql> show databases;                # show what databases defined
+   mysql> show processlist;              # show all connections to the database
+   mysql> show tables;                   # show all tables in this database
+   mysql> use username_test;             # change to another database
+   mysql> show tables;                   # show all tables in this database
+   mysql> use username_prod;             # change back to the first database
+   mysql> show tables;                   # show all tables in this database
+   mysql> create table foo (foo_id integer not null auto_increment primary key,
+          foo_dt date, foo_name varchar(255), foo_num integer) engine=MyISAM;
+   mysql> show tables;
+   mysql> drop table foo;
+   mysql> create table foo (foo_id integer not null auto_increment primary key,
+          foo_dt date, foo_name varchar(255), foo_num integer) engine=InnoDB;
+   mysql> describe foo;
+   mysql> show table status like 'foo';
+   mysql> show indexes from foo;
+   mysql> insert into foo (foo_dt, foo_name, foo_num) values ('2006-10-08','yowee',7);
+   mysql> insert into foo (foo_dt, foo_name, foo_num) values ('2006-09-28','yowza',2);
+   mysql> select * from foo;
+   mysql> update foo set foo_num = 5 where foo_name = 'yowza';
+   mysql> select * from foo;
+   mysql> delete from foo where foo_dt = '2006-10-08';
+   mysql> select * from foo;
+   mysql> exit
+
+=head1 SET UP THE FRAMEWORK TO READ THE DATABASE
+
+=head2 CREATE app.conf
+
+There are two kinds of configuration files in an application
+written for the App::Context framework: app.conf and app.pl.
+
+The "app.conf" file is the low-level configuration file.
+"app.conf" is sometimes called the "options file" because
+it is read by App::Options.
+It contains parameters which are specific to the deployment
+rather than to the structure of the application. 
+It can be thought of as a "deployment descriptor".
+
+For our purposes, the only thing unique about our installation
+is the database connection information.
+
+   vi $PREFIX/etc/app/app.conf
+
+      dbhost = localhost
+      dbname = username_prod
+      dbuser = username_dbuser
+      dbpass = my_password_here
+
+   chmod 600 $PREFIX/etc/app/app.conf
+
+=head2 CREATE app.pl
+
+The "app.pl" file is the Application Configuration file.
+This is where you define (and assemble) Services (i.e. components)
+in the App::Context framework.
+
+When an application is developed, a file like "app.pl" is part of the source
+code of that application.  This file is not usually modified at the time
+it is deployed along with supporting code into production.
+
+For our example, we configure the Repository named
+"dbprod" as a service in the "App::Repository::MySQL" class.
+Then we configure the "default" Repository as an alias for "dbprod".
+
+   vi $PREFIX/etc/app/app.pl
+
+      $conf = {
+        Repository => {
+          default => {
+            alias => "dbprod",
+          },
+          dbprod => {
+            class => "App::Repository::MySQL",
+          },
+        },
+      };
+
+=head2 TEST THE CONNECTION
+
+With the App-Context distribution comes a generic utility, "app", that can
+be used to exercise any configured service.
+
+Try the following.
+
+   app Repository default get_rows foo
+
+"app" takes the following arguments.
+
+   1. The service type (here, it is "Repository")
+   2. The service name (here, it is "default")
+   3. The method to invoke on the service
+   4+ The arguments to the method
+
+Then it prints out whatever is returned from the method.
+
+   # app Repository default get_rows foo
+   $data = [
+     [
+       '2',
+       '2006-09-28',
+       'yowza',
+       '5'
+     ]
+   ];
+
+All programs that are built using the framework (with App-Options, App-Context,
+and App-Repository) (such as "app") get a number of built-in features for free. 
+You can experiment with the following.
+
+   app --help
+   app --debug_options=3
+   app --debug_conf
+   app --debug_sql Repository default get_rows foo
+   app --trace Repository default get_rows foo
+   
+=head1 YOUR FIRST WEB APPLICATION
+
+=head1 ACKNOWLEDGEMENTS
+
+ * Author:  Stephen Adkins <spadkins@gmail.com>
+ * License: This is free software. It is licensed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<App::quickstart>,
+L<App::installguide>,
+L<App::installguide::win32>,
+L<App::Options>, L<App::Context>, L<App::Repository>,
+L<App::Widget>
+
+=cut
+

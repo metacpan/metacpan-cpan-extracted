@@ -1,0 +1,46 @@
+---
+abstract: 'Fetch and show dependencies of CPAN module'
+author:
+  - 'moznion C<< moznion@gmail.com >>'
+build_requires:
+  Capture::Tiny: 0.22
+  Test::MockObject::Extends: 1.20120301
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-pmdeps
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  App::pmdeps:
+    file: lib/App/pmdeps.pm
+    version: 0.02
+requires:
+  Furl: 2.16
+  Getopt::Long: 2.39
+  JSON: 2.59
+  Module::CoreList: 2.91
+  Term::ANSIColor: 4.02
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/moznion/App-pmdeps/issues
+  homepage: https://github.com/moznion/App-pmdeps
+  repository: git://github.com/moznion/App-pmdeps.git
+version: 0.02
+x_contributors:
+  - 'moznion <moznion@gmail.com>'

@@ -1,0 +1,28 @@
+// Copyright (c) 2009 AdCopy
+// Author: Jeff Weisberg
+// Created: 2009-Apr-01 10:57 (EDT)
+// Function: 
+//
+// $Id$
+
+
+message ACPYentaCheckValue {
+        required string         map             = 1;
+        required int64          version         = 2;
+        optional int32          level           = 3;
+        optional string         key             = 4;
+        optional string         hash            = 5;
+        optional int64          shard           = 6;
+};
+
+message ACPYentaCheckRequest {
+        required string         map             = 1;
+        required int32          level           = 2;
+        required int64          version         = 3;
+        optional int64          shard           = 4;
+};
+
+message ACPYentaCheckReply {
+        repeated ACPYentaCheckValue check     = 1;
+};
+

@@ -1,0 +1,45 @@
+Apache2::Filter::CSS::LESS is Copyright (C) 2009, Michael Schout.
+
+WHAT IS THIS?
+
+This module provides on demand conversion of CSS LESS files to CSS using
+CSS::LESSp under mod_perl2.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If perl Makefile.PL fails because it cannot find apxs, you can specify the path
+to it via the -apxs parameter:
+
+    perl Makefile.PL -apxs /path/to/apxs
+
+DEPENDENCIES
+
+This module requires these other CPAN modules:
+
+    CSS::LESSp
+    Apache::Test
+    mod_perl2
+
+In addition, an Apache 2.0 or later server with mod_perl version 2.0 or later
+is required.
+
+COPYRIGHT AND LICENCE
+
+   Copyright (C) 2009 Michael Schout.
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of either:
+
+   *   the GNU General Public License as published by the Free Software
+       Foundation; either version 1, or (at your option) any later
+       version, or
+
+   *   the Artistic License version 2.0.
+

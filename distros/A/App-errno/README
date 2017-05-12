@@ -1,0 +1,10 @@
+DESCRIPTION
+
+    This distribution includes a CLI script errno to list/show errno.
+
+SEE ALSO
+
+    errno
+
+    $! (a.k.a. $ERRNO a.k.a. $OS_ERROR) in perldata
+

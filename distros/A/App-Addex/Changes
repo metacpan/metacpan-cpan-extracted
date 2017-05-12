@@ -1,0 +1,94 @@
+Revision history for App-Addex
+
+0.026     2014-03-31 21:41:23-04:00 America/New_York
+        - use phrase/addr-spec output for muttrc instead of comment form
+          (recent mutts seem to use comments if you use parents in muttrc
+          aliases, which is no good)
+
+0.025     2013-10-24 22:34:16 America/New_York
+          fix a bunch of duplicated documentation
+
+0.024     2013-07-23 11:21:27 America/Los_Angeles
+          fix a boneheaded precedence error in the Mutt plugin; thanks, Reini
+          Urban!
+
+          repackage with Dist::Zilla
+
+0.023     2012-02-27
+          sort entries before processing
+
+0.022     2010-06-13
+          updated for new Config::MVP
+
+0.021     2009-07-27
+0.020     2009-07-27
+          updated for new Config::MVP
+
+0.019     2009-01-16
+          update packaging a bit
+
+0.018     2008-06-22
+          make ->entries a delegated method
+          make Output::Mutt not give (name) for groups; mutt pukes
+
+0.017     2008-05-29
+          most of Config has been refactored to Config::INI::MVP::Reader
+          use that!
+
+0.016     2008-04-13
+          fix missing prereq
+
+0.015     2008-04-12
+          Output::ToFile now opens output filehandles to write utf8
+          add unidecode option for Output::Mutt
+          output all label/alias combinations for Output::Mutt
+
+0.014     2008-02-17
+          AddressBook objects can now refer back to the App::Addex object
+          experimental "plugin" classes
+
+          EmailAddress objects may be "send" or "receive" or both now
+
+0.013     2007-12-17
+          declare that we require 5.008; easier than fixing tests, but patches
+            welcome, I guess
+
+0.012     2007-11-12
+          stop brokenly reaching into guts of Config::INI::Reader object
+            (thanks, JCAP!)
+          remove spurious 'use' statement in addex program
+
+0.011     2007-11-11
+          use Mixin::ExtraFields::Param for ->field method (dogfood!)
+          remove spurious Mac::Glue prereq
+
+0.010     2007-11-05
+          add base Output class to make future expansion easier
+          add finalize output method
+          suppress some warnings during testing
+
+0.009     2007-10-24
+          upgrade Module::Install
+
+0.008     2007-05-11
+          wrote tests for just about everything
+          fix mutt labels to start at with 1 after the first of each label
+
+0.007     2007-05-11
+          App::Addex::Entry::EmailAddress
+          mutt output includes address labels in aliases if available
+
+0.006     2007-05-10
+          introduce App::Addex::Config, making config files much easier
+
+0.005     2007-05-09
+          fixed a really stupid, broken test
+
+0.004     2007-05-09
+          ensure that new plugins are getting hashref args
+
+0.003     2007-05-05
+          change procmail output to use . for folder paths
+
+0.001     2007-03-21
+          first release

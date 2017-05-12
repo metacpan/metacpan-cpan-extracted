@@ -1,0 +1,15 @@
+#!/usr/bin/perl -w
+
+# The script verifies pod in all classes.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+
+my $test_pod_class = "Test::Pod 1.14";
+eval "use $test_pod_class";
+plan skip_all => "$test_pod_class required for testing POD" if $@;
+all_pod_files_ok();

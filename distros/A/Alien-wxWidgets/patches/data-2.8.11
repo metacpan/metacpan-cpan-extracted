@@ -1,0 +1,47 @@
+my $VERSION = '2.8.11';
+   $URL   ||= "http://prdownloads.sourceforge.net/wxwindows";
+my $BASE    = 'wxWidgets';
+# $TYPE from Build.PL
+
+my @common = qw(wxWidgets-2.8.0-magic.patch);
+
+{ msw     => { unicode => [ qw(
+wxMSW-2.8.0-setup_u.patch
+wxMSW-2.8.10-config.patch
+wxMSW-2.8.11-makefiles.patch
+wxMSW-2.8.10-w64-mslu.patch
+wxMSW-2.8.10-w64-winhash.patch
+wxMSW-2.8.11-w64.patch
+wxMSW-2.8.10-w64-stc.patch
+wxMSW-2.8.11-filefn.patch
+                               ), @common ],
+               ansi    => [ qw(
+wxMSW-2.8.0-setup.patch
+wxMSW-2.8.10-config.patch
+wxMSW-2.8.11-makefiles.patch
+wxMSW-2.8.10-w64-mslu.patch
+wxMSW-2.8.10-w64-winhash.patch
+wxMSW-2.8.11-w64.patch
+wxMSW-2.8.10-w64-stc.patch
+wxMSW-2.8.11-filefn.patch
+                               ), @common ],
+               },
+  mac     => { unicode => [ qw(
+wxMac-2.8.3-brokengcc.patch
+                               ), @common ],
+               ansi    => [ qw(
+wxMac-2.8.3-brokengcc.patch
+                               ), @common ],
+               },
+  unix    => { unicode => [ qw( 
+  
+  							   ), @common ],
+               ansi    => [ qw(
+               				   ), @common ],
+               },
+  data    => { url  => ( sprintf '%s/%s-%s.%s', $URL, $BASE, $VERSION, $TYPE ),
+               directory => ( sprintf '%s-%s', $BASE, $VERSION ),
+               archive   => ( sprintf '%s-%s.%s', $BASE, $VERSION, $TYPE ),
+               version   => $VERSION,
+               },
+  };

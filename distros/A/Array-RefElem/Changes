@@ -1,0 +1,21 @@
+2003-12-18  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.00
+
+   Documentation fixes by Paul Croome <Paul.Croome@softwareag.com>.
+
+
+
+2000-01-13   Gisle Aas <gisle@aas.no>
+
+   Release 0.02
+
+   Do reference counting for av_store/hv_store the right way.  Previously we
+   could trigger a core dump if the thing to be stored only was kept alive by
+   a reference at the same location in the array.
+
+
+
+2000-01-10   Gisle Aas <gisle@aas.no>
+
+   Release 0.01

@@ -1,0 +1,13 @@
+Revision history for Perl extension Attribute::Protected.
+
+0.03  Sun Dec 16 22:35:40 JST 2001
+	- Tweak Test::More::is()
+
+0.02  Mon Sep  3 09:46:17 JST 2001
+	- fixed typo in croaking message of Protected method.
+	- use Test::More for testing.
+	
+0.01  Tue Aug 28 06:06:12 2001
+	- original version; created by h2xs 1.21 with options
+		-AXn Attribute::Protected
+

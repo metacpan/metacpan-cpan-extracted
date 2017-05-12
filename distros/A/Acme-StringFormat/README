@@ -1,0 +1,71 @@
+NAME
+    Acme::StringFormat - Smart interface to sprintf()
+
+VERSION
+    This document describes Acme::StringFormat version 0.04
+
+SYNOPSIS
+        use Acme::StringFormat;
+
+        # enable 'sprintf' operator in the scope
+
+        say '[%s][%s]' % 'foo' % 'bar'; # => [foo][bar]
+
+DESCRIPTION
+    I had a desire for a "format operator" of other languages. Take boost
+    C++ libraly for example:
+
+            using namespace boost;
+            std::cout << format("[%1%][%2]") % "foo" % "bar" << std::endl;
+
+    Now this pragmatic module provides Perl with a format operator "%",
+    which is equivalent to "sprintf".
+
+INTERFACE
+  "use Acme::StringFormat;"
+    Enables the "sprintf" operator in the rest of the scope;
+
+  "no Acme::StringFormat;"
+    Disables the "sprintf" operator in the rest of the scope;
+
+DIAGNOSTICS
+    "Arguments mismatch for Acme::StringFormat"
+        (W printf) Too few format parameters or too many format arguments.
+
+CONFIGURATION AND ENVIRONMENT
+    Acme::StringFormat requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+    Perl 5.10.0 or later, and a C compiler.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-acme-stringformat@rt.cpan.org/", or through the web interface at
+    <http://rt.cpan.org/>.
+
+SEE ALSO
+    "sprintf" in perlfunc - this module is an interface to "sprintf".
+
+    The following languages (or libraries) also provide "%" format
+    operators:
+
+    C++ <http://www.boost.org/>.
+
+    Ruby
+        <http://www.ruby-lang.org/>.
+
+    Python
+        <http://www.python.org/>.
+
+AUTHOR
+    Goro Fuji <gfuji(at)cpan.org>.
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2008, Goro Fuji <gfuji(at)cpan.org>. Some rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

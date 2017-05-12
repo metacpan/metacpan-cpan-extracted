@@ -1,0 +1,2017 @@
+0.079		2017-04-26	T. R. Wyant
+    Move satpass script from bin/ to script/
+
+    Mark OID 25041 (Iridium 40) tumbling, and 25042 (Iridium 41) spare
+    per Kelso. The latter appears to have actually been declared spare
+    in July 2016, but somehow I missed updating the canned status table.
+
+    Kelso added OID 16719 (COSMOS 1743) to magnitudes
+
+0.078		2017-02-10	T. R. Wyant
+  Fix L<> links, and things that should have been L<> but were not.
+    Thanks to Ben Bullock for the pull request.
+
+  Add 'provides' data to ExtUtils::MakeMaker output
+
+  Add 'base' to dependencies.
+
+0.077		2016-12-03	T. R. Wyant
+  Remove leading 0 from Space Track 3le names
+
+  Handle year incompatibility between Time::Local and Time::y2038
+    This is the same problem as RT #118861 on Astro-App-Satpass2, and I
+    applied the same solution. As a result of this,
+    Astro::App::Satpass2::Utils now exports time_gm() and time_local().
+
+0.076		2016-11-06	T. R. Wyant
+  Clean up Changes file. Version 0.075 had raw Git log for changes.
+    Oops.
+
+0.075		2016-11-06	T. R. Wyant
+  Add estimated magnitude for Tiangong 2.
+    Since I believe (per Wikipedia) that it is the same size as Tiangong 1,
+    I am estimating the same absolute magnitude (4.0).
+
+0.074		2016-09-04	T. R. Wyant
+
+  Add HISTORICAL CALCULATIONS section to OVERVIEW.
+
+  Correct almanac_hash() methods when station is defaulted to the body's
+    station attribute rather than explicitly passed.
+
+  Add eg/solstice
+
+0.073		2016-08-07	T. R. Wyant
+  Update Celestrak visual.txt date. No data change.
+
+  Update canned Iridium statuses and magnitudes in
+    Astro::Coord::ECI::TLE.
+
+  Tweak satpass script geocoding heuristics.
+
+  Tweak eg/visual for Perl 5.6.2.
+
+0.072		2016-07-02	T. R. Wyant
+  Set canned status for Iridium 57 (OID 25273) failed per Kelso.
+
+0.071		2016-01-06	T. R. Wyant
+  Add GitHub repository to metadata.
+
+  Change satpass script to geocode using OSM.
+    Also fix apparent bit rot in show command.
+
+  Correct Astro::Coord::ECI->next_elevation(). Elevation was being
+    calculated inconsistently, resulting in incorrect rise/set and
+    begin/end twilight results inside the Arctic and Antarctic Circles
+    on days when the Sun did not rise or set. This error may have been
+    introduced in March 2012 with version 0.049_01, though it may go
+    back to the original release. Thanks to Adam Osuchowski for finding
+    this.
+
+0.070		2015-06-25	T. R. Wyant
+  The Astro::Coord::ECI::Sun almanac() method now returns the correct
+    quarter descriptions (equinox, solstice) when the 'station'
+    attribute is set to a location south of the Equator. The event
+    detail (which is encoded as a number) does not change, but is now
+    documented to refer to 'March equinox', and so on.
+
+  Add -date option to eg/almanac
+
+0.069		2015-06-07	T. R. Wyant
+  Update canned status of Iridium 63 (OID 25286)
+
+0.068		2015-03-26	T. R. Wyant
+  Make the satpass script time zone functionality work with Date::Manip
+    versions 6.49 and greater.
+
+  Track changes in Mike McCants' magnitude data.
+
+0.067		2014-11-10	T. R. Wyant
+  Fix failure in t/tle_support.t. I hope.
+
+  Add OID 15494 to canned magnitude table.
+
+0.066		2014-10-16	T. R. Wyant
+  Update Iridium 42 (OID 25077) to failed, per Kelso.
+
+  Regenerate canned magnitude table.
+
+  Croak on encountering JSON key SATNAME. This was replaced by
+    OBJECT_NAME during the REST interface's beta.
+
+  Remove installer question about installing satpass, per documented
+    deprecation schedule.
+
+0.065		2014-07-27	T. R. Wyant
+  Prevent TLE manufacture for oddball objects.
+
+  Add TLE pass variant PASS_VARIANT_TRUNCATE, which truncates passes to
+    the beginning and end times given to pass(), rather then computing
+    complete passes (and therefore requiring the satellite to rise and
+    set).
+
+  Expose Space Track time formatting and decoding routines for possible
+    use by subclasses. The key routines __to_json() and __from_json()
+    are still undocumented and considered highly experimental, though.
+    Sorry.
+
+  Add OID 00694 to Astro::Coord::ECI::TLE canned magnitudes.
+
+0.064		2014-05-29	T. R. Wyant
+  Add Astro::Coord::ECI::TLE method illuminated()
+
+0.063		2014-05-02	T. R. Wyant
+  Allow PASS_VARIANT_BRIGHTEST event even if the 'visible' attribute is
+    false.
+
+  Document magnitude functionality in satpass script.
+
+  Add pass variant PASS_VARIANT_BRIGHTEST. If this is set, an event
+    representing the time the satellite is brightest will be added to
+    the pass. This is ignored if the calculation can not be made (e.g.
+    if 'visible' is false, or 'intrinsic_magnitude' is undefined).
+
+  Clarify Astro::Coord::ECI::Moon phase() docs.
+
+  Eliminate uses of each() built-in.
+
+  Add magnitude functionality to satpass script.
+
+0.062		2014-04-01	T. R. Wyant
+  Update canned status for Iridium 29 (24944). Kelso says it's tumbling.
+
+  t/tle_json.t now only dumps versions on an error.
+
+  Require correct Perl version in t/tle_mag.t
+
+  In t/tle_json.t, work around problem that occurs when JSON::XS encodes
+    a number in a locale that uses a comma as the decimal point, such as
+    'de_DE.UTF-8'. Make a note of this in Astro::Coord::ECI::TLE, since
+    there is nothing I can do in my code to actually fix the problem.
+
+  The 'unpack' built-in does not default to $_ as the buffer to unpack
+    under Perls before 5.10.
+
+  Have Astro::Coord::ECI::TLE magnitude() method set the station's time.
+
+  Correct logic for building the fold_case() utliity subroutine under
+    Perls before 5.16.
+
+  Computation of (perhaps very) approximate magnitudes for satellites is
+    now supported. Changes to support this include:
+
+    - A magnitude() method on all classes that represent satellites;
+
+    - An intrinsic_magnitude attribute (defaulting to undef) on
+      Astro::Coord::ECI::TLE objects;
+
+    - Default intrinsic_magnitude to 7 on
+      Astro::Coord::ECI::TLE::Iridium objects;
+
+    - A canned table of intrinsic magnitudes in Astro::Coord::ECI::TLE
+      which includes most of the objects in the Celestrak visual list,
+      with magnitudes from Mike McCants' mcnames.zip and vsnames.zip
+      files;
+
+    - Support in the Astro::Coord::ECI::TLE parse() method to set the
+      magnitude of satellites that are in the table;
+
+    - Static method magnitude_table() on Astro::Coord::ECI::TLE to
+      maintain the canned magnitude table;
+
+    - Modify the Astro::Coord::ECI::Sun magnitude() method to take an
+      observing station argument (which is ignored) to be consistent
+      with the same-named Astro::Coord::ECI::TLE method.
+
+  The precess() and precess_dynamical() methods now do nothing to
+    objects set to Earth-fixed coordinates. Previously they were
+    converted to Ecliptic (and therefore inertial) coordinates, which
+    manifested as a bug when the observing station was an attribute of a
+    star.
+
+  Support new (to us) Space Track JSON keys FILE, OBJECT_TYPE, ORDINAL
+    and ORIGINATOR with same-named (except for being lower case)
+    attributes.
+
+  Method body_type() now returns the 'object_type' attribute if that is
+    defined. If not it computes its return from the object name, like it
+    always has.
+
+0.061		2014-01-13	T. R. Wyant
+  On install, warn that I intend to remove the 'install satpass'
+    question asked by Build.PL and Makefile.PL. The only way to install
+    the satpass script will be to run Build.PL or Makefile.PL with the
+    '-y' option. Also warn of eventual package name change, from
+    'Astro-satpass' to 'Astro-Coord-ECI'.
+
+  Warn every time Astro::Coord::ECI::TLE->parse() encounters JSON key
+    SATNAME. This was removed while Space Track's REST interface is
+    still in beta.
+
+  Computation of a Doppler shift based on the station's 'frequency'
+    attribute is now fatal. The body's 'frequency' attribute should be
+    set instead.
+
+  Remove all references to the satpass 'lit' setting and the
+    corresponding Astro::Coord::ECI 'limb' attribute, which were
+    deprecated out long since.
+
+  Remove all mention of the 'upper' argument to the Astro::Coord::ECI
+    azel() method. It's still an exception to pass a second argument,
+    though.
+
+  Remove all references to SOAP::Lite in the satpass code, except for
+    POD saying it was gone.
+
+  Various changes to Astro::Coord::ECI::TLE to try to support
+    prospective classes representing non-orbiting objects. These are
+    experimental, and may change or be retracted with little or no
+    notice. The hope is a class that can represent the objects in one of
+    NASA's .kmz files that are published for certain launches. These
+    include:
+
+    * Refactoring illumination and periodic position calculations in the
+      pass() method;
+
+    * Add public method intrinsic_events(), which returns events
+      intrinsic to the body, rather than observational ones like rise
+      and set, and call it in the pass() method;
+
+    * Add protected (and therefore doubly experimental) method
+      __pass_backup_earliest() to limit how hard the pass() method tries
+      to find a rise time when the pass starts with the body above the
+      horizon.
+
+    I have no idea whether the class this is in support of will ever see
+    the light of day.
+
+  Improve Astro::Coord::ECI::Utils::find_first_true() documentation.
+
+0.060		2013-12-18	T. R. Wyant
+  In eg/almanac, correct the handling of -sun and -moon when exactly one
+    is specified.  The erroneous processing forced both to be asserted
+    in all circumstances. Thanks to Mike Donn for reporting the
+    problem. and pointing out the solution.
+
+0.059		2013-12-03	T. R. Wyant
+  Make the zero-argument form of the maidenhead() method conform to the
+    docs.
+
+0.058		2013-11-25	T. R. Wyant
+  Handle undef period in pass(). At the moment it's handled by fudging in
+    90 minutes, which is bogus, but lets me experiment objects whose
+    motion is defined by a list of positions.
+
+  Add a paragraph on how passes are detected to the
+    Astro::Coord::ECI::TLE pass() documentation.
+
+  In the satpass script, implement 'sky lookup' in terms of
+    Astro::SIMBAD::Client script() rather than query(), so that we do not
+    need SOAP::Lite.
+
+0.057		2013-07-08	T. R. Wyant
+  Deprecate the satpass script.
+
+  Modify the appulse algorithm when the appulsing body is a satellite,
+    since the original algorithm did not necessarily converge to the
+    correct time for satellites in similar orbits. Thanks to Vidar
+    Tyldum for bringing this to my attention, and working with me on it.
+
+  Go back to simply allowing invalid international launch designators.
+    They started getting rejected about release 0.051_01 (2012-08-18).
+    Thanks to Vidar Tyldum for bringing this to my attention, and
+    working with me on it.
+
+  Take spaces as equivalent to zeroes in numeric fields (which I believe
+    is the old FORTRAN behavior), and in the numeric portions of the
+    international launch designator.
+
+  As a consequence of the above, the 'international' attribute will be
+    zero-filled on retrieval.
+
+  Update docs. Replace 'location' by 'station' where that is what is
+    meant. Add a (very brief) explanation of times to the overview. Also
+    add information on the Space Track REST interface to the overview.
+
+  Deprecations:
+
+  * The two-argument form of azel() is now fatal.
+
+  * The satpass script fails if you try to geocode without
+    Geo::Coder::Geocoder::US.
+
+  * Use of the satpass script 'lit' setting is now fatal; instead use
+    'edge_of_earths_shadow'.
+
+  * Use of the Astro::Coord::ECI::TLE 'limb' attribute is now fatal;
+    instead use 'edge_of_earths_shadow'.
+
+  * Feeding a JSON file to Astro::Coord::ECI::TLE->parse() which uses
+    the SATNAME key is deprecated, and produces a warning. This warning
+    will become fatal in the future. Instead use OBJECT_NAME.
+
+  * Warn every time a Doppler shift is computed using the station's
+    frequency. This will become fatal in the future. The frequency
+    should be set on the orbiting object.
+
+0.056		2012-12-08	T. R. Wyant
+  Deprecation warnings:
+
+  * The Doppler calculation warns the first time the frequency comes
+    from the station rather than the satellite.
+
+  * The satpass script warns every time geocoding is done if
+    Geo::Coder::Geocoder::US is not installed.
+
+0.055		2012-10-27	T. R. Wyant
+  Workaround for problem with Date::Manip clobbering $ENV{PATH} when it
+    is loaded.
+
+  T. S. Kelso recorded Iridium 4 (OID 24796) as being out of service
+    about midnight 20-Oct-2012 GMT. I have updated the canned status,
+    since I know he calls Iridium LLC to get the status.
+
+  Have the Astro::Coord::ECI::TLE status() method take optional OID
+    arguments for the 'show' subcommand.
+
+0.054		2012-10-09	T. R. Wyant
+  Correct field TLE_LINE0 in the JSON TLE generated by
+    Astro::Coord::ECI::TLE to include the leading '0 '.
+
+  INCOMPATIBLE CHANGE: In the JSON representaion of a TLE, the common
+    name of the body is now OBJECT_NAME, not SATNAME. This was done to
+    track the usage of Space Track, which did not previously have the
+    common name in its TLE data. The SATNAME field will still be used if
+    it appears in input, but is being put through a deprecation cycle.
+
+0.053		2012-09-10	T. R. Wyant
+  Suppress the 'OK' after an st( set => ...) in the satpass script.
+
+  Address satpass script Term::ReadLine load failures under the test
+    harness by doing the load in an eval, and falling back to the
+    non-ReadLine case.
+
+  Update the canned status table in Astro::Coord::ECI for the fact that
+    both Sladen and McCants call Iridium 51 (OID 25262) in service.
+
+0.052		2012-09-05	T. R. Wyant
+  Per schedule, the following deprecated items will produce a warning on
+    each use:
+
+    * The 'upper' argument of the Astro::Coord::ECI azel() method;
+
+    * The Astro::Coord::ECI::TLE 'limb' attribute;
+
+    * The satpass 'lit' setting.
+
+  All these warnings will become fatal in the first release on or after
+  March 1 2013.
+
+  Remove support for the 'horizon' setting of the Astro::Coord::ECI
+    'almanac_horizon' attribute. This was introdiced in 0.051_01, but on
+    second thought I decided the 'horizon' logic was ill-conceived.
+
+  Change the JSON representation of the International Launch Designator
+    to track Space Track change by Space Track to REST predicate
+    INTLDES.
+
+  Further corrections to t/tle_json.t for OS-dependant failures.
+
+  Enhance Astro::Coord::ECI::TLE->parse() to parse Iridium status off
+    the name if it is present.
+
+  Fudge the JSON in t/tle_json.t for system-to-system differences in
+    floating point representations (2-digit vs 3-digit exponent).
+
+  Remove the -json output formatting option from the satpass tle()
+    command. Instead, provide eg/convert_tle.
+
+  Add attribute almanac_horizon to Astro::Coord::ECI. This sets the
+    horizon for almanac calculations. The default is 0 (radians), but
+    other values are possible, as well as 'horizon' (meaning, use the
+    value of the 'horizon' attribute) and 'height' (meaning, depress the
+    horizon for the height of the observer above sea level). The satpass
+    script allows access to this.
+
+  Add JSON support for Astro::Coord::ECI::TLE and
+    Astro::Coord::ECI::TLE::Iridium. This includes the ability of
+    Astro::Coord::ECI::TLE->parse() to handle JSON orbital elements from
+    the Space Track REST interface (provided the optional JSON module
+    can be loaded), and hooks in both classes for them to serialize
+    themselves into Space-Track-like JSON.
+
+  Add -json option to the satpass script's tle() command, to get
+    canonical JSON output.
+
+  Make use of DateTime (if available) to interpret a non-numeric
+    Astro::Coord::ECI::TLE::Iridium zone attribute. If DateTime is not
+    available, fall back to the old implementation of setting $ENV{TZ}
+    and hoping localtime() responds to this.
+
+  Correct the documentation of the Astro::Coord::ECI 'twilight'
+    attribute, which really can not be set to 'civil', etc.
+
+0.051		2012-06-08	T. R. Wyant
+  Use YAML instead of YAML::Any, since they are both in the same distro,
+    and YAML does not suffer from deprecation warnings.
+
+  Add pass variant PASS_VARIANT_NO_ILLUMINATION. If attribute 'visible'
+    is false, this causes no illumination calculations at all to be
+    done.  This seems to save 20% in calculation time, but your mileage
+    may vary, especially inside the Arctic or Antarctic Circles.
+
+  Have bin/satpass warn the first time it geocodes if geocoding is done
+    directly using SOAP::Lite.
+
+  Make the Astro::Coord::ECI azel_offset() Doppler calculation
+    contingent on the availability of a radial velocity value.
+
+  Reinstate the Doppler calculation in Astro::Coord::ECI's
+    azel_offset(). Thanks to Vidar Tyldum for finding this omission.
+    While in the Doppler code, made the satellite the primary source of
+    the frequency. Getting the frequency from the observer object is
+    being put through a deprecation cycle, and will eventually result in
+    an error.
+
+0.050		2012-05-04	T. R. Wyant
+  The 'status iridium' command in the 'satpass' script is now fatal;
+    it has been deprecated in favor of 'status show' for some time,
+    issued a warning on every use since version 0.044.
+
+  Have Astro::Coord::ECI method heliocentric_ecliptic_cartesian() set
+    the object's {inertial} to true.
+
+  Add module Astro::Coord::ECI::Mixin to provide common-logic methods
+    which do not seem to fit the object hierarchy.
+
+  Promote method ecliptic_longitude() from Astro::Coord::ECI::Sun to
+    Astro::Coord::ECI.
+
+  In Astro::Coord::ECI:
+
+    * Add attribute 'sun', to hold the object used to convert to and
+      from Heliocentric coordinates.
+
+    * Add methods ecliptic_cartesian(), heliocentric_ecliptic(), and
+      heliocentric_ecliptic_cartesian().
+
+    * Consolidate code for conversion between Cartesian and spherical
+      coordinates.
+
+  In Astro::Coord::ECI::Set:
+
+    * Have the aggregate() method _not_ aggregate TLEs that have a blank
+      ID and model 'null'. This piece of ad-hocery was necessary to
+      prevent aggregation of "fake" TLEs representing different fixed
+      points in space (e.g. as created by the satpass or satpass2
+      'geodetic' command).
+
+0.049		2012-03-12	T. R. Wyant
+  In the Astro::Coord::ECI precess_dynamical() method, set the time of
+    the station attribute (if any) before precessing it.
+
+  In Astro::Coord::ECI::TLE, throw an exception if the Sun never rises.
+    This should not happen, but was encountered while sorting out the
+    precess_dynamical() bug.
+
+  Independently test appulses of all relevant classes, since this is how
+    the precess_dynamical() bug manifested.
+
+  In Astro::Coord::ECI::TLE::Set, override the get() method, and have
+    get( 'tle' ) return the concatenated TLEs of all members.
+
+  In Astro::Coord::ECI::TLE::Iridium reflection() method, fix
+    two-argument azel() call.
+
+0.048		2012-03-08	T. R. Wyant
+  Add keplers_equation() to Astro::Coord::ECI::Utils.
+
+  In the 'satpass' script's pass() subroutine, set the 'station'
+    attribute of all bodies in the @sky array before passing them to the
+    Astro::Coord::ECI::TLE pass() method.
+
+  In the Astro::Coord::ECI::TLE::Iridium flare() method, set the
+    'station' attribute of the object that represents the center of the
+    flare.
+
+  Have the first use of the Astro::Coord::ECI::TLE 'limb' attribute, the
+    satpass script 'lit' setting, and the Astro::Coord::ECI azel()
+    method with an 'upper' argument display a warning. These were
+    deprecated in September 2011.
+
+  In Astro::Coord::ECI:
+
+  * Have next_azimuth(), next_elevation(), and next_meridian() make use
+    of the 'station' attribute if the invocant is the only
+    Astro::Coord::ECI argument.
+
+  Have Astro::Coord::ECI::TLE->parse() take, as an optional first
+    argument, a reference to a hash that is used to initialize
+    attributes not initialized by parsing the TLE data.
+
+  Convert all eg/ scripts to use the 'station' attribute where possible,
+    and the optional Astro::Coord::ECI::TLE->parse() hash argument where
+    practical.
+
+  In Astro::Coord::ECI:
+
+  * Add 'station' attribute, as origin of observer-centered coordinate
+    systems. If azel() is called with the invocant as the only
+    Astro::Coord::ECI argument, it returns the coordinates of the
+    invocant relative to the 'station' attribute.
+
+  * Factor out the Cartesian portion of the azel() method, and add
+    methods neu() and enu(), to provide local Cartesian coordinates
+    relative to the 'station' attribute.
+
+  * Add method equatorial_apparent(), to calculate apparent equatorial
+    coordinates as seen from the location in the 'station' attribute.
+
+  * Work on velocity transformations from eci() to ecef(), neu(), enu(),
+    azel(), and equatorial(). All these seem sane to me, though I still
+    have no worked examples to test against.
+
+  I intend the use of the 'station' attribute to be the preferred way to
+  get observer-relative coordinates. I would like to eventually
+  deprecate $station->azel( $body ) and friends, as well as the practice
+  of passing an explicit station to the pass() and flare() methods, but
+  whether this actually happens is another question.
+
+0.047		2012-01-20	T. R. Wyant
+  Have the functionality related to the Astro::Coord::ECI::TLE
+    'pass_threshold' attribute (introduced in 0.046) take visibility
+    into account if the 'visible' attribute is true.
+
+0.046		2012-01-18	T. R. Wyant
+  Add Astro::Coord::ECI::TLE attribute 'pass_threshold'. If set to
+    something (in radians) other than undef, the sattelite's highest
+    point during a pass must be at least this high for the pass to be
+    reported.
+
+  Support the 'pass_threshold' setting in the satpass script.
+
+  Optional code that used to feel around for a YAML implementation now
+    just uses YAML::Any.
+
+  The utility subroutines deg2rad() and rad2deg() now support an
+    argument of undef which, unsurprisingly, returns undef.
+
+  The Changes file now conforms to Test::CPAN::Changes, and the author
+    test xt/author/changes.t has been added to keep it so.
+
+0.045		2011-12-05	T. R. Wyant
+  Have the satpass script's geocode command favor
+    Geo::Coder::Geocoder::US. Deprecate the use of SOAP::Lite.
+
+  Have the satpass script set the height to 0 if the position was set by
+    the geocode command, but height() failed.
+
+  Update the copy of the GNU GPL in LICENSES/Copying to have the current
+    FSF address.
+
+  Document the release of Astro-App-Satpass2, and the eventual
+    deprecation of the satpass script.
+
+  Try to clarify how the atmospheric refraction calculation works.
+
+0.044		2011-10-19	T. R. Wyant
+  Require Test::More 0.88 for testing. The requirement was actually
+    introduced in version 0.042. Thanks to Christopher Kybe for
+    picking up this discrepancy.
+
+  The satpass script's 'status iridium' command now generates a
+    deprecation notice every time it is issued.
+
+0.043		2011-08-29	T. R. Wyant
+  The earthquake (Mineral Virginia USA) fire (Great Dismal Swamp) and
+    flood (hurricane Irene) edition.
+
+  Updated the canned Iridium status in Astro::Coord::ECI::TLE for
+    McCants' and Sladen's reporting of Iridium 26 (OID 24903) as out of
+    service. They also updated Iridium 23 (OID 24906) to show it in
+    service rather than failed, but I have continued to follow Kelso in
+    calling it a spare.
+
+  Other than this, only documentation changes, mostly relating to the
+    deprecation of the 'limb' attribute and its relation to the new
+    'edge_of_earths_shadow' attribute.
+
+  In the satpass script, use the new 'edge_of_earths_shadow' setting in
+    the 'flare' and 'position' commands, though the flare calculation
+    does not actually make use of it.
+
+  Replace the Astro::Coord::ECI::TLE 'limb' attribute and the satpass
+    'lit' setting with the 'edge_of_earth_shadow' attribute and setting.
+    The new attribute and setting are numeric, and specify an increase
+    in elevation (or decrease if negative) in units of the apparent
+    radius of the body. The replaced attribute and setting still exist,
+    but are deprecated, and will begin warning in the first release
+    after March 1 2012. This setting/attribute is used by the pass
+    calculation.
+
+  Provide an Astro::Coord::ECI azel_offset() method, which takes, as its
+    optional second argument, an offset applied to the elevation, in
+    terms of the apparent radius of the body whose position is being
+    calculated. The two-argument version of the azel() method is now
+    deprecated, and will begin warning in the first release after March
+    1 2012.
+
+  Override the Astro::Coord::ECI correct_for_refraction() method in
+    Astro::Coord::ECI::TLE, Astro::Coord::ECI::Moon, and
+    Astro::Coord::ECI::Sun. The override simply returns the input
+    elevation unmodified.
+
+0.042		2011-08-07	T. R. Wyant
+  In the Astro::Coord::ECI maidenhead() method:
+
+  * Document the fact that, when used as a mutator, it sets the position
+    of the center of the square;
+
+  * Modify the accessor to try to minimize truncation error.
+
+  Added t/eci_maidenhead.t.
+
+0.041		2011-07-25	T. R. Wyant
+  Re-fix longitude out-of-range warning in Astro::Coord::ECI::Moon.
+
+  Fix problem with time specification in eg/sh_script when Date::Manip
+    is not installed.
+
+  Add attribute 'pass_variant' to Astro::Coord::ECI::TLE. This tweaks
+    the output of the pass() method, and can be set to the bitwise 'or'
+    (a.k.a. '|') of the following exported values:
+
+    * PASS_VARIANT_NONE - No tweaks.
+
+    * PASS_VARIANT_VISIBLE_EVENTS - Remove from the output all pass
+      events which were not visible. Ignored if the 'visible' attribute
+      is false.
+
+    * PASS_VARIANT_FAKE_MAX - Create a 'max' event representing the
+      largest visible elevation if the absolute max was filtered out by
+      PASS_VARIANT_VISIBLE_EVENTS.
+
+    * PASS_VARIANT_START_END - Report the first and last pass events as
+      PASS_EVENT_START and PASS_EVENT_END. These are the same as
+      PASS_EVENT_RISE and PASS_EVENT_SET unless the 'visible' attribute
+      is true and PASS_VARIANT_VISIBLE_EVENTS is asserted.
+
+  Minor optimization to the pass() method: the changes of 0.039_01
+    through 0.039_05 left the appulse calculation before the point at
+    which provisional passes were accepted or rejected. This has been
+    moved below that point.
+
+  New example script, eg/xml that makes use of the 'pass_variant'
+    attribute, and generates XML from pass data using XML::Writer.
+
+0.040		2011-07-06	T. R. Wyant
+  Tried to make the documentation of the Astro::Coord::ECI::TLE
+    lazy_pass_position clearer.
+
+  Unconditionally set lazy_pass_position in the satpass script, since it
+    recomputes position anyway.
+
+  Added a few words to the OVERVIEW about how to get results more like
+    those of the Heavens Above web site.
+
+  Fix yet more problems in Astro::Coord::ECI::TLE->pass():
+
+  * Do not report passes which ended before the prediction interval
+    started.
+
+  * Rework the implementation of the 'interval' attribute to be
+    (hopefully!) more efficient, and to fix incorrectly-reported
+    illuminations.
+
+  * Fix incorrect rise (and sometimes max) times when the pass is in
+    progress when the prediction interval starts and the 'visible'
+    attribute is false.  The previous fix only worked if the 'visible'
+    attribute was true.
+
+  Add Astro::Coord::ECI::TLE attribute 'lazy_pass_position', to give the
+    pass() method permission not to calculate and report event position
+    if the event's time can be calculated without calculating position.
+
+  The satpass script's 'verbose' setting now works as advertised.
+
+  Re-fix the time-zone-dependant test failures in t/tle_flare.t.
+
+  Fix more problems in Astro::Coord::ECI::TLE->pass():
+
+  * Fix detection and calculation of events of visible passes which
+    begin during the day, or any pass in progress at the beginning of
+    the computation interval.
+
+  Have Astro::Coord::ECI::TLE->parse() throw a warning if it can not
+    understand the --effective date, and record the effective date as
+    undef. Also allow --effective dates without a fractional part of the
+    second.
+
+  Add more tests to try to capture all these changes.
+
+  Fix various problems in Astro::Coord::ECI::TLE->pass(), also brought
+    to my attention by Jaap Meijers:
+
+    * Incorrect time of maximum elevation when only one of the original
+      one-minute samples is above the horizon.
+
+    * Sporadic detection of passes which spend less than a minute above
+      the horizon.
+
+    * Potentially, sporadic detection of passes which spend less than a
+      minute illuminated before daylight occurs. I have no examples of
+      this, though.
+
+  Add tests for Astro::Coord::ECI::TLE->pass(). More are needed.
+
+  Make the Astro::Coord::ECI::TLE pass() method more lenient when
+    screening for passes in which the satellite is illuminated. Thanks
+    to Jaap Meijers for bringing this to my attention.
+
+0.039		2011-04-29	T. R. Wyant
+  Silence warnings about out-of-range longitude which are sometimes
+    generated when computing the position of the Moon.
+
+  Added -dump-headers command line option to eg/passes.
+
+0.038		2011-04-14	T. R. Wyant
+  Updated code that uses the optional Astro::SpaceTrack module to
+    require version 0.052 wherever the Space Track web site is (or may
+    be) accessed.
+
+  Removed calls to _INSTANCE in little-used code in bin/satpass. It must
+    be little-used, since it hasn't been imported from Params::Util
+    since version 0.033 dated 17-Sep-2010.
+
+  Fix to zone attribute code in bin/satpass, so that it can be cleared
+    once set.
+
+0.037		2011-04-04	T. R. Wyant
+  Added a zone attribute to Astro::Coord::ECI::TLE::Iridium, so that it
+    could properly distinguish between -am and -pm flares somewhere
+    other than in the local zone. Thanks to CPAN Testers for finding
+    this consequence of publishing a t/iridium.t that everyone can run.
+
+0.036		2011-04-02	T. R. Wyant
+  t/iridium.t no longer requires any extra data for its execution.
+
+  The satpass 'status iridium' command, which has been deprecated for
+    quite a while, now issues a warning the first time it is issued. See
+    the satpass documentation for the the schedule for its removal.
+
+  Document Astro::Coord::ECI::TLE::Iridium max_mirror_angle attribute.
+
+  Correct export tag documentation in Astro::Coord::ECI::TLE (from
+    ':constant' to ':constants').
+
+  Correct the attribute() method on Astro::Coord::ECI,
+    Astro::Coord::ECI::TLE, and Astro::Coord::ECI::TLE::Iridium.
+    Formerly it was returning false for some extant attributes.
+
+0.035		2011-03-03	T. R. Wyant
+  Removed the rightascension attribute in favor of the ascendingnode
+    attribute. This is the last step in its deprecation.
+
+  Update the canned Iridium statuses in Astro::Coord::ECI::TLE for the
+    taking-out-of-service of Iridium 23. Following Kelso, I have marked
+    it spare, rather than failed.
+
+0.034		2010-12-06	T. R. Wyant
+  Make code for Astro::Coord::ECI zero-argument ecliptic() less cute
+    also, to try to forestall problems.
+
+  Update canned Iridium statuses in Astro::Coord::ECI::TLE, to cover the
+    replacement of Iridium 23 (24906) with Iridium 11 (25578) about
+    November 3 2010.
+
+  Update and re-enable xt/author/iridium_status.t.
+
+  Try to avoid panic in Astro::Coord::ECI zero-argument geocentric()
+    under at least one version by using less-cute code to compute the
+    value. The problem could be reproduced using OID 25591 epoch
+    30-Nov-2009 05:49:13 (which was over a year old at the time of
+    testing).
+
+  This release has known failures in xt/author/iridium_status.t.
+
+0.033		2010-09-17	T. R. Wyant
+  Fix glitch in Astro::Coord::ECI::TLE::Iridium flare() where the
+    maximum magnitude logic was being called when a flare was not
+    possible.
+
+  Add t/sgp4-ver.tle to the distribution, instead of asking people to
+    download it. Thanks to Dr. T. S. Kelso.
+
+  Add attribute rcs (radar cross-section) to Astro::Coord::ECI::TLE.
+    That class' parse() method will populate the rcs attribute if it
+    finds --rcs number on the name line of a NASA-format TLE.
+
+  Require version 5.64 of Exporter, so I don't have to juggle export
+    tags for the benefit of early Perls.
+
+  Drop dependency on Params::Util.
+
+  Move author tests from xt/ to xt/author/.
+
+  Make sure POD links specify text.
+
+  Make minimum Perl version 5.6.2, since that is the lowest version I
+    have a prayer of supporting.
+
+0.032		2010-07-03	T. R. Wyant
+  Have Astro::Coord::ECI::TLE complain every time the rightascension
+    attribute is accessed. This is being deprecated in favor of the
+    ascendingnode attribute. Elimination is scheduled for the first
+    release in 2011.
+
+  Consolidate prerequisites into inc/Astro/Coord/ECI/Meta.pm.
+
+  Don't require Module::Build for configuration when building a
+    distribution. This is controlled by environment variable
+    MAKING_MODULE_DISTRIBUTION.
+
+  Document that Astro::Coord::ECI::TLE::Iridium will probably not work
+    for Iridium Next satellites, to be launched starting about 2015.
+
+  Move acknowledgment of Goran Gasparovic from bin/satpass to
+    lib/Astro/Coord/ECI.pm, since that's where the code is and where the
+    acknowledgment should have been all along, and so it does not get
+    lost when bin/satpass is superseded by App::Satpass2.
+
+  Fix fatal error in satpass when tilde-expanding a non-existent user
+    name. It's still an error, just not fatal.
+
+  Tweak the documentation of Astro::Coord::ECI::TLE->is_valid_model(),
+    to make it clearer why it was provided, and make it obvious that it
+    can be called as a static method.
+
+  Fix bug in precession of equatorial coordinates, which would cause an
+    error if no observing station was passed to the subroutine.
+
+  Add Astro::Coord::ECI::TLE method body_type(), which computes the type
+    of the body from the common name using an algorithm similar to the
+    one documented on Space Track's Satellite Box Score page.
+
+  Weaken recommendation of Time::y2038 when run under Perl 5.12 and
+    above, since I really don't think it's needed.
+
+0.031		2010-05-06	T. R. Wyant
+  Add the maidenhead() method to Astro::Coord::ECI, to get or set
+    geodetic position in the Maidenhead Locator System.
+
+  Update install instructions in README to include cpan, cpanp, or ppi
+    as appropriate.
+
+  Add example script eg/passes to download TLEs and predict passes in
+    one fell swoop.
+
+  Change the output in the Astro::Coord::ECI::Sun example to UT, and add
+    a note why. Thanks to Richard Hardwick for raising this issue.
+
+0.030		2010-02-26	T. R. Wyant
+  Update copyright in README to 2010.
+
+  Consolidate all optional module logic, to eliminate duplicate code
+    between Makefile.PL and Build.PL, and so the messages all have the
+    same 'look and feel.' Dropped XML::Parser from the list, since it
+    is no longer used directly by any supported code.
+
+  Add the Heavens Above web site to Astro::Coord::ECI's 'SEE ALSO'.
+
+  Have the satpass script look in $ENV{USERPROFILE} for the
+    initialization file, in addition to all the other possibilities.
+
+  Use explicit tolerances for fractional results in the Julian date
+    conversion tests in t/basic.t. This is for Strawberry Perl under
+    ReactOS 0.3.11, which seems to have a case of the .999999s.
+
+  Trap possible exception from gmtime when generating the sgp4r
+    'mean eccentricity < 0 or >= 1' error in Astro::Coord::ECI::TLE.
+
+0.029		2010-02-04	T. R. Wyant
+  Date::Manip and Time::y2038 are no longer 'recommended' but 'optional'.
+    This means not telling the tool chain about them, but doing custom
+    checks, and custom, gentler messages about why you might (or might
+    not!) want these modules.
+
+  Centralize the decision about what time routines to use in
+    Astro::Coord::ECI::Utils, and have it export to the other modules,
+    the tests, the 'satpass' script, and the example scripts.
+
+  Rewrite t/parse_date.t so that it no longer needs Time::y2038.
+    Instead, it uses precomputed times, which it offsets for the target
+    system's epoch when it runs.
+
+  The above was done in an attempt to clarify the role of the optional
+    modules, and cases where they might not be desirable. Thanks to
+    Christopher Sylvain for identifying the problems and working with me
+    on their solution.
+
+  Rewrite the time portions Astro::Coord::ECI::OVERVIEW to better
+    reflect the current state of the time handling. Plus, retitle it so
+    that hopefully it will actually appear in the distribution.
+
+0.028		2010-01-11	T. R. Wyant
+  Fix bug introduced in 0.027, in which the Astro::Coord::ECI::TLE
+    pass() method failed to include the {appulse} data when an appulse
+    was found.
+
+0.027		2010-01-08	T. R. Wyant
+  Correct (I hope!) the computation of illumination changes in the
+    Astro::Coord::ECI::TLE pass() method. The original could miss them
+    in the first or last minute of the pass.
+
+  Add exportable constants SPEED_OF_LIGHT (in kilometers per second) and
+    SECS_PER_SIDERIAL_DAY to Astro::Coord::ECI::Utils.
+
+  Add attribute frequency (in Hertz) to Astro::Coord::ECI.
+
+  Have the Astro::Coord::ECI->azel() method return Doppler shift as the
+    seventh element of the returned array if velocities are available
+    AND the frequency attribute is set.
+
+  Attempt to correct the transverse velocities calculated by
+    Astro::Coord::ECI->azel() for the rotation of the coordinate system.
+    I am not convinced the corrections (or indeed the transverse
+    velocities themselves) are correct.
+
+  The first time the Astro::Coord::ECI::TLE rightascension attribute is
+    used in a given script, issue a warning that it is deprecated.
+
+  Update copyrights to 2010.
+
+  The Astro::Coord::ECI azel() method now returns velocities if
+    these are available. The transverse velocities (azimuthal and
+    elevational) are NOT corrected for the Coriolis effect.
+
+  Added Astro::Nova to the Astro::Coord::ECI 'SEE ALSO' section.
+
+  Date::Manip is no longer required. If it is not available, the
+    'satpass' script will use a home-grown pseudo-ISO-8601 parser
+    instead. The t/parse_time.t test was added to make sure this works
+    as advertized.
+
+  Have 'authortest' run the normal tests without any of the optional
+    modules. This requires either Test::Without::Module or Devel::Hide.
+    If neither is available, 'authortest' will not attempt these tests.
+
+  Remove the last vestiges of the $ENV{DEVELOPER_TEST} machinery.
+
+  Rewrote xt/manifest.t to use Test::More.
+
+  All modules' versions set to 0.026_01. In the future all modules in
+    a given release will have the same version number.
+
+  Convert all modules to the CPAN-recommended license.
+
+  Author tests no longer rely on environment variable DEVELOPER_TEST.
+    Instead, they are executed by ./Build authortest. This means author
+    tests are no longer available via the ExtUtils::MakeMaker build.
+
+  Astro::Coord::ECI:
+
+    * Modify correct_for_refraction() to work down to (and a bit below)
+      the horizon setting if that is negative. Thanks to Vidar Tyldum
+      Hansen of Kongsberg Satellite Services AS for identifying the
+      need for this, and working with me on it.
+
+  satpass:
+
+    * Add the 'refraction' parameter, to allow the user to turn off
+      atmospheric refraction (it is on by default).
+  
+0.026		2009-10-02	T. R. Wyant
+  Astro::Coord::ECI 0.026:
+
+    * Default the {inertial} attribute appropriately.
+
+    * Add the next_azimuth() method to compute when a body passes the
+      given azimuth. Thanks to Lixus Zoran for suggesting this on the
+      geo-perl mailing list.
+
+  Astro::Coord::ECI::Moon 0.007:
+
+    * Default the {inertial} attribute appropriately.
+
+  Astro::Coord::ECI::Sun 0.010:
+
+    * Default the {inertial} attribute appropriately.
+
+  Astro::Coord::ECI::TLE 0.020:
+
+    * Default the {inertial} attribute appropriately.
+
+    * Deprecate the {rightascension} attribute in favor of the
+      {ascendingnode} attribute. See the POD for the
+      deprecation plan.
+
+0.025		2009-09-07	T. R. Wyant
+  Astro::Coord::ECI 0.035:
+
+    * Correct documentation of matrix math in azel() method.
+
+  Astro::Coord::ECI::TLE 0.019:
+
+    * Add and document validate() method.
+
+    * Make max_effective_date() ignore undef arguments.
+
+    * More verbose message for bad eccentricity in sgp4r.
+
+    * Correct description of synopsis to match what it actually does.
+
+  Astro::Coord::ECI::TLE::Set 0.008:
+
+    * Add and document validate() method.
+
+  bin/satpass 0.024:
+
+    * Add validate command.
+
+  Build.PL:
+
+    * Remove need for Module::Build for configuration, since I also
+      supply Makefile.PL.
+
+0.024		2009-08-18	T. R. Wyant
+  General:
+
+    * Require Test::More 0.40 for testing.
+
+  Astro::Coord::ECI 0.024:
+
+    * Increment version. No other changes.
+
+  Astro::Coord::ECI::TLE 0.018:
+
+    * Add methods semiminor(), apoapsis(), apogee(), periapsis(), and
+      perigee.
+
+    * Add 'effective' attribute, with logic in the parse() method to
+      parse Astro::SpaceTrack --effective date out of line 0 of the
+      TLE. Thanks to Thomas Wehr for reporting the problem this
+      addresses, and T. S. Kelso for explaining what was needed to
+      fix it.
+
+    * Add method max_effective_date() to figure out what date to use,
+      since things are becoming rather complicated.
+    * Add method tle_verbose() to centralize the verbose output of TLE.
+
+  Astro::Coord::ECI::TLE::Set 0.007:
+
+    * Add method max_effective_date() to do the right thing when there
+      is more than one TLE to consider.
+
+0.023		2009-03-09	T. R. Wyant
+  General:
+
+    * Test t/tle_exception.t is no longer a developer test, but it will be
+      skipped unless the user has Time::y2038.
+
+  Astro::Coord::ECI 0.023:
+
+    * Add method equatorial_unreduced(), for those who are only interested
+      in range and velocity.
+
+    * Attempt to straighten out velocities when transforming among ECEF,
+      ECI, and equatorial. No tests yet, though, so I have no idea if
+      it is right. Note that as a consequence of this change it is
+      possible to have an object without a velocity, since inertial
+      objects no longer default to 0 velocity.
+
+  Astro::Coord::ECI::TLE 0.017:
+
+    * Set Iridium 91 in service in canned status, reflecting updates by
+      Rod Sladen and T. S. Kelso. This is the real reason for the
+      release; otherwise I would have sat on it until I had velocity
+      tests.
+
+0.022		2009-02-15	T. R. Wyant
+  General:
+
+    * Make new test t/tle_exception.t a developer test until I can figure
+      out why it only runs on my configuration.
+
+0.021		2009-02-13	T. R. Wyant
+  General:
+
+    * Make Time::y2038 recommended rather than required, since
+      ActivePerl has problems with that module. We use it if
+      available, otherwise we fall back to the core modules
+      (and Time::Local if needed).
+
+    * Add eg/closest and eg/positions, showing calculation of the
+      closest approach to a given point, and standalone calculation
+      of the positions of all bodies at a given time.
+
+    * Correct '## no critic' in various places.
+
+  Astro::Coord::ECI 0.021:
+
+    * Trap any exceptions encountered when setting the time, set the time
+      to undef (since otherwise we're left in an inconsistent state)
+      and re-raise the exception.
+
+  Astro::Coord::ECI::TLE 0.016:
+
+    * Add OID number to exceptions related to orbital elements.
+
+    * Correct error messages involving using a near-earth model on a
+      deep-space satellite or vice versa.
+
+    * Document the units of the model results (km or km/sec).
+
+    * Update canned Iridium status for the loss of Iridium 33 in a
+      collision with Cosmos 2251.
+
+  Astro::Coord::ECI::TLE::Set 0.006:
+
+    * Tell carp not to report Astro::Coord::ECI (and friends) errors
+      as originating in Astro::Coord::ECI::TLE::Set.
+
+  bin/satpass 0.021:
+
+    * Add gmt parameter which, if true, causes time output to be GMT.
+
+    * Trap Astro::Coord::ECI::TLE modeling exceptions in the 'flare',
+      'pass', and 'position' commands, so that the whole command does
+      not abort when this happens. SIGINT still aborts the whole
+      command. Add -quiet option to supress error output.
+
+    * Mark geocode_ca as unsupported and probably not working, since
+      they have started requiring registration for use of their
+      free port.
+
+  Build.PL:
+
+    * Change check for Astro::SIMBAD::Query to Astro::SIMBAD::Client
+
+  Makefile.PL:
+
+    * Change check for Astro::SIMBAD::Query to Astro::SIMBAD::Client
+
+0.020		2009-01-09	T. R. Wyant
+  General:
+
+    * Add Time::y2038 as prerequisite, and use in place of Time::Local and
+      CORE gmtime and localtime functions.
+
+    * Add Params::Util 0.25 as prerequisite.
+
+    * Add Astro/Coord/ECI/Overview.pod to try to give a "big picture".
+
+    * Eliminate function calls to UNIVERSAL::can and UNIVERSAL::isa in
+      favor of Params::Util::_INSTANCE(), ::_CLASSISA(), or
+      Astro::Coord::ECI::Utils::embodies().
+
+    * Update copyright date to 2009.
+
+    * Restructure Build.PL and Makefile.PL to better adapt to the
+      installed version.
+
+    * Distribute t/critic.t, t/executable.t, t/iridium_status.t,
+      t/manifest.t, and t/perlcriticrc but do not run them unless
+      environment variable DEVELOPER_TEST is set.
+
+    * Bring code up to perlcritic --stern with exceptions contained in
+      t/perlcriticrc. This was not done to bin/satpass, since I plan to
+      retire it.
+
+  Astro::Coord::ECI 0.020:
+
+    * Use represents() rather than isa() on the argument (if any) to the
+      equatorial(), next_elevation(), and next_meridian() methods, to
+      allow Astro::Coord::ECI::TLE::Set objects.
+
+  Astro::Coord::ECI::Moon 0.006:
+
+    * Make case of 'Moon' in next_quarter() output consistent.
+
+    * Append 'Moon' to first and last quarter description.
+
+    * Add method next_quarter_hash(), which wraps next_quarter() and
+      returns a hash similar to the one returned by the
+      Astro::Coord::ECI::TLE->pass() method.
+
+    * Add method almanac_hash(), which wraps almanac() in a manner similar
+      to next_quarter_hash().
+
+  Astro::Coord::ECI::Star 0.006:
+
+    * Add method almanac_hash(), which wraps almanac() and returns a hash
+      similar to the one returned by the Astro::Coord::ECI::TLE->pass()
+      method.
+
+  Astro::Coord::ECI::Sun 0.008:
+
+    * Add method next_quarter_hash(), which wraps next_quarter() and
+      returns a hash similar to the one returned by the
+      Astro::Coord::ECI::TLE->pass() method.
+
+    * Add method almanac_hash(), which wraps almanac() in a manner similar
+      to next_quarter_hash().
+
+  Astro::Coord::ECI::TLE::0.015:
+
+    * Add ability to manufacture the 'tle' attribute when the object was
+      not generated by the parse() method.
+
+    * Supress object dump when environment variable DEVELOPER_TEST is set.
+
+    * Correct SYNOPSIS to include $tle->set(backdate=>0) with comments.
+
+    * Document models sgp4r and model4r under the 'model' attribute, and
+      add them to the DESCRIPTION section of the POD.
+
+  Astro::Coord::ECI::TLE::Iridium 0.007:
+
+    * Document attributes am, day, extinction, and pm.
+
+  Astro::Coord::ECI::TLE::Set 0.005:
+
+    * Add explicit represent() method.
+
+    * Add optional options hash as first argument of aggregate(). The only
+      option is {select => $time} which if true causes select($time) to
+      be called on any Astro::Coord::ECI::TLE::Set objecgts created.
+
+  Astro::Coord::ECI::TLE::Utils 0.010:
+
+    * Add subroutine embodies($obj, $class) as a safe way to call
+      represents() without throwing an exception if $obj is not blessed.
+
+  bin/satpass 0.020:
+
+    * Use Geo::WebService::Elevation::USGS for height().
+
+    * Drop support for SIMBAD 3, since U. Strasbourg did a while back.
+
+    * Trap SOAP errors and correct result hash expansion in height().
+
+    * Eliminate function calls to UNIVERSAL::can and UNIVERSAL::isa.
+
+    * Correct (reverse) documented meaning of flare() options -am, -day,
+      and -pm.
+
+    * Document models sgp4r and model4r under the 'model' paramter.
+
+    * Revise 'NOTES' section to cover plans for App::Satpass2, and changes
+      for this release.
+
+0.019		2008-10-27	T. R. Wyant
+  Astro::Coord::ECI 0.019:
+
+    * Truncate SYNOPSIS code.
+
+    * Range-check angular position input, with warning if out of range:
+
+      - Latitude: - PI/2 <= latitude <= PI/2;
+
+      - Longitude: - 2*PI <= longitude < 2*PI (Jean Meeus' examples
+        sometimes use examples outside the conventional range);
+      - Right ascension: 0 <= right ascension < 2*PI
+
+  Astro::Coord::ECI::Moon 0.005:
+
+    * Clarify and expand SYNOPSIS code.
+
+  Astro::Coord::ECI::Star 0.005:
+
+    * Correct and expand SYNOPSIS code.
+
+    * Normalize computed right ascension to range 0 to 2 PI.
+
+  Astro::Coord::ECI::Sun 0.007:
+
+    * Clarify and expand SYNOPSIS code.
+
+  Astro::Coord::ECI::TLE 0.014:
+
+    * Clarify and expand SYNOPSIS code.
+
+  Astro::Coord::ECI::TLE::Iridium 0.006:
+
+    * Correct SYNOPSIS code.
+
+    * Document problems with magnitude estimate when the Sun is close
+      to the horizon as seen from the satellite.
+
+  Astro::Coord::ECI::TLE::Set 0.004:
+
+    * Clarify and complete SYNOPSIS code.
+
+0.018		2008-10-03	T. R. Wyant
+  Astro::Coord::ECI 0.018:
+
+    * Update version number and copyright date. No other changes.
+
+  Astro::Coord::ECI::TLE 0.013:
+
+    * Add semimajor(), to calculate and return the semimajor axis of the
+      orbit.
+
+    * Update Iridium status: mark Iridium 28 (OID 24948) failed, and
+      Iridium 95 (OID 27375) as in service (was spare).
+
+  bin/satpass 0.018:
+
+    * Under Mac OS X, use Mac::Pasteboard for clipboard operations if
+      available; supress pbcopy warning when run as cron job.
+
+    * Fix 'height' query to track changes in USGS' elevation web service.
+
+  t/tle_sgp4r.t:
+
+    * Correct the code that extracts the needed TLEs from the downloaded
+      zip file.
+
+0.017		2007-12-30	T. R. Wyant
+  Astro::Coord::ECI 0.017:
+
+    * Fall back to homegrown (and un-general, and insufficiently tested)
+      code if Storable::dclone not available.
+
+  Astro::Coord::ECI::TLE 0.012:
+
+    * Correct behavior when Scalar::Util::dualvar not present.
+
+  Astro::Coord::ECI::TLE::Iridium 0.005:
+
+    * Use max() and min() from Astro::Coord::ECI::Utils.
+
+  Astro::Coord::ECI::Utils 0.009:
+
+    * Added looks_like_number(), max(), min(), defaulting to the
+      Scalar::Util or List::Util implementations if possible, but
+      providing our own if not.
+
+    * Clarify load_module() documentation.
+
+  bin/satpass 0.017:
+
+    * Use looks_like_number() and max() from Astro::Coord::ECI::Utils.
+
+    * Recode _load_module to use Astro::Coord::ECI::Utils::load_module.
+
+    * Fix clipboard code to fail gracefully if Scalar::Util::weaken
+      is unavailable.
+
+  t/{moon,sun}.t:
+
+    * Skip singleton test if Scalar::Util::refaddr not available.
+
+  t/pod_coverage.t:
+
+    * Correct also_private setting to make it skip all-uppercase+numeric
+      (blind fix since mine seems to skip constants anyway, which is
+      what I'm really trying to do).
+
+  t/tle.t:
+
+    * Use max() from Astro::Coord::ECI::Utils.
+
+  t/pod_spelling.t 0.010:
+
+    * Add stop words 'max' and 'min'.
+
+  bin/satpass 0.017:
+
+    * Supress '"our" variable $clipboard_unavailable masks earlier
+      declaration ...' under 5.10.0.
+
+0.016		2007-12-28	T. R. Wyant
+  Astro::Coord::ECI 0.016:
+
+    * Increment version. No other changes.
+
+  Astro::Coord::ECI::TLE 0.011:
+
+    * Use PI-related constants from Astro::Coord::ECI::Utils.
+
+    * pass() no longer throws 'end before beginning' error if caused
+      by setting backdate false; instead returns empty list of
+      passes.
+
+  Astro::Coord::ECI::TLE::Iridium 0.004:
+
+    * flare() no longer throws 'end before beginning' error if caused
+      by setting backdate false; instead returns empty list of
+      passes.
+
+    * Add model 'sgp4r', based on 'Revisiting Spacetrack Report #3',
+      and equivalent metamodel 'model4r.'
+
+    * Make metamodel 'model' execute sgp4r.
+
+    * Have 'period' take into account which model is being used.
+
+  Build.PL:
+
+    * Prompt for installation of 'satpass' script, defaulting to 'n'.
+
+  Makefile.PL:
+
+    * Fix license support check to work with developer versions of
+      ExtUtils::MakeMaker.
+
+    * Prompt for installation of 'satpass' script, defaulting to 'n'.
+
+  bin/satpass 0.016:
+
+    * Document major changes in classes. No other changes.
+
+  eg/tle_period.t:
+
+    * Pseudo-test to compare the various period calculations.
+
+  eg/README:
+
+    * Update to add eg/tle_period.t
+
+  t/{eci,moon,star,sun}.t:
+
+    * Remove dependency on Math::Trig.
+
+    * Prefer Astro::Coord::ECI::Utils over local definitions of
+      constants.
+
+  t/iridium.t:
+
+    * Clarify (I hope!) how to run the Iridium tests.
+
+  t/tle_sgp4r.t:
+
+    * New test for model sgp4r. TLEs are not included in the kit,
+      but are downloaded if needed.
+
+  t/sgp4r.out:
+
+    * Comparison data for tle_sgp4r.t. Renamed from tforver.out in
+      the 'Revisiting Spacetrack Report #3' download.
+
+  t/pod.t:
+
+    * Remove unused variable
+
+  t/pod_coverage.t:
+
+    * Remove unused variable
+
+0.015		2007-11-15	T. R. Wyant
+  Astro::Coord::ECI 0.015:
+
+    * Bump version number. No other changes.
+
+  bin/satpass 0.015:
+
+    * Document pod coverage test change, intent to and plans for
+      implementing "Revisiting Spacetrack Report #3".
+
+    * Bump version.
+
+  t/pod_coverage.t:
+
+    * Specify all-caps routines as private, since some testers are
+      getting failures on 'use constant' declarations. I don't get
+      these, so the change is kind of blind.
+
+0.014		2007-11-13
+  Astro::Coord::ECI 0.014:
+
+    * Add equinox_dynamical attribute; precess() now uses this as start
+      point and leaves the time alone. It is also used when going from
+      ECI to ECEF, and set to the current time when going from ECEF to
+      ECI.
+
+    * Add global $EQUINOX_TOLERANCE to determine minimum precession when
+      converting from ECI to ECEF.
+
+    * Add method equinox_dynamical for performance.
+
+    * Document dynamical and universal times.
+
+    * Add method precess_dynamical() to precess to the given dynamical
+      time. The precess() method simply converts its argument to
+      dynamical and delegates to this.
+
+  Astro::Coord::ECI::Moon 0.004:
+
+    * Have model set equinox_dynamical attribute to modeled dynamical
+      time.
+
+  Astro::Coord::ECI::Star 0.004:
+
+    * Set equinox_dynamical attribute before precessing to current
+      equinox.
+
+    * Precess coordinates at end of time_set(), not in middle.
+
+  Astro::Coord::ECI::Sun 0.006:
+
+    * Have model set equinox_dynamical attribute to modeled dynamical
+      time.
+
+  Astro::Coord::ECI::TLE 0.010:
+
+    * Add backdate attribute (default: true) to control whether pass()
+      uses elements before their epoch.
+
+    * Use the alias() mechanism for special-case settings of the
+      illum attribute.
+
+    * Have models set equinox_dynamical to the dynamical epoch.
+
+  Astro::Coord::ECI::TLE::Iridium 0.003:
+
+    * Have backdate attribute control whether flare() uses elements
+      before their epoch.
+
+  Astro::Coord::ECI::TLE::Set 0.003:
+
+    * Minor documentation tweaks and POD fixes.
+
+  Astro::Coord::ECI::Utils 0.008:
+
+    * Add constant JD_OF_EPOCH, globals $DATEFORMAT and $JD_GREGORIAN,
+      and subroutines date2jd, date2epoch, epoch2datetime, jd2date,
+      jd2datetime.
+
+    * Add subroutine load_module and centralize all on-the-fly loading
+      here, for support of .pmc modules.
+
+  bin/satpass 0.014:
+
+    * Add 'echo' and 'times' commands.
+
+    * Add 'backdate' parameter, propagate to pass() and flare().
+
+    * Add 'desired_equinox' parameter, use it when displaying inertial
+      coordinates (only equatorial, at the moment).
+
+    * Allow pseudo-redirection of command output into a pipe.
+
+0.013		2007-03-02	T. R. Wyant
+  Astro::Coord::ECI 0.013:
+
+    * No code changes, but updated version to be visible to CPAN 'r'.
+
+  Astro::Coord::ECI::TLE 0.009:
+
+    * Updated canned Iridium status table for failure of Iridium 36 and
+      its replacement by Iridium 97.
+
+  Astro::Coord::ECI::TLE::Iridium 0.002:
+
+    * Fixed occasional borderline-case spurious flare prediction.
+
+  bin/satpass 0.013:
+
+    * Added -version command option, to display preamble and exit.
+
+    * Wrap probe for clipboard helpers in eval{}. Among other things, this
+      allows the script to run in taint mode.
+
+    * Add -choose option to list().
+
+    * Allow extra arguments to status show, to do selective status display.
+
+  t/moon.t:
+
+    * Fixed cosmetic undefined value error when Scalar::Util does not
+      implement refaddr().
+
+  t/sun.t:
+
+    * Fixed cosmetic undefined value error when Scalar::Util does not
+      implement refaddr().
+
+0.012		2007-01-09	T. R. Wyant
+  ECI.pm 0.012:
+
+    * Localized $Data::Dumper::Terse
+
+    * Fixed divide-by-zero in azel() when the points coincide.
+
+    * Convert angle() to use law of haversines rather than law of cosines,
+      for better performance on small angles.
+
+  ECI/Sun.pm 0.005:
+
+    * Add magnitude() method.
+
+  ECI/TLE.pm 0.008:
+
+    * Add {body} and {station} to hash returned by pass().
+
+    * Add support for reblessing to Astro::Coord::ECI::TLE::Iridium if
+      appropriate. This includes rebless(), before_reblessing(),
+      after_reblessing(), alias(), can_flare(), status(), and the {reblessable}
+      attribute.
+
+  ECI/TLE/Iridium.pm 0.001:
+
+    * Initial release.
+
+  ECI/Utils.pm 0.007:
+
+    * Confess on invalid acos() argument.
+
+    * Add find_first_true() to support finding Iridium flares.
+
+  bin/satpass 0.012:
+
+    * If a source file ends with a continued line, warn and abandon the
+      line.
+
+    * Set the time on the appulsing body before obtaining its coordinates.
+
+    * Fix error in end time parser in position().
+
+    * Throw error if doing 'sky lookup' on a body that is already in the
+      sky.
+
+    * Have pass() round the displayed time for the appulsing body.
+
+    * Add flare() to calculate Iridium flares.
+
+    * Modify position() to report flare potential for Iridium satellites.
+
+    * Added -choose option to pass(), position(), tle().
+
+    * Removed pass_old() and the timing parameter, strongly deprecated in
+      version 0.011.
+
+    * Added {simbad_version} parameter to select SIMBAD software to use.
+
+  eg/iridium 0.001:
+
+    * New example calculating Iridium flares.
+
+0.011		2006-10-26	T. R. Wyant
+  ECI.pm 0.011:
+
+    * Add horizon attribute.
+
+  ECI/TLE.pm:
+
+    * Add pass() method and supporting attributes.
+
+  bin/satpass:
+
+    * Add check_version()
+
+    * Defer loading of optional modules to speed startup.
+
+    * Rewrite XML parsing to use either XML::Parser or XML::Parser::Lite,
+      with XML::Parser being preferred.
+
+    * Fix fatal error when running off the end of the top-level command
+      script.
+
+    * Support ~user in filenames.
+
+    * Convert pass() to use Astro::Coord::ECI::TLE->pass(). Old code
+      remains as pass_old(), strongly deprecated.
+
+    * Use Time::HiRes for timing, if that is available.
+
+    * Document status of pass_old, 'timing' parameter (strongly
+      deprecated) and the SIMBAD situation.
+
+  eg/iss:
+
+    * New example to demonstrate Astro::Coord::ECI::TLE->pass().
+
+0.010		2006-09-23	T. R. Wyant
+  ECI.pm 0.010:
+
+    * Check for null arguments on most calls, so we die now rather
+        than later.
+    * Fix undefined value when calling set() with no arguments.
+
+  ECI/Moon.pm 0.003:
+
+    * Make singleton object by default.
+
+  ECI/Sun.pm 0.004:
+
+    * Make singleton object by default.
+
+  bin/satpass 0.010:
+
+    * Add qualifiers -brief, -list, and -delete to macro command.
+        Parameter explicit_macro_delete controls what the macro
+        command does when given a name but no definition.
+
+    * Make -time work on macros and source commands.
+
+    * Add ability to abort macros and source scripts on error,
+        controlled by parameter error_out.
+
+  Build.PL:
+
+    * Correct add_to_cleanup() call.
+
+    * Add omitted ECI/Sun.pm.
+
+  Makefile.PL:
+
+    * Add explicit PL_FILES => {}, to prevent old versions from
+        trying to execute 'perl Build.PL Build'.
+
+0.009		2006-07-23	T. R. Wyant
+  ECI.pm 0.009:
+
+    * Add represents() method.
+
+  ECI/Sun.pm 0.003:
+
+    * Remove redundant definition of ASTRONOMICAL_UNIT; use AU from
+        Astro::Coord::ECI::Utils
+
+  ECI/TLE.pm 0.006:
+
+    * Add is_model_attribute(), is_valid_model().
+
+  ECI/TLE/Set.pm 0.002:
+
+    * Allow Astro::Coord::ECI::TLE::Set objects as arguments of add().
+
+    * Take advantage of is_model_attribuite(), is_valid_model().
+
+  bin/satpass 0.009:
+
+    * Fix defaulting of second argument of quarters().
+
+    * Allow macros to override core commands. Macros can no longer
+        call themselves, and core commands can be accessed explicitly
+        by the syntax core.command.
+
+    * Relative times for the second and subsequent arguments of a
+        command are relative to previous time argument of the same
+        command, whether absolute or relative.
+
+  Build.PL 0.001:
+
+    * Initial version.
+
+0.008		2006-07-14	T. R. Wyant
+  ECI.pm 0.008:
+
+    * Support the use of Astro::Coord::ECI::TLE::Set objects in the
+        angle() method.
+
+    * Add method attribute().
+
+  ECI/TLE.pm 0.005:
+
+    * Add the null model.
+
+  ECI/TLE/Set.pm 0.001 - New container object.
+
+  ECI/Utils.pm 0.006:
+
+    * Add dynamical_delta() method (was private method in ECI.pm).
+
+  bin/satpass 0.008:
+
+    * Use Astro::Coord::ECI::TLE::Set objects to represent satellites
+        when we have more than one set of orbital elements.
+
+    * Add help for Astro::Coord::ECI::TLE::Set.
+
+    * Add and document 'singleton' parameter. Use it in pass() and
+        position().
+
+    * Default end times relative to start times, rather than relative
+        to the last explicit time.
+
+    * Fix interaction between clipboard functionality and test hook.
+        Thanks to IMACAT for help diagnosing and verifying.
+
+    * Add acknowledgments.
+
+0.007		2006-07-06	T. R. Wyant
+  ECI.pm:
+
+    * Optimize, mostly by being smarter about when to clear cached
+      coordinates.
+
+    * Correct spelling in POD.
+
+  ECI/Moon.pm:
+
+    * Change die to confess on programming error.
+
+    * Correct spelling in POD.
+
+  ECI/Star.pm:
+
+    * Correct spelling in POD.
+
+  ECI/Sun.pm:
+
+    * Correct spelling in POD.
+
+  ECI/TLE.pm:
+
+    * Modify internals for easier cache clearing.
+
+    * Better documentation of 'mean anomaly'.
+
+    * Correct spelling in POD.
+
+    * Trap invalid effective eccentricity in sgp4. The underlying cause
+      of the problem is probably either an invalid TLE or using the TLE
+      past its 'good until' date.
+
+  ECI/Utils.pm:
+
+    * Change die to confess on programming error.
+
+    * Correct spelling in POD.
+
+  Makefile.PL:
+
+    * Get rid of wrong-headed attempt to configure optional modules.
+
+  bin/satpass:
+
+    * Various documentation corrections.
+
+    * Correct spelling in POD.
+
+    * Add store() and retrieve() as interface to Storable.
+
+    * Centralize tilde expansion, and do it on cd(), load(), retrieve (),
+      source(), store ().
+
+    * Preprocess -start and -end options of st(), to make dates
+      consistent with the rest of satpass.
+
+    * Add -initialization_file command option.
+
+    * Add -optional option on source().
+
+    * Add localize(), and macro/source call frames to support this.
+
+    * Add localize subcommand to st().
+
+    * Make 'st show' a synonym for 'st get', and make 'st get' without
+      arguments show all settings.
+
+    * Add test hooks, and a test to exercise the more arcane functions
+      of the script.
+
+    * Add -source_layer and -retry_on_zero options to height_us().
+
+    * Add a separate height_ca() method that makes use of the above
+      options when delegating to height_us(), in response to anomalous
+      responses to height queries.
+
+    * Fix problem displaying appulses in pass().
+
+    * Make the position() display positions for a range of times. Add
+      -realtime option to position() to display positions in
+      near-real-time.
+
+    * Add drop().
+
+    * Fix formatting of error messages from the local coordinate
+      formatters.
+
+    * Have position() display epoch and illumination when displaying
+      objects from the observing list.
+
+0.006		2006-06-07	T. R. Wyant
+  ECI.pm:
+
+    * Cache some calculations for re-use.
+
+  ECI/Star.pm:
+
+    * Tweak docs.
+
+  ECI/Utils.pm:
+
+    * Add intensity_to_magnitude(), atmospheric_extinction().
+
+  bin/satpass:
+
+    * Correct check for whether location has been set. Old check
+      did not recognize 0 latitude, longitude, or height.
+
+    * Special-case code to 'unset' tz when it is set to undef or ''.
+
+    * Make 'position' iterate over time, in real time with -realtime.
+
+    * Add -time global command option to time execution.
+
+    * Add 'country' parameter. Break out 'geocode' and 'height' to
+      country-specific versions, and make the original command
+      dispatch based on 'country' parameter or explicit argument.
+
+    * Allow formatting of local coordinates without range information.
+
+    * Round pass times to the nearest second (since strftime truncates).
+
+    * Add 'almanac' command options -horizon, -quarters, -transit, and
+      -twilight to restrict the output.
+
+    * Make height_us() work with revised USGS SOAP calling sequence.
+
+0.005		2006-04-21	T. R. Wyant
+  ECI.pm:
+
+    * Add 'inertial' read-only attribute.
+
+    * Add equatorial coordinates relative to observer.
+
+    * Fix negative right ascension - should be mod 2 pi.
+
+    * Tweak docs, including fuller synopsis.
+
+  bin/satpass:
+
+    * Add local_coord parameter to determine local coordinate system
+      (azel or equatorial).
+
+    * Modify pass and position output to use local_coord.
+
+  TLE.pm:
+
+    * Tweak synopsis, to show that setting time runs model.
+
+0.004		2006-03-14	T. R. Wyant
+  bin/satpass:
+
+    * Rewrite command parsing so that we can retain quotes and
+      be POSIXly correct in option processing for the system
+      command.
+
+    * Give tle command a -verbose qualifier, to produce a formatted
+      listing of the orbital parameters.
+
+    * Provide HTML =item targets consistent with links.
+
+  ECI.pm:
+
+    * Clean up docs.
+
+  TLE.pm:
+
+    * Clean up docs, wrap some really long lines.
+
+    * Replace _fmod2p with mod2pi from Utils module.
+
+0.003		2006-03-10	T. R. Wyant
+  bin/satpass:
+
+    * Remove all uses of Clipboard, to try to get built under
+      ActiveState's ActivePerl.
+
+    * Correct version number in Astro::SpaceTrack load.
+
+    * Accumulate Iridium operational statuses.
+
+    * Add status command to display satellite operational status.
+
+  Astro::Coord::ECI:
+
+    * Increment version, as a lazy way to increment the distribution
+      version.
+
+    * Tweak documentation.
+
+  Astro::Coord::ECI::Utils:
+
+    * Make subclass of Exporter, since ActiveState's build
+      seems to have a problem with 'use Exporter qw{import}'
+      (except under darwin, strangely enough).
+
+    * Increment version.
+
+0.002		2006-03-02	T. R. Wyant
+  bin/satpass:
+    * Behave better when no Clipboard module.
+
+    * Do not use Clipboard module under darwin.
+
+    * Require Astro::SpaceTrack 0.016 (if any).
+
+    * Default star distance now 10000 parsecs (was 1 parsec).
+
+    * Add 'sky lookup', using Astro::SIMBAD::Query.
+
+    * Modified 'sky' listing format to look like 'sky add' commands.
+
+  Astro::Coord::ECI:
+
+    * Add NAD83 ellipsoid.
+
+  Astro::Coord::ECI::Utils:
+
+    * Corrected documentation.
+
+0.001		2006-02-17	T. R. Wyant
+  Initial release

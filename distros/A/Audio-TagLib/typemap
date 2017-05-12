@@ -1,0 +1,510 @@
+TYPEMAP
+TagLib::ByteVector *									TL_OBJECT
+long long												T_NV
+const char												T_CHAR
+TagLib::APE::Footer *									TL_OBJECT
+TagLib::String *										TL_OBJECT
+TagLib::ByteVectorList *								TL_OBJECT
+TagLib::StringList * 									TL_OBJECT
+TagLib::APE::Item * 									TL_OBJECT
+TagLib::MPEG::Header * 									TL_OBJECT
+TagLib::AudioProperties * 								TL_OBJECT
+TagLib::File * 											TL_OBJECT
+TagLib::Tag * 											TL_OBJECT
+TagLib::FileRef * 										TL_OBJECT
+TagLib::FileRef::FileTypeResolver * 					TL_OBJECT
+const TagLib::FileRef::FileTypeResolver * 				TL_OBJECT
+TagLib::MPEG::XingHeader * 								TL_OBJECT
+TagLib::ID3v1::StringHandler * 							TL_OBJECT
+TagLib::ID3v2::ExtendedHeader * 						TL_OBJECT
+TagLib::ID3v2::Footer * 								TL_OBJECT
+TagLib::ID3v2::Header * 								TL_OBJECT
+TagLib::ID3v2::RelativeVolumeFrame * 					TL_OBJECT
+TagLib::ID3v2::RelativeVolumeFrame::PeakVolume * 		TL_OBJECT
+TagLib::ID3v2::Frame * 									TL_OBJECT
+TagLib::ID3v2::FrameFactory * 							TL_OBJECT
+TagLib::APE::Tag * 										TL_OBJECT
+TagLib::ByteVector::Iterator * 							TL_OBJECT
+TagLib::String::Iterator * 								TL_OBJECT
+TagLib::APE::ItemListMap * 								TL_OBJECT
+TagLib::APE::ItemListMap::Iterator * 					TL_OBJECT
+TagLib::ID3v1::Tag * 									TL_OBJECT
+TagLib::ID3v1::GenreMap * 								TL_OBJECT
+TagLib::ID3v1::GenreMap::Iterator * 					TL_OBJECT
+TagLib::ID3v2::Tag * 									TL_OBJECT
+TagLib::ID3v2::FrameListMap * 							TL_OBJECT
+TagLib::ID3v2::FrameList * 								TL_OBJECT
+TagLib::ID3v2::FrameListMap::Iterator * 				TL_OBJECT
+TagLib::ID3v2::FrameList::Iterator * 					TL_OBJECT
+TagLib::Ogg::XiphComment * 								TL_OBJECT
+TagLib::Ogg::FieldListMap * 							TL_OBJECT
+TagLib::Ogg::FieldListMap::Iterator * 					TL_OBJECT
+TagLib::ID3v2::AttachedPictureFrame * 					TL_OBJECT
+TagLib::ID3v2::CommentsFrame * 							TL_OBJECT
+TagLib::ID3v2::TextIdentificationFrame * 				TL_OBJECT
+TagLib::ID3v2::UserTextIdentificationFrame * 			TL_OBJECT
+TagLib::ID3v2::UniqueFileIdentifierFrame * 				TL_OBJECT
+TagLib::ID3v2::UnknownFrame * 							TL_OBJECT
+TagLib::Ogg::Page * 									TL_OBJECT
+TagLib::Ogg::PageHeader * 								TL_OBJECT
+TagLib::Ogg::File * 									TL_OBJECT
+TagLib::FLAC::File * 									TL_OBJECT
+TagLib::MPC::File * 									TL_OBJECT
+TagLib::MPEG::File * 									TL_OBJECT
+TagLib::Ogg::File * 									TL_OBJECT
+TagLib::Ogg::FLAC::File * 								TL_OBJECT
+TagLib::Ogg::Vorbis::File * 							TL_OBJECT
+TagLib::Vorbis::File * 									TL_OBJECT
+TagLib::FLAC::Properties * 								TL_OBJECT
+TagLib::MPC::Properties * 								TL_OBJECT
+TagLib::MPEG::Properties * 								TL_OBJECT
+TagLib::Ogg::Vorbis::Properties * 						TL_OBJECT
+TagLib::Vorbis::Properties * 							TL_OBJECT
+
+TagLib::APE::Item::ItemTypes 				TL_APE_ITEM_ITEMTYPES
+TagLib::AudioProperties::ReadStyle			TL_AUDIOPROPERTIES_READSTYLE
+TagLib::MPEG::Header::Version 				TL_MPEG_HEADER_VERSION
+TagLib::MPEG::Header::ChannelMode 			TL_MPEG_HEADER_CHANNELMODE
+TagLib::File::Position 						TL_FILE_POSITION
+TagLib::String::Type 						TL_STRING_TYPE
+TagLib::Ogg::Page::ContainsPacketFlags 		TL_OGG_PAGE_CONTAINSPACKETFLAGS
+TagLib::Ogg::Page::PaginationStrategy		TL_OGG_PAGE_PAGINATIONSTRATEGY
+TagLib::ID3v2::AttachedPictureFrame::Type	TL_ID3V2_ATTACHEDPICTUREFRAME_TYPE
+TagLib::ID3v2::RelativeVolumeFrame::ChannelType		TL_ID3V2_RELATIVEVOLUMEFRAME_CHANNELTYPE
+TagLib::MPC::File::TagTypes 				TL_MPC_FILE_TAGTYPES
+TagLib::MPEG::File::TagTypes 				TL_MPC_FILE_TAGTYPES
+
+################################################################
+OUTPUT
+TL_OBJECT
+	sv_setref_pv($arg, \"Audio::${subtype}\", (void*)$var);
+TL_PTRLIST
+	SV * reflist = newSV(0);
+	sv_setref_pv(reflist, Nullch, (void *)$var);
+	std::list<bool> * memlist = new std::list<bool>();
+	/* by default, mark all item to perform delete action */
+	for(int i = 0; i < $var->size(); i++)
+		memlist->insert(memlist->begin(), true);
+	SV * refmemlist = newSV(0);
+	sv_setref_pv(refmemlist, Nullch, (void *)memlist);
+	AV * array = newAV();
+	if(av_store(array, 0, reflist) == NULL || 
+		av_store(array, 1, refmemlist) == NULL) {
+		delete $var;
+		delete memlist;
+		croak("failed to store reflist/refmemlist in AV");
+	}
+	$arg = sv_2mortal(newRV_noinc(array));
+	sv_bless($arg, stash_gv(\"Audio::${subtype}\", TRUE));
+TL_APE_ITEM_ITEMTYPES
+	switch($var) {
+	case TagLib::APE::Item::Text:
+		$arg = sv_2mortal(newSVpv(\"Text\", 0));
+		break;
+	case TagLib::APE::Item::Binary:
+		$arg = sv_2mortal(newSVpv(\"Binary\", 0));
+		break;
+	default:
+		/* TagLib::APE::Item::Locator */
+		$arg = sv_2mortal(newSVpv(\"Locator\", 0));
+	}
+TL_AUDIOPROPERTIES_READSTYLE
+	switch($var) {
+	case TagLib::AudioProperties::Fast:
+		$arg = sv_2mortal(newSVpv(\"Fast\", 0));
+		break;
+	case TagLib::AudioProperties::Average:
+		$arg = sv_2mortal(newSVpv(\"Average\", 0));
+		break;
+	default:
+		/* TagLib::AudioProperties::Accurate */
+		$arg = sv_2mortal(newSVpv(\"Accurate\", 0));
+	}
+TL_MPEG_HEADER_VERSION
+	switch($var) {
+	case TagLib::MPEG::Header::Version1:
+		$arg = sv_2mortal(newSVpv(\"Version1\", 0));
+		break;
+	case TagLib::MPEG::Header::Version2:
+		$arg = sv_2mortal(newSVpv(\"Version2\", 0));
+		break;
+	default:
+		/* TagLib::MPEG::Header::Version2_5 */
+		$arg = sv_2mortal(newSVpv(\"Version2_5\", 0));
+	}
+TL_MPEG_HEADER_CHANNELMODE
+	switch($var) {
+	case TagLib::MPEG::Header::Stereo:
+		$arg = sv_2mortal(newSVpv(\"Stereo\", 0));
+		break;
+	case TagLib::MPEG::Header::JointStereo:
+		$arg = sv_2mortal(newSVpv(\"JointStereo\", 0));
+		break;
+	case TagLib::MPEG::Header::DualChannel:
+		$arg = sv_2mortal(newSVpv(\"DualChannel\", 0));
+		break;
+	default:
+		/* TagLib::MPEG::Header::SingleChannel */
+		$arg = sv_2mortal(newSVpv(\"SingleChannel\", 0));
+	}
+TL_FILE_POSITION
+	switch($var) {
+	case TagLib::File::Beginning:
+		$arg = sv_2mortal(newSVpv(\"Beginning\", 0));
+		break;
+	case TagLib::File::Current:
+		$arg = sv_2mortal(newSVpv(\"Current\", 0));
+		break;
+	default:
+		/* TagLib::File::End */
+		$arg = sv_2mortal(newSVpv(\"End\", 0));
+	}
+TL_STRING_TYPE
+	switch($var) {
+	case TagLib::String::Latin1:
+		$arg = sv_2mortal(newSVpv(\"Latin1\", 0));
+		break;
+	case TagLib::String::UTF8:
+		$arg = sv_2mortal(newSVpv(\"UTF8\", 0));
+		break;
+	case TagLib::String::UTF16BE:
+		$arg = sv_2mortal(newSVpv(\"UTF16BE\", 0));
+		break;
+	case TagLib::String::UTF16LE:
+		$arg = sv_2mortal(newSVpv(\"UTF16LE\", 0));
+		break;
+	default:
+		/* TagLib::String::UTF16 */
+		$arg = sv_2mortal(newSVpv(\"UTF16\", 0));
+	}
+TL_OGG_PAGE_CONTAINSPACKETFLAGS
+	switch($var) {
+	case TagLib::Ogg::Page::DoesNotContainPacket:
+		$arg = sv_2mortal(newSVpv(\"DoesNotContainPacket\", 0));
+		break;
+	case TagLib::Ogg::Page::CompletePacket:
+		$arg = sv_2mortal(newSVpv(\"CompletePacket\", 0));
+		break;
+	case TagLib::Ogg::Page::BeginsWithPacket:
+		$arg = sv_2mortal(newSVpv(\"BeginsWithPacket\", 0));
+		break;
+	default:
+		/* TagLib::Ogg::Page::EndsWithPacket */
+		$arg = sv_2mortal(newSVpv(\"EndsWithPacket\", 0));
+	}
+TL_OGG_PAGE_PAGINATIONSTRATEGY
+	switch($var) {
+	case TagLib::Ogg::Page::SinglePagePerGroup:
+		$arg = sv_2mortal(newSVpv(\"SinglePagePerGroup\", 0));
+		break;
+	default:
+		/* TagLib::Ogg::Page::Repaginate */
+		$arg = sv_2mortal(newSVpv(\"Regainate\", 0));
+	}
+TL_ID3V2_ATTACHEDPICTUREFRAME_TYPE
+	switch($var) {
+	case TagLib::ID3v2::AttachedPictureFrame::Other:
+		$arg = sv_2mortal(newSVpv(\"Other\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::FileIcon:
+		$arg = sv_2mortal(newSVpv(\"FileIcon\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::OtherFileIcon:
+		$arg = sv_2mortal(newSVpv(\"OtherFileIcon\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::FrontCover:
+		$arg = sv_2mortal(newSVpv(\"FrontCover\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::BackCover:
+		$arg = sv_2mortal(newSVpv(\"BackCover\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::LeafletPage:
+		$arg = sv_2mortal(newSVpv(\"LeafletPage\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::Media:
+		$arg = sv_2mortal(newSVpv(\"Media\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::LeadArtist:
+		$arg = sv_2mortal(newSVpv(\"LeadArtist\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::Artist:
+		$arg = sv_2mortal(newSVpv(\"Artist\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::Conductor:
+		$arg = sv_2mortal(newSVpv(\"Conductor\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::Band:
+		$arg = sv_2mortal(newSVpv(\"Band\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::Composer:
+		$arg = sv_2mortal(newSVpv(\"Composer\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::Lyricist:
+		$arg = sv_2mortal(newSVpv(\"Lyricist\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::RecordingLocation:
+		$arg = sv_2mortal(newSVpv(\"RecordingLocation\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::DuringRecording:
+		$arg = sv_2mortal(newSVpv(\"DuringRecording\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::DuringPerformance:
+		$arg = sv_2mortal(newSVpv(\"DuringPerformance\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::MovieScreenCapture:
+		$arg = sv_2mortal(newSVpv(\"MovieScreenCapture\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::ColouredFish:
+		$arg = sv_2mortal(newSVpv(\"ColouredFish\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::Illustration:
+		$arg = sv_2mortal(newSVpv(\"Illustration\", 0));
+		break;
+	case TagLib::ID3v2::AttachedPictureFrame::BandLogo:
+		$arg = sv_2mortal(newSVpv(\"BandLogo\", 0));
+		break;
+	default:
+		/* TagLib::ID3v2::AttachedPictureFrame::PublisherLogo */
+		$arg = sv_2mortal(newSVpv(\"PublisherLogo\", 0));
+	}
+TL_ID3V2_RELATIVEVOLUMEFRAME_CHANNELTYPE
+	switch($var) {
+	case TagLib::ID3v2::RelativeVolumeFrame::Other:
+		$arg = sv_2mortal(newSVpv(\"Other\", 0));
+		break;
+	case TagLib::ID3v2::RelativeVolumeFrame::MasterVolume:
+		$arg = sv_2mortal(newSVpv(\"MasterVolume\", 0));
+		break;
+	case TagLib::ID3v2::RelativeVolumeFrame::FrontRight:
+		$arg = sv_2mortal(newSVpv(\"FrontRight\", 0));
+		break;
+	case TagLib::ID3v2::RelativeVolumeFrame::FrontLeft:
+		$arg = sv_2mortal(newSVpv(\"FrontLeft\", 0));
+		break;
+	case TagLib::ID3v2::RelativeVolumeFrame::BackRight:
+		$arg = sv_2mortal(newSVpv(\"BackRight\", 0));
+		break;
+	case TagLib::ID3v2::RelativeVolumeFrame::BackLeft:
+		$arg = sv_2mortal(newSVpv(\"BackLeft\", 0));
+		break;
+	case TagLib::ID3v2::RelativeVolumeFrame::FrontCentre:
+		$arg = sv_2mortal(newSVpv(\"FrontCentre\", 0));
+		break;
+	case TagLib::ID3v2::RelativeVolumeFrame::BackCentre:
+		$arg = sv_2mortal(newSVpv(\"BackCentre\", 0));
+		break;
+	default:
+		/* TagLib::ID3v2::RelativeVolumeFrame */
+		$arg = sv_2mortal(newSVpv(\"Subwoofer\", 0));
+	}
+TL_MPC_FILE_TAGTYPES
+	switch($var) {
+	case TagLib::MPC::File::NoTags:
+		$arg = sv_2mortal(newSVpv(\"NoTags\", 0));
+		break;
+	case TagLib::MPC::File::ID3v1:
+		$arg = sv_2mortal(newSVpv(\"ID3v1\", 0));
+		break;
+	case TagLib::MPC::File::ID3v2:
+		$arg = sv_2mortal(newSVpv(\"ID3v2\", 0));
+		break;
+	case TagLib::MPC::File::APE:
+		$arg = sv_2mortal(newSVpv(\"APE\", 0));
+		break;
+	default:
+		/* TagLib::MPC::File::AllTags */
+		$arg = sv_2mortal(newSVpv(\"AllTags\", 0));
+	}
+################################################################
+INPUT
+TL_OBJECT
+	if (sv_isobject($arg) && sv_derived_from($arg, \"Audio::${subtype}\")) 
+		$var = INT2PTR($type, SvIV((SV *)SvRV($arg)));       
+	else
+		Perl_croak(aTHX_ \"$var is not of type Audio::${subtype}\")
+TL_PTRLIST
+	if (sv_isobject($arg) && sv_derived_from($arg, \"Audio::${subtype}\"))
+		$var = INT2PTR($type, SvIV(SvRV(
+			*av_fetch((AV *)SvRV($arg), 0, 0))));
+	else
+		Perl_croak(aTHX_ \"$var is not of type Audio::${subtype}\")
+TL_APE_ITEM_ITEMTYPES
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"Text\", 4) == 0)
+		$var = TagLib::APE::Item::Text;
+	else if(strncasecmp(SvPVX($arg), \"Binary\", 6) == 0)
+		$var = TagLib::APE::Item::Binary;
+	else if(strncasecmp(SvPVX($arg), \"Locator\", 7) == 0)
+		$var = TagLib::APE::Item::Locator;
+	else
+		Perl_croak(aTHX_ \"$var is not of value Text/Binary/Locator\")
+TL_AUDIOPROPERTIES_READSTYLE
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"Fast\", 4) == 0)
+		$var = TagLib::AudioProperties::Fast;
+	else if(strncasecmp(SvPVX($arg), \"Average\", 7) == 0)
+		$var = TagLib::AudioProperties::Average;
+	else if(strncasecmp(SvPVX($arg), \"Accurate\", 8) == 0)
+		$var = TagLib::AudioProperties::Accurate;
+	else
+		Perl_croak(aTHX_ \"$var is not of value Fast/Average/Accurate\")
+TL_MPEG_HEADER_VERSION
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"Version1\", 8) == 0)
+		$var = TagLib::MPEG::Header::Version1;
+	else if(strncasecmp(SvPVX($arg), \"Version2\", 8) == 0)
+		$var = TagLib::MPEG::Header::Version2;
+	else if(strncasecmp(SvPVX($arg), \"Version2_5\", 10) == 0)
+		$var = TagLib::MPEG::Header::Version2_5;
+	else
+		Perl_croak(aTHX_ \"$var is not of value Version1/Version2/Version2_5\")
+TL_MPEG_HEADER_CHANNELMODE
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"Stereo\", 6) == 0)
+		$var = TagLib::MPEG::Header::Stereo;
+	else if(strncasecmp(SvPVX($arg), \"JointStereo\", 11) == 0)
+		$var = TagLib::MPEG::Header::JointStereo;
+	else if(strncasecmp(SvPVX($arg), \"DualChannel\", 11) == 0)
+		$var = TagLib::MPEG::Header::DualChannel;
+	else if(strncasecmp(SvPVX($arg), \"SingleChannel\", 13) == 0)
+		$var = TagLib::MPEG::Header::SingleChannel;
+	else
+		Perl_croak(aTHX_ \"$var is not of value Stereo/JointStereo/DualChannel/SingleChannel\")
+TL_FILE_POSITION
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"Beginning\", 9) == 0)
+		$var = TagLib::File::Beginning;
+	else if(strncasecmp(SvPVX($arg), \"Current\", 7) == 0)
+		$var = TagLib::File::Current;
+	else if(strncasecmp(SvPVX($arg), \"End\", 3) == 0)
+		$var = TagLib::File::End;
+	else
+		Perl_croak(aTHX_ \"$var is not of value Beginning/Current/End\")
+TL_STRING_TYPE
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"Latin1\", 6) == 0)
+		$var = TagLib::String::Latin1;
+	else if(strncasecmp(SvPVX($arg), \"UTF8\", 4) == 0)
+		$var = TagLib::String::UTF8;
+	else if(strncasecmp(SvPVX($arg), \"UTF16BE\", 7) == 0)
+		$var = TagLib::String::UTF16BE;
+	else if(strncasecmp(SvPVX($arg), \"UTF16LE\", 7) == 0)
+		$var = TagLib::String::UTF16LE;
+	else if(strncasecmp(SvPVX($arg), \"UTF16\", 5) == 0)
+		$var = TagLib::String::UTF16;
+	else
+		Perl_croak(aTHX_ \"$var is not of value Latin1/UTF8/UTF16BE/UTF16LE/UTF16\")
+TL_OGG_PAGE_CONTAINSPACKETFLAGS
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"DoesNotContainPacket\", 20) == 0)
+		$var = TagLib::Ogg::Page::DoesNotContainPacket;
+	else if(strncasecmp(SvPVX($arg), \"CompletePacket\", 14) == 0)
+		$var = TagLib::Ogg::Page::CompletePacket;
+	else if(strncasecmp(SvPVX($arg), \"BeginsWithPacket\", 16) == 0)
+		$var = TagLib::Ogg::Page::BeginsWithPacket;
+	else if(strncasecmp(SvPVX($arg), \"EndsWithPacket\", 14) == 0)
+		$var = TagLib::Ogg::Page::EndsWithPacket;
+	else
+		Perl_croak(aTHX_ \"$var is not of value DoesNotContainPacket\\
+			/CompletePacket/BeginsWithPacket/EndsWithPacket\")
+TL_OGG_PAGE_PAGINATIONSTRATEGY
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"SinglePagePerGroup\", 18) == 0)
+		$var = TagLib::Ogg::Page::SinglePagePerGroup;
+	else if(strncasecmp(SvPVX($arg), \"Repaginate\", 10) == 0)
+		$var = TagLib::Ogg::Page::Repaginate;
+	else
+		Perl_croak(aTHX_ \"$var is not of value SinglePagePerlGroup/Repaginate\")
+TL_ID3V2_ATTACHEDPICTUREFRAME_TYPE
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if (strncasecmp(SvPVX($arg), \"Other\", 5) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Other;
+	else if(strncasecmp(SvPVX($arg), \"FileIcon\", 8) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::FileIcon;
+	else if(strncasecmp(SvPVX($arg), \"OtherFileIcon\", 13) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::OtherFileIcon;
+	else if(strncasecmp(SvPVX($arg), \"FrontCover\", 10) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::FrontCover;
+	else if(strncasecmp(SvPVX($arg), \"BackCover\", 9) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::BackCover;
+	else if(strncasecmp(SvPVX($arg), \"LeafletPage\", 11) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::LeafletPage;
+	else if(strncasecmp(SvPVX($arg), \"Media\", 5) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Media;
+	else if(strncasecmp(SvPVX($arg), \"LeadArtist\", 10) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::LeadArtist;
+	else if(strncasecmp(SvPVX($arg), \"Artist\", 6) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Artist;
+	else if(strncasecmp(SvPVX($arg), \"Conductor\", 9) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Conductor;
+	else if(strncasecmp(SvPVX($arg), \"Band\", 4) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Band;
+	else if(strncasecmp(SvPVX($arg), \"Composer\", 8) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Composer;
+	else if(strncasecmp(SvPVX($arg), \"Lyricist\", 8) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Lyricist;
+	else if(strncasecmp(SvPVX($arg), \"RecordingLocation\", 17) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::RecordingLocation;
+	else if(strncasecmp(SvPVX($arg), \"DuringRecording\", 15) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::DuringRecording;
+	else if(strncasecmp(SvPVX($arg), \"DuringPerformance\", 17) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::DuringPerformance;
+	else if(strncasecmp(SvPVX($arg), \"MovieScreenCapture\", 18) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::MovieScreenCapture;
+	else if(strncasecmp(SvPVX($arg), \"ColouredFish\", 12) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::ColouredFish;
+	else if(strncasecmp(SvPVX($arg), \"Illustration\", 12) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::Illustration;
+	else if(strncasecmp(SvPVX($arg), \"BandLogo\", 8) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::BandLogo;
+	else if(strncasecmp(SvPVX($arg), \"PublisherLogo\", 13) == 0)
+		$var = TagLib::ID3v2::AttachedPictureFrame::PublisherLogo;
+	else
+		Perl_croak(aTHX_ \"$var is not of type TagLib::ID3v2::AttachedPictureFrame::Type\")
+TL_ID3V2_RELATIVEVOLUMEFRAME_CHANNELTYPE
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$arg is not a string\");
+	if(strncasecmp(SvPVX($arg), \"Other\", 5) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::Other;
+	else if(strncasecmp(SvPVX($arg), \"MasterVolume\", 12) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::MasterVolume;
+	else if(strncasecmp(SvPVX($arg), \"FrontRight\", 10) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::FrontRight;
+	else if(strncasecmp(SvPVX($arg), \"FrontLeft\", 9) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::FrontLeft;
+	else if(strncasecmp(SvPVX($arg), \"BackRight\", 9) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::BackRight;
+	else if(strncasecmp(SvPVX($arg), \"BackLeft\", 8) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::BackLeft;
+	else if(strncasecmp(SvPVX($arg), \"FrontCentre\", 11) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::FrontCentre;
+	else if(strncasecmp(SvPVX($arg), \"BackCentre\", 10) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::BackCentre;
+	else if(strncasecmp(SvPVX($arg), \"Subwoofer\", 9) == 0)
+		$var = TagLib::ID3v2::RelativeVolumeFrame::Subwoofer;
+	else
+		Perl_croak(aTHX_ \"$var is not of type TagLib::ID3v2::RelativeVolumeFrame::ChannelType\")
+TL_MPC_FILE_TAGTYPES
+	if(!SvPOK($arg))
+		Perl_croak(aTHX_ \"$var is not of type TagLib::MPC::File::TagTypes\");
+	if(strncasecmp(SvPVX($arg), \"NoTags\", 5) == 0)
+		$var = TagLib::MPC::File::NoTags;
+	else if(strncasecmp(SvPVX($arg), \"ID3v1\", 5) == 0)
+		$var = TagLib::MPC::File::ID3v1;
+`	else if(strncasecmp(SvPVX($arg), \"ID3v2\", 5) == 0)
+		$var = TagLib::MPC::File::ID3v2;
+	else if(strncasecmp(SvPVX($arg), \"APE\", 3) == 0)
+		$var = TagLib::MPC::File::APE;
+	else if(strncasecmp(SvPVX($arg), \"AllTags\", 7) == 0)
+		$var = TagLib::MPC::File::AllTags;
+	else
+		Perl_croak(aTHX_ \"$var is not of type TagLib::MPC::File::TagTypes\")

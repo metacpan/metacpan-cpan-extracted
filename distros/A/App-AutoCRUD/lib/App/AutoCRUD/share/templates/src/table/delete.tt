@@ -1,0 +1,106 @@
+[% WRAPPER head %]
+
+
+<style>
+  .groupname { font-weight: bold; color: navy; font-size: 120% }
+  .colname   { width: 25%; padding-left : 1em }
+  .actions   { width: 100%; text-align: right }
+  .remarques { font-size: 90%; text-decoration: italic }
+  .readonly  { background-color: lightgrey }
+  .where     { width: 4em; text-align: right;  }
+</style>
+<script>
+  function setup() {  
+    new GvaScript.TreeNavigator(
+       'TN_tree', 
+       {selectFirstNode: false, tabIndex: -1}
+    );
+    new GvaScript.Form('delete_form', {
+      datatree: [% data.init_form %]
+     });
+  }
+  window.onload = setup;
+</script>
+[% WRAPPER linked_script %][% base %]static/js/autocrud_utils.js[% END %]
+
+[% END; # WRAPPER head %]
+
+[%# ---------- start body ---------- %]
+
+<div class="actions">
+  <a href="descr">describe</a> | 
+  <a href="search">search</a> this table
+</div>
+
+
+<h1>Delete from [% data.table %]</h1>
+
+
+<form action="delete" method="POST" id='delete_form' 
+   [% "onsubmit='return confirm_n_ary_operation(this,\"delete\")'" IF ! data.where_pk %]>
+
+  <div id="TN_tree">
+
+
+    [% FOREACH multi_cols_key IN data.multi_cols_keys %]
+    <div class="TN_node">
+      <span class="TN_label groupname">Multi-column keys</span>
+      <div class="TN_content">
+        <div class="TN_leaf">
+          <span class="TN_label colname">[% multi_cols_key %]</span>
+          <span class="after_label">
+             <span class="where">[%  seen_where ? "and" : "where";
+                                     SET seen_where = 1; %]</span>
+             <input name="where.[% multi_cols_key %]" size=10
+                    readonly class="readonly">
+          </span>
+        </div>
+      </div>
+    </div>
+    [% END; # FOREACH multi_cols_key IN data.multi_cols_keys %]
+
+
+    [% IF data.where_pk;
+       # deleting one single record %]
+
+       [% FOREACH col_name IN data.where_pk.keys %]
+          <div class="TN_leaf">
+            <span class="TN_label colname">[% col_name %]</span>
+                where <input name="where.[% col_name %]" size=10 readonly
+                             class="readonly">
+          </div>
+       [% END; # FOREACH col_name IN data.where_pk.keys %]
+
+    [% ELSE; # data.where_pk undefined ==> deleting several records %]
+
+      [% FOREACH group IN data.colgroups %]
+      <div class="TN_node">
+        <span class="TN_label groupname">[% group.name %]</span>
+        <div class="TN_content">
+          [% FOREACH col IN group.columns;
+             SET col_name = col.COLUMN_NAME;
+             NEXT IF data.ignore_col.$col_name; %]
+          <div class="TN_leaf">
+            <span class="TN_label colname" title="[% col.descr %]">[% col_name %]</span>
+              [% IF data.where_pk.defined(col_name) %]
+                where <input name="where.[% col_name %]" size=10 readonly
+                             class="readonly">
+              [% ELSE %]
+                [% IF ! data.where_pk %]
+                   <span class="where">[% seen_where ? "and" : "where";
+                                          SET seen_where = 1; %]</span>
+                   <input name="where.[% col_name %]" size=10>
+                [% END; # IF data.where_pk %]
+              [% END; # IF data.where_pk.defined(col_name) %]
+          </div>
+          [% END; # FOREACH col IN group.columns %]
+        </div>
+      </div>
+      [% END; # FOREACH group IN data.colgroups %]
+
+    [% END; # IF data.where_pk %]
+  </div>
+
+  <input type="submit">
+  <input type="reset">
+</form>

@@ -1,0 +1,11 @@
+--- SDL-1.2.14/src/SDL.c	2009-10-13 02:07:16.000000000 +0200
++++ SDL-1.2.14/src/SDL.c	2010-02-11 12:02:22.953125000 +0100
+@@ -21,6 +21,8 @@
+ */
+ #include "SDL_config.h"
+ 
++/* placebo change just to check patching process */
++
+ /* Initialization code for SDL */
+ 
+ #include "SDL.h"

@@ -1,0 +1,271 @@
+Revision history for App::TimeTracker
+
+2.024   2016-02-11T10:39:11
+    - report: fix --detail option (Thomas Klausner)
+    - list/worked: support --fparent (Thomas Klausner)
+    - report: fix accumulation of child times in deep trees (Thomas Klausner)
+    - Fixed broken links in the pod (Mohammad S Anwar)
+
+
+2.023   2016-01-24T21:20:58
+    - pack run into eval so we can get nicer error messages (Thomas Klausner)
+    - pass current config to load_attrib (Thomas Klausner)
+
+
+2.022   2016-01-16T16:18:37
+    - remove some warnings (github issue #16 reported by David Provost) (Thomas Klausner)
+    - Add link tags to App::TimeTracker instances in POD (Paul Cochrane)
+    - Improve tracker POD slightly (Paul Cochrane)
+    - Fix typos in POD (Paul Cochrane)
+    - Use the word "plugin" consistently (Paul Cochrane)
+    - Wrap POD text more consistently (Paul Cochrane)
+    - Remove trailing whitespace (Paul Cochrane)
+    - --fparent: include parent in list of project (Thomas Klausner)
+    - add fparent option to report (Thomas Klausner)
+
+
+2.021	2015-08-08T20:46:51
+    - attribute all contributors (Thomas Klausner)
+    - output the JSON in its canonical form (Yanick Champoux)
+
+
+2.020   2014-05-27T15:28:40+0200
+    - Use bytes for creating the token digest, otherwise we'll get into trouble (Michael Kröll)
+    - Message already is utf-8 characters at that point, do not double-encode (Michael Kröll)
+    - aded safe_branch_name (Thomas Klausner)
+    - fixed typo (David Schmidt)
+    - set current time when stopping via start & reprotoing (Thomas Klausner)
+
+
+2.019   2014-03-02T14:43:45+0100
+    - init: store new project in projects.json (Thomas Klausner)
+    - set correct stop time when doing start (Thomas Klausner)
+    - find_task_files performance optimization (Lukas Rampa)
+    - in cmd_stop, generate a new dynamic class based on the stopped config,
+      and use an instance of that class to stop (implementing github
+      issue #8) (Thomas Klausner)
+    - set tracker home via ENV (Thomas Klausner)
+    - remove given() { when () } :( (Klaus Ita)
+    - silence experimental warnings for perl 5.18 (Yanick Champoux)
+    - Fixed spelling error (jenkings build hook test commit) (Michael Kröll)
+    - Only use the first assigned tag to calculate the aggregated times and
+      use it as tag key. (Michael Kröll)
+    - Prevent creating circular parent-child project relations (Michael Kröll)
+    - Documented tracker list command (Michael Kröll)
+    - Do not change the configured stop status if it has been changed since
+      starting the ticket (Michael Kröll)
+    - Allow to steal tickets from Nobody (Michael Kröll)
+    - Append and not replace task description with ticket subject if a
+      description is passed to the task (useful for micro-tasks part of a
+      ticket) (Michael Kröll)
+    - Support setting of RT status on stop and reducing value of time-left
+      ticket property (Michael Kröll)
+    - RT: Only update the ticket if we made changes locally (Thomas Sibley)
+    - RT: Treat "append" the same as "start" since it is logically
+      equivalent (Thomas Sibley)
+    - only report description if --detail desc is set (Thomas Klausner)
+    - --detail now takes args (Thomas Klausner)
+    - new option to define what RT status to set on tracker start
+      (Thomas Klausner)
+    - Small typo fix in bin/tracker (Nelo Onyiah)
+
+
+2.018   2012-11-29T11:10:34+0100
+    - use json decoder object (Thomas Klausner)
+    - enable proper posting of correctly decoded utf8 (Thomas Klausner)
+    - moved RT ticket name ascii-isation into method (Thomas Klausner)
+    - honor config value "parent" in project_tree (Thomas Klausner)
+    - dynamic 00-load.t (Thomas Klausner)
+    - squash a warning (cpan-rt75266) (Thomas Klausner)
+    - fix tag sorting (Jozef Kutej)
+    - set tracker script STDOUT to utf8 (Jozef Kutej)
+    - add description to the detail report (Jozef Kutej)
+    - Switch to Digest::SHA (in core since 5.9.3) to reduce external
+      deps (Roland Lammel)
+
+
+2.017   2012-01-12T22:59:32+0100
+    - finally fixed rt.cpan.org #73859:
+      During DateTime coercion for --at new DateTime objects
+      were initiated without setting time_zone => 'local'
+      That's added now (and tested), so hopefully the bug IS squashed
+    - new command: version
+      prints out the current version
+    - add suggestion for better --at if stop<start
+      (suggested by Ruslan Zakirov)
+
+
+2.016   2012-01-10T23:08:20+0100
+    - fixed rt.cpan.org #73859 reported by Ruslan Zakirov:
+      stop now aborts if the stop time is earlier than the start
+      time.
+
+
+2.015   2012-01-09T20:26:47+0100
+    - SyncViaGit: removed debug messages (Thomas Klausner)
+
+
+2.014   2012-01-04T23:17:20+0100
+    - SyncViaGit: proper fix to git-rm deleted files
+
+
+2.013   2012-01-04T19:37:11+0100
+    - fix tests for single digit months (Thomas Klausner)
+    - properly sync "current" (suggested by github.com/plu) (Thomas Klausner)
+    - stop does not require a project (Thomas Klausner)
+    - make --project work for "virtual" projects (i.e. ones
+      that do not exists in filesystem (Thomas Klausner)
+    - do not abort if there is no RT configured (Thomas Klausner)
+    - RT plugin now also works (a bit) offline (Thomas Klausner)
+    - Nicely fix directory traversal issue, by using absolute path for
+      parent traversing (Roland Lammel)
+    - Only throw warning if Git plugin does not find git repository
+      refactor repository init (Roland Lammel)
+    - Escape messages in IRC-bot post uri (Maros Kollar)
+    - Basic autocomplete (Maros Kollar)
+
+
+2.012   2011-11-01T19:29:55+0100
+    - doc fix suggested by David Mertens (Thomas Klausner)
+    - some tests for C::Core (init, start, stop, append) (c:61.1%;sc:83.9%) (Thomas Klausner)
+    - fixed CPAN-RT#72039 reported by Kartik Thakore (Thomas Klausner)
+    - cpanm install docs (Thomas Klausner)
+
+
+2.011   2011-10-28T16:36:21+0200
+    - autocreate tracker.json and projects.json if there is no
+      home yet (Thomas Klausner)
+    - rearranged docs (Thomas Klausner
+
+
+2.010   2011-10-28T00:28:54+0200
+    - new plugin: Overtime (Thomas Klausner)
+    - pass new fproject ftag to find_task_files (Thomas Klausner)
+    - changed report params to --fprojects and --ftags (_f_ilter*)
+      (Thomas Klausner)
+    - SyncViaGit: honor .gitignore (Thomas Klausner)
+    - specify "parent" in tracker.json to switch to another path
+      (Thomas Klausner)
+    - Fix --this date option (Maros Kollar)
+    - Display error message if projects.json cannot be found (Maros Kollar)
+    - fix build_from (Klaus Ita)
+    - Add list command (Maros Kollar)
+    - do not report tasks without time (Thomas Klausner)
+    - Make project setable from cmdline options (Maros Kollar)
+    - show project tree in report (Thomas Klausner)
+    - fixed bug in writing projects.json (Thomas Klausner)
+
+
+2.009	2011-08-11T15:17:36+0200
+    - more docs
+    - new command: plugins
+    - fixed MANIFEST.SKIP (thanks to Tokuhiro Matsuno for the tipp)
+
+
+2.008  2011-08-09T15:30:53+0200
+    - this is going to be the first release to CPAN since 0.21
+    - relaxed decoding of json config files
+    - started to add docs 
+    - back to per-dir config files, much saner
+    - new commands: show_config, init
+    - Better datetime parsing
+
+
+2.007  2011-07-07T15:00:02+0200
+    - another new config file layout, which sucks less
+
+
+2.006  2011-07-05T02:24:36+0200
+    - new config file layout, which sucks
+    - TextNotify
+    - big RT/TimeWorked mixup created & resolved
+    - some testing
+
+
+2.005   2011-04-13 08:55:32
+    - update RT->TimeWorked after stop
+    - added --irc_quiet
+    - added _current_task
+    - added command recacl_trackfile
+    - split up worked/report options
+    - added --verbose to report
+
+
+2.004   2011-03-29 11:49:49
+    - replaced Project/Tag classes with plain strings
+    - fixed bug when duration is 0
+
+
+2.003   2011-03-20 18:07:16
+    - crude job hack
+    - added --this & --last to report & worked
+
+
+2.002   2011-03-14 09:16:00
+    - added Post2IRC
+
+
+2.001
+    - COMPLETE, NOT BACKWARD COMPATIBLE REWRITE
+
+
+
+0.21   2009-02-17 20:50:30
+    - remove debug output
+    - fix 00-load.t (thanks to cpan-testers for spotting this)
+
+
+0.20    2009-02-12
+    - switched to new storage system (filesystem base, not sqlite, to 
+      make syncing via git et.al. easier
+
+
+0.08	2008-04-04
+    - added cmd "report"
+    - added --this and --last to "worked"
+    - "worked" now works with tags
+    - added --from and --to to "worked"
+    - added --svn to "stop"
+    - added some docs
+    - added missing dependency on DateTime::Format::Strptime
+
+
+0.07    2008-01-23
+    - added docs
+    - fixed bad default filepath
+
+
+0.06    2008-01-22
+    - renamed to App::TimeTracker
+    - first release to CPAN
+
+
+0.05    2008-01-21
+    - switched to SQLite for storage
+    - added DBIx::Class
+    - rewrote a lot of stuff to work with DBIx::Class
+
+
+0.04    2008-01-18
+    - added docs
+    - added command 'worked'
+    - added command 'current'
+    - now using App::Cmd
+
+
+0.03    2008-01-07
+    - override start/stop time from commandline
+
+
+0.02    2008-01-04
+    - ask before adding a new project (to catch typos etc)
+    - added beautify_seconds and some nicer output to stop/start
+
+
+0.01    2008-01-03
+    - basic functionality working (start/stop)
+
+
+0.00    2008-01-02
+    - first draft
+

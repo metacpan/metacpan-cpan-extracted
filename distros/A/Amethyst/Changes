@@ -1,0 +1,5 @@
+evision history for Perl extension Amethyst.
+
+0.01  Fri Dec 13 11:42:54 2002
+        - Converted to MakeMaker.
+		- Initial documentation in Amethyst.pm.

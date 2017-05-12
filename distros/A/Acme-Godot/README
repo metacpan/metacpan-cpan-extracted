@@ -1,0 +1,97 @@
+NAME
+
+    Acme::Godot - Nothing to be done
+
+SYNOPSIS
+
+        use Acme::Godot;
+
+DESCRIPTION
+
+    This module will make your program wait for Godot.
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+INTERFACE
+
+    Acme::Godot does not have an interface, and need only to be used by
+    another program in order to start waiting.
+
+DIAGNOSTICS
+
+    (Program apparently hanging)
+
+      Everything is OK. Your program is successfully waiting for Godot.
+      He'll probably be here soon.
+
+    (Program exited unexpectedly)
+
+      Godot may have arrived. Have you checked? If he's not here, start
+      your program again.
+
+CONFIGURATION AND ENVIRONMENT
+
+    Acme::Godot requires no configuration files or environment variables,
+    but the end user of this program is advised to make use of available
+    assistive tools and methods in order to make the waiting for Godot more
+    pleasant.
+
+DEPENDENCIES
+
+    You might want to warn people dependent on you that you're about to use
+    this module.
+
+INCOMPATIBILITIES
+
+    None reported. We're still waiting for Godot to bring the test reports.
+
+BUGS AND LIMITATIONS
+
+    No bugs have been reported. Where's Godot with the bug reports?
+
+ACKNOWLEDGEMENTS
+
+    Thanks to mr. Rune Sandnes for the inspiration.
+
+AUTHOR
+
+    Salve J. Nilsen <sjn@cpan.org>
+
+LICENCE AND COPYRIGHT
+
+    Copyright (c) 2007-2015, Salve J. Nilsen <sjn@cpan.org>. All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

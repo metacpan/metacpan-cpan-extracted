@@ -1,0 +1,45 @@
+This is Perl module Apporo.
+
+INSTALLATION
+
+Perl module Apporo is Perl binding for Apporo (http://code.google.com/p/apporo/)
+
+Apporo installation isn't straightforward.
+
+You should install tsubomi before installing apporo.
+And you should install apporo before installing the Perl module Apporo.
+
+    % cd YOUR_TMP_DIR
+    % svn checkout http://tsubomi.googlecode.com/svn/trunk/ tsubomi
+    % cd tsubomi/src/tsubomi
+    % make
+    % sudo make install
+    % cd ../../../
+    % svn checkout http://apporo.googlecode.com/svn/trunk/ apporo
+    % cd apporo/src
+    % make
+    % sudo make install
+    % cd ../../
+
+After these, if your CPAN shell is set up,you should just be able to do
+
+    % cpan Apporo
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Apporo documentation is available as in POD. So you can do:
+
+    % perldoc Apporo
+
+to read the documentation online with your favorite pager.
+
+Toshinori Satou (@overlast)

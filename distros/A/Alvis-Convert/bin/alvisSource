@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+
+# Feeds docs from DIR/*.xml into the pipelineT. Wait minutes before each send.
+
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Alvis::Pipeline;
+# use Data::Dumper;
+
+use encoding 'utf8';
+use open ':utf8';
+binmode STDIN, ":utf8";
+binmode STDERR, ":utf8";
+
+my $PIPE_WRITEPORT=0;
+my $PIPE_WRITEHOST="localhost";
+
+my $verbose = 0;
+my ( @dirs, $sleep, $shutdown, $host, $port );
+$host = 'localhost';
+$port = 10000;
+$shutdown = 0;
+$sleep = 0;
+GetOptions(
+     'man'     => sub { pod2usage( -exitstatus => 0, -verbose => 2 ) },
+     'shutdown' => \$shutdown,
+     'v'        => sub { $verbose++; },
+     's|sleep=i' => \$sleep,
+     'o|host=s' => \$host,
+     'p|port=i' => \$port,
+     'h|help'     => sub { pod2usage(1) },
+     '<>'         => sub { push @dirs, @_ },
+     );
+
+pod2usage( -message => "ERROR: dir is not specified" )
+          if ( $#dirs < 0 && !$shutdown );
+
+my $out= new Alvis::Pipeline::Write(port =>  $port, host => $host)
+or die "can't create write-pipe for port $host:$port : $!";
+if ( $verbose ) {
+  print STDERR "Opened write-pipe for port $host:$port\n";
+}
+
+foreach my $dir ( @dirs ) {
+  opendir(XA,"$dir") or die "Cannot opendir $dir/: $!";
+  my $latest = 0;
+  while ( (my $file=readdir(XA)) ) {
+    if ( $file !~ /^\./ && $file =~ /\.xml$/ ) {
+      open(F,"<$dir/$file");
+      my $buf = join("",<F>);
+      close(F);
+      if ( $verbose ) {
+	print STDERR "Writing XML of size " . length($buf) . " from $dir/$file\n";
+      }
+      $out->write($buf);
+      sleep($sleep * 60);
+    }
+  }
+  closedir(XA);
+}
+if ( $shutdown ) {
+  $out->write("<shutdown/>");
+}
+$out->close();
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+  alvisSource -- export XML content along the Alvis pipeline
+
+=head1 SYNOPSIS
+
+  alvisSource [-v] [--host H] [--port P] [--sleep S] [--shutdown] <dir> ...
+
+=head1 OPTIONS
+
+B<--host H>  receiving host address as a string, 'localhost' by default
+
+B<--port P>  receiving port as an integer
+
+B<--sleep S>  sleep for S minutes between each file, default is 0
+
+B<--shutdown>  at the end, send the single <shutdown> element as a message
+
+B<-v>       set verbosity
+
+=head1 DESCRIPTION
+
+Send all the files in <dir>/*.xml along the Alvis pipeline to host:port
+specified.  Wait so many minutes between each send.  Does not recursively
+descend directories, and only sends files with a '.xml' ending.  Can take
+multiple input directories. 
+
+=head1 AUTHOR
+
+Wray Buntine
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Wray Buntine
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+=head1 SEE ALSO
+
+alvisSink.pl, alvisXMLsplit.pl, alvisXMLmerge.pl, alvisXMLjoin.pl
+
+=cut

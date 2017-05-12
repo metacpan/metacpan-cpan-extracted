@@ -1,0 +1,82 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [
+		doap-deps:on "Attribute::Handlers"^^doap-deps:CpanId;
+	], [ doap-deps:on "Devel::StrictMode"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Attribute-QueueStack>;
+	doap:created         "2013-06-16"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Attribute-QueueStack>;
+	doap:homepage        <https://metacpan.org/release/Attribute-QueueStack>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Attribute-QueueStack";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-attribute-queuestack>;
+	];
+	doap:shortdesc       "designate an array as a queue or a stack".
+
+<http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Attribute-QueueStack-0.001"^^xsd:string;
+	dc:issued            "2013-06-17"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Attribute-QueueStack-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Attribute-QueueStack-0.002"^^xsd:string;
+	dc:issued            "2014-05-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Altered the decision mechanism as to whether the attributes are 'ARMED'. Attribute::QueueStack now mostly just defers to Devel::StrictMode to make the decision.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Attribute-QueueStack-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Attribute-QueueStack/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "The 'Better Together' Release";
+	dc:identifier        "Attribute-QueueStack-0.003"^^xsd:string;
+	dc:issued            "2014-09-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "use strict/warnings everywhere.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Attribute-QueueStack-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

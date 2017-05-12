@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<xspwiki xmlns:wiki="http://axkit.org/NS/xsp/wiki/1"
+      xmlns:xsp="http://apache.org/xsp/core/v1"
+      xmlns:comment="http://axkit.org/NS/xsp/comments/1"
+      xmlns:cookie="http://axkit.org/NS/xsp/cookie/v1"
+>
+    <xsp:logic>
+      my $path_info = $r->path_info;
+      
+      my $dbroot = $r->dir_config('WikiDBRoot') || die "No DB root specified!";
+      my $default_db = $r->dir_config( 'WikiDB' ) || 'AxKit';
+      my $default_page = $r->dir_config( 'DefaultPage' ) || 'DefaultPage';
+      $AxKit::XSP::Wiki::EmailAlerts = $r->dir_config('WikiEmailTo');
+      my $uri = $r->uri;
+      $uri =~ s/\/edit/\/view/;
+      
+      my ($db, $page) = AxKit::XSP::Wiki::extract_page_info($path_info);
+
+      if (!$db) {
+        $r->header_out(Location => "$uri/$default_db/$default_page");
+	return 302;
+      }
+      if (!$page) {
+        $r->header_out(Location => "$uri/$db/$default_page");
+	return 302;
+      }
+      
+      my $action = $cgi->param('action') || 'view';
+      $action = 'preview' if $cgi->param('preview');
+      my $id = $cgi->param('id');
+      if ($id !~ /^\d*$/) {
+        die "Invalid id format";
+      }
+
+      my $ip = $r->get_remote_host();
+      my $user = $r->connection->user();
+      
+      if ($action eq 'save') {
+        AxKit::XSP::Wiki::save_page(
+          $dbroot, $db, $page, $cgi->param('text'), $cgi->param('texttype'), $ip, $user, 
+        );
+        $r->header_out(Location => "$uri/$db/$page");
+        return 302;
+      }
+      elsif ($action eq 'restore') {
+        AxKit::XSP::Wiki::restore_page(
+          $dbroot, $db, $page, $ip, $id, $user, 
+        );
+        $r->header_out(Location => "$uri/$db/$page");
+        return 302;
+      }
+      elsif ($action eq 'preview') {
+       <xsp:content>
+        <page><xsp:expr>$page</xsp:expr></page>
+        <db><xsp:expr>$db</xsp:expr></db>
+        <main-content>
+        <wiki:preview-page>
+          <wiki:dbpath><xsp:expr>$dbroot</xsp:expr></wiki:dbpath>
+          <wiki:db><xsp:expr>$db</xsp:expr></wiki:db>
+          <wiki:page><xsp:expr>$page</xsp:expr></wiki:page>
+          <wiki:text><xsp:expr>$cgi->param('text')</xsp:expr></wiki:text>
+          <wiki:texttype><xsp:expr>$cgi->param('texttype')</xsp:expr></wiki:texttype>
+        </wiki:preview-page>
+        </main-content>
+       </xsp:content>
+      }
+      else {
+        $r->header_out(Location => "$uri/$db/$page");
+	return 302;
+      }
+      
+    </xsp:logic>
+
+</xspwiki>

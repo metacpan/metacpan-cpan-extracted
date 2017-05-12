@@ -1,0 +1,26 @@
+SKIP SING
+COL 1 ON 2
+COL 2 ON 3
+COL 2 ON 4
+COL 3 ON 5
+COL 3 ON 6
+COL 4 ON 7
+COL 4 ON 8
+COL 5 ON 9
+COL 5 ON 10
+COL 6 ON 11
+COL 6 ON 12
+line ST     2
+line ST     4
+line ST     6
+line ST     8
+line ST    10
+line ST    12
+R    X   0.303905964 6.98999977
+LOC  0 0 1 1
+LAB  F  rim1_b1_mos1.grp50.pi bowshock_bg2_mos1.grp50.pi rim1_b1_mos2.grp50.pi bowshock_
+LAB  T  data and folded model
+LAB  X  channel energy (keV)
+LAB  Y  normalized counts/sec/keV
+R    Y   0 5.86059952
+LOG  X ON 1

@@ -1,0 +1,25 @@
+Revision history for Perl extension Attribute-SubName
+
+1.101420  2010-05-22 22:08:54 Europe/Vienna
+    - 'use parent' instead of 'use base'
+
+1.100710  2010-03-12 15:15:29 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.03  Thu, 29 May 2008 12:00:21 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.03
+     - accept attribute data as scalar and array ref now to please both
+       Attribute::Handlers 0.78 and 0.79
+     - .shipit: fixed svk.tagpattern
+
+0.02  Mon, 03 Dec 2007 23:15:40 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.02
+     - Makefile.PL: requires Sub::Name
+
+0.01  Mon, 03 Dec 2007 21:59:25 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

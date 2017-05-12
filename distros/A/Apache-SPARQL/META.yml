@@ -1,0 +1,16 @@
+---
+name: Apache-SPARQL
+version: 0.22
+author:
+  - Alberto Reggiori <alberto@asemantics.com>
+abstract: A mod_perl handler base class for SPARQL query service using HTTP bindings
+license: bsd
+requires:
+  Apache::Request: >= 1.3
+  LWP::UserAgent: >  1.00
+  mod_perl: >= 1.29
+provides:
+  Apache::SPARQL:
+    file: lib/Apache/SPARQL.pm
+    version: 0.22
+generated_by: Module::Build version 0.2608

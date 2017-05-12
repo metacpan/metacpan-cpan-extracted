@@ -1,0 +1,9 @@
+Revision history for Perl extension App-Hako
+
+0.03 2017-01-11T16:51:14Z
+    - added an option for new network namespace
+
+0.02 2017-01-08T15:22:51Z
+
+    - original version
+

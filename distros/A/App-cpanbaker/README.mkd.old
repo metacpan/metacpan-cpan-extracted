@@ -1,0 +1,57 @@
+
+# CPANBAKER - backup your whole module files
+
+backup your whole cpan module files
+
+* backup cpan self && cpanminus
+* backup cpan config
+* backup all user's cpan config ~/.cpan
+* backup cpanmini ?
+* backup module files
+* backup cpan mini
+* backup local::lib
+
+    perl -Mlocal::lib
+
+    get install base from perl -V 
+
+    PERL_LOCAL_LIB_ROOT
+
+* backup man pages
+
+    $ head /opt/local/share/man/man3/Moose.3
+    $ man -w Moose
+    $ perldoc -l Moose
+
+* backup script files (/usr/bin...)
+
+
+    scan $PATH env
+    for file in * ; do if [[ -n `head $file | grep perl` ]] echo $file ; done
+
+
+    $ perl -V to get INC
+    $ cd to /
+    $ tar these path
+    $ find perl man pages
+
+
+    $ cpanbak --installed > module-list
+    $ cpanbak --install   < module-list
+
+    is equal to:
+
+        $ cpanm < module-list
+
+    $ cpanbak -b  # backup
+    $ cpanbak -z -b file.tgz # use gzip
+    $ cpanbak -7 -b file.7z  # use 7zip
+
+    $ cpanbak -b file.tgz # backup to file
+    $ cpanbak -r file.tgz # restore
+
+    --exclude [pattern]
+
+    $ cpanbak --local -b file.tgz   # backup local lib only
+
+* compare path list to find top level paths (?)

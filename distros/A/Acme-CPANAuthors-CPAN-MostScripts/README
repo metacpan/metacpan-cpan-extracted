@@ -1,0 +1,34 @@
+SYNOPSIS
+
+       use Acme::CPANAuthors;
+       use Acme::CPANAuthors::CPAN::MostScripts;
+    
+       my $authors = Acme::CPANAuthors->new('CPAN::MostScripts');
+    
+       my $number   = $authors->count;
+       my @ids      = $authors->id;
+       my @distros  = $authors->distributions('RJBS');
+       my $url      = $authors->avatar_url('RJBS');
+       my $kwalitee = $authors->kwalitee('RJBS');
+
+DESCRIPTION
+
+    This module lists 50 CPAN authors with the most scripts on CPAN. This
+    list is produced by querying a local mini CPAN mirror using this
+    command:
+
+     % lcpan authors-by-script-count | head -n 50
+
+    Statistics of the CPAN mirror:
+
+    # COMMAND: lcpan stats-last-index-time --format text-pretty
+
+    Current ranking:
+
+    # CODE: require Perinci::Result::Format::Lite; print
+    Perinci::Result::Format::Lite::format($main::res, 'text-pretty');
+
+SEE ALSO
+
+    Acme::CPANAuthors
+

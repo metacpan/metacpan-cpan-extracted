@@ -1,0 +1,8 @@
+# $Id: startup.pl,v 1.5 2005/08/10 08:20:57 c10232 Exp $ -*-perl-*- 
+use strict;
+
+use lib("@ServerRoot@/../lib");
+use Apache::Request;
+use Apache::LangPrefCookie ();
+
+1;

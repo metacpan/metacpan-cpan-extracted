@@ -1,0 +1,10 @@
+Revision history for Perl extension AxKit::XSP::Swish.
+
+0.02  Wed Oct  2 12:00:00 2002
+
+	- modified test proceedure to include testing of SWISHE.pm module
+
+0.01  Thu Apr  4 18:50:36 2002
+	- original version; created by h2xs 1.20 with options
+		-AX -n AxKit::XSP::Swish
+

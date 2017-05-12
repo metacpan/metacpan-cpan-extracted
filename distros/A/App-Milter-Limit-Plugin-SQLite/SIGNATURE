@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7e9c8aa21e5ddcb9668c01d553d5fd9291ab1c01 Changes
+SHA1 2567ebef08c659e7f40bee2fbd29f69f00c6c863 LICENSE
+SHA1 7fa21e09cac4e9139366be1d34f7594fc072d24d MANIFEST
+SHA1 b3c95918951ae93714cc30cba9d9bf24683ce7c0 META.yml
+SHA1 abd5ef6a29e704b44e8d346512d789ceeec202c8 Makefile.PL
+SHA1 c4a0646a9ee9eda9415bdfc9519ee754be3cbb30 README
+SHA1 24631a8678b5d821d6777b0fadc3fb75d8101aba dist.ini
+SHA1 1fd2b221ed8d9c80b947011331609b56905dbfc1 lib/App/Milter/Limit/Plugin/SQLite.pm
+SHA1 c05bd0bcb60e20050fb59d52c784aa458bba3f12 t/compile.t
+SHA1 5da741e4cabd859cbd6a3f2ad1c9901b892da4d0 t/release-pod-coverage.t
+SHA1 946206d2ce9fba0e8fda1d429e01245fb8934622 t/release-pod-syntax.t
+SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkuyIckACgkQ+CqvSzp9LOx32gCeO7gtdBUACCBD8wghvEqYw8q4
+QNAAn3M5FQUT0JocZb7/BrIsbq6nXt8j
+=yHGp
+-----END PGP SIGNATURE-----

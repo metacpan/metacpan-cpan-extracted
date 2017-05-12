@@ -1,0 +1,16 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README.txt
+bin/prototype-carousel-install
+carousel.js
+carousel.css
+inc/MY/Build.pm
+lib/Alien/Prototype/Carousel.pm
+t/01-loads.t
+t/02-install.t
+t/pod.t
+t/pod-coverage.t

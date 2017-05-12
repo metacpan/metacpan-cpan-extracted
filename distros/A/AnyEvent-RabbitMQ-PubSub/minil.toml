@@ -1,0 +1,6 @@
+name = "AnyEvent-RabbitMQ-PubSub"
+badges = ["travis"]
+authority="cpan:TYNOVSKY"
+
+module_maker="ModuleBuildTiny"
+

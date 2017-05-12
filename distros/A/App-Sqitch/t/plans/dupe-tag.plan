@@ -1,0 +1,14 @@
+%project=dupe_tag
+
+whatever 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+@foo 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+
+hi 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+@bar 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+
+@stink  2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+
+@blah 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+@bar 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+@w00t 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>
+OHNOEZ 2012-07-16T17:25:07Z Barack Obama <potus@whitehouse.gov>

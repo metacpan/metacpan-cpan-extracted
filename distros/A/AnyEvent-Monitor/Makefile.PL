@@ -1,0 +1,13 @@
+sub readme_from {}; sub auto_include_deps {}; sub author_tests {}; sub auto_set_repository {};
+use inc::Module::Install;
+name 'AnyEvent-Monitor';
+all_from 'lib/AnyEvent/Monitor.pm';
+readme_from 'lib/AnyEvent/Monitor.pm';
+build_requires 'Test::More';
+requires 'Any::Moose';
+requires 'AnyEvent';
+requires 'Method::Signatures::Simple';
+auto_include_deps;
+author_tests('xt');
+auto_set_repository;
+WriteAll;

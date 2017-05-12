@@ -1,0 +1,97 @@
+Astro::PAL -- interface to Starlink PAL C library
+==========
+
+This module provides an interface layer to the Starlink PAL positional
+astronomy library.
+
+An example program, stime, is provided. This simply reports the
+current time (modified Julian day and local sidereal time for the JCMT).
+
+Requirements:
+-------------
+
+A C compiler is required but the SOFA and PAL source code are included
+with the distribution and will be built automatically.
+
+Installation:
+-------------
+
+  % perl Build.PL
+  % ./Build
+  % ./Build test
+  % ./Build install
+
+The tests only test part of the build. Some functions remain untested.
+
+See Astro::Coords for a general object-oriented wrapper around Astro::PAL.
+
+Documentation:
+--------------
+
+The module provides documentation on how to use the perl interface
+to PAL. It does not contain information on how to use
+PAL itself.
+
+The basic PAL documentation can be found at
+
+ http://www.starlink.ac.uk/star/docs/sun267.htx/sun267.html
+
+For more information the SLA documentation provides much more
+detail:
+
+  http://www.starlink.ac.uk/star/docs/sun67.htx/sun67.html
+
+A description paper for PAL was published in the ADASS XXII
+conference proceedings:
+
+  http://adsabs.harvard.edu/abs/2013ASPC..475..307J
+
+Please consider citing this if you use PAL or this module in your
+research.
+
+Copyright
+---------
+
+Copyright (C) 2014 Tim Jenness
+Copyright (C) 2012 Tim Jenness and the Science and Technology Facilities
+Council. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+The array handling code was written by Karl Glazebrook.
+
+Version History
+---------------
+
+1.00 Initial release
+
+1.01 Fix MANIFEST of distribution to include PAL and SOFA source code.
+
+1.02 Fix floating point comparisons in sun67.t
+
+1.03 Update PAL to v0.1.2. Avoid using the C99 copysign() function
+     on Solaris.
+
+1.04 Update PAL to v0.1.3. Use __STDC_VERSION__ test before using
+     copysign().
+
+1.05 Update PAL to v0.1.4. Use a private isblank() function and do
+     not attempt to use modern POSIX compiler settings.
+
+1.06 Update PAL to v0.5.0
+     - Now ships with ERFA v1.1.0 instead of SOFA, clarifying license anomalies.
+     Add support for palOap, palOapqk, palRefco, palRefcoq, palRefro,
+     palRefv, palRefz, palAop, palAoppa, palAoppat, palAopqk, palAtmdsp
+
+1.07 Fix build dependencies

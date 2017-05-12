@@ -1,0 +1,61 @@
+{
+   "abstract" : "We are the CPAN authors that have written the modules installed on your perl!",
+   "author" : [
+      "Vincent Pit <perl@profvince.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-You-re_using",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0.16",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "Module::Metadata" : "1.000017",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0.16",
+            "File::Find" : "0",
+            "Module::Metadata" : "1.000017",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Name=Acme-CPANAuthors-You-re_using"
+      },
+      "homepage" : "http://search.cpan.org/dist/Acme-CPANAuthors-You-re_using/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FAcme-CPANAuthors-You-re_using.git"
+      }
+   },
+   "version" : "0.08"
+}

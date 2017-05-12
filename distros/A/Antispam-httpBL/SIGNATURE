@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 53baffa6d2f0038defb81fbd6829806863300dfc Changes
+SHA1 1a725e34df90bd8c00028a6590874fb23ebf4a9d INSTALL
+SHA1 23c628b4a8a36738405ccdacaeb912d2e727b4c0 LICENSE
+SHA1 654f4846c94f4b3b7e47024f771a5f1cf5c9ca15 MANIFEST
+SHA1 40236bf93cbeac65b0e0a8741847cfb8d3848344 META.json
+SHA1 29e3b60ac39b54031ed1c44e69931358f953ea76 META.yml
+SHA1 4b4bc7464ba2fceb8f82283c34bb5db6c1b99fe4 Makefile.PL
+SHA1 51a7746bb2011d450fa557654884acfb94fcc610 README
+SHA1 48fa3d0e4eca8805b9d3bd66f591166dda41da4d dist.ini
+SHA1 f5b1b241cc014a09ebd7995ff99fd2b7556be301 lib/Antispam/httpBL.pm
+SHA1 093f77a04cc0612c8dcd98123e2ce1d982f6a573 t/httpBL.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 961a1e2c92d836c8cad2d34b784cbc75345dec63 t/release-kwalitee.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkzr7pcACgkQIgMCsV8qvRLd9ACcD2XxgU/M8y+zIRFbG/76EmHm
+iQMAn35QOOpL4K7jpko/RbAOiKbNnb9Q
+=rC5l
+-----END PGP SIGNATURE-----

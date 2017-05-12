@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use vars qw/$DB $URL %PAPERS/;
+
+use Ace 1.38;
+use CGI 2.42 qw/:standard :html3 escape/;
+use CGI::Carp qw/fatalsToBrowser/;
+use Ace::Browser::AceSubs qw(:DEFAULT DoRedirect);
+use Ace::Browser::SearchSubs;
+
+# zero globals in utilities
+my $query          = param('query');
+my $offset         = AceSearchOffset();
+
+$URL = url();
+$URL=~s!^http://[^/]+!!;
+
+# fetch database handle
+$DB = OpenDatabase() || AceError("Couldn't open database.");
+
+my ($objs,$count);
+($objs,$count) = do_search($query,$offset) if $query;
+DoRedirect(@$objs) if $count==1;
+
+PrintTop(undef,undef,'AceDB Query');
+display_search_form();
+display_search($objs,$count,$offset,$query) if $query;
+
+PrintBottom();
+
+sub display_search_form {
+  print p({-class=>'small'},
+	  "Type in a search term using the Ace query language. Separate multiple statements with semicolons.",
+	  br,
+	 "Examples: ",
+	  ul(
+	     li(
+		[cite({-style=>'font-size: 10pt'},'find Author COUNT Paper > 100'),
+		 cite({-style=>'font-size: 10pt'},'find Author IS "Garvin*" ; >Laboratory; >Staff')
+		]),br,
+		a({-href=>"http://probe.nalusda.gov:8000/aboutacedbquery.html",
+		   -style=>'font-size: 10pt'},
+		  'Documentation and more examples')
+		),
+	  );
+  print start_form,
+        textfield(-name=>'query',-size=>80),br,
+        submit(-label=>'Query'),
+        end_form;
+}
+
+
+
+
+
+
+
+
+
+sub do_search {
+  my ($query,$offset) = @_;
+  my $count;
+  my (@objs) = $DB->find(-query=> $query,
+			 -count  => MAXOBJECTS,
+			 -offset => $offset,
+			 -total => \$count);
+  return unless @objs;
+  return (\@objs,$count);
+}
+
+sub display_search {
+    my ($objs,$count,$offset,$query) = @_;
+    print p(strong($count),"objects satisfy the query",strong($query));
+    my @objects = map { a({-href=>Object2URL($_)},"$_") } @$objs;
+    AceResultsTable(\@objects,$count,$offset) if @objects;
+}
+

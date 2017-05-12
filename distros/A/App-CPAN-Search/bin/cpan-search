@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use App::CPAN::Search;
+
+# Version.
+our $VERSION = 0.01;
+
+# Run.
+App::CPAN::Search->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+cpan-search - Script to search on CPAN archive.
+
+=head1 SYNOPSIS
+
+ cpan-search [-h] [--version] module_prefix
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<module_prefix>
+
+ Perl module prefix.
+ e.g. Module::Install
+
+=back
+
+=head1 EXAMPLE
+
+ cpan-search Module::Install
+
+=head1 REPOSITORY
+
+L<https://github.com/tupinek/App-CPAN-Search>
+
+=head1 AUTHOR
+
+Michal Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+ © 2015 Michal Špaček
+ BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

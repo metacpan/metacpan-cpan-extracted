@@ -1,0 +1,22 @@
+Revision history for Perl extension App::digestarchive
+
+0.044   Tue Nov  6 01:46:31 JST 2012
+        - update inc/Module/Install.pm v1.0.6
+0.043   Fri Jul 27 19:11:39 JST 2012
+        - add use v5.8.0
+0.042   Tue Jul 24 22:32:34 JST 2012
+        - delete trash
+0.041   Tue Jul 24 22:24:16 JST 2012
+        - update Makefile.PL. none use Module::Install::TestTarget
+0.04    Tue Jul 24 21:48:47 JST 2012
+        - update Makefile.PL and test
+0.032   Tue Jul 24 13:43:12 JST 2012
+        - update Makefile.PL. add Archive::Tar::VERSION.
+0.031   Tue Jul 24 00:44:54 JST 2012
+        - update Makefile.PL. add require modules.
+0.03    Mon Jul 23 16:14:45 JST 2012
+        - update typo
+0.02    Mon Jul 23 16:14:28 JST 2012
+        - add filter_cb test
+0.01    Mon Jul 23 01:25:06 JST 2012
+        - original version

@@ -1,0 +1,21 @@
+Each subdirectory represents a set of related tests.
+
+Each one contains:
+ * one or more files with names beginning "input-"
+
+   The prefix will be stripped and they will be copied
+   into a new directory before beginning the test.
+   The script will run from this directory.
+
+ * a file "command"
+
+   giving the parameters to bernard
+
+ * one or more files with names beginning "output-"
+
+  Each of these is a test.  Its contents will be compared
+  with a file of the same name in the new directory.
+  "output-stdout" is a special case; it represents whatever
+  was printed to stdout.
+  The comparison is exact, except for the "PO-Revision-Date"
+  header.

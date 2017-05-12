@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+  "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>
+<head>
+<title>Apache::Wombat</title>
+<!-- thanks perldoc.com! -->
+<link rel="stylesheet" href="./wombat.css">
+</head>
+<body>
+<h1>Apache::Wombat</h1>
+<p>
+<strong>Apache::Wombat</strong> is a connector for the <a
+href="http://wombat.sourceforge.net/">Wombat</a> servlet engine that
+embeds the engine in an <a href="http://httpd.apache.org/">Apache</a>
+web server built with <a
+href="http://perl.apache.org/">mod_perl</a>.
+</p>
+<p>
+This guide will help you quickly get Wombat installed, configured and
+running for the purposes of demonstration. It is not a user manual for
+Wombat (one of those is forthcoming). It assumes intermediate to
+advanced knowledge of building and configuring Apache, mod_perl, and
+CPAN modules.
+</p>
+<p>
+Questions? <a
+href="http://lists.sourceforge.net/lists/listinfo/wombat-users">Join</a>
+the <code>wombat-users@lists.sourceforge.net</code> mailing list and
+send them to us.
+</p>
+<p>
+The master versions of these documents are located at <a
+href="http://wombat.sourceforge.net/apache/">
+<code>http://wombat.sourceforge.net/apache/</code></a>.
+</p>
+<ul>
+<li><a href="#installation">Installation Instructions</a>
+<li><a href="./api/Apache/">Apache::Wombat API Docs</a>
+<li><a href="http://wombat.sourceforge.net/wombat/api/">Wombat API Docs</a>
+</ul>
+<hr noshade>
+<h2><a name="installation">Installation Instructions</a></h2>
+<ol>
+<li>
+<p>
+Make sure you have at least version 5.6.0 of perl.
+</p>
+<li>
+<p>
+Make sure you have built mod_perl with Apache. Apache 1.3.0 is
+required. Any recent version of mod_perl will do). mod_perl must be
+built with the following hooks enabled:
+</p>
+<ul>
+<li>PERL_CHILD_INIT (enabled by default)
+<li>PERL_CHILD_EXIT (enabled by default)
+<li>PERL_TABLE_API
+<li>PERL_METHOD_HANDLERS
+</ul>
+<p>
+Obviously the easy way is to build with EVERYTHING.
+</p>
+<li>
+<p>
+Install Apache::Wombat. This will catch all of the non-optional
+dependencies, including libservlet and Wombat (you will still have to
+install dependencies for optional components, such as DBI for
+DBIRealm, separately):
+</p>
+<pre>
+$ perl -MCPAN -e 'install Apache::Wombat'
+</pre>
+<p>
+The build process will ask you some questions about your installation
+preferences. You can simply hit enter to accept the defaults. You can
+also use '.' to refer to the current working directory (the directory
+from which you ran Makefile.PL) and '~' to refer to your home directory.
+</p>
+<ul>
+<li> Installation directory: This is where the Apache::Wombat modules
+will be installed. The default is the normal perl site library
+directory. If you specified a PREFIX when you built mod_perl, you
+might like to use the same value here.
+<li> Apache config directory: This is where generated config files
+will be installed.
+<li> Apache log directory: This is where the wombat.log file will be
+written, if you enable the <strong>Apache::Wombat::FileLogger</strong>
+module (not enabled by default).
+<li> Webapps directory: This is where Wombat will look for your web
+applications.
+</ul>
+<p>
+The below instructions assume you made the following choices:
+</p>
+<ul>
+<li> Installation directory: <code>/usr/local/apache</code>
+<li> Config directory: <code>/usr/local/apache/conf</code>
+<li> Log directory: <code>/usr/local/apache/logs</code>
+<li> Webapps directory: <code>/usr/local/apache/webapps</code>
+</ul>
+<p></p>
+<li>
+<p>
+Install the <code>wombat-webapps</code> package into the webapps
+directory you just specified.
+</p>
+<pre>
+$ cd /usr/local/apache/webapps
+$ lwp-download http://prdownloads.sourceforge.net/wombat/wombat-webapps.tar.gz
+$ tar xzvf wombat-webapps.tar.gz
+</pre>
+<li>
+<p>
+Add an Include directive to <code>httpd.conf</code> to include the
+generated <code>wombat.conf</code> file.
+</p>
+<pre>
+Include /usr/local/apache/conf/wombat.conf
+</pre>
+<li>
+<p>
+If you installed <strong>Apache::Wombat</strong> into a non-standard
+location, add that location to <code>$PERL5LIB</code> in your
+environment.
+<pre>
+$ export PERL5LIB=/where/my/libs/are:$PERL5LIB
+</pre>
+<li>
+<p>
+Now you should be able to start Apache. You should see something like
+this printed to the console:
+</p>
+<pre>
+[Thu Oct 25 18:20:37 2001] [info] [28898] Engine[Apache-Wombat]: StandardSessionManager started
+[Thu Oct 25 18:20:37 2001] [info] [28898] Engine[Apache-Wombat]: ApacheConnector[Apache/mod_perl Connector]: Apache/mod_perl Connector started
+[Thu Oct 25 18:20:37 2001] [info] [28898] Engine[Apache-Wombat]: ApacheConnector[Apache/mod_perl Connector]: Apache/mod_perl Connector started
+[Thu Oct 25 18:20:37 2001] [error] [28898] Engine[Apache-Wombat]: Wombat/0.7.0 configured -- resuming normal operations
+</pre>
+<li>
+<p>
+Point your browser at <code>/wombat-examples</code> and begin viewing
+the examples.
+</p>
+<li>
+<p>
+At this point you can start customizing the configuration. For
+reference, use the following documents:
+</p>
+<ul>
+<li><a href="./api/Apache/Wombat.html">
+<strong>Apache::Wombat</strong></a> man page (Apache config info)
+<li><a href="http://wombat.sourceforge.net/wombat/api/Wombat.html">
+<strong>Wombat</strong></a> man page (Wombat and webapp config info)
+<li><a href="http://wombat.sourceforge.net/wombat/api/Wombat/">
+<strong>Wombat optional components</strong></a> man pages (Wombat
+config info)
+<li>generated <a
+href="../conf/wombat.conf"><strong>wombat.conf</strong></a> and <a
+href="../conf/server.xml"><strong>server.xml</strong></a>
+<li><a href="http://www.jcp.org/aboutJava/communityprocess/final/jsr053/">
+<strong>Java (TM) Servlet 2.3 Specification</strong></a> (webapp
+config info)
+</ul>
+<p>
+Use the Examples application as a template for your own
+applications. The <code>web.xml</code> deployment descriptor located
+in the <code>WEB-INF</code> application resource directory is
+essential. Refer to the Java (TM) Servlet Specification for a
+discussion of the contents of <code>web.xml</code> and the Wombat man
+page for a list of supported elements and features.
+</p>
+<p>
+Good luck and have fun!
+</p>
+</body>
+</html>

@@ -1,0 +1,15 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::CM qw (getcellstatus);
+
+die "Usage: $0 cell\n" if ($#ARGV==-1);
+
+my $cell = shift;
+
+my $setuid = getcellstatus($cell);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { printf("Setuid allowed: %s \n", $setuid ? 'yes' : 'no'); }

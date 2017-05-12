@@ -1,0 +1,50 @@
+Astro-FITS-CFITSIO-Simple version 0.13
+======================================
+
+This module presents an uncomplicated interface to reading (and
+eventually writing) FITS files with the CFITSIO library.  It attempts
+to perform the intuitive action when left to its own devices, but much
+of its behavior can be controlled by an application.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Params::Validate
+  Astro::FITS::Header
+  Astro::FITS::Header::CFITSIO
+  Astro::FITS::CFITSIO
+  Astro::FITS::CFITSIO::CheckStatus
+
+This module was developed against version 2.8.1 of
+Astro::FITS::Header, which has bugs in it which must be patched in
+order for Astro::FITS::CFITSIO::Simple to operate.  Patches which fix
+the problems on the following web sites.
+
+        https://rt.cpan.org/NoAuth/Bug.html?id=4816
+        https://rt.cpan.org/NoAuth/Bug.html?id=11722
+
+Asgtro::FITS::Header version 3.000 does not suffer from these bugs, and
+does not require the patches.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004,2005 by the Smithsonian Astrophysical Observatory
+
+This software is released under the GNU General Public License. You
+may find a copy at http://www.fsf.org/copyleft/gpl.html.
+
+
+

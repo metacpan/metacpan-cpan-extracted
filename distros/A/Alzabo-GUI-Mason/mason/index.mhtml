@@ -1,0 +1,129 @@
+% if (@s) {
+<div class="levelone">
+ <h2>Existing Schemas</h2>
+
+ <table width="100%" class="schema-list">
+%   foreach my $row (@rows) {
+  <tr>
+%     foreach my $s (@$row) {
+   <td width="50%">
+    <h3><& 'href', text => $s, path => 'view_schema' . Alzabo::GUI::Mason::Config::mason_extension(), query => { schema => $s } &></h3>
+   </td>
+%     }
+  </tr>
+%   }
+ </table>
+</div>
+% }
+
+<div class="levelone">
+ <h2>Create a new schema</h2>
+
+ <form action="new_schema<% Alzabo::GUI::Mason::Config::mason_extension() %>" method="get">
+ <table width="100%">
+  <tr>
+   <td width="30%">
+    <h4>Schema name:</h4>
+   </td>
+   <td><input class="h4" type="textfield" name="name" size="20"></td>
+  </tr>
+  <tr>
+   <td width="30%">
+    <h4>RDBMS:</h4>
+   </td>
+   <td>
+    <select class="h4" name="rdbms">
+% foreach my $rdbms ( sort Alzabo::RDBMSRules->available ) {
+     <option value="<% $rdbms | h %>"><% $rdbms | h %></option>
+% }
+    </select>
+   </td>
+  </tr>
+  <tr>
+   <td colspan="2">
+    <input class="h4" type="submit" value="Submit">
+   </td>
+  </tr>
+ </table>
+ </form>
+
+</div>
+
+<div class="levelone">
+
+ <h2>Reverse engineer schema</h2>
+
+ <form action="reverse_engineer<% Alzabo::GUI::Mason::Config::mason_extension() %>" method="POST">
+
+ <table width="100%">
+  <tr>
+   <td colspan="2"></td>
+  </tr>
+
+  <tr>
+   <td width="30%"><h4>Database name:</h4></td>
+   <td><input class="h4" type="textfield" name="name" size="20"></td>
+  </tr>
+
+  <tr>
+   <td width="30%"><h4>Username:</h4></td>
+   <td><input class="h4" type="textfield" name="username" size="20"></td>
+  </tr>
+
+  <tr>
+   <td width="30%"><h4>Password:</h4></td>
+   <td><input class="h4" type="password" name="password" size="20"></td>
+  </tr>
+
+  <tr>
+   <td width="30%"><h4>Host:</h4></td>
+   <td><input class="h4" type="text" name="host" size="20"></td>
+  </tr>
+
+  <tr>
+   <td width="30%"><h4>Port:</h4></td>
+   <td><input class="h4" type="text" name="port" size="6"></td>
+  </tr>
+
+  <tr>
+   <td width="30%"><h4>RDBMS:</h4></td>
+   <td>
+    <select class="h4" name="rdbms">
+% foreach my $rdbms (sort Alzabo::RDBMSRules->available) {
+    <option value="<% $rdbms | h %>"><% $rdbms | h %></option>
+% }
+    </select>
+   </td>
+  </tr>
+
+  <tr>
+   <td colspan="2"><input class="h4" type="submit" value="Submit"></td>
+  </tr>
+ </table>
+
+ </form>
+</div>
+
+<br />
+
+<%init>
+my @s = sort { lc $a cmp lc $b } (Alzabo::Config::available_schemas());
+
+my @rows;
+if ( @s > 10 )
+{
+    my @c1 = splice @s, 0, int( @s / 2 );
+    # first column should be larger if count is odd
+    push @c1, shift @s if @s > @c1;
+    my @c2 = @s;
+
+    while (@c1)
+    {
+        push @rows, [ (shift @c1), (@c2 ? shift @c2 : '') ];
+    }
+}
+else
+{
+    @rows = map { [ $_ ] } @s;
+}
+</%init>

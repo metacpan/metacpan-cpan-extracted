@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+
+
+use strict;
+use warnings;
+
+require Alvis::TermTagger;
+
+my $corpus = "corpus";
+my $lemmatised_corpus = "lemmatised-corpus";
+my $termlist = "term+lem+semtaglist+wordlemma";
+my @selected_term_list;
+my $term;
+
+my %term_listIdx;
+my @term_list;
+my @regex_term_list;
+my @regex_lemmawordterm_list;
+my %corpus;
+my %lc_corpus;
+my %lemmatised_corpus;
+my %lc_lemmatised_corpus;
+my %corpus_index;
+my %lemmatised_corpus_index;
+my %idtrm_select;
+my %idlemtrm_select;
+my $CS = 3;
+
+
+Alvis::TermTagger::load_TermList($termlist, \@term_list, \%term_listIdx);
+Alvis::TermTagger::get_Regex_TermList(\@term_list, \@regex_term_list, \@regex_lemmawordterm_list);
+Alvis::TermTagger::load_Corpus($corpus, \%corpus, \%lc_corpus);
+Alvis::TermTagger::load_Corpus($lemmatised_corpus, \%lemmatised_corpus, \%lc_lemmatised_corpus);
+Alvis::TermTagger::corpus_Indexing(\%lc_corpus, \%corpus, \%corpus_index, $CS);
+Alvis::TermTagger::corpus_Indexing(\%lc_lemmatised_corpus, \%lemmatised_corpus, \%lemmatised_corpus_index, $CS);
+Alvis::TermTagger::term_Selection(\%corpus_index, \@term_list, \%idtrm_select, $CS);
+# Alvis::TermTagger::term_Selection(\%lemmatised_corpus_index, \@term_list, \%idtrm_select, $CS);
+Alvis::TermTagger::term_Selection(\%lemmatised_corpus_index, \@term_list, \%idlemtrm_select, $CS);
+Alvis::TermTagger::term_tagging_offset_tab(\@term_list, \@regex_term_list, \%idtrm_select, \%corpus, \@selected_term_list, $CS);
+Alvis::TermTagger::term_tagging_offset_tab(\@term_list, \@regex_lemmawordterm_list, \%idlemtrm_select, \%lemmatised_corpus, \@selected_term_list, $CS);
+
+foreach $term (@selected_term_list) {
+  print "$term\n";
+}
+
+

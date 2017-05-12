@@ -1,0 +1,17 @@
+SKIP SING
+COL 1 ON 2
+COL 1 ON 3
+line ST     1
+line ST     2
+LS     2 ON   2
+line ST     3
+LS     3 ON   3
+R    X   0.299999982 10
+LOC  0 0 1 1
+LAB  F  none
+LAB  T  Current model
+LAB  X  Energy
+LAB  Y  Photons/cm\u2\d s keV
+R    Y   3.2315063E-6 0.00323150633
+LOG  X ON 1
+LOG  Y ON 1

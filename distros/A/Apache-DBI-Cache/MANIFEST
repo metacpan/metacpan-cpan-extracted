@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+perl-Apache-DBI-Cache.spec
+MANIFEST
+README
+mk_README.sh
+t/001cache.t
+t/002noshm.t
+t/003plugin.t
+t/004rootclass.t
+t/005rootclass.t
+t/100mysql.t
+t/200imadbi.t
+t/201imadbi.t
+t/202imadbi.t
+t/203classdbi.t
+t/204classdbi.t
+t/205classdbi.t
+lib/Apache/DBI/Cache.pm
+lib/Apache/DBI/Cache.pod
+lib/Apache/DBI/Cache/mysql.pm
+lib/Apache/DBI/Cache/ImaDBI.pm
+META.yml                                 Module meta-data (added by MakeMaker)

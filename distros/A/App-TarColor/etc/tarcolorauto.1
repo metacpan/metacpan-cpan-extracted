@@ -1,0 +1,37 @@
+.IX Title "TARCOLORAUTO.SH 1"
+.TH TARCOLORAUTO.SH 1 "2012-02-12"
+.\" For nroff, turn off justification.  Always turn off hyphenation; it makes
+.\" way too many mistakes in technical documents.
+.if n .ad l
+.nh
+.SH "NAME"
+.IX Header "NAME"
+tarcolorauto - shell script for transparent use of tarcolor
+.SH "SYNOPSIS"
+.IX Header "SYNOPSIS"
+source tarcolorauto.sh
+
+tarcolorauto on
+
+tarcolorauto off
+.SH "DESCRIPTION"
+.IX Header "DESCRIPTION"
+tarcolorauto.sh is a shell script for bash and zsh that makes the use of tarcolor transparent.
+.PP
+From a shell startup file (such as ~/.profile):
+
+  source /usr/local/etc/tarcolorauto/tarcolorauto.sh
+  tarcolorauto on
+
+This automatically causes "tar tvf" commands to be piped through tarcolor. You can turn this off by doing:
+
+  tarcolorauto off
+.SH "SEE ALSO"
+.LP
+\fBtarcolor(1)\fR\&
+.SH "SOURCE CODE"
+.IX Header "SOURCE CODE"
+https://github.com/msabramo/tarcolor
+.SH "AUTHOR"
+.IX Header "AUTHOR"
+Marc Abramowitz <marc@marc\-abramowitz.com>

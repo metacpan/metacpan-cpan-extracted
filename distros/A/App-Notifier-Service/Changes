@@ -1,0 +1,41 @@
+0.0401  2017-04-14
+    * Avoid spawning zombie processes after forking to execute commands.
+        - See:
+        - http://lists.preshweb.co.uk/pipermail/dancer-users/2017-April/005781.html
+        - Thanks to Andy and to racke for helping.
+
+0.0400  2014-04-12
+    * bin/app.pl: add SIGINT handling to exit(0) so Ctrl+C won't warn in the
+    konsole and just dismiss the service.
+    * Add separate LICENSE file (CPANTS).
+
+0.0301  2014-01-26
+    * Remove Makefile.PL from the distribution.
+        - It was a leftover and no longer relevant.
+    * Add a README.
+    * Add t/style-trailing-space.t and remove trailing space.
+    * Add t/pod-coverage.t t/pod.t.
+
+0.0300  2014-01-16
+    * Add support for passing text_params into the service. Useful for
+    messages/etc.
+
+0.0202  2012-07-12
+    * Build.PL: add a requires on YAML::XS (and some other referenced
+    modules), due to test failures:
+        - http://www.cpantesters.org/cpan/report/7013729c-cbaa-11e1-9066-3d54fb7543f5
+
+0.0201  2012-07-12
+    * Some clarifications to the documentation thanks to ironcamel.
+    * Fix the link to the repository in Build.PL/META.yml/META.json.
+        - https://bitbucket.org/shlomif/app-notifier/issue/1
+        - Thanks to ironcamel.
+
+0.0200  2012-07-11
+    * Add more documentation with examples.
+    * Add newlines to the output reports of /notify.
+    * Now forking in order to execute @cmd_line (so the HTTP service
+    will respond immediately.)
+
+0.0100  2012-07-11
+    * First release.

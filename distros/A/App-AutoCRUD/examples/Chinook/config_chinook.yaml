@@ -1,0 +1,158 @@
+app:
+  # global settings for the application
+  # maybe application name, stuff for the homepage, etc.
+  name: Demo
+  title: AutoCRUD demo application
+  readonly: 0
+  default:
+      page_size : 50
+
+datasources :
+  Chinook :
+    dbh:
+      connect:
+        - "dbi:SQLite:dbname=Chinook_Sqlite_AutoIncrementPKs.sqlite"
+        - ""
+        - ""
+        - RaiseError: 1
+          sqlite_unicode: 1
+          sqlite_open_flags: 2 # SQLITE_OPEN_READWRITE
+
+    tablegroups :
+      - name: Music
+        descr: Tables describing music content
+        node: open
+        tables :
+          - Artist
+          - Album
+          - Track
+
+      - name: Playlist
+        descr: Tables for structuring playlists
+        node: open
+        tables :
+          - Playlist
+          - PlaylistTrack
+
+      - name: Business
+        descr: Customers, invoices and employees
+        node: open
+        tables :
+          - Customer
+          - Invoice
+          - InvoiceLine
+          - Employee
+
+      - name: Reference
+        descr: Lists of codes
+        node: closed
+        tables :
+          - MediaType
+          - Genre
+
+      - name: Technical
+        descr: Internal sqlite information
+        node: closed
+        tables :
+          - sqlite_sequence
+
+
+    tables:
+      Track:
+        colgroups:
+          - name: keys
+            columns:
+              - name: TrackId
+                descr: Primary key
+              - name: AlbumId
+                descr: foreign key to the album where this track belongs
+              - name: GenreId
+                descr: foreign key to the genre of this track
+              - name: MediaTypeId
+                descr: foreign key to the media type of this track
+          - name: Textual information
+            columns:
+              - name: Name
+                descr: name of this track
+              - name: Composer
+                descr: name of composer of this track
+          - name: Technical details
+            columns:
+              - name: Bytes
+              - name: Milliseconds
+          - name: Commercial details
+            columns:
+              - name: UnitPrice
+      Customer:
+        colgroups:
+          - name: keys
+            columns:
+              - name: CustomerId
+                descr: Primary key
+              - name: SupportRepId
+                descr: foreign key to the support employee
+          - name: Name
+            columns:
+              - name: FirstName
+              - name: LastName
+              - name: Company
+          - name: Address
+            columns:
+              - name: Address
+              - name: PostalCode
+              - name: City
+              - name: State
+              - name: Country
+          - name: Other coordinates
+            columns:
+              - name: Email
+              - name: Fax
+              - name: Phone
+
+      Invoice:
+        colgroups:
+          - name: keys
+            columns:
+              - name: InvoiceId
+                descr: primary key
+              - name: CustumerId
+                descr: foreign key to the customer of this invoice
+          - name: Invoice details
+            columns:
+              - name: InvoiceDate
+              - name: Total
+          - name: Billing address
+            columns:
+              - name: BillingAddress
+              - name: BillingPostalCode
+              - name: BillingCity
+              - name: BillingState
+              - name: BillingCountry
+
+      Employee:
+        colgroups:
+          - name: keys
+            columns:
+              - name: EmployeeId
+                descr: primary key
+              - name: ReportsTo
+                descr: foreign key to the manager of this employe
+          - name: Employee details
+            columns:
+              - name: Title
+              - name: FirstName
+              - name: LastName
+              - name: BirthDate
+              - name: HireDate
+          - name: Address
+            columns:
+              - name: Address
+              - name: PostalCode
+              - name: City
+              - name: State
+              - name: Country
+          - name: Other coordinates
+            columns:
+              - name: Email
+              - name: Fax
+              - name: Phone

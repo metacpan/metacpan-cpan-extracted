@@ -1,0 +1,14 @@
+Revision history for App-Nopaste-Service-AnyPastebin
+
+0.01    Jan 21st 2010
+        First version, pushed to CPAN
+
+0.02    Mar 25th 2010
+        As per feature request via RT #55257:
+           Derivable post content allowed - thanks AEvar
+
+0.03    Apr 8th 2010
+        Fixed changes file and updated verison.
+
+0.04    Sep 23rd 2010
+        Fixed RT #61565 for installs on system without Module::Install

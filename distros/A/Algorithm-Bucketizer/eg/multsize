@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+###########################################
+# multsize - Buckets with different sizes
+# 2006, Mike Schilli <cpan@perlmeister.com>
+###########################################
+use strict;
+use warnings;
+use Getopt::Std;
+use Pod::Usage;
+use Algorithm::Bucketizer;
+use Data::Dumper;
+
+my @items = (30 .. 39);
+
+my $b = Algorithm::Bucketizer->new(
+    bucketsize => 100, 
+    algorithm => 'retry'
+);
+
+for(qw(100 50 200)) {
+    $b->add_bucket(maxsize => $_);
+}
+
+for my $item (@items) {
+    $b->add_item($item, $item);
+}
+
+for my $bucket ($b->buckets()) {
+    for my $item ($bucket->items()) {
+        print "Bucket: ", $bucket->serial(), ": Item $item\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+    multsize - blah blah blah
+
+=head1 SYNOPSIS
+
+    multsize -xyz
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-x>
+
+Prints this manual page in text format.
+
+=back
+
+=head1 DESCRIPTION
+
+multsize blah blah blah.
+
+=head1 EXAMPLES
+
+  $ multsize -x foo bar
+
+=head1 LEGALESE
+
+Copyright 2006 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2006, Mike Schilli <cpan@perlmeister.com>

@@ -1,0 +1,39 @@
+---
+abstract: 'Prove that a Perl Module Dist is OK for CPAN'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: App::Prove::Dist
+name: App-Prove-Dist
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  App::Prove: 3.23
+  App::cpanminus: 1.5003
+  Capture::Tiny: 0.11
+  IO::All: 0.44
+  Module::ScanDeps: 1.04
+  Mouse: 0.97
+  MouseX::App::Cmd: 0.08
+  YAML::XS: 0.37
+  local::lib: 1.008004
+  perl: 5.10.0
+resources:
+  homepage: https://github.com/ingydotnet/app-prove-dist-pm/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/ingydotnet/app-prove-dist-pm.git
+    web: https://github.com/ingydotnet/app-prove-dist-pm/tree
+version: 0.02

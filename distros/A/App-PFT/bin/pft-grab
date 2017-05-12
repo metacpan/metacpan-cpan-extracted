@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+#
+# Copyright 2014-2016 - Giovanni Simoni
+#
+# This file is part of PFT.
+#
+# PFT is free software: you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# PFT is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with PFT.  If not, see <http://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+pft grab - Grab a file as attachment or picture
+
+=head1 SYNOPSYS
+
+pft grab [options] <file> [<file> ...]
+
+=head1 DESCRIPTION
+
+Grab one or more files as attachments or pictures, put it in the right
+place under C<ROOT/content>.
+
+The command will assume by default that the file is an I<attachment>, that
+is a binary file to be stored under C<ROOT/content/attachments>. This
+behavior can be overridden by specifying the C<--picture> option: as
+result the C<ROOT/content/pics> directory will be used instead as
+destination.
+
+This command outputs the I<Markdown> code for linking, which can be pasted
+in your text entry. The output will be consistent with the
+attachment/picture choice: if C<--picture> is specified, the Markdown
+notation for including a picture will be used, otherwise the output will
+be the syntax for links:
+
+    $ pft grab /tmp/tux.png
+    [tux.png]: :attach:tux.png
+
+    $ pft grab /tmp/tux.png --picture
+    ![tux.png](:pic:tux.png)
+
+The C<pft grab> command work also with URLs:
+
+    pft grab --picture http://example.com/picture.png
+    ![picture.png](:pic:picture.png)
+
+If you are using the vim editor, probably you want to call this command
+from within it as follows:
+
+    :read ! pft grab [options] file [file...]
+
+=head1 OPTIONS
+
+=over
+
+=item --today | -d
+
+Store the file inside a content directory named after the current day. This
+is meant to avoid name conflict with previously stored attachments or
+pictures having the same name.
+
+    $ pft grab /tmp/tux.png --picture --today
+    ![tux.png](:pic:2016-04-20/tux.png)
+
+=item --picture | -p
+
+Store the files into the C<I<ROOT>/content/pics> directory and output the
+Markdown code required to show it as a picture.
+
+Note that no check is performed on the file content.
+
+=item --rename=<name> | -r <name>
+
+Rename the file. The supplied name must explicitly set file extensions, if
+any is needed. This however will not imply a format change.
+
+This option is not allowed if multiple files are grabbed with the same
+command.
+
+=item --year=<Y> | -y <Y>
+
+When using C<--today>, overload year. Implies C<--today>.
+
+=item --month=<M> | -m <M>
+
+When using C<--today>, overload month. Implies C<--today>.
+
+=item --day=<D> | -d <D>
+
+When using C<--today>, overload day. Implies C<--today>.
+
+=item --help | -h
+
+Show this help.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use feature qw/say/;
+
+use File::Spec::Functions qw/catfile catdir abs2rel/;
+use File::Path qw/make_path/;
+use File::Basename qw/basename/;
+use File::Copy;
+
+use Encode;
+use Encode::Locale;
+
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+use PFT::Tree;
+
+use URI;
+use LWP::Simple;
+
+my %date;
+my %opts = (
+    dst     => 'a',
+    date    => 0,
+);
+GetOptions(
+    'year|y=i'      => \$date{year},
+    'month|m=s'     => \$date{month},
+    'day|d=i'       => \$date{day},
+
+    'today|t!'     => \$opts{date_prefix},
+    'picture|p!'   => sub { $opts{dst} = 'p' },
+    #'attach|a!'    => sub { $opts{dst} = 'a' },
+    'rename|r=s'   => \$opts{rename},
+    'help|h' => sub {
+        pod2usage
+            -exitval => 1,
+            -verbose => 2,
+            -input => App::PFT::help_of 'grab',
+    }
+) or exit 1;
+
+@ARGV or do {
+    say STDERR 'Any file?';
+    exit 1;
+};
+
+@ARGV > 1 and $opts{rename} and do {
+    say STDERR '--rename is not allowed with multiple files';
+    exit 1;
+};
+
+my $content = eval{ PFT::Tree->new->content } or do {
+    say STDERR $@ =~ s/ at.*$//rs;
+    exit 1
+};
+
+my $dst_base = do {
+    my $o = $opts{dst};
+
+    $o eq 'a' ? $content->dir_attachments :
+    $o eq 'p' ? $content->dir_pics :
+    die;
+};
+
+my $dst_dir = do {
+    if ($opts{date_prefix} || grep defined @date{qw/year month day/}) {
+        catdir($dst_base, PFT::Date->from_spec(%date)->repr('-'))
+    } else {
+        $dst_base
+    }
+};
+
+make_path encode(locale_fs => $dst_dir);
+
+ITEM: for my $orig_path (@ARGV) {
+    my $uri = URI->new($orig_path);
+    my $fn = basename $uri->path . ($uri->query || '');
+
+    my $dst_path = catfile($dst_dir, $opts{rename} || $fn);
+
+    if ($uri->has_recognized_scheme) {
+        my $status = LWP::Simple::getstore($uri->as_string, $dst_path);
+        if ($status < 200 || $status >= 300) {
+            say STDERR 'Failed to retrieve ', $uri->as_iri, ': ', $status;
+            next ITEM;
+        }
+    }
+    else {
+        File::Copy::copy($orig_path, $dst_path) or do {
+            say STDERR "Copy failed: $!";
+            exit 2
+        }
+    }
+
+    my $relative = abs2rel($dst_path, $dst_base);
+    say STDOUT
+        $opts{dst} eq 'a' ? "[$fn]: :attach:$relative" :
+        $opts{dst} eq 'p' ? "![$fn](:pic:$relative)" :
+        die;
+}

@@ -1,0 +1,7 @@
+<xpathscript:wrapper 
+    xmlns:xpathscript="http://babyl.dyndns.org/xpathscript"
+    xpathscript:type="text/html">
+<doc>
+<%= "Hello world!" %>
+</doc>
+</xpathscript:wrapper>

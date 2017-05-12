@@ -1,0 +1,10 @@
+ChangeLog
+lib/Apache/GzipChain.pm
+MANIFEST
+Makefile.PL
+lib/Apache/PassFile.pm
+README
+t/loadme.t
+t/pod.t
+t/podcover.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+README
+lib/App/EUMM/Migrate.pm
+t/00-load.t
+t/pod.t
+Build.PL
+eumm-migrate.pl
+ignore.txt
+META.yml
+Makefile.PL
+META.json

@@ -1,0 +1,62 @@
+ABNF-Grammar version 0.05
+=========================
+
+ABNF-Grammar - validator and generator for ABNF grammars.
+
+This module parses IETF ABNF (STD 68, RFC 5234, 4234, 2234) grammars via Parse::ABNF and provides tools to :
+   * verify validity of string;
+   * generate valid messages;
+   * generate invalid messages.
+
+SYNOPSIS
+
+use ABNF::Grammar qw(Grammar);
+use ABNF::Generator qw(asStrings);
+use ABNF::Generator::Honest qw(Honest);
+use ABNF::Generator::Liar qw(Liar);
+use ABNF::Validator qw(Validator);
+
+my $grammar = Grammar->new("smtp.bnf", qw(ehlo helo mail rcpt data rset vrfy noop quit data data-terminate));
+my $valid = Validator->new($grammar);
+my $liar = Liar->new($grammar, $valid);
+my $honest = Honest->new($grammar, $valid);
+
+$valid->validate("vrfy", "string");
+
+my @strings = $liar->withoutArguments("vrfy");
+
+my $string = $liar->unExistedCommand("vrfy");
+
+my $string = $liar->endlessCommand("vrfy");
+
+my $string = $liar->generate("helo");
+
+my $string = $honest->generate("helo");
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   * Parse::ABNF => 0.05;
+   * Storable => 2.39;
+   * Method::Signatures => 20130505;
+   * Readonly => 1.03;
+   * perl >= 5.014.
+
+BUG REPORTS
+
+Please report bugs in this module via <nyaapa@cpan.org>
+
+AUTHOR / COPYRIGHT / LICENSE
+
+Copyright (c) 2013 Arseny Krasikov <nyaapa@cpan.org>.
+This module is licensed under the same terms as Perl itself.

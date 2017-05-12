@@ -1,0 +1,27 @@
+---
+abstract: 'An implementation of the Paxos protocol'
+author:
+  - 'Chris Prather <chris@prather.org>'
+build_requires:
+  File::Find: 0
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-Paxos
+requires:
+  Moose: 0
+  Moose::Role: 0
+  Sub::Exporter: 0
+  Sub::Exporter::Util: 0
+  Throwable::Error: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  perl: 5.10.0
+version: 0.001

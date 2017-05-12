@@ -1,0 +1,10 @@
+SYNOPSIS
+
+    See the included script dump-firefox-history.
+
+SEE ALSO
+
+    App::DumpChromeHistory
+
+    App::DumpOperaHistory
+

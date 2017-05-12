@@ -1,0 +1,12 @@
+<Fields>
+	<Img>aspose-words.png</Img>
+	<SenderName>Aspose.com</SenderName>
+	<RecipientName>Farooq Sheikh</RecipientName>
+	<FaxNumber>123456789</FaxNumber>
+	<PhoneNumber></PhoneNumber>
+	<Subject>Hello</Subject>
+	<Body>Test message 1</Body>
+	<Urgent>true</Urgent>
+	<ForReview>false</ForReview>
+	<PleaseComment>true</PleaseComment>
+</Fields>

@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+#
+# open - a commandline interface to launching programs via filename and URL associations.
+#
+# Please see COPYING for information on author, copyright, etc.
+#
+
+use strict;
+use warnings;
+
+use App::Open;
+use App::Open::Config;
+use Pod::Usage;
+use Getopt::Long;
+
+# macro to coerce the exit status from waitpid() output
+use POSIX qw(WEXITSTATUS); 
+
+use constant VERSION => $App::Open::VERSION;
+
+my $backend = "YAML";
+my $config  = "$ENV{HOME}/.openrc";
+my $help    = undef;
+
+GetOptions(
+    'b|backend=s' => \$backend,
+    'c|config=s'  => \$config,
+    'h|help'      => \$help,
+);
+
+sub error {
+    pod2usage(
+        {
+            -message => "@_",
+            -exitval => -1,
+            -verbose => 2,
+            -output  => \*STDERR,
+        }
+    );
+}
+
+error "You must specify a filename" unless @ARGV;
+
+$config ||= undef;
+
+if ($config && ! -f $config) {
+    error "Supplied configuration file does not exist."
+}
+
+my $c_obj;
+
+eval { $c_obj = App::Open::Config->new($config); };
+
+# XXX yes, this assignment is intentional
+if ($_ = $@) { 
+    /INVALID_CONFIGURATION/ && error "Your configuration could not be parsed.";
+    error "There was an unspecified problem handling your configuration."
+}
+
+foreach my $file (@ARGV) {
+    my $e_obj;
+
+    eval { $e_obj = App::Open->new($c_obj, $file); };
+
+    if ($_ = $@) {
+        /MISSING_ARGUMENT|INVALID_ARGUMENT/ 
+            && error "There was a problem setting up the execution internally. Please contact the author.";
+        /FILE_NOT_FOUND/
+            && error "File does not exist.";
+        /^NO_BACKEND_FOUND\s(.*)/
+            && error "There was a problem loading the backend '$1'. Please check your configuration.";
+        /BACKEND_CONFIG_ERROR/
+            && error "There was a problem with the configuration of one of your backends. Please check your configuration.";
+        error "There was an unspecified problem handling the execution."
+    }
+
+    my $return;
+    eval { $return = $e_obj->execute_program };
+
+    if ($_ = $@) {
+        /NO_PROGRAM/
+            && error "No suitable program could be found for your file.";
+        error "There was an unspecified problem trying to execute the program against your file." 
+    }
+
+    if ($return eq -1) {
+        error "The program specified for '$file' failed to execute: $!";
+    }
+
+    if (@ARGV == 1) {
+        exit WEXITSTATUS($return);
+    }
+}
+
+exit 0;
+
+=head1 open - a commandline interface to launching programs via MIME associations
+
+=head2 usage
+
+open [options] files
+
+=head2 options
+
+=over 4
+
+=item -b, --backend [MODULE]
+
+Loads a backend for finding the right program. It will first attempt to load
+App::Open::[MODULE], then [MODULE] directly. This command may be repeated for
+multiple backends to attempt resolution, first match wins.
+
+=item -c, --config [FILENAME]
+
+Specifies an alternative configuration file to the default $HOME/.openrc.
+
+=item -h, --help
+
+This help message
+
+=back
+
+=cut

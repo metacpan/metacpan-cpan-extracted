@@ -1,0 +1,13 @@
+\.swp$
+^ref
+\.svn
+a.out
+constants.xs
+functions.xs
+constant-test.xs
+Makefile$
+Makefile.old$
+predef.xs
+t/copy.wav
+test.c
+

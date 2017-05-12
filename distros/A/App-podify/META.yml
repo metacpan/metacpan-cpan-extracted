@@ -1,0 +1,27 @@
+---
+abstract: 'Add POD to your modules'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-podify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Applify: '0.12'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/jhthorsen/app-podify/issues
+  homepage: https://github.com/jhthorsen/app-podify
+  repository: https://github.com/jhthorsen/app-podify.git
+version: '0.03'

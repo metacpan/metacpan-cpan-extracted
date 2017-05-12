@@ -1,0 +1,59 @@
+Revision history for App-OTRS-CreateTicket
+
+1.16  2015-05-21
+ - Add option to add attachments to the created tickets.
+ - Specified Encode::Locale as a dependency.
+
+1.15  2015-04-22
+ - Bundle example webservice configuration file in dist. Previously I used
+   an URL to the OTRS repo but they changed file names causing breakage.
+ - Force ticket and article parameters to string in generated SOAP
+   to prevent binary serialization in some circumstances. Thanks to
+   TitovLab for reporting. Fixes Github issue #2.
+
+1.14  2014-05-28
+ - Add --PendingTime option for pending states.
+   This option takes a date in YYYY-MM-DDTHH:MM format, or a number,
+   which is handled as the number of minutes from current time.
+
+1.13  2013-11-13
+ - Add --TimeUnit option, which is required on some servers.
+     Thanks to @jensoliver for reporting!
+   Note that because of https://github.com/OTRS/otrs/pull/157
+   on OTRS systems, you might not be able to set it to '0'.
+
+1.12  2013-10-09
+ - Improve @ARGV decoding, assume utf8.
+ - Cosmetic dist impovements.
+
+1.11  2013-02-28
+ - Decode @ARGV properly, arguments now can include non-ascii chars.
+
+1.10  2013-02-27
+ - Switched to x.xx style version numbering as this is easier 
+   on CPAN.
+ - Fixed source links.
+ - Switched link to GenericTicketConnector.yml file to point to Github.
+
+1.0.7 2012-12-24
+ - Specified minimum perl version to 5.8.7 to fix test failures.
+
+1.0.6 2012-12-19
+ - Corrected POD UserLogin command line option.
+ - Improved STDIN handling.
+ - Closes file handle after reading body contents.
+
+1.0.5 2012-08-29
+ - Added option to load ticket body from a file or from STDIN.
+
+1.0.4 2012-08-28
+ - Make it work on perls < 5.16.
+
+1.0.3 2012-08-28
+ - Fixed dependencies in dist.ini.
+
+1.0.2 2012-08-28
+ - POD fix. Specified OTRS 3.1 as minimum version.
+
+1.0.1 2012-08-28
+ - Initial version packaged for CPAN.

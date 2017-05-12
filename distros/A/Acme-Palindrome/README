@@ -1,0 +1,32 @@
+NAME
+    Acme::Palindrome - Programs are the same backward and forward
+
+SYNOPSIS
+      use Acme::Palindrome;
+
+      print "Hello world";
+
+DESCRIPTION
+    The first time you run a program under "use Acme::Palindrome", the
+    module reverses the code in your source file from top to bottom, left to
+    right. The code continues to work exactly as it did before, but now it
+    looks like this:
+
+      use Acme::Palindrome;
+
+      ;"dlrow olleH" tnirp
+
+DIAGNOSTICS
+        Acme::Palindrome could not access the source file to modify it.
+
+SEE ALSO
+        Acme::Bleach - Code and documentation nearly taken verbatim.
+
+AUTHOR
+        Casey West <casey@geeknest.com>
+
+COPYRIGHT
+          Copyright (c) 2003, Casey West.  All Rights Reserved.
+          This module is free software.  It may be used under the
+          same terms as Perl itself.
+

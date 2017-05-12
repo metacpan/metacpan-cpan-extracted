@@ -1,0 +1,31 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
+
+Revision history for Acme-MetaSyntactic-soviet
+
+0.05    2016-10-21, the Styx version
+        Fifth version, released  on the 49th anniversary of the sinking of the Israeli destroyer Eilat by Styx missiles fired from Egyptian patrol boats.
+        - playing the CPANTS game: adding "strict" and "warnings" as prerequisite.
+        - add data from Dunnigan's "How to Make War" and from Clancy's "Red Storm Rising".
+
+0.04    2016-05-01, the Guideline version
+        Fourth version, released on the 56th anniversary of the downing of Gary Power's U-2 by a SA-2 Guideline.
+        - fix some issues (duplicate entries)
+        - add data from "Les Flottes de Combat 1968", SPI-TSR's "Air War", GTG's "Rolling Thunder",
+        "The Hunt for Red October" and "Fox Two".
+
+0.03    2012-09-06, the Foxbat version
+        Third version, released on the 36th anniversary of Victor Belenko's flight from USSR to Japan.
+        - Compatibility with Acme::MetaSyntactic::MultiList version 1.
+        - Loading data from POD.
+        - Adding submarines, which may be redundant with A::MS::alphabet (nato category),
+        A::MS::phonetic (x-nato category) and A::MS::roman, but has a few more entries.
+
+0.02    2012-01-02, the Fishbed version
+        Second version, released on the 45th anniversary of Operation Bolo.
+        - Various typos and sorting errors fixed.
+        - Duplicate entries removed.
+        - POD encoding clearly specified, so the website will correctly print FDC's author name.
+
+0.01    2008-10-23, the Sandal version
+        First version, released on the 46th anniversary of the blockade against Cuba
+

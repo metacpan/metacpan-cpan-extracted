@@ -1,0 +1,14 @@
+{
+	"type":"object",
+	"$schema": "http://json-schema.org/draft-03/schema",
+	"id": "#",
+	"required":true,
+	"properties":{
+		"tata": {
+			"type":"string",
+			"id": "tata",
+			"required":true
+		}
+	}
+}
+	    		

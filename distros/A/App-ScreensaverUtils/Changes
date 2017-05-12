@@ -1,0 +1,11 @@
+0.002   2017-03-31 (PERLANCAR)
+
+        - [Incompatible change] Adjust to Screensaver::Any 0.002, rename
+          is-screensaver-active to screensaver-is-active.
+
+        - Add utility: prevent-screensaver-activated.
+
+
+0.001   2017-03-30 (PERLANCAR)
+
+        - First release, supersedes App-SetScreensaverTimeout.

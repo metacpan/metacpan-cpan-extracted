@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ed25f6c50ee5a2503f6ef62d9ee82c94c851d6fc Build.PL
+SHA1 c3329f98de23b682e1fbafb1edc946b622803580 Changes
+SHA1 e62578b6e5f90550c069ec970c78070716854a23 MANIFEST
+SHA1 1d6a2ca92ed8f48681969e8534bdb115a54c2498 MANIFEST.SKIP
+SHA1 446ab9a298eb9db3e673f04e517ae18e6bd6b6d1 META.json
+SHA1 cb40f7b98ea6eb76e5266f12e7de8cf3afe864a5 META.yml
+SHA1 1b535014bd8ef6bcc19d601c59832e1a7ae2a89c README
+SHA1 38a95a72ad8aec89434f1039a1e097a9786d229d doap.ttl
+SHA1 ca75aea319eb7d8b5d2d5989d4d8f38d392bdb6d examples/synopsis.pl
+SHA1 efbb568dd8cfec9ad8a491f5315bd9268f479aeb lib/Alien/LibXML.pm
+SHA1 2899e3f85bfba09d4ff6c735f6007edc96428ccb t/00-use.t
+SHA1 1780c5c733762ebb3b8f95f7fc8a7b96fbf27cc1 t/01-compiler.t
+SHA1 f9a38f73bdfab2e77a6a599a2b1e34069bdf8f9d t/tree1.c
+SHA1 5a47c06fe899cea598786fcfe3e2ed44cd94bab3 t/tree1.xml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQYYswACgkQzr+BKGoqfTkLKwCfd9aeu3QZtxbAna30Qaa7P1nP
+6e8Amwdp7ifckJxsgyTP04bnlll7O9oc
+=dL0b
+-----END PGP SIGNATURE-----

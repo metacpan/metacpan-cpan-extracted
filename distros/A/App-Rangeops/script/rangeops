@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::Rangeops;
+
+App::Rangeops->run;
+
+=head1 OVERVIEW
+
+For help with App::Rangeops, run "rangeops help"
+
+=cut
+
+__END__
+
+perl -I lib/ script/rangeops
+
+perl -I lib/ script/rangeops sort t/II.links.tsv -o stdout
+cat t/II.links.tsv \
+    | perl -I lib/ script/rangeops sort stdin -o t/II.sort.tsv
+
+perl -I lib/ script/rangeops merge t/II.links.tsv -o stdout
+cat t/II.links.tsv \
+    | perl -I lib/ script/rangeops merge stdin -o t/II.merge.tsv
+
+perl -I lib/ script/rangeops clean t/II.sort.tsv -o stdout
+perl -I lib/ script/rangeops clean t/II.sort.tsv --bundle 500 -o stdout
+perl -I lib/ script/rangeops clean t/II.sort.tsv -r t/II.merge.tsv -o stdout
+cat t/II.sort.tsv \
+    | perl -I lib/ script/rangeops clean stdin -r t/II.merge.tsv -o t/II.clean.tsv
+perl -I lib/ script/rangeops clean t/links.sort.tsv -o stdout
+
+perl -I lib/ script/rangeops connect t/II.clean.tsv -v -o t/II.connect.tsv
+
+perl -I lib/ script/rangeops filter t/II.connect.tsv -n 2 -o stdout
+
+perl -I lib/ script/rangeops circos t/II.connect.tsv -o stdout
+perl -I lib/ script/rangeops circos t/II.connect.tsv -l -o stdout
+
+cat ~/data/alignment/Ensembl/S288c/I.fa > xt/genome.fa
+samtools faidx xt/genome.fa
+perl -I lib/ script/rangeops create xt/I.connect.tsv -g xt/genome.fa -o stdout
+perl -I lib/ script/rangeops create xt/I.connect.tsv -g xt/genome.fa --name S288c -o stdout
+
+# S288c
+perl -I lib/ script/rangeops sort S288c/links.lastz.tsv S288c/links.blast.tsv \
+    -o S288c/sort.tsv
+
+perl -I lib/ script/rangeops clean S288c/sort.tsv \
+    -o S288c/sort.clean.tsv
+
+perl -I lib/ script/rangeops merge S288c/sort.clean.tsv -c 0.95 \
+    -o S288c/merge.tsv
+
+perl -I lib/ script/rangeops clean S288c/sort.clean.tsv -r S288c/merge.tsv --bundle 500 \
+    -o S288c/clean.tsv
+
+perl -I lib/ script/rangeops connect S288c/clean.tsv -r 0.8 \
+    -o S288c/connect.tsv
+
+perl -I lib/ script/rangeops filter S288c/connect.tsv -r 0.8 \
+    -o S288c/filter.tsv
+
+wc -l S288c/*.tsv
+     229 S288c/clean.tsv
+     148 S288c/connect.tsv
+     148 S288c/filter.tsv
+     566 S288c/links.blast.tsv
+     346 S288c/links.lastz.tsv
+      74 S288c/merge.tsv
+     282 S288c/sort.clean.tsv
+     626 S288c/sort.tsv
+
+cat S288c/connect.tsv \
+    | perl -nla -F"\t" -e 'print for @F' \
+    | runlist cover stdin -o S288c/cover.yml
+
+runlist stat --size S288c/chr.sizes S288c/cover.yml -o stdout
+
+# Atha
+perl -I lib/ script/rangeops sort Atha/links.lastz.tsv Atha/links.blast.tsv \
+    -o Atha/sort.tsv
+
+perl -I lib/ script/rangeops clean Atha/sort.tsv \
+    -o Atha/sort.clean.tsv
+
+perl -I lib/ script/rangeops merge Atha/sort.clean.tsv -c 0.95 \
+    -o Atha/merge.tsv -p 5
+
+perl -I lib/ script/rangeops clean Atha/sort.clean.tsv -r Atha/merge.tsv --bundle 500 \
+    -o Atha/clean.tsv
+
+perl -I lib/ script/rangeops connect Atha/clean.tsv -o Atha/connect.tsv
+
+perl -I lib/ script/rangeops filter Atha/connect.tsv -r 0.8 \
+    -o Atha/filter.tsv
+
+wc -l Atha/*.tsv
+    4500 Atha/clean.tsv
+    3834 Atha/connect.tsv
+    3834 Atha/filter.tsv
+    3894 Atha/links.blast.tsv
+    6830 Atha/links.lastz.tsv
+     785 Atha/merge.tsv
+    5416 Atha/sort.clean.tsv
+    7754 Atha/sort.tsv
+
+cat Atha/connect.tsv \
+    | perl -nla -F"\t" -e 'print for @F' \
+    | runlist cover stdin -o Atha/cover.yml
+
+runlist stat --size Atha/chr.sizes Atha/cover.yml -o stdout

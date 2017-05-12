@@ -1,0 +1,52 @@
+
+=head1 Audio::Audiere
+
+=head1 CREDITS
+
+The t/test.wav file is from the KDE project. 
+
+=head1 INSTALL
+
+For instructions on how to install Audio::Audiere under Windows, please
+see README.win32.
+
+=head1 DEPENDENCIES
+
+You need to install the Audiere sound library from L<http://audiere.sf.net>.
+
+Then follow these steps:
+
+* untar/ungzip the package (replace 0.02 with the version you got)
+
+	tar -xzf Audio::Audiere-0.02.tar.gz
+
+* Check the signature. Download my key from http://bloodgate.com/tels.asc or
+  from my CPAN directory. Also install Module::Signature if you haven't alrady.
+  Then do in the build directory (where you unwrapped stuff):
+
+	cpansign --verify
+
+* if the signature verifies OK, proceed. Otherwise NOTIFY ME IMMIDIATELY. Do
+  NOT INSTALL THE PACKAGE! Your system might get compromised!
+
+* Build the make file:
+
+	perl Makefile.PL
+
+* Then run the testsuite:
+
+	make test
+
+If there are any test failures, please notify me. Thank you!
+
+* If all tests pass, install as root:
+
+	su
+	[enter password]
+	make install
+	exit
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

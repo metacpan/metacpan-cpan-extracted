@@ -1,0 +1,32 @@
+---
+abstract: 'Database source for Algorithm::Dependency'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0.80
+  File::Temp: 0
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Algorithm-Dependency-Source-DBI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Algorithm::Dependency: 1.102
+  DBI: 0
+  Params::Util: 0.23
+  perl: 5.005
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Algorithm-Dependency-Source-DBI
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Algorithm-Dependency-Source-DBI
+version: 1.06

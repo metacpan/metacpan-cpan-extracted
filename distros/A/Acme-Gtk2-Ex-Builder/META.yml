@@ -1,0 +1,21 @@
+---
+abstract: 'Funny Gtk2 Interface Design Module'
+author:
+  - 'Keedi Kim - 김도형 <keedi@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Gtk2-Ex-Builder
+requires:
+  Exporter: 0
+  perl: 5.010
+resources:
+  repository: http://github.com/keedi/Acme-Gtk2-Ex-Builder.git
+version: 0.008

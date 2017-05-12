@@ -1,0 +1,134 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION  @FILES);
+use Getopt::Std::Strict 'dhvb:';
+use LEOCHARRE::DEBUG;
+use Cwd;
+use Carp;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.3 $ =~ /(\d+)/g;
+
+init();
+
+do_one($_) for @FILES;
+
+exit;
+
+
+
+
+
+
+
+# - - #
+
+
+
+sub do_one {
+   my $abs = shift;
+   my $bitrate = $opt_b;   
+
+   my $abs_tmp = "$abs.tmp.mp3";
+
+   # any tags
+   my($artist,$album,$song)= _artist_album_song($abs);
+ 
+   system( 'lame' ,'-b', $bitrate, $abs, $abs_tmp ) == 0 or die($?);
+
+   if($artist){ system( 'id3tag','--artist',$artist, $abs_tmp) ==0 or die($?) }
+   if($album){ system( 'id3tag','--album',$album, $abs_tmp) ==0 or die($?) }
+   if($song){ system( 'id3tag','--song',$song, $abs_tmp) ==0 or die($?) }
+
+   system('mv',$abs_tmp,$abs) ==0 or die($?);
+
+   debug("$abs done.");   
+
+}
+
+
+sub _artist_album_song {
+   my $abs = shift;
+   $abs or croak("missing arg");
+   -f $abs or warn("not on disk: $abs") and return;
+
+
+   # any tags
+   my($artist,$album,$song);
+
+   my $out = `id3info "$abs"`;
+   $? and die("error id3info $abs , $?");
+
+
+   if( $out=~/TPE1.+\:(.+)\n/ ){
+      $artist = $1;
+      $artist=~s/^\s+|\s+$//g;
+   }
+   if ($out=~/TALB.+\:(.+)\n/ ){
+      $album = $1;
+      $album=~s/^\s+|\s+$//g;
+   }
+   if ($out=~/TIT2.+\:(.+)\n/ ){
+      $song = $1;
+      $song=~s/^\s+|\s+$//g;
+   }
+
+   debug("artist $artist, album $album, song $song");
+
+   return ($artist, $album, $song);
+}
+
+
+
+
+
+
+
+
+
+
+exit;
+
+
+
+sub usage {
+   qq{$0 - reduce mp3 size keeping basic id3 tags
+
+DESCRIPTION
+
+This will likely ruin the sound quality of any mp3 file.
+
+I had some mp3s in a package that needed to be smaller for portability.
+I wanted to keep the tags though, the basic artist, album, and song tags- if present.
+Lame did not do this by default. So.. here.
+
+OPTIONS
+
+   -d          debug on
+   -h          help
+   -v          version and exit
+   -b number   bitrate, 10 default
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+Astroboy - parent package
+
+}}
+
+sub init {
+   $::DEBUG = 1 if $opt_d;
+   $opt_h and print usage() and exit;
+   $opt_v and print $VERSION and exit;
+
+   for (grep { /\.mp3$/i } @ARGV){
+      my $abs = Cwd::abs_path($_) or die("cant resolve $_");
+      -f $abs or die("not file $abs");
+      push @FILES, $abs;
+   }
+   scalar @FILES or die("no files");
+   $opt_b ||= 10;   
+}
+
+

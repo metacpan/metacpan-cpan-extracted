@@ -1,0 +1,43 @@
+Revision history for Perl module Algorithm::BinarySearch::Vec
+
+v0.08 Thu, 01 Sep 2016 12:09:31 +0200 moocow
+	* ensure $Config{use64bitint} before setting HAVE_QUAD
+	  - should fix weird errors on e.g. 32-bit freebsd without perl -use64bitint compile-time option
+	  - compare cpantesters results
+	    ~ WITH    -use64bitint: http://www.cpantesters.org/cpan/report/749d41d2-6a1e-11e6-8807-814d1da4c10f
+	    ~ WITHOUT -use64bitint: http://www.cpantesters.org/cpan/report/228a2396-6a47-11e6-8807-814d1da4c10f
+
+v0.07 Mon, 18 Apr 2016 16:42:44 +0200 moocow
+	* added support for nbits==64; indices are still always 32-bit
+	  - for batch vector-wise search variants we'll need xs sub variants to ensure compatibility
+	* added set operations vunion(), vintersect(), vsetdiff()
+	  - intersect & setdiff optimized for merging a small set $a with a large one $b, independent of argument order: O($Na * log $Nb)
+	* re-worked tests to use Test::More
+
+v0.06 2015-04-08 moocow (no cpan release)
+	* fixed unrespected strict imin checking in absv_bsearch_lb()
+
+v0.05 2012-10-31  moocow
+	* added Changes (fixes RT #80502)
+	* tweaked 'use vars' line in t/01_ini.t (perl 5.6.2 choked)
+	  - see http://www.cpantesters.org/cpan/report/67845932-1927-11e2-8c89-c5fec1a37597
+
+v0.04 2012-10-17  moocow
+	* fixed vXbsearch_lb() for ilo==imin with v[ilo]<key
+	* added test for ilo==imin with v[ilo]<key
+	* updated docs
+
+v0.03 2012-10-10  moocow
+	* fixed consistency errors
+	* updated docs
+
+v0.02 2012-10-09  moocow
+	* added vv* functions (vec-wise search, returns 32-bit index-vec)
+	* renamed to top-level Algorithm::BinarySearch::Vec
+	* cleaned up for cpan release
+	* added README, docs
+	* got tests working
+
+v0.01 2012-10-08 moocow
+	* fast binary search on perl vec() vectors
+	* original version as Algorithm::BinarySearch::Vec::XS

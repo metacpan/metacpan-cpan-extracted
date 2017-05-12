@@ -1,0 +1,197 @@
+#!/usr/bin/perl
+
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2015-2016 -- leonerd@leonerd.org.uk
+
+use strict;
+use warnings;
+
+use App::MatrixTool;
+exit App::MatrixTool->run( @ARGV );
+
+=head1 NAME
+
+matrixtool - commands to interact with a Matrix home-server
+
+=head1 SYNOPSIS
+
+ $ matrixtool server-key matrix.org
+
+=head1 DESCRIPTION
+
+This command provides a wrapper around a number of sub-commands that provide
+useful interactions with a Matrix home-server.
+
+The individual sub-commands are listed below:
+
+=head1 COMMANDS
+
+=head2 client
+
+Commandline client utilities
+
+   $ matrixtool client COMMAND [...]
+
+Options:
+
+=over 4
+
+=item * --server (-s)
+
+Server
+
+=item * --user-id (-u)
+
+User ID
+
+=item * --user-id-parameter (-U)
+
+'user_id' query parameter override
+
+=back
+
+See also L<App::MatrixTool::Command::client>.
+
+=head2 client json
+
+Perform a direct JSON request
+
+   $ matrixtool client json PATH [DATA]
+
+Options:
+
+=over 4
+
+=item * --method (-m)
+
+HTTP method
+
+=back
+
+See also L<App::MatrixTool::Command::client::json>.
+
+=head2 client list-rooms
+
+List the rooms the user is in
+
+   $ matrixtool client list-rooms 
+
+See also L<App::MatrixTool::Command::client::list_rooms>.
+
+=head2 client login
+
+Obtain a client authentication token
+
+   $ matrixtool client login USER [PASSWORD]
+
+See also L<App::MatrixTool::Command::client::login>.
+
+=head2 client sync
+
+Follow the /sync event stream
+
+   $ matrixtool client sync 
+
+Options:
+
+=over 4
+
+=item * --initial (-i)
+
+Print the initial sync result too
+
+=back
+
+See also L<App::MatrixTool::Command::client::sync>.
+
+=head2 client upload
+
+Upload a file to the media repository
+
+   $ matrixtool client upload FILE [TYPE]
+
+See also L<App::MatrixTool::Command::client::upload>.
+
+=head2 directory
+
+Look up room alias to room ID entries
+
+   $ matrixtool directory ALIAS
+
+Options:
+
+=over 4
+
+=item * --servers (-s)
+
+Include list of candidate servers
+
+=back
+
+See also L<App::MatrixTool::Command::directory>.
+
+=head2 help
+
+Display help information about commands
+
+   $ matrixtool help [COMMAND...]
+
+See also L<App::MatrixTool::Command::help>.
+
+=head2 notary
+
+Fetch a server's signing key via another server
+
+   $ matrixtool notary SERVER-NAME VIA
+
+See also L<App::MatrixTool::Command::notary>.
+
+=head2 resolve
+
+Look up hostnames or IP addresses of a server
+
+   $ matrixtool resolve SERVER-NAME
+
+Options:
+
+=over 4
+
+=item * --address (-a)
+
+Resolve hostnames into IP addressese
+
+=back
+
+See also L<App::MatrixTool::Command::resolve>.
+
+=head2 server-key
+
+Fetch a server's signing key
+
+   $ matrixtool server-key SERVER-NAME
+
+Options:
+
+=over 4
+
+=item * --no-store (-n)
+
+Don't cache the received key in the key store
+
+=item * --v1 (-1)
+
+Restrict to the v1 key API
+
+=item * --v2 (-2)
+
+Restrict to the v2 key API
+
+=back
+
+See also L<App::MatrixTool::Command::server_key>.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

@@ -1,0 +1,41 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+
+NAME
+    AudioCD - Module for basic Audio CD control
+
+SYNOPSIS
+        use AudioCD;
+        # see below
+
+DESCRIPTION
+    See `AudioCD::Mac' for more information. Right now, this module has
+    support only for MacPerl. Please feel free to write other modules for
+    Your Favorite Platform and let me know about it.
+
+AUTHOR
+    Chris Nandor <pudge@pobox.com> http://pudge.net/
+
+    Copyright (c) 1998 Chris Nandor. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself. Please see the Perl Artistic License.
+
+VERSION
+    v0.20, Wednesday, December 9, 1998
+        Renamed to `AudioCD', added controls for Audio CD.
+
+    v0.10, Thursday, October 8, 1998
+        First version, made for Mac OS to get CDDB TOC data.
+
+SEE ALSO
+    CDDB.pm
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0 for non-commercial use <http://www.pgp.com>
+Charset: noconv
+
+iQCVAwUBNm7suShcZja3bnKtAQH6zgQApPpfNO5+DZmwzjUprBZBRlsx1omi0R1E
+uMfkWAIP1Sb6zUpyh5Byb77NxfVgX5nFKv9t38sQzxZNTKZnoIU6JzJZ9vzjzYbP
+cTU9WJBTodXnBEkcX0lDCQzkw/BOMfUkxJQ3N5t7YFQyB7L32dETDCvq1poJDXBg
+50hAAXfzD9Y=
+=PUSZ
+-----END PGP SIGNATURE-----

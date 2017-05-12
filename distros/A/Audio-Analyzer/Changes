@@ -1,0 +1,25 @@
+0.22 July 19, 2013
+    * Incorporated patch from mikegrb which closes RT #68543 
+      "Documentation problem with Audio::Analyzer::Chunk"
+    * Fix dead links to example media in documentation; new urls:
+        * http://www.youtube.com/watch?v=W8Jk8rTP5lg
+        * http://www.youtube.com/watch?v=6yTEUBgvxs4
+        * http://www.youtube.com/watch?v=bFp2zZlFgv4 
+    * Add in fileless operation mode as undocumented feature
+
+0.20 May 16, 2009
+    * Removed plug for musicwatcher from documentation
+
+0.1	May 18, 2008
+    * Added tests against a few moments of sin wave.
+    * Set version to 0.1 since things have been fairly stable.
+
+0.03 Dec 9, 2007
+    * Slight documentation updates.
+
+0.02 Feb 20 2007
+    * Added Audio::Analyzer::Chunk.
+    * Interface changes to support Audio::Analyzer::Chunk (sorry).
+
+0.01 Feb 16 2007
+    * A new module is released into an unsuspecting wild. 

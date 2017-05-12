@@ -1,0 +1,21 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::KTC_PRINCIPAL;
+use AFS::Cell qw(expandcell);
+
+die "Usage: $0 principal\n" if ($#ARGV != 0);
+
+my $name = shift;
+
+my $princ = AFS::KTC_PRINCIPAL->new($name);
+
+$princ->cell(expandcell($princ->cell));
+
+print "name      = ", $princ->name, "\n";
+print "instance  = ", $princ->instance, "\n";
+print "cell      = ", $princ->cell, "\n";
+print "principal = ", $princ->principal, "\n";

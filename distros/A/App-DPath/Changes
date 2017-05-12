@@ -1,0 +1,54 @@
+Revision history for App-DPath
+
+0.10      2017-02-17
+        - new input type -i 'taparchive' backed by TAP::DOM::Archive
+
+0.09      2015-09-30
+        - generalize the use of YAML with an option --yaml-module
+        - and throw away again format 'yaml10' which I just invented an
+          hour ago in version 0.08
+        - by default it still does not use 'YAML::Syck' though
+
+0.08      2015-09-30
+        - no longer use YAML::Syck to handle input/output format 'yaml'
+          (blacklisted for YAML::Any which we use in behind the scenes)
+        - new input/output format 'yaml10' which uses YAML::Syck
+
+0.07      2015-08-03
+        - Adjust quoting to pass windows testing [Lance A. Brown]
+        - Search all YAML docs instead of just the last one [Michael Carman]
+
+0.06      2014-03-16
+        - same as 0.05; uploaded again without nytprof dumps
+
+0.05      2014-03-16
+        - -i tap assumes TAP version 13
+          (with TAP::Parser 3.22+)
+        - migrate from App::Cmd to App::Rad
+
+0.04      2012-04-13
+  [Maintenance]
+  - use Dist::Zilla for building
+
+  [new input/output formats]
+  - fix RT#76018: Please provide a UNIX shell friendly output format
+    * intoduce new output format 'flat' for typical 1 or 2 level
+      scalar/hash/array data structures
+  - fix RT#76017 - INI output format broken
+    * now use Config::INI::Serializer
+
+  [bugfixes]
+  - use YAML::Any to decide which YAML to use
+  - "die" instead of "exit" on error
+
+0.03      2009-10-01
+  - add new input type "cfggeneral" for Config::General files
+  - fix JSON tests to now work with explicit unbless
+  - test suite cleanup
+
+0.02      2009-04-26
+  - cleanup docs
+  - add data format "xml" (via XML::Simple)
+
+0.01      2009-04-25
+  - initial version

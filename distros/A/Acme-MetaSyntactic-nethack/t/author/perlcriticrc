@@ -1,0 +1,34 @@
+# Make things as strict as possible.
+severity = 1
+
+# Tags are good enough for me.
+[-Miscellanea::RequireRcsKeywords]
+
+# No Emacs around here.
+[-Editor::RequireEmacsFileVariables]
+
+# Need to write CodeLayout::RequireUTF8
+[-CodeLayout::RequireASCII]
+
+# Perl::Tidy wouldn't know a properly formatted conditional expression
+# if one stomped all over Perl::Tidy.pm.  (Not to say that P::T isn't
+# useful.)
+[-CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | DESCRIPTION | DIAGNOSTICS | CONFIGURATION AND ENVIRONMENT | DEPENDENCIES | INCOMPATIBILITIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT | DISCLAIMER OF WARRANTY
+
+# Need __DATA__ section, so this can't be complied with.
+[-Documentation::RequirePodAtEnd]
+
+# Magic numbers BAD.  (It doesn't hurt that I wrote this policy.)
+[ValuesAndExpressions::ProhibitMagicNumbers]
+severity = 4
+
+# For some reason, this chokes on v-strings within a version constructor
+# and I don't have time to chase this down.
+[-Modules::PerlMinimumVersion]
+
+# setup nethack: set filetype=conf tabstop=4 softtabstop=4 expandtab :
+# setup nethack: set shiftwidth=4 shiftround textwidth=0 nowrap autoindent :
+# setup nethack: set foldmethod=indent foldlevel=0 :

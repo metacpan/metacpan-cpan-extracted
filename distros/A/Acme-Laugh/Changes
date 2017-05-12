@@ -1,0 +1,17 @@
+Revision history for Acme-Laugh
+
+0.0.1  Sat Dec 10 22:56:46 2005
+       Initial release.
+
+0.0.2  Sat Dec 10 23:44:46 2005
+       Learnt to use Exporter - mbwawhahwhawah 
+
+0.0.3  Tue Dec 13 03:00:00 2005
+       Got rid of starter line for POD tests
+
+0.0.4  Mon Sep 03 11:58:00 2007
+       Tried to improve kwalitee. Added example plugin for xchat.
+
+0.0.5  Sun Jul 21 14:40:00 2013
+       Added encoding directive to POD.
+       Removed tests for POD for normal user.

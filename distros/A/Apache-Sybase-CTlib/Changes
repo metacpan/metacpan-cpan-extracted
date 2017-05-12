@@ -1,0 +1,14 @@
+Revision history for Perl extension Apache::Sybase::CTlib.
+
+0.01  Wed Aug 26 11:58:46 1998
+	- original version; created by h2xs 1.18
+
+1.01 
+	- original release version to CPAN
+
+1.02  Fri Sep 11 11:38:11 PDT 1998
+	- added a "use db" call after the connection is established. This is
+	  an optional parameter.
+
+2.00  Wed Nov 19 7:15:00 PST 2003
+	- minor modifications and name change to work with ModPerl2.0

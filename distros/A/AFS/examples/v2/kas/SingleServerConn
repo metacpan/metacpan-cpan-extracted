@@ -1,0 +1,31 @@
+#!/usr/local/bin/perl
+
+use blib;
+use Time::localtime;
+use AFS::KAS;
+use AFS::KTC_PRINCIPAL;
+use AFS::KTC_TOKEN;
+use AFS::KTC_EKEY;
+use AFS::Cell qw(localcell);
+use AFS qw(checkafs raise_exception setpag);
+
+die "Usage: host admin user\n" if ($#ARGV != 2);
+
+raise_exception(1);
+
+setpag;
+
+my $host  = shift;
+my $princ = AFS::KTC_PRINCIPAL->new(shift);
+my $user  = AFS::KTC_PRINCIPAL->new(shift);
+my $key   = AFS::KTC_EKEY->ReadPassword("Admin Password:");
+my $token = AFS::KTC_TOKEN->GetAdminToken($princ, $key, 300);
+my $kas   = AFS::KAS->SingleServerConn($host, $token, &AFS::KA_MAINTENANCE_SERVICE);
+
+my $entry = $kas->getentry($user->name, $user->instance);
+
+print "\n\nUser data for ", $user->name, $user->instance, ": \n";
+foreach my $tp_key (sort keys %$entry) {
+  printf("%20s  %s\n",$tp_key, $$entry{$tp_key});
+
+}

@@ -1,0 +1,9 @@
+0.06 - 17.12.2014 17:14
+    Fixed tests for cpantesters.
+
+0.05 - 24.12.2014 22:27
+    Removed shebangs from tests.
+
+0.04 - 23.12.2014
+	Initial version.
+

@@ -1,0 +1,112 @@
+#!perl
+use strict;
+use warnings;
+use 5.014;
+
+use Future;
+use Path::Class;
+use File::Which qw(which);
+use Cwd qw(getcwd);
+use App::Multigit;
+use Getopt::Long qw(:config gnu_getopt require_order);
+use Pod::Usage;
+use Try::Tiny;
+
+sub usage;
+
+{
+    my $qs = 0;
+    GetOptions(
+        help => \&usage,
+        'quiet|q' => sub {
+            # Can't use + for this because -v needs to counteract it.
+            $qs++;
+        },
+        'verbose|v' => sub {
+            $qs--;
+        },
+        'concurrent|c=i' => \$ENV{MG_CONCURRENT_PROCESSES},
+        'skip-readonly' => \$ENV{MG_SKIP_READONLY},
+        'output-only|o' => \$ENV{MG_OUTPUT_ONLY},
+    );
+
+    if ($qs > 0) {
+        $ENV{MG_REPORT_ON_NO_OUTPUT} = 0;
+    }
+    if ($qs > 1) {
+        $ENV{MG_IGNORE_STDERR} = 1;
+    }
+}
+
+my $cmd = shift or usage 1;
+
+if ($cmd eq 'help') {
+    # mg help is just usage
+    $cmd = shift or usage;
+
+    @ARGV = '--help';
+}
+else {
+    # mg-init may be run in a new mg, or in an existing one.
+    my @workdir = try { '--workdir', App::Multigit::mg_parent } catch {};
+
+    unshift @ARGV, @workdir;
+}
+
+my $mg_cmd = which("mg-$cmd") // die "$cmd is not an mg command.\n";
+
+exec $mg_cmd, @ARGV
+    or die "Failed to exec $mg_cmd: $!";
+
+sub usage {
+    my $exitcode = shift // 0;
+    pod2usage({ -exitcode => $exitcode, -verbose => 2 });
+}
+
+=head1 SYNOPSIS
+
+    mg [options] command [command-options]
+    mg help [command]
+
+Runs mg-$command, which may or may not run something in each repository.
+
+C<options> control the environment of mg itself; C<command-options> control the
+specific command. Each command will accept its own set of options, so see 
+C<mg help $command> for those.
+
+=head1 OPTIONS
+
+=over
+
+=item -q 
+
+=item --quiet
+
+Repeatable option. First occurrence prevents reporting on repositories
+that had no output; second occurrence stifles stdout from all streams
+before applying the effect of the first occurrence.
+
+=item -v
+
+=item --verbose
+
+Repeatable option. Every occurrence of -v will counteract an occurrence
+of -q, so if you have some environment stuff going on you can override
+it.
+
+=item --concurrent=N
+
+=item -c N
+
+Limit concurrency to N processes at once. This is often a good idea when
+using `mg each` with a bunch of repositories that point to the same
+server; if you cannot have more than N connections to the server, you
+probably don't want to connect to it more than N times. That's when you
+might use this.
+
+=item --skip-readonly
+
+Skip readonly repositories.  Repositories marked readonly = 1 in the .mgconfig
+will be ignored by whatever command you run.
+
+=back

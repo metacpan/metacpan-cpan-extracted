@@ -1,0 +1,46 @@
+{
+   "abstract" : "objects whose behaviour is determined by attempts to inspect or interact with it.",
+   "author" : [
+      "Daniel Perrett <perrettdl@googlemail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Cat-Schroedinger",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Cat::Schroedinger" : {
+         "file" : "lib/Acme/Cat/Schroedinger.pm",
+         "version" : "1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1"
+}

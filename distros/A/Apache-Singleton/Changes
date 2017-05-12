@@ -1,0 +1,65 @@
+Revision history for Perl extension Apache::Singleton.
+
+0.16  2014-11-07
+    - fix signature test due to MYMETA.* in new EU::MM
+    - Work around global destruction order issue by integrating on proposed
+      patch to Class::Singleton [#68534] (Thanks Steve Hay!)
+
+0.15  2012-04-02
+    - fixed test: limit MaxClient to 1. process/printer_instance.t expects the
+      same apache to handle each request. [RT 76244]
+
+0.14  2011-12-06
+    - load Apache::Singleton::Request if necessary [RT 71218]
+    - note that PerlOptions +GlobalRequest is required for
+      Apache::Singleton::Request
+
+0.13  2011-05-29
+    - No changes. Rebuild tarball in WinZip compatible way.
+
+0.12  2011-05-28
+    - Use Dist::Zilla for distribution building
+    - Copy args passed to instance() to constructor
+
+0.11  Tue Nov 24 2009
+    - added real test suite using Apache::Test
+    - reorganized test files
+    - removed _delegator() from Apache::Singleton.  it causes problems under
+      MP2
+
+0.10  Sun Nov 22 2009
+  *** new maintainer: Michael Schout <mschout@cpan.org>
+    - updated Makefile.PL
+    - added META_MERGE to Makefile.PL
+    - update so mod_perl2 2.0 >= RC5 is supported
+    - split out test mocks into t/lib
+    - add mod_perl2 tests
+    - sign the dist, add signature test
+    - check for mod_perl version in Makefile.PL.
+        if mod_perl2, require >= 1.9922
+    - update README
+    - remove META.yml from repo, make dist generates it
+
+0.06  Tue Oct 19 17:29:05 JST 2004
+    - removed dependency on Cache::Cache in Makefile.PL
+    * Added mod_perl2 support
+      Thanks to Frank Wiles <frank@wiles.org>
+
+0.05  Tue Dec 25 05:59:55 JST 2001
+    - Compatibility: defaults to Process in non-mod_perl environment
+
+0.04  Sun Dec 23 21:20:04 JST 2001
+    - Fixed docs
+    - pulled off Server subclass: it was completely broken
+
+0.03  Sat Dec 22 22:29:50 JST 2001
+    - Added test for multiple classes
+    * Added Request, Process, Server subclasses
+
+0.02  Sat Dec 22 16:58:34 JST 2001
+    - use pnotes instead of register_cleanup
+      (Thanks to Perrin Harkins <perrin@elem.com>)
+
+0.01  Thu Dec 20 12:45:29 2001
+    - original version; created by h2xs 1.19
+

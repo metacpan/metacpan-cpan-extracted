@@ -1,0 +1,29 @@
+[% META title = "EVENT" %]
+<p>
+<table >
+	<tr align='left'>
+		<th>ID</th><th>USER</th><th>ACTION</th><th>DESC</th><th>TIME</th>
+	</tr>
+	[% WHILE (event = events.next) %]
+	<tr>
+		<td>[% event.id%]</td>
+		<td>[% event.uid%]</td>
+		<td>[% event.content%]</td>
+		<td><span id="event_object">[% event.target %]</span></td>
+		<td>[% event.e_time%]</td>		
+	</tr>
+	[% END %]
+</table>
+<a href="[% Catalyst.uri_for('/user/history')%]?page=[% pager.first_page %]">
+First</a>
+[% IF (pager.previous_page) %]
+<a href="[% Catalyst.uri_for('/user/history')%]?page=[% pager.previous_page %]">
+Previous</a>
+[% END %]
+[% IF (pager.next_page) %]
+<a href="[% Catalyst.uri_for('/user/history')%]?page=[% pager.next_page %]">
+Next</a>
+[% END %]
+<a href="[% Catalyst.uri_for('/user/history')%]?page=[% pager.last_page %]">
+Last</a>
+</p>

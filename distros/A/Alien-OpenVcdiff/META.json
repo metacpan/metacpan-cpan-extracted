@@ -1,0 +1,51 @@
+{
+   "abstract" : "Build and install open-vcdiff, a binary diff/patch library",
+   "author" : [
+      "Doug Hoyte <doug@hcsw.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-OpenVcdiff",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.003",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::OpenVcdiff" : {
+         "file" : "lib/Alien/OpenVcdiff.pm",
+         "version" : "0.101"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoytech/Alien-OpenVcdiff/issues"
+      },
+      "homepage" : "https://github.com/hoytech/Alien-OpenVcdiff",
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/hoytech/Alien-OpenVcdiff.git"
+      }
+   },
+   "version" : "0.101"
+}

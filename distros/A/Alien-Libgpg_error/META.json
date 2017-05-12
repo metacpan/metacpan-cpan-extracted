@@ -1,0 +1,48 @@
+{
+   "abstract" : "Download, configure, build and install libgpg-error automagically!",
+   "author" : [
+      "Salvador FandiÃ±o <sfandino@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Libgpg_error",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0.024",
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Libgpg_error" : {
+         "file" : "lib/Alien/Libgpg_error.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

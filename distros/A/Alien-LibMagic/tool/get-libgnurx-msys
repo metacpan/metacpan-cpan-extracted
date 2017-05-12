@@ -1,0 +1,10 @@
+#!/bin/sh
+
+CURDIR=`dirname "$0"`
+cd "$CURDIR"
+
+TARGET_DIR="../inc/" # relative to $CURDIR
+mkdir "$TARGET_DIR"
+
+wget -P "$TARGET_DIR" -c http://prdownloads.sourceforge.net/mingw/mingw-libgnurx-2.5.1-bin.tar.gz
+wget -P "$TARGET_DIR" -c http://prdownloads.sourceforge.net/mingw/mingw-libgnurx-2.5.1-dev.tar.gz

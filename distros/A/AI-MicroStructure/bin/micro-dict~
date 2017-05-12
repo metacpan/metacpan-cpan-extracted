@@ -1,0 +1,74 @@
+#!/bin/bash
+IFS=$'\n';
+
+#REMOVETHESE="gov|search|cid|aaa|bbb|ccc|ddd|eee|fff|ggg|hhh|iii|jjj|kkk|lll|mmm|nnn|ooo|ppp|qqq|rrr|sss|ttt|eee|fff|ggg|hhh|iii|jjj|kkk|lll|mmm|nnn|ooo|ppp|qqq|rrr|sss|ttt|uuu|vvv|www|xxx|yyy|zzz|org|wiki|png|jpg|thumb|pdf|ref|idx|php|html|json|abc|wmf|gif|jpg|images|svg|upload|ebi|cgi|commons|index|title|skins|static|action|commons"
+#  egrep -v "($REMOVETHESE)" |
+
+                                    #+ options to sort. Changed from
+
+
+
+
+stop=$(perl -MAI::MicroStructure::WordBlacklist -E  "my \$s=AI::MicroStructure::WordBlacklist::getStopWords('de'); my @s = keys %\$s; print join('|',@s);")
+
+
+
+function uniquemmasher(){
+
+if [ -f "$1" ]
+then                                #+ valid file argument.
+cmd=cat
+else
+cmd=echo
+fip
+
+
+
+stop=$(perl -MAI::MicroStructure::WordBlacklist -E  "my \$s=AI::MicroStructure::WordBlacklist::getStopWords('de'); my @s = keys %\$s; print join('|',@s);")
+
+res=$($cmd $1 |   tr A-Z a-z |                # Convert to lowercase.
+        tr ' ' '_' |             # New: change spaces to newlines.
+        tr -c '\012a-z'  '\012' |   #  Rather than deleting non-alpha
+        egrep -v "^[ ]*([A-Za-z][A-Za-z]|[A-Za-z])$" | egrep -v "^$");
+
+
+
+             echo "$res"
+
+
+
+
+}
+
+function masher(){
+
+if [ -f "$1" ]
+then                                #+ valid file argument.
+cmd=cat
+else
+cmd=echo
+fi
+
+$cmd $1 | tr A-Z a-z |                # Convert to lowercase.
+        tr ' ' '\012' |             # New: change spaces to newlines.
+   #    tr -cd '\012[a-z][0-9]' |   #  Get rid of everything
+                                    #+ non-alphanumeric (in orig. script).
+        tr -c '\012a-z'  '\012' |   #  Rather than deleting non-alpha
+                                    #+ chars, change them to newlines.
+        egrep -v '^#' |              # Delete lines starting with hashmark.
+        egrep -v "^[ ]*([A-Za-z][A-Za-z]|[A-Za-z])$" |
+        egrep -v '^$'
+
+
+
+
+}
+
+
+if [ "$2" == 1 ]                    #  Need at least one
+then
+uniquemmasher $*;
+else
+masher $*;
+fi
+exit 0

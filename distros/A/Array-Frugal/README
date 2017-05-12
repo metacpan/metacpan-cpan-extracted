@@ -1,0 +1,21 @@
+Array-Frugal version 0.01
+=========================
+
+an array that grows only as large as the number of
+defined elements, and re-uses slots from which the 
+data has been deleted.
+
+
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by david
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,58 @@
+0.0404  2016-02-09
+        - Fix an obscure and unhelpful run on "docmake pdf" without an "-o"
+        flag.
+            - With tests.
+
+0.0403  2014-01-26
+        - Remove the Makefile.PL - not we are Build.PL only.
+        - Set minimal version of perl to be 5.008 (5.8.0).
+            - Kwalitee
+
+0.0402  2013-05-21
+        - Remove trailing space - t/style-trailing-space.t .
+        - Update the repository in Build.PL .
+        - Add script/bump-version-number.pl .
+
+0.0401  2012-09-05
+        - Move away tag-release.pl under script.
+            - This way it hopefully won't be installed by overzelous
+            installation procedures such as Mageia Linux's.
+        - Dying on a failed system() command.
+
+0.0400  2011-12-25
+        - Add support for --basepath
+        - Made the -o flag optional, and excluding it from xsltproc if it's
+        not specified (there are other ways to specify the output with
+        xsltproc and XSLT).
+            - These two changes were intended for adapting docmake to
+            building DocBook 5.
+
+0.0300  2011-04-20
+        - Add support for the xhtml-1_1 mode.
+        - Add the tag-release.pl script.
+
+0.0201  2009-06-30
+        - Fixed --make with xhtml - previously it didn't build the
+        xhtml at all.
+        - Got rid of some warnings in the --make flag with the is_older
+        flag. Made _is_older more robust.
+
+0.0200  2009-06-28
+        - Removed the "all rights reserved" copyright language - it's not
+        compatible with the MIT/X11 License anyway.
+        - Added the COPYING file.
+        - Added 'create_makefile_pl' to the Build.PL.
+        - Added meta_merge resources and keywords to Build.PL.
+
+0.0101  2009-04-01
+        - now accepting a --stringparam empty.param="" notation for empty
+        string parameters.
+        - changed the license in Build.PL from 'bsd' to 'mit' because it's:
+            - 1. More accurate.
+            - 2. Does not error on my system.
+
+0.01    2008-07-11
+        - First version.
+        - Has "fo", "xhtml", "pdf" and "rtf" modes.
+        - Some flags.
+        - PODs, help, etc.

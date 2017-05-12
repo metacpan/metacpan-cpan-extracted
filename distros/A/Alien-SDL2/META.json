@@ -1,0 +1,81 @@
+{
+   "abstract" : "Get, Build and Use SDL2 libraries",
+   "author" : [
+      "Kartik Thakore <KTHAKORE@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-SDL2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Digest::SHA" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Fetch" : "0.24",
+            "File::Find" : "0",
+            "File::Path" : "2.08",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.23",
+            "File::Which" : "0",
+            "Module::Build" : "0.36",
+            "Text::Patch" : "1.4"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Digest::SHA" : "0",
+            "File::Fetch" : "0.24",
+            "File::Find" : "0",
+            "File::Path" : "2.08",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "IPC::Run3" : "0",
+            "Module::Build" : "0.36",
+            "Text::Patch" : "1.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "File::Temp" : "0.23",
+            "File::Which" : "0",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::SDL2" : {
+         "file" : "lib/Alien/SDL2.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/PerlGameDev/SDL2/issues?labels=Alien-SDL2"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/PerlGameDev/Alien-SDL2"
+      }
+   },
+   "version" : "0.002"
+}

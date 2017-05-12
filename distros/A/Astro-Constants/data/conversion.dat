@@ -1,0 +1,18 @@
+# conversion.dat
+#	constants of conversion from one unit to another
+#
+# Format: variable<tab>description<tab>CGS value<tab>MKS value
+#    or   variable<tab>description<tab>value
+#
+A_amu	ATOMIC_MASS_UNIT	atomic mass unit	1.660539040e-24	1.660539040e-27	1.2e-8
+A_eV	ELECTRON_VOLT	electron volt	1.6021766208e-12	1.6021766208e-19	6.1e-9
+# http://www.iau.org/static/resolutions/IAU2012_English.pdf for parsec and AU
+# check precision in parsec
+A_pc	PARSEC	parsec	3.08567758149e18	3.08567758149e16	1e-11
+A_AU	ASTRONOMICAL_UNIT	astronomical unit	1.496e13	149_597_870_700	0
+A_ly	LIGHT_YEAR	light year	9.4607304725808e17	9_460_730_472_580_800	0
+A_AA	ANGSTROM	Angstrom	1e-8	1e-10	0
+A_Jy	JANSKY	Jansky	1e-23	1e-26	0
+A_NA	AVOGADRO	Avogadro's number	6.022140857e23	1.2e-8
+# astronomical year 365.25 days
+A_yr	YEAR	year	31_557_600	0

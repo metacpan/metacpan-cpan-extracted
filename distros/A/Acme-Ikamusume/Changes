@@ -1,0 +1,39 @@
+Revision history for Perl extension Acme::Ikamusume
+
+0.08 2016-09-11T09:15:19Z
+        - rewrite with Text::Mecabist
+        - Ikachan forever...!
+
+0.07  Thu Apr  5 11:03:31 JST 2012
+        - Hide T::MeCab::Node from pause (ty wchristian)
+          https://github.com/CPAN-API/metacpan-web/issues/524#issuecomment-4953663
+
+0.06  Mon Dec 20 15:08:03 JST 2010
+        - change verb(original form) + postp = GESO + postp
+        - understands meaning of the symbols
+        - add long IKA pattern
+        - add IKAN pattern
+        - add few words into userdic
+        - more MASU formal to casual pattern
+        - more lovely ebi accent
+
+0.05  Tue Dec 14 03:44:57 JST 2010
+        - 0 but ture bugfix
+        - add no honorific rule
+        - add GESO replace rule
+
+0.04  Mon Dec 13 09:22:06 JST 2010
+        - more GESO
+        - more IKA (postp KA)
+        - fix DA + postp
+        - fix EBI accent rule on unknown word
+
+0.03  Sat Dec 11 23:25:15 JST 2010
+        - add ONUSHI to userdic
+        - typo fix
+
+0.02  Sat Dec 11 15:04:11 JST 2010
+        - first release
+
+0.01  
+        - original version

@@ -1,0 +1,43 @@
+Revision history for App-Taskflow
+
+1.0 2013-01-14
+
+    * one file script `tasklet` with minimal dependencies added.
+
+0.9 2012-12-01
+
+    * bug fixed in case of daemonize() - now waiting infinitely
+    * long options added to POD
+
+0.8 2012-11-27
+
+    * child PID is written now in a pid_file - close was missing
+    * reduced dependencies - 'IPC::Cmd' and 'autodie' removed
+
+0.7 2012-08-28
+    
+    * due to using new regex features, restricted to v5.10 and above.
+
+0.6 2012-08-16
+
+    * Undeclared dependency on autodie added, report 22959735
+
+0.5 2012-07-30
+
+    * make it compatible for pre v5.14 versions
+
+0.4 2012-07-29
+
+    * Few enhancements: taskflow script added to installation processs
+
+0.3 2012-07-29
+
+    * dependencies added
+
+0.2 2012-07-27
+
+    * main module missing - added
+
+0.1 2012-07-27
+
+    * First version, released on an unsuspecting world.

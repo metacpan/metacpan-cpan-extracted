@@ -1,0 +1,36 @@
+---
+abstract: 'Detect missing streams or attributes'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  File::Slurp: '0'
+  File::Temp: '0'
+  IPC::Transit: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-MultiModule-Tasks-Heartbeat
+requires:
+  App::MultiModule::Task: '0'
+  App::MultiModule::Test: '0'
+  Data::Dumper: '0'
+  Message::Match: '0'
+  Message::Transform: '0'
+  POSIX: '0'
+  Storable: '0'
+  Test::More: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dana/perl-App-MultiModule-Tasks-Heartbeat/issues
+  homepage: https://github.com/dana/perl-App-MultiModule-Tasks-Heartbeat
+  repository: https://github.com/dana/perl-App-MultiModule-Tasks-Heartbeat.git
+version: '1.161950'

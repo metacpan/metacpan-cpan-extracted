@@ -1,0 +1,20 @@
+abstract: Replaces your ugly Perl code with powerful XML
+author: Original code by Dan Brooks
+build_requires:
+  File::Spec: 0.80
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.62
+license: perl
+name: Acme-PerlML
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  PPI: 1.002
+  Perl::SAX: 0.06
+  XML::Parser::PerlSAX: 0
+  XML::SAX: 0
+  perl: 5.005
+version: 1.00

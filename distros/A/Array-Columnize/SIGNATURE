@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ceb0f2ee2166aeca163b376aaf330827a077d6fc Build.PL
+SHA1 c19d9896843f1e028a1f481d8ea49ca8422b3f5c ChangeLog
+SHA1 aeb7733cd182d36bf5859732e08ed181b62b9fb1 Changes
+SHA1 2dd78ffb024dc92047f956ff6d6d450b8bc58cca GNUmakefile
+SHA1 f1d1732c3159f52d3cc2a0f31f4358bceeb07f72 MANIFEST
+SHA1 f0303daea3e40dfa3338afd29ccf1d1114a88b60 META.json
+SHA1 4ad20e1e6b81acf68ec848b4178524077b0e6fcd META.yml
+SHA1 9fa7916b771b6b22d684acab640dcea37b5e0624 Makefile.PL
+SHA1 2ba9d3ca762dc4e74bd95fb4282d36262f5c739e README.md
+SHA1 8647b636e5a29e0a83d49c37b36726a87214c583 eg/example.pl
+SHA1 e86b93934ed213bc9a6dccb3848923b01ab456b5 lib/Array/Columnize.pm
+SHA1 07ce2ea0b7b79d71488feca8404d63c35382feb5 lib/Array/Columnize/columnize.pm
+SHA1 b27525e3218cb1a9fb6f1875c2c7dc1973435f32 lib/Array/Columnize/options.pm
+SHA1 0028fef9be7783d9eba29ae4d3940cc99cc8d14e t/00.test-pod.t
+SHA1 5a05c2ec9eea8a884c93e798e4e65b8e26b91c93 t/01.version.t
+SHA1 47fb2c3cb443da3e17f5ee8c804f3fe93eacfef5 t/02.options.t
+SHA1 589b6496eb7e3e3931db8e5f6aca286b3135eb46 t/03.cell_size.t
+SHA1 7fb04edf48f64e54702b5faa8af81c58f10ccc8a t/04.columnize.t
+SHA1 ad3f83aadde81fdb6eacbbe19d28b8ecce10d421 t/05.longcol.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlG3z50ACgkQGo3lAIJ17CEVMwCfc942aUZXje8u+KDA3l1SFDma
+VWAAn2NqSqonVg9rvJMkSNtCBDsCYipW
+=fIc4
+-----END PGP SIGNATURE-----

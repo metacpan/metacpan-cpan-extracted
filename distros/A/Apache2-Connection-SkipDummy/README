@@ -1,0 +1,33 @@
+NAME
+    Apache2::Connection::SkipDummy - Skip main server requests to wake up
+    child httpds
+
+SYNOPSIS
+    In your httpd.conf:
+
+     PerlPostReadRequestHandler Apache2::Connection::SkipDummy
+
+DESCRIPTION
+    End requests from the main httpd process to child processes which are
+    only using for waking up processes listening for new connections.
+
+    You can see this in your access log with the identifying user agent
+    "(internal dummy connection)". You can remove these entries with
+    mod_setenvif directives also, but this is a mod_perl based solution for
+    those who don't have httpd compiled with mod_setenvif.
+
+SEE ALSO
+    Apache2::Connection
+
+    http://wiki.apache.org/httpd/InternalDummyConnection
+
+AUTHOR
+    Fred Moyer, <fred@redhotpenguin.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Fred Moyer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

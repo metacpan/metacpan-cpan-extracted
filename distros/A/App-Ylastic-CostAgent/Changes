@@ -1,0 +1,32 @@
+Revision history for App-Ylastic-CostAgent
+
+0.006     2011-04-07 17:23:53 America/New_York
+
+    - Fixed typos in the documentation
+
+    - Added README.INSTALL for anyone browsing the repository
+      directly and wondering how to install
+
+0.005     2011-03-21 10:13:11 America/New_York
+
+    - Ensure proper shebang line gets set in ylastic-costagent
+
+0.004     2011-03-20 03:32:00 America/New_York
+
+    - Renamed ylastic_costagent to ylastic-costagent 
+
+0.003     2011-03-19 22:20:02 America/New_York
+
+    - Added documentation that libssl-dev may be needed for dependencies
+    - Updated installation example recipe with curl instead of wget
+
+0.002     2011-03-18 23:24:22 America/New_York
+
+    - Add dependency on Mozilla::CA and switch on hostname verification
+      for SSL
+    - Fix test failures from extra warnings on older Perls
+
+0.001     2011-03-18 20:38:41 America/New_York
+
+    - initial release to CPAN
+

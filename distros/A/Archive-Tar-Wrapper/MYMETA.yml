@@ -1,0 +1,28 @@
+---
+abstract: "API wrapper around the 'tar' utility"
+author:
+  - 'Mike Schilli <cpan@perlmeister.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-Tar-Wrapper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  IPC::Run: '0'
+  Log::Log4perl: '0'
+resources:
+  repository: http://github.com/mschilli/archive-tar-wrapper-perl
+version: '0.23'

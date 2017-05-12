@@ -1,0 +1,59 @@
+NAME
+    AnyEvent::CurrentCost - AnyEvent module for reading from Current Cost
+    energy meters
+
+VERSION
+    version 1.130190
+
+SYNOPSIS
+      # Create simple Current Cost reader with logging callback
+      AnyEvent::CurrentCost->new(callback => sub { print $_[0]->summary },
+                                 device => '/dev/ttyUSB0');
+
+      # start event loop
+      AnyEvent->condvar->recv;
+
+DESCRIPTION
+    AnyEvent module for reading from Current Cost energy meters.
+
+    IMPORTANT: This is an early release and the API is still subject to
+    change.
+
+METHODS
+  "new(%params)"
+    Constructs a new "AnyEvent::CurrentCost" object. The supported
+    parameters are:
+
+    device
+        The name of the device to connect to. The value should be a tty
+        device name. The default is "/dev/ttyUSB0".
+
+    callback
+        The callback to execute when a message is received.
+
+    history_callback
+        A function, taking a sensor id, a time interval and a hash reference
+        of data as arguments, to be called every time a new complete set of
+        history data becomes available. The data hash reference has keys of
+        the number of intervals ago and values of the reading at that time.
+
+  "cleanup()"
+    This method attempts to destroy any resources in the event of a
+    disconnection or fatal error.
+
+  "open()"
+    This method opens the serial port and configures it.
+
+  "anyevent_read_type()"
+    This method is used to register an AnyEvent::Handle read type method to
+    read Current Cost messages.
+
+AUTHOR
+    Mark Hindess <soft-cpan@temporalanomaly.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Mark Hindess.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

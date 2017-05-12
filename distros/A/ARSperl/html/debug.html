@@ -1,0 +1,85 @@
+<html>
+ <HEAD>
+  <TITLE>ARSperl: How to debug ARSperl</TITLE>
+ </HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<H1> How to debug ARSperl </H1>
+
+Because the ARS extension gets loaded into perl dynamically, there
+are a few extra steps needed to debug it.  You will need to build a separate
+perl installation compiled with debugging turned on.
+
+<H3> Steps </H3>
+<OL>
+<FONT SIZE="+1"> <LI> Configure perl </FONT> <P>
+     When perl's Configure script prompts you : <BR>
+     <I> What optimizer/debugger flag should be used? </I><BR>
+     you should specify -g instead of the default -O. <BR>
+     It is also usually a good idea to use perl's built in malloc.
+     The will prevent ARSperl from crashing due to malloc/free bugs. <P>
+<FONT SIZE="+1"> <LI> Install perl/Install ARSperl </FONT> <P>
+     If you're perl install went correctly, ARSperl should automatically
+     get compiled with the -g switch.<P>
+<FONT SIZE="+1"> <LI> Try it out <BR> </FONT> <P>
+     I use gdb (the gnu debugger) for debugging, but others (like dbx) 
+     will probably work.  Debugging ARS involves switching between 
+     gdb and the perl debugger.  When I'm in the perl debugger, I use
+     control-c to send a SIGINT and return to gdb.  The function
+     names for ARSperl calls will be a little wierd.  You can look in
+     ARS.c to see what they are.  Make sure you keep ARS.c in
+     place so the debugger can find it! <P>
+     Here is an example debugging session:
+<PRE>
+152 cnu(11:13:13)~/ARSperl/ARSperl/example&gt; gdb /usr/local/bin/perl
+GDB is free software and you are welcome to distribute copies of it
+ under certain conditions; type "show copying" to see the conditions.
+There is absolutely no warranty for GDB; type "show warranty" for details.
+GDB 4.16 (sparc-sun-solaris2.3),
+Copyright 1996 Free Software Foundation, Inc...
+(gdb) set args -d GetField.pl remedyserver jmurphy mypass User 1
+(gdb) run
+Starting program: /usr/local/bin/perl -d GetField.pl remedyserver jmurphy mypass User 1
+Stack dump during die enabled outside of evals.
+
+Loading DB routines from perl5db.pl patch level 0.94
+Emacs support available.
+
+Enter h or `h h' for help.
+
+main::(GetField.pl:31): ($server, $username, $password, $schema, $fieldname) = @ARGV;
+  DB&lt;1&gt; n
+main::(GetField.pl:32): if(!defined($password)) {
+  DB&lt;1&gt; n
+main::(GetField.pl:39): print "Logging in ..\n";
+  DB&lt;1&gt; n
+Logging in ..
+main::(GetField.pl:41): ($ctrl = ars_Login($server, $username, $password)) ||
+main::(GetField.pl:42):     die "can't login to the server";
+  DB&lt;1&gt; ^C
+Program received signal SIGINT, Interrupt.
+0xef638848 in _read ()
+(gdb) break XS_ARS_ars_Login
+Breakpoint 1 at 0xef4f90a8: file ARS.c, line 1801.
+(gdb) c
+Continuing.
+1
+
+  DB&lt;1&gt; c
+
+Breakpoint 1, XS_ARS_ars_Login (cv=0x11e820) at ARS.c:1801
+(gdb) list
+1794            }
+1795        }
+1796        XSRETURN(1);
+1797    }
+1798
+1799    XS(XS_ARS_ars_Login)
+1800    {
+1801        dXSARGS;
+1802        if (items != 3)
+1803            croak("Usage: ARS::ars_Login(server,username,password)");
+(gdb)
+</PRE> 
+</OL>
+</BODY>
+</html>

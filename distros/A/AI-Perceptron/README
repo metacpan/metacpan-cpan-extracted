@@ -1,0 +1,179 @@
+NAME
+    AI::Perceptron - example of a node in a neural network.
+
+SYNOPSIS
+     use AI::Perceptron;
+
+     my $p = AI::Perceptron->new
+               ->num_inputs( 2 )
+               ->learning_rate( 0.04 )
+               ->threshold( 0.02 )
+               ->weights([ 0.1, 0.2 ]);
+
+     my @inputs  = ( 1.3, -0.45 );   # input can be any number
+     my $target  = 1;                # output is always -1 or 1
+     my $current = $p->compute_output( @inputs );
+
+     print "current output: $current, target: $target\n";
+
+     $p->add_examples( [ $target, @inputs ] );
+
+     $p->max_iterations( 10 )->train or
+       warn "couldn't train in 10 iterations!";
+
+     print "training until it gets it right\n";
+     $p->max_iterations( -1 )->train; # watch out for infinite loops
+
+DESCRIPTION
+    This module is meant to show how a single node of a neural network
+    works.
+
+    Training is done by the *Stochastic Approximation of the
+    Gradient-Descent* model.
+
+MODEL
+    Model of a Perceptron
+
+                  +---------------+
+     X[1] o------ |W[1]      T    |
+     X[2] o------ |W[2] +---------+         +-------------------+
+      .           | .   |   ___   |_________|    __  Squarewave |_______\  Output
+      .           | .   |   \     |    S    | __|    Generator  |       /
+      .           | .   |   /__   |         +-------------------+
+     X[n] o------ |W[n] |   Sum   |
+                  +-----+---------+
+
+                 S  =  T + Sum( W[i]*X[i] )  as i goes from 1 -> n
+            Output  =  1 if S > 0; else -1
+
+    Where "X[n]" are the perceptron's *inputs*, "W[n]" are the *Weights*
+    that get applied to the corresponding input, and "T" is the *Threshold*.
+
+    The *squarewave generator* just turns the result into a positive or
+    negative number.
+
+    So in summary, when you feed the perceptron some numeric inputs you get
+    either a positive or negative output depending on the input's weights
+    and a threshold.
+
+TRAINING
+    Usually you have to train a perceptron before it will give you the
+    outputs you expect. This is done by giving the perceptron a set of
+    examples containing the output you want for some given inputs:
+
+        -1 => -1, -1
+        -1 =>  1, -1
+        -1 => -1,  1
+         1 =>  1,  1
+
+    If you've ever studied boolean logic, you should recognize that as the
+    truth table for an "AND" gate (ok so we're using -1 instead of the
+    commonly used 0, same thing really).
+
+    You *train* the perceptron by iterating over the examples and adjusting
+    the *weights* and *threshold* by some value until the perceptron's
+    output matches the expected output of each example:
+
+        while some examples are incorrectly classified
+            update weights for each example that fails
+
+    The value each weight is adjusted by is calculated as follows:
+
+        delta[i] = learning_rate * (expected_output - output) * input[i]
+
+    Which is know as a negative feedback loop - it uses the current output
+    as an input to determine what the next output will be.
+
+    Also, note that this means you can get stuck in an infinite loop. It's
+    not a bad idea to set the maximum number of iterations to prevent that.
+
+CONSTRUCTOR
+    new( [%args] )
+        Creates a new perceptron with the following default properties:
+
+            num_inputs    = 1
+            learning_rate = 0.01
+            threshold     = 0.0
+            weights       = empty list
+
+        Ideally you should use the accessors to set the properties, but for
+        backwards compatability you can still use the following arguments:
+
+            Inputs => $number_of_inputs  (positive int)
+            N      => $learning_rate     (float)
+            W      => [ @weights ]       (floats)
+
+        The number of elements in *W* must be equal to the number of inputs
+        plus one. This is because older version of AI::Perceptron combined
+        the threshold and the weights a single list where W[0] was the
+        threshold and W[1] was the first weight. Great idea, eh? :) That's
+        why it's *DEPRECATED*.
+
+ACCESSORS
+    num_inputs( [ $int ] )
+        Set/get the perceptron's number of inputs.
+
+    learning_rate( [ $float ] )
+        Set/get the perceptron's number of inputs.
+
+    weights( [ \@weights ] )
+        Set/get the perceptron's weights (floats).
+
+        For backwards compatability, returns a list containing the
+        *threshold* as the first element in list context:
+
+          ($threshold, @weights) = $p->weights;
+
+        This usage is *DEPRECATED*.
+
+    threshold( [ $float ] )
+        Set/get the perceptron's number of inputs.
+
+    training_examples( [ \@examples ] )
+        Set/get the perceptron's list of training examples. This should be a
+        list of arrayrefs of the form:
+
+            [ $expected_result => @inputs ]
+
+    max_iterations( [ $int ] )
+        Set/get the perceptron's number of inputs, a negative value implies
+        no maximum.
+
+METHODS
+    compute_output( @inputs )
+        Computes and returns the perceptron's output (either -1 or 1) for
+        the given inputs. See the above model for more details.
+
+    add_examples( @training_examples )
+        Adds the @training_examples to to current list of examples. See
+        training_examples() for more details.
+
+    train( [ @training_examples ] )
+        Uses the *Stochastic Approximation of the Gradient-Descent* model to
+        adjust the perceptron's weights until all training examples are
+        classified correctly.
+
+        @training_examples can be passed for convenience. These are passed
+        to add_examples(). If you want to re-train the perceptron with an
+        entirely new set of examples, reset the training_examples().
+
+AUTHOR
+    Steve Purkis <spurkis@epn.nu>
+
+COPYRIGHT
+    Copyright (c) 1999-2003 Steve Purkis. All rights reserved.
+
+    This package is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+REFERENCES
+    *Machine Learning*, by Tom M. Mitchell.
+
+THANKS
+    Himanshu Garg <himanshu@gdit.iiit.net> for his bug-report and feedback.
+    Many others for their feedback.
+
+SEE ALSO
+    Statistics::LTU, AI::jNeural, AI::NeuralNet::BackProp,
+    AI::NeuralNet::Kohonen
+

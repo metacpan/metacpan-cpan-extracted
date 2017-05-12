@@ -1,0 +1,101 @@
+NAME
+    Algorithm::Points::MinimumDistance - Works out the distance from each
+    point to its nearest neighbour. Kinda.
+
+DESCRIPTION
+    Given a set of points in N-dimensional Euclidean space, works out for
+    each point the distance to its nearest neighbour (unless its nearest
+    neighbour isn't very close). The distance metric is a method; subclass
+    and override it for non-Euclidean space.
+
+SYNOPSIS
+      use Algorithm::Points::MinimumDistance;
+
+      my @points = ( [1, 4], [3, 1], [5, 7] );
+      my $dists = Algorithm::Points::MinimumDistance->new( points => \@points );
+
+      foreach my $point (@points) {
+          print "($point->[0], $point->[1]: Nearest neighbour distance is "
+              . $dists->distance( point => $point ) . "\n";
+      }
+
+      print "Smallest distance between any two points is "
+          . $dists->min_distance . "\n";
+
+METHODS
+    new
+          my @points = ( [1, 4], [3, 1], [5, 7] );
+          my $dists = Algorithm::Points::MinimumDistance->new( points  => \@points,
+                                                               boxsize => 2 );
+
+        "points" should be an arrayref containing every point in your set.
+        The representation of a point is as an N-element arrayref where N is
+        the number of dimensions in which we are working. There is no check
+        that all of your points have the right dimension. Whatever dimension
+        the first point has is assumed to be the dimension of the space. So
+        get it right.
+
+        "boxsize" defaults to 20.
+
+    box
+          my @box = $nn->box( [1, 2] );
+
+        Returns the identifier of the box that the point lives in. A box is
+        labelled by its "bottom left-hand" corner point.
+
+    distance
+          my $nn = Algorithm::Points::MinimumDistance->new( ... );
+          my $nn_dist = $nn->distance( point => [1, 4] );
+
+        Returns the distance between the specified point and its nearest
+        neighbour. The point should be one of your original set. There is no
+        check that this is the case. Note that if a point has no
+        particularly close neighbours, then "boxsize" will be returned
+        instead.
+
+    min_distance
+          my $nn = Algorithm::Points::MinimumDistance->new( ... );
+          my $nn_dist = $nn->min_distance;
+
+        Returns the minimum nearest-neighbour distance for all points in the
+        set. Or "boxsize" if none of the points are close to each other.
+
+ALGORITHM
+    We use the hash as an approximate conservative metric to basically do
+    clipping of space. A box is one cell of the space defined by the grid
+    size. A region is a box and all the neighbouring boxes in all
+    directions, i.e. all the boxes b such that d(b, c) <= 1 in the
+    d-infinity metric Noting that d(b, c) is always an integer in this case.
+
+      +-+-+-+-+-+
+      | | | | | |
+      +-+-+-+-+-+
+      | |x|x|x| |
+      +-+-+-+-+-+
+      | |x|b|x| |
+      +-+-+-+-+-+
+      | |x|x|x| |
+      +-+-+-+-+-+
+      | | | | | |
+      +-+-+-+-+-+ 
+
+    Now all points outside the region defined by the box b and the
+    neighbours x can not be within maximum radius $C of any point in box b.
+
+    So we reverse the stunt and shove any point in box b into the hash lists
+    for all boxes b and x so that when testing a point in any box, we have a
+    list of all points in that box and any neighbouring boxes (the region).
+
+AUTHOR
+    Algorithm by Shevek, modularisation by Kake Pugh (kake@earth.li).
+
+COPYRIGHT
+         Copyright (C) 2003 Kake Pugh.  All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+CREDITS
+    Shevek is utterly fab for telling me how to solve this problem. Greg
+    McCarroll is also fab for telling me what to call the module.
+

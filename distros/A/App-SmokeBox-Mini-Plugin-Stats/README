@@ -1,0 +1,40 @@
+NAME
+    App::SmokeBox::Mini::Plugin::Stats - gather smoking statistics from
+    minismokebox
+
+VERSION
+    version 0.10
+
+SYNOPSIS
+      # example minismokebox configuration file
+
+      [Stats]
+
+      enable=0
+
+DESCRIPTION
+    App::SmokeBox::Mini::Plugin::Stats is a statistics gathering plugin for
+    App::SmokeBox::Mini and minismokebox that collects all jobs and smokers
+    data and logs it to a DBD::SQLite based database.
+
+    The database file will be found in the ".smokebox" directory, see
+    minismokebox documentation for details of its location and how to affect
+    its location.
+
+CONFIGURATION
+    This plugin uses an "[Stats]" section within the minismokebox
+    configuration file.
+
+    "enable"
+        By default the plugin is enabled. You may set this to a "false"
+        value to disable the use of the plugin
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

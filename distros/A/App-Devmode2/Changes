@@ -1,0 +1,65 @@
+Revision history for App-Devmode2
+
+0.8   2015-11-22
+        Updating for release of version 0.8
+        Added missing test config and documentation (Ivan Wills)
+        Fixed missed rename from Path::Tiny move (Ivan Wills)
+
+0.7   2015-08-08
+        Updating for release of version 0.7
+        Removed creation of makefile (Ivan Wills)
+
+0.6   2015-07-09
+        Updating for release of version 0.6
+        Fixed using file rather than child after Path::Tiny migration (Ivan Wills)
+
+0.5   2015-07-08
+        Updating for release of version 0.5
+        Converted to Path::Tiny (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.4   2015-07-02
+        Updating for release of version 0.4
+        Fixed up the documentation (Ivan Wills)
+
+0.3   2015-06-02
+        Updating for release of version 0.3
+        Cleaned up auto-completion helper (Ivan Wills)
+        Making shure that the regex is case insensitive (Ivan Wills)
+        Fixed not correctly finding bundled layouts (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+        Added specific Test::More version for the features being used (Ivan Wills)
+        Added config for coveralls.io (Ivan Wills)
+
+0.2   2015-03-08
+        Updating for release of version 0.2
+        Added check that the directory exists before trying to change to it (Ivan Wills)
+        Added tags (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Added missing dependency (Ivan Wills)
+        Updated changes (Ivan Wills)
+
+0.1     2015-01-24
+        Updated License (Ivan Wills)
+        Auto completion help (Ivan Wills)
+        Implemented autocomplete (Ivan Wills)
+        Fixed to really set --save when --curdir is set (Ivan Wills)
+        Fixed reattaching sessions (Ivan Wills)
+        Changed --curdir to turn on --save (Ivan Wills)
+        Added documentation to --curdir (Ivan Wills)
+        Added --curdir option for saving the current directory with --save (Ivan Wills)
+        Made the help work correctly (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Factored out config (Ivan Wills)
+        Forgot to implement --chdir and document it (Ivan Wills)
+        Added using configs per session (and saving it) (Ivan Wills)
+        Added missing recommends dependency and reduced Perl verion to 5.8 (Ivan Wills)
+        Got author tests working (Ivan Wills)
+        Updated files (Ivan Wills)
+        Changed layout to be in the ~/.tmux directory (Ivan Wills)
+        Added setting terminal title (if Term::Title installed) (Ivan Wills)
+        Getting their (Ivan Wills)
+        Planning how I want this to work (Ivan Wills)
+        Starting to implement devmode2 (Ivan Wills)
+        Initial commit (Ivan Wills)
+

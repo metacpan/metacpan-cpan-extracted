@@ -1,0 +1,168 @@
+[% SET pk_name = data.primary_key.join("/"); %]
+
+
+[% WRAPPER head %]
+<style>
+  .record_key    { color: #a00; font-weight: bold; font-size: 120% }
+  .record_num    { font-size: 80%; float: right }
+  .groupname     { font-weight: bold; color: navy; font-size: 110% }
+  .record        { border-top: 1px dashed gray }
+  .criteria      { font-size: 90% }
+  .val           { background-color: #efe }
+  .check_record  { float: right}
+  .pk            { text-decoration: underline }
+  .message       { width: 60%; color: red; border: 1px solid red; 
+                   font-weight: bold; margin-top: 6px}
+  H1             { margin-bottom : 0}
+  H2             { margin-bottom : 0}
+  #TN_tree       { clear: right }
+</style>
+
+<script>
+  function setup() {  
+    new GvaScript.TreeNavigator('TN_tree',  {selectFirstNode: false});
+
+    new GvaScript.KeyMap({LEFT : function(){$('prev_page').click()},
+                          RIGHT: function(){$('next_page').click()}})
+                 .observe('keydown');
+  }
+  window.onload = setup;
+  function followLink(event) {
+    var label = event.controller.label(event.target);
+    if (label && label.tagName == "A") {
+      label.focus();
+      return Event.stopNone;
+    }
+  }
+  function propagate_checkbox(main_box) {
+    $('list_form').getInputs('checkbox').each(function(box) {
+       box.checked = main_box.checked;
+    });
+  }
+  function add_checkboxes(a_element) {
+    var vals = [];
+    $('list_form').getInputs('checkbox').each(function(box) {
+       if (box.checked) vals.push(encodeURIComponent(box.value));
+    });
+    if (vals.length > 0) {
+      a_element.href += "where." + encodeURIComponent("[% pk_name %]") 
+                                 + "=" + vals.join(",");
+      return true;
+    }
+    else {
+      alert("no record was checked!");
+      return false; // no submit
+    }
+  }
+</script>
+
+[% END; # WRAPPER head %]
+
+[%# ---------- start body ---------- %]
+
+<div class="actions">
+  [% BLOCK page_links %]
+  <div>
+    [% IF data.prev_page; %]
+      <a href="list?[% data.prev_page | utf8_url %]" [% " id='prev_page'" IF with_ids %]
+         title="press LEFT key">prev</a>
+    [% END; %]
+    [% " | "   IF data.prev_page && data.next_page; %]
+    [% IF data.next_page; %]
+      <a href="list?[% data.next_page | utf8_url %]" [% " id='next_page'" IF with_ids %]
+         title="press RIGHT key">next</a>
+    [% END; %]
+    [% " page" IF data.prev_page || data.next_page; %]
+  </div>
+  [% END; # BLOCK page_links %]
+  [% INCLUDE page_links with_ids=1 %]
+
+  <br>
+  <a href="descr">describe</a> this table
+
+  [% UNLESS c.app.readonly %]
+    [% IF data.rows.size > 0 %]
+        <br>
+        check/uncheck all records in page
+          <input type=checkbox onchange="propagate_checkbox(this)"> 
+        <br>
+        <a href="update?_noupd=[% pk_name | uri %]&" 
+           onclick="return add_checkboxes(this)">update</a> |
+        <a href="delete?" 
+           onclick="return add_checkboxes(this)">delete</a> checked records
+        <br>
+        <a href="update?_noupd=[% pk_name | uri %]&[% data.where_args | utf8_url %]">update</a> |
+        <a href="delete?[% data.where_args | utf8_url %]">delete</a> whole result set
+    [% END; # IF data.rows.size > 0 %]
+    <br>
+    <a href="insert">insert</a> a new record
+  [% END %]
+</div>
+
+<h1>List [% data.table %]</h1>
+
+
+<div class="criteria">
+  <b>Criteria</b>: [% (data.criteria || 'none') FILTER html %]<br>
+  <br>
+  search again with <a href="search">new</a> | 
+                    <a href="search?[% data.similar_query | utf8_url %]">similar</a> criteria
+</div>
+
+[% IF data.message; # could be a message coming from the last update() %]
+<div class="message">[% data.message %]</div>
+[% END; # IF data.message %]
+
+
+<h2>Page [% data.page_index %][% " of $data.page_count" IF data.page_count %]
+   (records [% data.offset %] - [% data.offset + data.rows.size - 1 %]
+    [% " of $data.row_count" IF data.row_count %])</h2>
+
+
+[% IF data.rows.size > 0 %]
+
+  [% WRAPPER form_unless_readonly; %]
+
+    <div id="TN_tree" onPing="followLink">
+      [% FOREACH row IN data.rows;
+           SET pk_vals = [];
+           FOREACH field IN data.primary_key;
+             pk_vals.push(row.$field);
+           END;
+           SET pk = pk_vals.join("/"); %]
+        [% UNLESS c.app.readonly %]   
+          <input name="[% pk_name %]" value="[% pk %]"
+                 type="checkbox" class="check_record" title="mark for update/delete">
+        [% END %]
+        <span class="record_num">#[% record_num = data.offset + loop.count - 1;
+                                     record_num %]</span>
+        <div class="TN_node record">
+          <a class="TN_label record_key" href="id/[% pk | utf8_url %]">
+             [%~ pk || record_num ~%]
+          </a>
+          <div class="TN_content">
+            [%- INCLUDE src/table/_record.tt -%]
+         </div>
+        </div>
+      [% END; # FOREACH row IN data.rows %]
+    </div>
+
+  [% END; # WRAPPER form_unless_readonly; %]
+
+  <div class="actions">
+    [% INCLUDE page_links %]
+  </div>
+
+[% END; # IF data.rows.size > 0 %]
+
+
+[% BLOCK form_unless_readonly;
+     IF c.app.readonly;
+       content;
+     ELSE;
+       "<form id='list_form' method='GET' action='update'>\n";
+       content;
+       "</form>\n";
+     END; # IF
+   END; # BLOCK %]
+  

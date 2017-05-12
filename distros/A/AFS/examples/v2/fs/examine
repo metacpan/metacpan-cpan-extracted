@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::CM qw(getvolstats);
+
+my ($path, $stats);
+
+die "Usage: $0 path\n" if ($#ARGV != 0);
+
+$path = shift;
+
+$stats = getvolstats($path);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else {
+    print "Volume status for vid = $stats->{'Vid'} named $stats->{'Name'} \n";
+    print "Current disk quota is $stats->{'MaxQuota'} \n";
+    print "Current blocks used are $stats->{'BlocksInUse'} \n";
+    print "The partition has $stats->{'PartBlocksAvail'} blocks available out of $stats->{'PartMaxBlocks'} \n";
+}

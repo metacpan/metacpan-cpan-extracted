@@ -1,0 +1,29 @@
+Revision history for Perl module Apache::Cache.
+
+0.05 Tue Oct  2 2001 16:09:37
+    - status now return bitmask values
+    - constructor parameter 'cachename' is now optional, default value is 
+      'default'
+    - feature enhancements, new clear method and new constructor parameter 
+      'default_lock_timeout'
+    - major documentation update (it's now readable, and understandable)
+    - new test scripts
+
+0.04 Wed August 29 2001 09:42:00
+    - major bugfix in "get" method: on first timeout, status was set to 
+      "delete" method's status (often SUCCESS) instead of EXPIRED
+    - bugfix in "set" method: wasn't unlock segment !
+    - major bugfix in _check_key: use of max_keys parameter wasn't work 
+      correctly
+
+0.03 Mon Jully 30, 2001 13:43:01
+    - fix major bug in "get" method: on unexists key, status was set to 
+      SUCCESS insted of EXPIRED
+
+0.02 Tue Junary 26, 2001 21:08:17
+    - correct major bugs.
+
+0.01 Mon Junary 25, 2001 07:43:48
+    - original version writen from scratch.
+    - fixing EXPORT_OK
+    - fixing referencing bug in delete method

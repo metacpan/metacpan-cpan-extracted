@@ -1,0 +1,26 @@
+---
+abstract: 'Alien package for the libuninum library'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.002'
+  File::ShareDir: '1.03'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Uninum
+requires:
+  Alien::Base: '0.002'
+  File::ShareDir: '1.03'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/EntropyOrg/p5-Alien-Uninum
+  repository: https://github.com/EntropyOrg/p5-Alien-Uninum.git
+version: '0.005'

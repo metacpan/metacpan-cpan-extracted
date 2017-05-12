@@ -1,0 +1,11 @@
+Revision history for App-ParseHosts
+
+0.002   2016-10-17 (PERLANCAR)
+
+        - [Bugfix] Fix interface (optional --filename/-f interface to customize
+          /etc/hosts location).
+
+
+0.001   2016-10-17 (PERLANCAR)
+
+        - First release.

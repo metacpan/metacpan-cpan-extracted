@@ -1,0 +1,36 @@
+Revision history for Perl extension Alien::Selenium.
+
+0.09  Thu Feb 21 2008
+    - Perl 5.6 required; no actual code change
+
+0.08  Fri Feb 6 2008
+    - Fixed build infrastructure for Perl 5.10 (correcting a CPANTS
+      failure)
+
+0.07  Fri Feb 1 2008
+    - Upgraded to Selenium 0.8.3
+    - Fixed RT #28855
+    - Corrected a cpantesters dependency issue
+
+0.06  Tue Aug 14 2007
+    - Bugfix release for RT #28048
+
+0.05  Wed Apr 11 2006
+    - New maintainer DOMQ@cpan.org
+    - Installs Selenium 0.8.2
+    - Handles readystate.xpi
+
+0.04  Tue Mar  7 2006
+    - Added the selenium_install utility to install Selenium
+      to a specified directory. (based upon a patch by Luke Closs)
+
+0.03  Sat Jan 14 2006
+    - Fix installation using CPANPLUS.
+    - Do not try to fetch Selenium when using the bundled one.
+
+0.02  Mon Jan  9 2006
+    - Bundles a stripped version of Selenium 0.6.0.
+      (suggested by Luke Closs)
+
+0.01  Tue Nov  1 2005
+    - First public version. Installs Selenium 0.6.0.

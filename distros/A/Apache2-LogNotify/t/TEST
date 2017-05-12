@@ -1,0 +1,18 @@
+#!/csf2/apps/bin/perl
+# WARNING: this file is generated, do not edit
+# generated on Thu Aug  7 23:16:37 2008
+# 01: /csf2/apps/lib/perl5/site_perl/5.8.8/x86_64-linux/Apache/TestConfig.pm:955
+# 02: /csf2/apps/lib/perl5/site_perl/5.8.8/x86_64-linux/Apache/TestConfig.pm:1045
+# 03: /csf2/apps/lib/perl5/site_perl/5.8.8/x86_64-linux/Apache/TestRun.pm:1284
+# 04: Makefile.PL:11
+
+BEGIN { eval { require blib && blib->import; } }
+
+use strict;
+use warnings FATAL => 'all';
+
+use lib qw(
+);
+
+
+use Apache::TestRunPerl ();Apache::TestRunPerl->new->run(@ARGV);

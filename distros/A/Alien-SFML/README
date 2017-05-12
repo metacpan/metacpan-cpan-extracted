@@ -1,0 +1,63 @@
+Alien::SFML version 0.01 SFML 2.0 RC
+====================================
+
+This module installs SFML 2.0 RC
+
+INSTALLATION
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl
+
+Alien::Base
+Alien::CMake
+
+If you are on linux, you will need (according to the SFML website) dev packages for:
+
+    pthread
+    opengl
+    xlib
+    xrandr
+    freetype
+    glew
+    jpeg
+    sndfile
+    openal
+
+COPYRIGHT AND LICENCE
+
+ ############################
+ # Copyright 2013 Jake Bott #
+ #=>----------------------<=#
+ #   All Rights Reserved.   #
+ #   Part of Alien::SFML.   #
+ #=>----------------------<=#
+ #   See the LICENCE file   #
+ ############################
+
+BUGS
+
+Please report bugs related to installing SFML here:
+
+https://github.com/jakeanq/perl-alien-sfml/issues
+
+Note that this is not for bugs in the SFML module or the SFML library.  For those,
+see the module and library homepages:
+
+https://github.com/jakeanq/perl-sfml/
+http://www.sfml-dev.org/
+
+Note that I do not maintain SFML itself, only Alien::SFML and the XS/perl bindings
+for it, under the SFML module.
+
+CHANGES:
+
+V0.0101 - Added CMake dependancy
+V0.02	- Upgrade to SFML 2.0

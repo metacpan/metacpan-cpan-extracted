@@ -1,0 +1,47 @@
+---
+abstract: 'WebSocket server for AnyEvent'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  AnyEvent::WebSocket::Client: '0.37'
+  Protocol::WebSocket::Frame: '0'
+  Protocol::WebSocket::Handshake::Client: '0'
+  Scalar::Util: '0'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  Try::Tiny: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-WebSocket-Server
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+  file:
+    - README.pod
+recommends:
+  Net::SSLeay: '0'
+requires:
+  AnyEvent::Handle: '0'
+  AnyEvent::WebSocket::Client: '0.37'
+  Carp: '0'
+  Protocol::WebSocket::Handshake::Server: '0'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/debug-ito/AnyEvent-WebSocket-Server/issues
+  repository: git://github.com/debug-ito/AnyEvent-WebSocket-Server.git
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

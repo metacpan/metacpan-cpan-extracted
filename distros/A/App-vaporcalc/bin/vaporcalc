@@ -1,0 +1,280 @@
+#!perl
+
+use Defaults::Modern;
+
+use App::vaporcalc::CmdEngine;
+use App::vaporcalc::FormatString;
+use App::vaporcalc::Recipe;
+use App::vaporcalc::RecipeResultSet;
+use App::vaporcalc::Types -all;
+
+use Getopt::Long;
+my $Opts = +{
+  help => sub {
+    say $_ for (
+      "vaporcalc - App::vaporcalc\n",
+      "  --recipe=PATH    Load specified recipe",
+      "  --nocolor        Disable ANSI colors",
+      "",
+      "  --help",
+      "  --version",
+    );
+    exit 0
+  },
+
+  version => sub {
+    my $vers = $App::vaporcalc::Recipe::VERSION || '[git]';
+    say "vaporcalc (App::vaporcalc $vers)";
+    exit 0
+  },
+
+  nocolor => 0,
+  recipe  => '',
+};
+
+GetOptions( $Opts,
+  'help',
+  'version',
+  'nocolor',
+  'recipe=s',
+);
+
+fun getopts { state $argv = hash(%$Opts)->inflate }
+
+use Term::ANSIColor ();
+fun colorify (Str $color, Str $text) {
+  getopts->nocolor ? $text : Term::ANSIColor::colored($text, $color)
+}
+
+fun format_error ($err) {
+  # Colorify first line only:
+  return '' unless $err;
+  my @lines = split "\n", "$err";
+  $lines[0] = colorify red => $lines[0];
+  join "\n", @lines
+}
+
+fun flavor_strings (RecipeResultSet $rset) {
+  my $recipe = $rset->recipe;
+  my $result = $rset->result;
+
+  my $flav_recipe_str = '';
+  for my $flav ($recipe->flavor_array->all) {
+    my $pcnt = colorify 'bold red' => $flav->percentage;
+    my $tag  = $flav->tag;
+    my $type = $flav->type;
+    $flav_recipe_str .= "   $tag -> $pcnt %  ($type)\n";
+  }
+
+  my $flav_result_str = '';
+  for my $flav ($result->flavors->kv->all) {
+    my ($tag, $ml) = @$flav;
+    $ml = colorify 'bold yellow' => $ml;
+    $flav_result_str .= "   $tag => [$ml ml]\n";
+  }
+
+  hash(
+    recipe_flavor_string => $flav_recipe_str,
+    result_flavor_string => $flav_result_str
+  )->inflate
+}
+
+fun format_resultset (RecipeResultSet $rset) {
+  state $tmpl = <<'EOT';
+ --> target amount: %target_quantity ml
+  pg: %target_pg %  vg: %target_vg %
+  nic base: %base_nic_per_ml mg/ml  nic type: %base_nic_type%
+  nic target: %target_nic_per_ml mg/ml
+  flavor targets:
+%flavor_recipe
+  notes: %notes
+ =>
+  vg: [%vg ml]  pg: [%pg ml]  nic base: [%nic ml]
+   (max vg total: %max_vg_total ml)
+  flavors:
+%flavor_result
+  total: %total ml
+EOT
+
+  my $recipe = $rset->recipe;
+  my $result = $rset->result;
+
+  my $flav_recipe_str = flavor_strings($rset)->recipe_flavor_string;
+  my $flav_result_str = flavor_strings($rset)->result_flavor_string;
+
+  format_str( $tmpl =>
+    notes => sub {
+      $recipe->notes->has_any ?
+        "\n" . $recipe->notes
+                ->map(sub { colorify('bold yellow', ' - '.$_) })
+                ->join("\n")
+        : 'none'
+    },
+
+    flavor_recipe => $flav_recipe_str,
+    flavor_result => $flav_result_str,
+
+    (map {; $_ => colorify('bold red', $recipe->$_) } qw/
+      target_quantity target_nic_per_ml
+      base_nic_per_ml base_nic_type
+      target_pg target_vg
+    /),
+
+    (map {; $_ => colorify('bold yellow', $result->$_) } qw/
+      vg pg nic total
+    /),
+
+    max_vg_total => sub {
+      colorify('bold yellow', $result->pg + $result->vg)
+    },
+  )
+}
+
+
+use Term::UI;
+use Term::ReadLine;
+my $termpkg = 
+  $ENV{PERL_RL} 
+  || try { use_module('Term::ReadLine::Perl5') }
+  || try { use_module('Term::ReadLine::Perl')  }
+  || 'Term::ReadLine';
+my $term  = $termpkg->new('vcalc'); 
+my $outfh = $term->OUT || \*STDOUT;
+$outfh->autoflush(1);
+
+$outfh->say('Welcome to App::vaporcalc!');
+$outfh->say("Try '@{[ colorify yellow => 'help' ]}' for usage details.");
+
+my $cmdeng = App::vaporcalc::CmdEngine->new;
+my $recipe = App::vaporcalc::Recipe->new(
+  target_quantity   => 10,
+  base_nic_per_ml   => 100,
+  target_nic_per_ml => 12,
+  target_pg         => 45,
+  target_vg         => 55,
+  flavor_percentage => 10,
+);
+my $initial_input = getopts->recipe ? 'recipe load '.getopts->recipe : undef;
+
+my $orig_prompt = colorify green => 'vcalc> ';
+my $prompt;
+PROMPT: while (1) {
+  $prompt //= $orig_prompt;
+
+  my $input = $initial_input // $term->get_reply(
+    prompt  => $prompt,
+    default => 'calc'
+  );
+  undef $initial_input;
+
+  next PROMPT unless $input;
+
+  $term->addhistory($input);
+
+  $input = 'show recipe' if $input eq 'calc';
+  last PROMPT            if $input =~ /^(?:exit|quit)/i;
+
+  my $parsed = try {
+    $cmdeng->parse_cmd($input)
+  } catch {
+    $outfh->say( format_error(">> Parser err: $_") );
+    undef
+  } or next PROMPT;
+
+  my $cmd_result = try {
+    $cmdeng->prepare_cmd(
+      subject => $parsed->subject,
+      verb    => $parsed->verb,
+      params  => $parsed->params,
+      recipe  => $recipe,
+    )->execute
+  } catch {
+    $outfh->say( format_error(">> Cmd err: $_") );
+    # FIXME if this is a RoundedResult err,
+    #  the recipe is busted;
+    #  use separate recipe/result templates so we can
+    #  display the broken recipe
+    undef
+  } or next PROMPT;
+
+  sswitch ($cmd_result->action) {
+    case 'display': {
+      $outfh->print( format_resultset( $cmd_result->resultset ) );
+    }
+
+    case 'print': {
+      $outfh->say( colorify yellow => $cmd_result->string );
+    }
+
+    case 'prompt': {
+      my $reply = $term->get_reply(prompt => $cmd_result->prompt);
+      $cmd_result->run_prompt_callback($reply)
+    }
+
+    case 'recipe': { 
+      $recipe = $cmd_result->recipe;
+      $outfh->say( colorify yellow => $cmd_result->string )
+        if $cmd_result->string;
+    }
+
+    case 'next': { next PROMPT }
+
+    case 'last': { last PROMPT }
+
+    default: {
+      $outfh->say(
+        format_error(">> Unknown Cmd::Result action: ".$cmd_result->action)
+      );
+    }
+  }
+} # PROMPT
+
+
+say "Bye!"; exit 0
+__END__
+
+=pod
+
+=head1 NAME
+
+vaporcalc - Terminal-based e-liquid recipe calculator
+
+=head1 SYNOPSIS
+
+  vaporcalc [OPTIONS]...
+
+=head1 OPTIONS
+
+  --nocolor     Disable ANSI colors
+
+  --version
+  --help
+  
+=head1 DESCRIPTION
+
+A terminal-based calculator for manging DIY e-liquid recipes.
+
+See L<App::vaporcalc>, and especially L<App::vaporcalc/"WARNING">.
+
+=head1 COMMANDS
+
+Commands can be issued in a reasonably natural manner; a command has a
+subject, possibly a verb (action the subject should perform), and possibly
+some parameters. For example, these are equally valid commands:
+
+  vcalc> show nic base
+  vcalc> nic base show
+  vcalc> set nic base 36
+  vcalc> nic base set 36
+
+The complete list of available subjects and their usage is available via the
+command C<help>.
+
+There are a few commands not represented via subjects: C<calc> is an alias for
+C<show recipe>. C<quit> and C<exit> will quit immediately.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut

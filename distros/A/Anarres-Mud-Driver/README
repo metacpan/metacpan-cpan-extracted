@@ -1,0 +1,46 @@
+NAME
+    Anarres::Mud::Driver - A game driver for LP Muds.
+
+SYNOPSIS
+      use Anarres::Mud::Driver;
+
+DESCRIPTION
+    This is an EXPERIMENTAL LP Mud driver written in Perl. The principle is
+    to parse the LPC as would a traditional driver, build and typecheck a
+    parse tree, then generate Perl source code from the parse tree. More
+    traditional drivers would here generate and interpret bytecode.
+
+    Generated Perl code is in a package namespace generated from the LPC
+    filename of the object to be compiled.
+
+    This program contains some interesting curiosities, such as an emulation
+    for a full 'C' style switch statement in Perl.
+
+USAGE
+    The system is developer only and the interface changes quite rapidly. A
+    good place to start is probably reading the test files. For more
+    information, see 'SUPPORT' below.
+
+BUGS
+    Incomplete. Experimental. Probably broken.
+
+SUPPORT
+    Speak to Arren on the Anarres II LP mud (telnet mudlib.anarres.org 5000)
+
+AUTHOR
+            Shevek
+            CPAN ID: SHEVEK
+            cpan@anarres.org
+            http://www.anarres.org/projects/
+
+COPYRIGHT
+    Copyright (c) 2002 Shevek. All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

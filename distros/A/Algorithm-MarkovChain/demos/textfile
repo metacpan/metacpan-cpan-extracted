@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(../blib/lib ./blib/lib);
+
+use Algorithm::MarkovChain;
+use Data::Dumper qw/DumperX/;
+
+my $c = Algorithm::MarkovChain::->new();
+
+my $filename = shift || 'README';
+
+open FILE, $filename
+  or die "cant open '$filename': $!";
+
+while (<FILE>) {
+    $c->seed(longest => 4,
+             symbols => [ m/(\S+)/g ] );
+}
+
+close FILE;
+
+print "Seeded\n";
+
+#poke where we're not invited.
+#for my $key (sort { keys %{ $c->{_chains}{$b} } <=> keys %{ $c->{_chains}{$a} } } keys %{ $c->{_chains} }) {
+#    print DumperX { $key => $c->{_chains}{$key} };
+#}
+
+while (<>) {
+    print join(' ', $c->spew(complete => [ m/(\S+)/g ],
+                             length => 20)),"\n";
+}

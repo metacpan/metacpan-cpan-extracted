@@ -1,0 +1,9 @@
+Revision history for Perl extension Array::LineReader.
+
+ * $Log: Changes,v $
+ * Revision 1.1  2004/06/10 15:07:37  Bjoern_Holsten
+ * First stable (as seems) version
+ *
+ * 0.01  Thu Jun 10 15:06:32 2004
+ *	- original version; created by h2xs 1.21 with options
+ *		-AX -n Array::LineReader

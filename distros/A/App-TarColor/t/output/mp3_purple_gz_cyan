@@ -1,0 +1,11 @@
+drwxr-xr-x  0 friebel sysprog     0 Nov 16 23:42 [01;34mlesspipe-1.72/[0m
+drwxr-xr-x  0 friebel sysprog      0 Nov 16 23:27 [01;34mlesspipe-1.72/contrib/[0m
+drwxr-xr-x  0 friebel sysprog      0 Oct 17 07:31 [01;34mlesspipe-1.72/testok/[0m
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 [01;36mlesspipe-1.72/testok/a*b.gz[0m
+-rw-r--r--  0 friebel sysprog   2092 Jul 10  2009 [01;35mlesspipe-1.72/testok/test.mp3[0m
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 [01;36mlesspipe-1.72/testok/a?b.gz[0m
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 [01;36mlesspipe-1.72/testok/a]b.gz[0m
+-rw-r--r--  0 friebel sysprog   1920 Jul 10  2009 [01;35mlesspipe-1.72/testok/id3v2.mp3[0m
+-rw-r--r--  0 friebel sysprog     35 Jul 10  2009 [01;36mlesspipe-1.72/testok/a`data.gz[0m
+-rw-r--r--  0 friebel sysprog     29 Jul 10  2009 [01;36mlesspipe-1.72/testok/a[b.gz[0m
+-rw-r--r--  0 friebel sysprog     45 Jul 10  2009 [01;36mlesspipe-1.72/testok/perlstorable.gz[0m

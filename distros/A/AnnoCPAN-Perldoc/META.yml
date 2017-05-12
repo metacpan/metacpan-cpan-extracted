@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         AnnoCPAN-Perldoc
+version:      0.10
+version_from: lib/AnnoCPAN/Perldoc.pm
+installdirs:  site
+requires:
+    DBD::SQLite:                   1
+    DBI:                           0
+    Digest::MD5:                   0
+    IO::String:                    0
+    Pod::Perldoc:                  3.14
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

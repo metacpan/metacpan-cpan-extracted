@@ -1,0 +1,12 @@
+bin/app_dispatch
+bin/dispatch.c
+Build.PL
+inc/MyBuild.pm
+lib/App/Dispatch.pm
+MANIFEST			This list of files
+README
+t/sample.pl
+t/sample/conf
+t/simple.t
+META.yml
+META.json

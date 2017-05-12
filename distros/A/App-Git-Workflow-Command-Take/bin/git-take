@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+# Created on: 2015-06-05 11:38:28
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use App::Git::Workflow::Command::Take;
+
+App::Git::Workflow::Command::Take->run();
+
+__DATA__

@@ -1,0 +1,24 @@
+0.06 20160411
+    . Restore compatibility with Perl 5.6.x
+      This means foregoing the defined-or operator, but as that one
+      only came in with Perl 5.10, I'm removing the use
+
+0.05 20160410
+    . More test fixes by Alexandr Ciornii
+    . No "undefined" warnings on non-Windows sytems
+
+0.04 20160409
+    . Switch tests to make indirect reliance on Archive::Zip optional
+    . This time, test those changes using Test::Without::Module
+    . Fix some documentation, add SYNOPSIS to Archive::SevenZip::API::ArchiveZip
+      No code changes
+
+0.03 20160407
+    . Switch tests to make indirect reliance on Archive::Zip optional
+      No code changes
+
+0.02 20160404
+    ! Switch all IPC to IPC::Open3
+
+0.01 20160403
+    . Released on an unsuspecting world

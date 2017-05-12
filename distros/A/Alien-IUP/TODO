@@ -1,0 +1,14 @@
+MEDIUM PRIORITY
+- more complex compile test (use some advanced iup C example, try to compile some DLL, test more then just iup lib)
+- more iupweb/webkit testing (Win32 as well as GTK2)
+- Win: generate makefiles for iupweb
+- try to build cdcairo - when has{pangocairo}
+
+LOW PRIORITY
+- complete redesign of iup+cd+im detection - compatible with havelib() - msvc support, fix temporary *.obj files in dist root
+- Unix - move essential lib detection into "perl Build.PL" phase (exit without creating Build script if essential libs not found)
+- Makefile*.nmake - dynamic lib build not supported
+
+ERRORS TO BE REPORTED TO TECGRAF
+- (reported) Dragonfly BSD: libjasper/jasper/jas_types.h:155 - 188 http://www.cpantesters.org/cpan/report/e2f01a0e-c8aa-11df-87cd-1c8c4afd17af
+- (reported) Dragonfly BSD: sizeof(FILE) not allowed - http://www.cpantesters.org/cpan/report/6b2b31dc-cc67-11df-87cd-1c8c4afd17af

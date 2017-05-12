@@ -1,0 +1,192 @@
+#------------------------------------------------------------------------------
+# RCS-Id: "@(#)$RCS-Id: pod/v2/afsperlktcp.pod 2e2ca60 Tue Apr 15 13:04:20 2014 +0200 Norbert E Gruener$"
+#
+# © 2001-2014 Norbert E. Gruener <nog@MPA-Garching.MPG.de>
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<AFS::KTC_PRINCIPAL> - Class to handle the B<AFS structure ktc_principal>
+
+=head1 SYNOPSIS
+
+  use AFS::KTC_PRINCIPAL;
+  use AFS::Cell qw(localcell);
+
+  my ($name, $inst, $cell) = AFS::KTC_PRINCIPAL->ParseLoginName('nog.admin@MPA-GARCHING.MPG.DE');
+  print "name     = ", $name, "\n";
+  print "instance = ", $inst, "\n";
+  print "cell     = ", $cell, "\n\n";
+
+  my $user = AFS::KTC_PRINCIPAL->new('nog', '', localcell);
+
+  print "name      = ", $user->name, "\n";
+  print "instance  = ", $user->instance, "\n";
+  print "cell      = ", $user->cell, "\n";
+  print "principal = ", $user->principal, "\n";
+
+  $user->set("rjsnfs", "root", localcell);
+  print "principal = ", $user->principal, "\n";
+  undef $user;
+
+  my $index =0;
+  while( $service = AFS::KTC_PRINCIPAL->ListTokens($index)) {
+      print "\nToken Num =  $index\n";
+      print "name      = ", $service->name, "\n";
+      print "instance  = ", $service->instance, "\n";
+      print "cell      = ", $service->cell, "\n";
+      print "principal = ", $service->principal, "\n";
+  }
+  undef $service;
+
+=head1 DESCRIPTION
+
+This class provides methods to handle the B<AFS structure ktc_principal>.
+This structure represents a principal which is used in the I<Kernel Token
+Cache> (KTC).  All entities on the network (users and services) are
+called I<principals>.  The KTC is part of the Cache Manager.
+
+It is used to create, modify, and retrieve B<ktc_principal> instances.
+It has methods to retrieve and to reset the B<KTC_principal>
+attributes.
+
+=head1 COMPATIBILITY
+
+B<This release does NOT support any features and interfaces
+from version 1.>
+
+=head1 OBJECT ATTRIBUTES
+
+=over 4
+
+=item B<name>
+
+Name of the user or service.
+
+=item B<instance>
+
+Instance of the user or service.
+
+=item B<cell>
+
+Name of the cell
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<CONSTRUCTOR>
+
+=item S< >
+
+=item B<$princ = AFS::KTC_PRINCIPAL-E<gt>new(NAME [, INSTANCE [, CELL]]);>
+
+=item B<$princ = AFS::KTC_PRINCIPAL-E<gt>new(NAME.INSTANCE@CELL);>
+
+Creates a new object of the class AFS::KTC_PRINCIPAL and sets its
+values for NAME, INSTANCE and CELL.
+
+=item B<$service = AFS::KTC_PRINCIPAL-E<gt>ListTokens(INDEX);>
+
+Searches in the token cache for the INDEX+1th token. On success it
+returns the corresponding principal instance $service and it
+increments INDEX.  If there is no INDEX+1th element AFS::CODE is set
+and the return value is C<undef>.  It calls the AFS system library
+function 'ktc_ListTokens'.
+
+=item B<CLASS METHODS>
+
+=item S< >
+
+=item B<($name, $instance, $cell) = AFS::KTC_PRINCIPAL-E<gt>ParseLoginName(LOGIN);>
+
+Parses the string LOGIN. It defines a syntax to allow a user to
+specify his identity in terms of his name, instance and cell with a
+single string. The syntax is very simple: the first dot ('.')
+separates the name from the instance and the first atsign ('@') begins
+the cell name.  A backslash ('\') can be used to quote these special
+characters.  It calls the AFS system library function
+'ka_ParseLoginName'.
+
+=item B<ATTRIBUTES ACCESS>
+
+=item S< >
+
+=item B<$princ-E<gt>ATTRIBUTE([value]);>
+
+Retrieves or sets the value for the specified object attribute, where
+ATTRIBUTE is one of the above listed object attributes (e.g. C<name>).
+
+=item B<INSTANCE METHODS>
+
+=item S< >
+
+=item B<$princ-E<gt>set(NAME, INSTANCE, CELL);>
+
+=item B<$princ-E<gt>set(NAME.INSTANCE@CELL);>
+
+Resets the value of the attributes NAME, INSTANCE and CELL for the
+principal instance.
+
+=back
+
+=head1 CURRENT AUTHOR
+
+Norbert E. Gruener E<lt>nog@MPA-Garching.MPG.deE<gt>
+
+=head1 AUTHOR EMERITUS
+
+Roland Schemers E<lt>schemers@slapshot.stanford.eduE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Copyright (c) 2001-2010 Norbert E. Gruener <nog@MPA-Garching.MPG.de>.
+ All rights reserved.
+
+ Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University.
+ All rights reserved.
+
+Most of the explanations in this document are taken from the original
+AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Authentication Server Interface
+ Edward R. Zayas
+ Copyright (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ Copyright (c) IBM Corporation 2000.
+ All rights reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=over 6
+
+=item The original module is covered by the following copyright:
+
+Copyright (c) 1994 Board of Trustees, Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by Stanford University.  The name of the University may not be used
+to endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+=head1 DOCUMENT VERSION
+
+Revision $Rev: 1059 $

@@ -1,0 +1,71 @@
+---
+name: Activator
+version: 0.91
+author: []
+abstract: |-
+  Object Oriented framework to ease
+  creation and rapid development of multi-developer distributed mixed
+  environment perl based software projects, especially Catalyst based
+  websites.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Cookie: 0
+  Class::StrongSingleton: 0
+  Crypt::CBC: 0
+  Data::Dumper: 0
+  Digest::SHA1: 0
+  Email::Send: 0
+  Exception::Class: 0
+  Exception::Class::DBI: 0
+  Exception::Class::TryCatch: 0
+  HTML::Entities: 0
+  Hash::Merge: 0
+  IO::Capture: 0
+  Log::Log4perl: 0
+  MIME::Base64: 0
+  MIME::Lite: 0
+  Scalar::Util: 0
+  Template: 0
+  Template::Plugin::HTML::Strip: 0
+  Test::Exception: 0
+  Test::Pod: 0
+  Time::HiRes: 0
+  YAML::Syck: 0
+provides:
+  Activator:
+    file: lib/Activator.pm
+  Activator::Config:
+    file: lib/Activator/Config.pm
+  Activator::DB:
+    file: lib/Activator/DB.pm
+  Activator::Dictionary:
+    file: lib/Activator/Dictionary.pm
+  Activator::Emailer:
+    file: lib/Activator/Emailer.pm
+  Activator::Exception:
+    file: lib/Activator/Exception.pm
+  Activator::Log:
+    file: lib/Activator/Log.pm
+  Activator::Options:
+    file: lib/Activator/Options.pm
+  Activator::Pager:
+    file: lib/Activator/Pager.pm
+  Activator::Registry:
+    file: lib/Activator/Registry.pm
+  Activator::Tutorial:
+    file: lib/Activator/Tutorial.pm
+  Catalyst::Plugin::Activator::Config:
+    file: lib/Catalyst/Plugin/Activator/Config.pm
+  Catalyst::Plugin::Activator::Dictionary:
+    file: lib/Catalyst/Plugin/Activator/Dictionary.pm
+  Catalyst::Plugin::Activator::Exception:
+    file: lib/Catalyst/Plugin/Activator/Exception.pm
+  Catalyst::Plugin::SecureCookies:
+    file: lib/Catalyst/Plugin/SecureCookies.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

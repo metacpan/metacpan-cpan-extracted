@@ -1,0 +1,7 @@
+---
+dirs-recursive:
+  .: ext/Data-Dumper
+exclude-regexes:
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?ppport\.h$'
+

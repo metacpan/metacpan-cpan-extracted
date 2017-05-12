@@ -1,0 +1,14 @@
+Revision history for Perl extension Algorithm.
+
+0.01  Thu Apr 11 19:19:59 2013
+        - original version; created by h2xs 1.23 with options
+                -X -n Algorithm
+0.02  Thu Apr 11 23:58:06 IST 2013
+        - Removed the POD errors
+0.03  Sat Jun  1 20:13:30 2013
+	- Removed Quick sorting of array before searching in Binary Search
+	- Improved Subroutine of Binary Search
+0.04  Monday May 5 22:12:30 2014
+	- Corrected Makefile.PL
+0.05  Monday May 5 22:12:30 2014
+	- Corrected folder name

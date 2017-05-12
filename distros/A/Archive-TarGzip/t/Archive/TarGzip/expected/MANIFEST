@@ -1,0 +1,8 @@
+lib/Docs/Site_SVD/Data_Str2Num.pm
+MANIFEST
+Makefile.PL
+README
+lib/Data/Str2Num.pm
+t/Data/Str2Num.d
+t/Data/Str2Num.pm
+t/Data/Str2Num.t

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 3328cba8b25078798fa4db28beecd65e2bad458f Build.PL
+SHA1 cc97e889a41642cf85ee5f78e5ab4f1f81af9c00 COPYING
+SHA1 9f94548492374fa636c90c2f6c2c75e73ebfd17e Changelog
+SHA1 9ddcab1cdc2f5d4255e28af017f3e24925d0c143 MANIFEST
+SHA1 7b92e79ad1042240200779bf344d9293f0b53390 META.json
+SHA1 207ed426f0a788ab79ddd38edc7f7d342f8c1ac6 META.yml
+SHA1 8876f9ae79a3eb999b6ede97ac061d93b0901dc7 README
+SHA1 ce11ca47b804722e2aed6fbe8ade832fadba2ea1 bin/raps2
+SHA1 288c1827b3f198d8ca5d93a0229849fffebf476f lib/App/Raps2.pm
+SHA1 333cacde00852d9a89aae9a294cef61e946df1db lib/App/Raps2/Password.pm
+SHA1 9539dabcebc181e2c3683325ee34570c9915843f lib/App/Raps2/UI.pm
+SHA1 16e17fb749b2b1e349e5e985bb68b0a0bd928766 t/00-compile.t
+SHA1 d6935cd7454a48ed1271dc18a4b87789fc5e02fb t/05-pod-compile.t
+SHA1 a922866224c2ec852fc541762cbbd3573217763e t/20-app-raps2-password.t
+SHA1 c6f5d5a037804b36a2725c879d3676c1677228ab t/29-app-raps2.t
+SHA1 29063e3932cc91591bc3477408b639f8e403f473 t/in/hash
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJWEU+xAAoJEBANW/tRZuAFeWkQAM2FaSrXBsPwHON61xnmgfHk
+IMu4b+dhiHEaVjv3htqX3Lx+hfzfB1tSTSeCaygGGjs0/XzVGLik9VUq4+7Xs+yW
+VZj9VQFTRxitR100PKAR2/OsGfKvPeFmSSL3ozXyMqmBtvwSWJqHHBsXzA0qyPq6
+jVQijgw6zoiapSRHVFokgVKbm7i0lp7K36XEr7MoFwYPOiLzrbtztvpOxjeCPpz4
+ZjO6RPTGhgZV3bzvVBZVNxPyiJ4AlgklX1u/d23uR+Lzb1DHTDjA7nGJbCv3piZT
+SpRXvKFeaO0NK2TM824SdpUABww2tXnroWmN33xWCK+DSqDFnszJtU4ga4gX1zxW
+cJQuoQyzOlzGG42vFZ0OXHK0HeuQzmgii7igiuCMorfwk4IeW+mwFt68n4dyWS8J
+1Tm5ZxOteyqVAAhF8keG1Vhasvs3plofNL2+6Jz/yGlrCiDd5hrus4SmOkAAMSr7
+DiZ+dkz4sTQpKlxvPNmPtLawiQHZuoOWzPj7VrGQlnTZcZRfZ4pfPTFbe8tAdJ81
+DNF2a6+pdjJTxKKGI7Suf2fu5xGWeoklW/r4OJQKQmbsvlqEhnEHRGqtRTuReHvY
+/ic3nb3ZVDwh9rHuV433K7QtSUyUx/aaE4Gh+XV2+BBjdgdMwtIGLqi8RdV0A/qC
+ZaGH6AAqhrl2QdtfmkxU
+=nUuB
+-----END PGP SIGNATURE-----

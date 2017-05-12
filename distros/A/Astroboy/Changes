@@ -1,0 +1,68 @@
+2009-02-04 10:13  cvs
+
+	* Astroboy-1.05.tar.gz, MANIFEST, t/00_albumdir_basic.t,
+	  t/01_albumfile_basic.t, t/02_astroboy.t,
+	  t/03_albumdir_advanced.t, t/04_guesstags.t: made it so the distro
+	  does not include my test mp3 suite, which is 1) bulky and 2)
+	  copyrighted
+
+2009-01-05 13:38  cvs
+
+	* bin/astroboyfindbad: made sure on missing args we say so for
+	  bin/astroboyfindbad
+
+2009-01-05 13:35  cvs
+
+	* t/04_guesstags.t: had to alter test 04 because it only works as
+	  hack on my laptop
+
+2009-01-05 13:25  cvs
+
+	* t/music/: dir1/velvet underground - loaded - 02 - sweet jane.mp3,
+	  dir1/velvet underground - loaded - 05 - new age.mp3, dir2_copy/01
+	  - Stone Temple Pilots - Meatplow.mp3, dir2_copy/01 - The
+	  Gutter.mp3, dir2_copy/03 Sober.mp3, dir2_copy/03 Vicious
+	  World.mp3, dir2_copy/06 Swamp Song.mp3, dir2_copy/Sonic Youth -
+	  03 - Theresa's Sound-world.mp3: renaming mp3 files so they have
+	  no spaces, this is for the manifest to work right
+
+2009-01-05 12:26  cvs
+
+	* README, bin/astroboy, bin/astroboyfindbad, lib/Astroboy.pod,
+	  lib/Astroboy/AlbumDir.pm, lib/Astroboy/AlbumFile.pm,
+	  lib/Astroboy/Base.pm: prepping for release
+
+2008-12-29 18:25  cvs
+
+	* Makefile.PL, bin/mp3resize, lib/Astroboy.pm, t/music/dir1/velvet
+	  underground - loaded - 02 - sweet jane.mp3, t/music/dir1/velvet
+	  underground - loaded - 05 - new age.mp3, t/music/dir2_copy/01 -
+	  Stone Temple Pilots - Meatplow.mp3, t/music/dir2_copy/01 - The
+	  Gutter.mp3, t/music/dir2_copy/03 Sober.mp3, t/music/dir2_copy/03
+	  Vicious World.mp3, t/music/dir2_copy/06 Swamp Song.mp3,
+	  t/music/dir2_copy/12-kuba_wandachowicz-wilderness.mp3,
+	  t/music/dir2_copy/Sonic Youth - 03 - Theresa's Sound-world.mp3,
+	  t/music/dir2_copy/Tom Waits - Foreign Affairs 02 - Muriel.mp3,
+	  t/music/dir2_copy/Violent Femmes - Viva Wisconsin - 05 - Gimme
+	  The Car.mp3, t/music/dir2_copy/Violent Femmes - Viva Wisconsin -
+	  12 - Good Feeling.mp3: resized mp3 files to be smaller, write
+	  mp3resize, included.
+
+2008-12-09 20:21  cvs
+
+	* MANIFEST, Makefile.PL, README, t/00_albumdir_basic.t,
+	  t/01_albumfile_basic.t, t/99_cleanup.sh, t/music/dir1/velvet
+	  underground - loaded - 02 - sweet jane.mp3, t/music/dir1/velvet
+	  underground - loaded - 05 - new age.mp3, t/music/dir1/velvet
+	  underground - loaded.txt, t/music/dir2_copy/01 - Stone Temple
+	  Pilots - Meatplow.mp3, t/music/dir2_copy/Tom Waits - Foreign
+	  Affairs 02 - Muriel.mp3, t/music/dir2_copy/03 Sober.mp3,
+	  t/music/dir2_copy/12-kuba_wandachowicz-wilderness.mp3,
+	  t/music/dir2_copy/Sonic Youth - 03 - Theresa's Sound-world.mp3,
+	  t/music/dir2_copy/01 - The Gutter.mp3, t/music/dir2_copy/06 Swamp
+	  Song.mp3, t/music/dir2_copy/Violent Femmes - Viva Wisconsin - 12
+	  - Good Feeling.mp3, bin/astroboy, lib/Astroboy/AlbumDir.pm,
+	  lib/Astroboy/AlbumFile.pm, t/music/dir2_copy/03 Vicious
+	  World.mp3, t/music/dir2_copy/Violent Femmes - Viva Wisconsin - 05
+	  - Gimme The Car.mp3: Initial revision
+

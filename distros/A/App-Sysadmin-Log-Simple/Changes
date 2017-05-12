@@ -1,0 +1,38 @@
+Revision history for Perl module App-Sysadmin-Log
+
+0.009     2013-08-26
+  - Actually, we need Path::Tiny 0.015 in the test suite
+
+0.008     2013-08-21
+  - Require Path::Tiny 0.008 in the test suite
+
+0.007     2013-08-20
+  - Update documentation to refer to the right executable name
+  - Use the right OS family to detect MS Windows
+
+0.006     2013-08-15
+  - Give up on Win32 support
+  - Rename "log" executable to "sysadmin-log" (so use uninst=1) [gh-14]
+  - Switch from File::Spec to Path::Tiny (<3!)
+  - Use Net::Twitter::Lite::WithAPIv1_1
+  - Add HTTP logger (gh-16; thanks djzort!)
+
+0.005     2012-06-05
+  - Remove perl5i - too slow
+  - Make the UDP stuff work right
+  - Improve a few minor design decisions
+  - Add DateTime::TimeZone dependency
+  - Fix the Twitter plugin
+  - Pass do_{twitter,udp,file} to log with that plugin
+
+0.004     2011-05-07
+  - Major rewrite, including the beginnings of a pluggable architecture
+
+0.003     2011-03-20
+  - Increase minimum version of File::Path required to 2.07 for make_path()
+
+0.002     2011-03-12
+  - Rewrite test - will hopefully resolve smoke testers failure reports
+
+0.001     2011-03-09
+  - Initial release

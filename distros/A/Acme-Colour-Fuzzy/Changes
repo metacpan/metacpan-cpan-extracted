@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme::Colour::Fuzzy.
+
+0.02  Sun Oct 14 19:06:42 CEST 2007
+	- Use Color::Similarity as interface for determining
+	  color similarity (default to Color::Similarity::HCL).
+
+0.01  Sun Mar 11 12:31:04 CET 2007
+	- First public release.
+

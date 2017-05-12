@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=frasier -le 'print metaname'
+     eddie
+    
+     % meta frasier 2
+     daly
+     donny
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+

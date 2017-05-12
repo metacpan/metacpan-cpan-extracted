@@ -1,0 +1,87 @@
+Revision history for Perl extension App::LogStats
+
+0.091  Sun May 12 22:21:30 JST 2013
+    [IMPROVEMENT]
+        - support coveralls.io: https://coveralls.io/r/bayashi/App-LogStats
+        - test enhancement
+        - tiny fix
+
+0.09   Sat Apr 20 12:29:37 JST 2013
+    [IMPROVEMENT]
+        - the option '--rc rcfile', it's supported '--rc=rcfile'
+        - try to read '/etc/.statsrc' as system configure
+        - tiny refactor
+
+0.083   Sat Apr 13 10:35:43 JST 2013
+    [NO CODE CHANGES]
+        - fixed the dependent module list: parent.pm
+
+0.082   Mon Apr  8 09:06:31 JST 2013
+    [IMPROVEMENT]
+        - fixed POD: added stddev and variance
+
+0.081   Sun Apr  7 15:01:04 JST 2013
+    [NO CODE CHANGES]
+        - fixed test: removed warnings
+
+0.08    Sun Apr  7 11:44:31 JST 2013
+    [BUG FIXES]
+        - fixed IO redirect target
+    [IMPROVEMENT]
+        - switched IO::Interactive to IO::Interactive::Tiny
+        - fixed shebang in 'stats'
+        - changed interface of calc util functions
+        - fixed indent
+
+0.07    Sat Apr  6 20:25:16 JST 2013
+    [NEW FEATURE]
+        - added new stats items: variance and stddev in '--more'
+
+0.06    Fri Apr  5 09:27:59 JST 2013
+    [IMPROVEMENT]
+        Text::ASCIITable is loaded lazy
+
+0.05    Fri Apr  5 09:04:28 JST 2013
+    [NEW FEATURE]
+        - new options: --cr and --crlf specify a line feed what you want(default: LF)
+    [IMPROVEMENT]
+        - refactoring about a logic of viewing logs, and Pod::Udage is loaded lazy
+        - fixed POD
+
+0.04    Wed Apr  3 08:21:33 JST 2013
+    [BUG FIXES]
+        - fixed the logic for calculating mode
+    [DOCUMENTATION]
+        - added EXAMPLE in bin/stats
+        - wrote the CONFIGURATION section
+
+0.03    Tue Apr  2 00:42:35 JST 2013
+    [NEW FEATURE]
+        - read custom settings from your '.statsrc' file.
+        - you can specify the path of custom setting file by a '--rc' option
+          (no documents yet..)
+    [BUG FIXES]
+        - fixed the logic for calculating a mode
+    [TEST FIXES]
+        - fixed broken tests
+        - added dependency modules for testing
+
+0.021   Sun Mar 31 23:21:38 JST 2013
+    [DOCUMENTATION]
+        - fixed EXAMPLE in bin/stats
+
+0.02    Sun Mar 31 22:05:03 JST 2013
+    [IMPROVEMENT]
+        - simplified a view of table
+
+0.012   Sun Mar 31 18:23:26 JST 2013
+    [IMPROVEMENT]
+        - added some tests
+
+0.011   Sun Mar 31 16:20:02 JST 2013
+    [IMPROVEMENT]
+        - refactored routines(no logic changes) and few tiny fixes(for speed etc)
+        - added few tests
+
+0.01    Sun Mar 24 22:13:57 2013
+        - original version

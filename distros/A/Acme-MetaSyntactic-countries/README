@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     % perl -MAcme::MetaSyntactic=countries -le 'print metaname'
+     indonesia
+    
+     % meta countries 2
+     ghana
+     china
+
+SEE ALSO
+
+    Acme::MetaSyntactic
+

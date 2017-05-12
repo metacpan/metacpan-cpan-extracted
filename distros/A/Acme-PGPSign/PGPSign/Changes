@@ -1,0 +1,4 @@
+Revision history for Perl extension Acme::PGPSign.
+
+0.01  Tue Jul 22 09:27:27 2003
+      Original Release - requires keyring already setup.

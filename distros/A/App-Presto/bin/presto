@@ -1,0 +1,343 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Command-line interface for RESTful web services
+# PODNAME: presto
+
+use App::Presto;
+
+App::Presto->run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+presto - Command-line interface for RESTful web services
+
+=head1 VERSION
+
+version 0.010
+
+=head1 SYNOPSIS
+
+Invoke from the shell:
+
+	bash$ presto http://my-server.com
+
+Very basic usage:
+
+	http://my-server.com> GET /product/1.json
+	{"id":1,"name":"My Product"}
+
+	http://my-server.com> HEAD /product/1.json
+	HTTP/1.1 200 OK
+	Connection: close
+	Date: Thu, 28 Jun 2012 21:05:33 GMT
+	Content-Length: 0
+	Content-Type: application/json
+	Client-Date: Thu, 28 Jun 2012 21:05:44 GMT
+	Client-Response-Num: 1
+
+=head1 DESCRIPTION
+
+C<App::Presto> provides a command-line interface (CLI) for RESTful
+web services.  When looking for a way to interact with RESTful services
+answers typically point to some horrible GUI or (on the complete opposite
+end of the spectrum) just using C<curl> directly on the command-line.
+This tool attempts to find some sort of middle ground by providing a
+quasi-DSL for interacting with a RESTful service in an interactive way.
+
+=head1 FEATURES
+
+=head2 Basic HTTP methods
+
+All HTTP methods are implemented as commands in presto.  The URL that is
+given is appended to the endpoint specified when presto is invoked as
+shown in the SYNOPSIS above.
+
+=head2 Request Building
+
+If the endpoint contains a C<*> character the URL fragment specified in
+the GET/POST/etc command is inserted at that point. This allows you to
+do things like auto-append a file extension to all URLs.  For instance:
+
+	bash$ presto http://my-server.com*.json
+	http://my-server.com> GET /product/1
+
+In this case, the full URL would be
+C<http://my-server.com/product/1.json>.  If no C<*> is found in the URL,
+the URL fragment is simply appended at the end of the endpoint.
+
+All arguments after the first will be treated as query parameters (for
+GET/HEAD/DELETE requests) or request content (for POST/PUT requests). For
+instance:
+
+	http://my-server.com> GET /products limit=10 offset=20
+  # request goes to http://my-sever.com/products?limit=10&offset=20
+
+	http://my-server.com> POST /products '{"name":"A New Product"}'
+  # request goes to http://my-sever.com/products with the body as specified
+
+You can also specify additional headers you would like included in the request:
+
+	# the ":" is optional
+	http://my-server.com> header Accept: application/json
+
+	# shortcut for "header Content-Type application/json"
+	http://my-server.com> type application/json
+
+	# shortcut for "header Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+	http://my-server.com> authorization Aladdin 'open sesame'
+
+	# view all headers
+	http://my-server.com> headers
+
+	# view specific header
+	http://my-server.com> header Authorization
+
+	# clear all headers
+	http://my-server.com> headers --clear
+
+	# unset specific header
+	http://my-server.com> header --unset Authorization
+
+If you are creating form URL-encoded data, a shortcut has been made to avoid having
+to manually URL-encode everything manually:
+
+	http://my-server.com> form foo=bar baz=1,2,3
+
+	# outputs
+	foo=bar&baz=1%2C2%2C3
+
+=head2 Response Handling
+
+By default, presto will just dump the response body to the screen after
+a request is completed. There are additional options, however:
+
+	# dump full request/response to the screen (exactly as transmitted over the wire)
+	http://my-server.com> config verbose 1
+
+	# parse the response according to the content-type and use
+	# Data::Dumper to display it
+	http://my-server.com> config deserialize_response 1
+
+	# use something other than Data::Dumper to dump a parsed
+	# response body
+	http://my-server.com> config pretty_printer JSON
+	http://my-server.com> config pretty_printer Data::Dump
+
+	# send the output to a file (the '>' must not be followed by any white-space!)
+	http://my-server.com> GET /some-image.png >some-image.png
+
+Pretty-printing can be especially helpful for making XML or JSON response
+bodies more human-readable.
+
+When C<deserialize_response> is set, if the content-type of the
+response is "text/html", the HTML is automatically stripped with
+L<HTML::FormatText::WithLinks> and displayed as formatted text.
+
+If the request or response body is binary (using a simple heuristic
+like the C<-B> file-test operator), the output is not printed to STDOUT.
+Instead, you may want to use output redirection as show above and send
+the response body to a file.
+
+	http://my-server.com> GET /some-image.jpg >foo.jpg
+
+=head2 Persistent Configuration
+
+As demonstrated above, you can use the C<config> command to change the
+behavior of presto.  These configuration options are persisted in a
+config file specific to the endpoint provided at the command-line and
+will be reloaded the next time you invoke presto with the same endpoint.
+
+Current valid config keys are:
+
+=over 4
+
+=item * verbose
+
+Boolean, when enabled, dumps request/response to STDOUT (defaults to "0")
+
+=item * deserialize_response 
+
+Boolean, when enabled response body is parsed based on the C<Content-Type>
+header (defaults to "1")
+
+=item * pretty_printer
+
+Must be one of the supported modules (i.e. Data::Dumper or JSON).
+Use tab completion to see currently supported values (defaults to "JSON").
+
+=item * binmode
+
+Used to set encoding of STDIN and STDOUT handles (defaults to "utf8")
+
+=back
+
+B<TODO:> provide a means for aliasing endpoints so that configuration
+is shared across multiple endpoints.
+
+=head2 History and Scripting
+
+Just like configuration, command history is maintained separately for each
+endpoint specified on the command-line and is persisted across sessions
+(assuming you have a capable Term::Readline library installed).  You can
+interrogate the history using the (surprisingly named) C<history> command.
+It supports a small subset of the C<bash> history command:
+
+	# dump all history
+	http://my-server.com> history
+
+	# dump last 5 entries
+	http://my-server.com> history 5
+
+	# delete specific history entries
+	http://my-server.com> history -d 4
+
+	# clear history
+	http://my-server.com> history -c
+
+Presto also provides a way of saving and replaying bits of your command
+history. Here are some examples:
+
+	# save all history to script file "my-script"
+	http://my-server.com> save my-script
+
+	# save the last 5 history entries
+	http://my-server.com> save my-script 5
+
+	# save entries 3-7
+	http://my-server.com> save my-script 3..7 
+
+To replay scripts:
+
+	http://my-server.com> source my-script
+
+	# prompt before each command
+	http://my-server.com> source -i my-script
+
+=head2 Variable interpolation
+
+At times (especially when working with scripts) it might be handy to
+use elements from a previous response to affect a subsequent request.
+Anything inside a balanced C<$(...)> will be interpolated for you.
+For instance, a very contrived example:
+
+	# hypothetical authentication protocal that returns a token in the response headers
+	http://my-server.com> POST /auth.json username=jdoe&password=s3cr3t
+	{"authenticated":true}
+
+	# see the authentication token
+	http://my-server.com> echo $(HEADER[X-Auth-Token])
+	2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae
+
+If you need to include that in subsequent request, you can use the "stash" feature:
+
+	# store the value
+	http://my-server.com> stash auth-token $(HEADER[X-Auth-Token])
+
+	# use the value later
+	http://my-server.com> header X-Auth-Token $(STASH[auth-token])
+
+Those variable substitutions can be used anywhere in a command.  C<HEADER>
+and C<BODY> always refer to the most recent request while the C<STASH>
+is a persisted for the life of the process.
+
+One useful feature for scripting is to prompt for user input.  You can do
+this by using the C<PROMPT> pseudo-variable.  The first set of brackets
+specify the prompt value.  The second (optional) set of brackets specify
+the initial value.  An example:
+
+	# collect the username/password from the user
+	http://my-server.com> stash username $(PROMPT[username:])
+	http://my-server.com> stash password $(PROMPT[password:])
+
+	# use the stashed values
+	http://my-server.com> authorization $(STASH[username]) $(STASH[password])
+	http://my-server.com> GET /$(STASH[username])/profile
+
+	# or use a value that was prompted for directly (without stashing it)
+	http://my-server.com> GET /products 'created_on=$(PROMPT[Created on (YYYY-MM-DD):])'
+
+	# you can also specify initial values
+	http://my-server.com> GET /products 'status=$(PROMPT[Product status:][active])'
+
+You may also specify a local file to use as an argument to a command.  An example:
+
+	http://my-server.com> POST /products $(FILE[my-product.xml])
+
+The file is assumed to be in the same encoding as the C<binmode>
+configuration.  If it is using a different character set, you can specify
+that in a second bracketed parameter:
+
+	http://my-server.com> POST /products $(FILE[my-product.xml][latin-1])
+
+The contents of the file will be slurped, decoded and included as an
+argument to the command as if you had typed it on the command-line
+directly.
+
+B<TODO:> Allow data structure references (from C<STASH> or even C<BODY>)
+to be passed to a POST or PUT command which is then serialized based
+on the content-type of the request before being sent over the wire.
+
+=head2 (EXPERIMENTAL) Data::DPath integration
+
+As an add-on to the variable interpolated described above, you can
+use dpath expressions to further process the data returned from the
+REST service.  Another very contrived example:
+
+	http://my-server.com> GET /products.json
+	[{"id":"1","name":"My Product"},{"id":"2","name":"Another Product"}]
+
+	# issue a request to /product/2.json
+	http://my-server.com> GET /product/$(BODY/id[-1]).json
+	{"id":2,"name":"Another Product"}
+
+In this example, anything after C<BODY> (including the C</>) is passed
+to L<Data::DPath> and the result is then injected in it's place (the target
+data for C<BODY> being the previous request's response data).
+
+This feature will work on C<$(STASH)> values as well.
+
+=head1 CAVEAT EMPTOR
+
+This is beta-quality code and while I use it in my own daily workflow,
+it is likely riddled with horribly obvious bugs and missing functionality
+(let alone undocumented features).
+
+=head1 ACKNOWLEDGEMENTS
+
+Much of this was inspired by L<resty|https://github.com/micha/resty>
+which is a rather magical (aka convoluted) set of bash functions (at least
+for this occassional bash programmer).  After attempting to understand
+and enhance L<resty|https://github.com/micha/resty>, I decided to try
+my hand at creating something a little more perlish.
+
+A big thank you to L<Shutterstock Images|http://shutterstock.com> for
+allowing me to work on this on company time and release it to the CPAN.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Brian Phillips <bphillips@cpan.org>
+
+=item *
+
+Matt Perry <matt@mattperry.com> (current maintainer)
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Brian Phillips and Shutterstock Images (http://shutterstock.com).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,9 @@
+This is a Perl5 interface to the AOL Instant Messenger "TOC" service. Enclosed
+you should find the appropriate modules (put them in your PERLLIB somewhere)
+and a couple example scripts, including a simple "bot."
+
+I'm not big on writing documentation, so it's assumed that if you're playing
+with this that you dig perl, and don't mind reading the code :-)
+
+- James
+  james@foo.org

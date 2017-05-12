@@ -1,0 +1,51 @@
+App-Reg
+
+App::Reg is utility that is wrapper to re 'debug'. Sometimes, the
+regexpes aren't working, but I was too lazy to constantly type this.
+
+    perl -Mre=debug -e'"abc"=~/a.c/'
+
+Why bother with constantly typing it when you can have wrapper.
+
+    re 'abc' 'a.c'
+
+And it just works!
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::Reg
+
+You can also look for information at:
+
+    Issues tracker (report bugs here)
+        https://github.com/GlitchMr/App-Reg/issues
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/App-Reg
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/App-Reg
+
+    Search CPAN
+        http://search.cpan.org/dist/App-Reg/
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2012 by Konrad Borowski.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

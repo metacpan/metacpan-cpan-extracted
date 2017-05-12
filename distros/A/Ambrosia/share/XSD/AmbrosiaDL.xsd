@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- moget ya ostanus -->
+<xs:schema
+  xmlns:atns="app://Ambrosia/EntityDataModel/2011/V1"
+  targetNamespace="app://Ambrosia/EntityDataModel/2011/V1"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.1">
+
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This Schema describe the ADL (Ambrosia Definition Language).
+      Version 0.010.
+      Copyright 2012 (C) Nikolay Kuritsyn. All rights reserved.
+    </xs:documentation>
+  </xs:annotation>
+
+<!--
+    Ambrosia base types
+-->
+
+  <xs:simpleType name="Boolean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="YES"/>
+      <xs:enumeration value="NO"/>
+    </xs:restriction>
+  </xs:simpleType> 
+
+  <xs:simpleType name="EntityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ABSTRACT"/>
+      <xs:enumeration value="TABLE"/>
+      <xs:enumeration value="VIEW"/>
+      <xs:enumeration value="BIND"/>
+      <xs:enumeration value="TREE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DataSource">
+    <xs:annotation>
+      <xs:documentation>
+        The list of types of the data source.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DBI"/>
+      <xs:enumeration value="Resource"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EngineSource">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="mysql"/>
+      <xs:enumeration value="Pg"/>
+      <xs:enumeration value="Hash"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CommonGatewayInterface">
+    <xs:annotation>
+      <xs:documentation>
+        The list of types of the CommonGatewayInterface.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CGI"/>
+      <xs:enumeration value="ApacheRequest"/>
+      <xs:enumeration value="Options"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+<!-- ROOT ELEMENT -->
+  <xs:element name="Application">
+    <xs:annotation>
+      <xs:documentation>
+        The root element for application definition.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Config">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CommonGatewayInterface">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Params" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>
+                              Have any attributes that are needed for CommonGatewayInterface such as Cache_control, Pragma etc.
+                          </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:anyAttribute processContents="skip"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Engine" type="atns:CommonGatewayInterface"/>
+                </xs:complexType>
+              </xs:element>
+              <!-- end of CommonGatewayInterface -->
+              <xs:element name="Host" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="Name" type="xs:NCName" use="required"/>
+                  <xs:attribute name="ProjectPath" type="xs:string" use="required"/>
+                  <xs:attribute name="PerlLibPath" type="xs:string" use="optional"/>
+                  <xs:attribute name="ServerName" type="xs:NCName" use="required"/>
+                  <xs:attribute name="ServerPort" type="xs:short" use="optional" default="80"/>
+                  <xs:attribute name="Debug" type="atns:Boolean" use="optional" default="NO"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <!-- end of Config -->
+
+        <xs:element name="DataSource">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Type" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Source">
+                      <xs:complexType>
+                        <xs:attribute name="Name" type="xs:NCName" use="required"/>
+                        <xs:attribute name="Engine" type="atns:EngineSource" use="required"/>
+                        <xs:attribute name="Catalog" type="xs:NCName" use="optional"/>
+                        <xs:attribute name="Schema" type="xs:NCName" use="required"/>
+                        <xs:attribute name="User" type="xs:NCName" use="required"/>
+                        <xs:attribute name="Password" type="xs:string" use="optional"/>
+                        <xs:attribute name="Params" type="xs:string" use="optional"/>
+                        <xs:attribute name="Charset" type="xs:string" use="optional" default="utf8"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="Name" type="atns:DataSource"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <!-- end of DataSource -->
+
+        <xs:element ref="atns:Entitys"/>
+        <xs:element ref="atns:Relations"/>
+
+        <xs:element name="MenuGroups">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Group" type="atns:Group" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="Name" use="required" type="xs:NCName"/>
+      <xs:attribute name="Label" use="optional" type="xs:string"/>
+      <xs:attribute name="Charset" use="optional" type="xs:NCName" default="utf-8"/>
+      <xs:attribute name="Language" use="optional" type="xs:string" default="en"/>
+      <xs:attribute name="Authorization" use="optional" type="atns:Boolean" default="YES"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- End Application element -->
+
+  <xs:element name="Entitys">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="atns:Entity" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:key name="PKEntity">
+      <xs:selector xpath="atns:Entity"/>
+      <xs:field xpath="@Id"/>
+    </xs:key>
+
+    <xs:keyref name="fk_RelationEntity" refer="atns:PKEntity">
+      <xs:selector xpath="atns:Relations/atns:Relation"/>
+      <xs:field xpath="@RefId"/>
+    </xs:keyref>
+
+    <xs:keyref name="fk_RelationEntityRef" refer="atns:PKEntity">
+      <xs:selector xpath="atns:Relations/atns:Relation/atns:EntityRef"/>
+      <xs:field xpath="@RefId"/>
+    </xs:keyref>
+
+    <xs:keyref name="fk_GroupEntity" refer="atns:PKEntity">
+      <xs:selector xpath="atns:MenuGroups/atns:Group"/>
+      <xs:field xpath="@RefId"/>
+    </xs:keyref>
+  </xs:element>
+
+  <xs:element name="Relations">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Relation" type="atns:Relation" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+  </xs:element>
+
+  <!-- ....................................................................... -->
+  <xs:element name="Entity">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Key" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FieldRef" type="atns:FieldRef" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="AutoUniqueValue" type="atns:Boolean" use="optional" default="NO"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Field" type="atns:Field" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="Id" type="xs:integer" use="required"/>
+      <xs:attribute name="Name" type="xs:NCName" use="required"/>
+      <xs:attribute name="DataSourceTypeRef" type="atns:DataSource" use="required"/>
+      <xs:attribute name="DataSourceNameRef" type="xs:NCName" use="required"/>
+      <xs:attribute name="SourcePath" type="xs:NCName" use="required"/>
+      <xs:attribute name="Type" type="atns:EntityType" use="required"/>
+      <xs:attribute name="Extends" type="xs:string" use="optional"/>
+      <xs:attribute name="Label" type="xs:string" use="optional"/>
+    </xs:complexType>
+
+    <xs:key name="PKField">
+      <xs:selector xpath="atns:Field"/>
+      <xs:field xpath="@Name"/>
+    </xs:key>
+
+    <xs:keyref name="fieldRef" refer="atns:PKField">
+      <xs:selector xpath="atns:Key/atns:FieldRef"/>
+      <xs:field xpath="@Name"/>
+    </xs:keyref>
+  </xs:element>
+
+  <xs:complexType name="FieldRef">
+    <xs:attribute name="Name" type="xs:NCName"/>
+  </xs:complexType>
+
+  <xs:complexType name="Field">
+    <xs:attribute name="Name" type="xs:NCName" use="required"/>
+    <xs:attribute name="Label" type="xs:string" use="optional"/>
+    <xs:attribute name="Title" type="xs:string" use="optional"/>
+    <xs:attribute name="Type" type="xs:NCName" use="required"/>
+    <xs:attribute name="Unsigned" type="atns:Boolean" use="optional" default="NO"/>
+    <xs:attribute name="Size" type="xs:short" use="required"/>
+    <xs:attribute name="Hidden" type="atns:Boolean" use="optional" default="NO"/>
+    <xs:attribute name="IsNullable" type="atns:Boolean" use="optional" default="NO"/>
+    <xs:attribute name="Default" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <!-- ....................................................................... -->
+  <xs:complexType name="Relation">
+    <xs:sequence>
+      <xs:element name="EntityRef" type="atns:EntityRef" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="RefId" type="xs:integer" use="required"/>
+    <xs:attribute name="Type" type="xs:NCName" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="EntityRef">
+    <xs:attribute name="RefId" type="xs:integer" use="required"/>
+ <!--
+  The attribute "Feedback" use for back reference.
+  The element "Relation" establishes a direct link to another object
+  and if it need access to current, then you must set "Feedback='YES'"
+ -->
+    <xs:attribute name="Feedback" type="atns:Boolean" use="optional" default="NO"/>
+    <xs:attribute name="Multiplicity" type="atns:Boolean" use="required" />
+    <xs:attribute name="Optional" type="atns:Boolean" use="optional" />
+    <xs:attribute name="To" type="xs:NCName" use="required"/>
+    <xs:attribute name="From" type="xs:NCName" use="required"/>
+    <xs:attribute name="Role" type="xs:NCName" use="required"/>
+  </xs:complexType>
+
+  <!-- ....................................................................... -->
+  <xs:complexType name="Group">
+    <xs:sequence>
+      <xs:element name="EntityRef" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="RefId" type="xs:integer" use="required"/>
+          <xs:attribute name="Type" type="xs:NCName" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:NCName" use="required"/>
+    <xs:attribute name="Title" type="xs:string" use="optional"/>
+  </xs:complexType>
+</xs:schema>

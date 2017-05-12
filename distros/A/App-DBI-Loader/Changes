@@ -1,0 +1,7 @@
+Revision history for App-DBI-Loader
+
+v0.0.2    2013-12-03 22:58:02 Asia/Tokyo
+    - Avoid lives_ok that contains fork for Win32 environment (close gh-6).
+
+v0.0.1    2013-12-02 23:17:11 Asia/Tokyo
+    - Initial release.

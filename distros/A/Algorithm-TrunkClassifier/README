@@ -1,0 +1,47 @@
+TrunkClassifier version v1.0.1
+============================
+
+This Perl module is the implementation of the Decision Trunk Classifier algorithm. It is composed of
+a set of Perl pm files accompanied by a C library. The module has been tested to install and run
+on Mac OS X and Linux Ubuntu. See the online documentation at CPAN for more detailed information about
+how to use the algorithm.
+
+INSTALLATION
+
+To install this module in Ubuntu or OS X, navigate to this folder in a
+terminal and type the following:
+
+   perl Build.PL
+   ./Build
+   sudo ./Build install
+
+To install in Windows, open a DOS prompt and type the following:
+
+   cpan
+   install Algorithm::TrunkClassifier
+
+DEPENDENCIES
+
+This module requires the following Perl modules to be installed:
+-Module::Build
+-ExtUtils::CBuilder
+-XSLoader
+-Exporter
+-POSIX
+
+In addition, a GNU C compiler is required for module installation.
+
+RUNNING THE ALGORITHM
+
+The quickest way to test the algorithm is to use the run_classifier.pl script in the t/ folder. After the
+module is installed, navigate the the t/ folder and type the following:
+
+perl run_classifier.pl -v -o test_set_tissue -s test_supp.txt test_data.txt
+
+For a description of command line arguments, input files and output, please see the CPAN documentation.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Benjamin Ulfenborg
+
+This module is free to use, modify and redistribute for academic purposes.

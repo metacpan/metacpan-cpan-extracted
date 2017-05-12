@@ -1,0 +1,26 @@
+---
+abstract: 'Utility package to install and locate libjio'
+author:
+  - 'Jonathan Yu <jawnsy@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  ExtUtils::ParseXS: 0
+  Module::Build: 0.2808_01
+  Test::More: 0.62
+  Test::NoWarnings: 0.084
+configure_requires:
+  Module::Build: 0.2808_01
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200003, CPAN::Meta::Converter version 2.102400'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Libjio
+requires:
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-Libjio
+  homepage: http://search.cpan.org/dist/Alien-Libjio
+  repository: git://github.com/jawnsy/Alien-Libjio.git
+version: 1.004

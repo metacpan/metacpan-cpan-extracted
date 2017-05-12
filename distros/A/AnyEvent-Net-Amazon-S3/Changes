@@ -1,0 +1,177 @@
+Revision history for Perl module AnyEvent::Net::Amazon::S3:
+
+v0.04.0.80 Mon May 04 20:30:33 JST 2015
+    - Sync with Net::Amazon::S3 0.80.
+
+v0.03.0.60 Sat Aug 16 13:49:59 JST 2014
+    - Sync with Net::Amazon::S3 0.60.
+
+v0.02.0.58 Wed Dec 19 23:40:13 JST 2012
+    - Rename s3cl to avoid conflict with original module.
+
+v0.01.0.58 Tue Dec 11 00:12:28 JST 2012
+    - Adapt to Net::Amazon::S3 0.58.
+
+v0.01.0.57 Sat Dec 08 17:43:59 JST 2012
+    - Initial release.
+
+Revision history for Perl module Net::Amazon::S3:
+
+0.60 Sun May 11 23:36:38 BST 2013
+    - Moose enum fixes (patch by Tom Hukins)
+    - Support for reduced redundancy (patch by Aaron Crane)
+    - README file name fix (patch by Jay Hannah)
+    - Fixed s3cl synopsis for sync_up (patch by perlpong)
+
+0.59 Sat Mar 17 09:36:38 GMT 2013
+    - Added support for security token authentication (patch by Miquel Ruiz)
+
+0.58 Wed Nov 28 16:22:42 GMT 2012
+    - Added support for multi-part upload and multiple objects deletion (patch
+      by Robert B. Clarke)
+
+0.57 Sun Sep 16 22:38:38 BST 2012
+    - Added support for Content-disposition (initial patch by Michele Beltrame)
+    - Added sync_up option to s3cl (patch by Leo Lapworth)
+    - Dist::Zilla tidying
+
+0.56 Sun Dec 18 22:22:32 GMT 2011
+    - Spelling error (RT #69817, patch from Fabrizio Regalli)
+    - Added use_ok tests (RT #72856, suggested by Gregor Herrmann)
+    - Added missing use URI::Escape (RT #72857, patch from Gregor Herrmann)
+    - Bumped dependency on MooseX::StrictConstructor to 0.16 (RT #73229,
+      suggested by Andrew Main)
+    - Enforce dependency versions (RT #73193, suggested by Andrew Main)
+
+0.55 Sat Dec 10 00:55:29 GMT 2011
+    - Replaced dependency on MooseX::Types::DateTimeX with
+      MooseX::Types::DateTime::MoreCoercions (RT #72472).
+
+0.54 Sat Mar 21 21:23:32 BST 2011
+    - Fix for a naked qw() warning (patch by David Wheeler)
+    - Fixed path issues (patch by Pavel Karoukin)
+      *WARNING* THIS MIGHT BREAK EXISTING APPS *WARNING*
+    - Author and development information changes
+
+0.53 Tue Mar 30 15:24:19 BST 2010
+    - fix authenticated urls to work with EU buckets (patch by Edmund
+      von der Burg)
+    - tiny POD fix (patch by Frank Wiegand)
+    - add an exists method to Net::Amazon::S3::Client (suggested by
+      David Golden)
+    - fix max_keys when listing buckets (spotted by Andrew Bryan)
+    - add content_encoding to Net::Amazon::S3::Object (suggested
+      by Egor Korablev)
+    - update s3cl: You need to use the module before you use it,
+      added the mkbucket command, now you can run the help without
+      your AWS secret key, add docs about the env variables you need
+      to run s3cl (patches by Jesse Vincent)
+
+0.52 Thu Jul  2 09:17:11 BST 2009
+    - increase version prerequisites for some modules so that they
+      are known to work
+
+0.51 Tue May 19 08:31:59 BST 2009
+    - use MooseX::Types::DateTimeX so that we work with latest Moose
+      (noticed by Ted Zlatanov)
+
+0.50 Wed Jan 21 10:42:00 GMT 2009
+    - add support for an expires header when putting an object to
+      Net::Amazon::S3::Client::Object
+    - make all the classes immutable
+    - add query_string_authentication_uri() to
+      Net::Amazon::S3::Client::Object, suggested by Meng Wong
+
+0.49 Tue Jan 13 09:04:42 GMT 2009
+    - add support for listing a bucket with a prefix to
+      Net::Amazon::S3::Client::Bucket
+
+0.48 Thu Dec  4 09:24:23 GMT 2008
+    - be slightly less strict about bucket names: they can contain uppercase
+      letters, Amazon just doesn't recommend it (noticed by Simon Elliott,
+      fixes Brackup)
+
+0.47 Tue Dec  2 08:03:39 GMT 2008
+    - fix listing with a prefix (spotted by Nobuo Danjou)
+
+0.46 Mon Nov 24 08:53:18 GMT 2008
+    - refactor request creation into Net::Amazon::S3::Request
+      and many subclasses
+    - move to Moose
+    - add Net::Amazon::S3::Client and subclasses
+
+0.45 Wed Aug 20 17:06:49 BST 2008
+    - make add_key, head_key etc. return all the headers, not
+      just the X-Amazon ones (patch by Andrew Hanenkamp)
+    - require IO::File 1.14 (noticed by tsw)
+    - remove DateTime::Format::Strptime prerequisite as it was not
+      being used (noticed by Yen-Ming Lee)
+    - do not try and parse non-XML errors (patch by lostlogic)
+    - make it possible to store and delete the key "0"
+      (patch by Joey Hess)
+    - make it possible to store empty files (patch by BDOLAN)
+    - add Copy support (patch by BDOLAN)
+    - add s3cl for command-line access (patch by Leo Lapworth)
+
+0.44 Thu Mar 27 08:35:59 GMT 2008
+    - fix bug with storing files consisting of "0" (thanks to
+      Martin Atkins)
+
+0.43 Sat Mar  1 10:55:54 GMT 2008
+     - add binmode() to support Windows (thanks to Gabriel Weinberg)
+
+0.42 Thu Feb 28 06:39:59 GMT 2008
+     - add exponential backoff upon temporary errors with the new
+       retry option
+
+0.41 Fri Nov 30 10:42:26 GMT 2007
+     - fix the expensive tests (patch by BDOLAN)
+     - added support for EU buckets (patch by BDOLAN)
+
+0.40 Tue Oct 30 11:40:42 GMT 2007
+     - fix for content length with empty keys by Mark A. Hershberger
+     - get_key and get_key_filename now return content_length
+     - rewrote synopsis
+     - added support for common prefix (thanks to Andy Grundman)
+
+0.39 Sun Aug 19 14:47:01 BST 2007
+     - add add_key_filename and get_key_filename which send files
+       directly from disk - good for large files (Jim Blomo)
+     - support UTF8 keys (Jim Blomo)
+     - switch back from Build.PL to Makefile.PL
+
+0.38 Sun Mar  4 16:43:28 GMT 2007
+     - use http_proxy and https_proxy environment variables for proxy
+       settings (Ask Bjoern Hansen)
+     - don't add the Authorization header if one is already specified
+       when making a request - good for allowing caching to resources
+       that are public. (Ask Bjoern Hansen)
+
+0.37 Fri Oct 13 19:14:57 BST 2006
+     - added support for ACLs (thanks to Gordon McCreight)
+
+0.36 Sun Sep 10 16:30:39 BST 2006
+     - remove extra warning
+
+0.35 Sun Sep 10 16:25:44 BST 2006
+     - added list_bucket_all to stop having to worrying about 'marker'
+
+0.34 Sun Sep 10 07:27:06 BST 2006
+     - added next marker and more docs from Jesse Vincent
+
+0.33 Sat Aug 26 16:26:37 BST 2006
+     - documentation and test cleanup from Jesse Vincent
+     - use HTTP keep alive (patch by Scott Gifford)
+     - remove ununused code in _make_request (patch by Scott Gifford)
+
+0.32 Tue Apr 25 19:51:06 BST 2006
+     - fix bug with listing buckets with parameters (thanks to karjala)
+
+0.31 Tue Apr  4 21:15:02 BST 2006
+     - many patches from Brad Fitzpatrick to make change the API, make
+       return values sane, add err/errstr, make Bucket object
+     - added a timeout option as suggested by Brad Dixon
+     - it's the Brad release!
+
+0.30 Mon Mar 20 20:20:29 GMT 2006
+     - initial release

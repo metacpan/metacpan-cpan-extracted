@@ -1,0 +1,50 @@
+=for HTML <a href="https://travis-ci.org/ivanwills/git-workflow-tools"><img src="https://travis-ci.org/ivanwills/git-workflow-tools.svg?branch=master"></a>
+<a href='https://coveralls.io/r/ivanwills/git-workflow-tools?branch=master'><img src='https://coveralls.io/repos/ivanwills/git-workflow-tools/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=head1 git-workflow-tools
+
+A bunch of tools to help ease the git workflow process
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc git-workflow-tools
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=git-workflow-tools
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/git-workflow-tools
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/git-workflow-tools
+
+    Search CPAN
+        http://search.cpan.org/dist/git-workflow-tools/
+
+    Source Code
+        git://github.com/ivanwills/git-workflow-tools.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

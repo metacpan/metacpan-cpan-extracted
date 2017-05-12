@@ -1,0 +1,135 @@
+=pod
+
+=head1 NAME
+
+Astroboy - organize mp3 files by album and artist
+
+=head1 DESCRIPTION
+
+Astroboy is a set of tools to organize your mp3 collection on disk.
+
+You can point Astroboy to an mp3 file anywhere on the hard drive, 
+and it will look inside it for id3 tags
+artist and album, and move the file to ~/music/artist/album/file.
+
+=head2 MOTIVATION
+
+We had a repository of many mp3 files, that needed to be kept in some check,
+as to artist names, etc.
+This will allow you to organize many many many files.
+
+=head1 ABS MUSIC
+
+You should have a place on disk where you organize your music.
+By default this place is ~/music
+If you don't want to keep providing as argument to the cli tools this path,
+and you keep your music elsewhere, you can symlink to solve the issue.
+
+Imagine you keep your mp3s in '/usr/share/music', and you have these users 
+who will be using astroboy to arrange the music in the same place, 'joe', 'root', 'jane'.
+Do this, as root:
+
+   ln -s /usr/share/music /home/joe/music
+   ln -s /usr/share/music /home/jane/music
+   ln -s /usr/share/music /root/music
+   chown joe.joe /home/joe/music
+   chown jane.jane /home/jane/music
+
+That is an example of what you would do.
+
+=head1 USING ASTROBOY
+
+You call astroboy via the command line.
+   
+   astroboy
+
+You can provide as argument a directories or files.
+
+   astroboy ./album_dir   
+   astroboy ./musicfiles/file1.mp3
+
+Directories are expected to be albums, with a set of mp3 files.
+Files are expected to be mp3 files with album and artist id3 tags.
+
+=head2 Sorting albums and files
+
+Astroboy can be told to sort an album or a file.
+
+What's the difference?
+An album is a collection of files, of which most are mp3 files.
+A file must be an mp3 file.
+
+When we sort an album, it's really just a directory that we try to interpret
+as a colleciton of files. We run heuristics to findout what the album and artist is for all
+the files therein.
+
+=head1 TOUBLESHOOTING
+
+=head2 Albums and files that won't sort
+
+=head3 Albums won't sort if:
+
+Most files are not mp3 files.
+The files do not have album and artist id3 tags.
+All mp3 files must have the same artist and album tags.
+
+=head3 Solutions
+
+You may have par2 files and txt files that ammount to more than the count of mp3 files. 
+Delete the par2 files, and run astroboy again.
+
+   rm album/*par2 album/*PAR2
+   astroboy album/
+
+Also make sure the files have album and artist id3 tags.
+
+=head2 Making sure files have artist and album tags
+
+Maybe the mp3 files are missing album and artist tags?
+
+   id3info album/*mp3
+
+If so, you can place the id3tag, and run astroboy again:
+
+   id3tag --album="Super" --artist="The Best" ./album/*mp3
+   astroboy album/
+
+=head1 TODO
+
+Use configuration file.
+
+Let configuration specify sort order. 
+Presently it is artist/album. Is there a call for another hierarchy structure?
+
+=head1 SEE ALSO
+
+L<Astroboy::API> - still in development.
+L<astroboy> - cli.
+
+=head1 CAVEATS
+
+This package is in development.
+Do not use the api.
+Use the cli.
+
+=head1 BUGS
+
+Please contact the L<AUTHOR> for any suggestions, help, criticism.
+Feel free to also post in perlmonks.org for discussion.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

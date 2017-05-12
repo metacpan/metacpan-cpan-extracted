@@ -1,0 +1,45 @@
+Revision history for App-CPAN-Mini-Visit
+
+0.008     2014-02-27 11:35:44-05:00 America/New_York
+
+    [CHANGED]
+
+    - Actually fix the repo URL this time
+
+0.007     2014-02-27 11:31:54-05:00 America/New_York
+
+    [CHANGED]
+
+    - Updated metadata, repo, and bugtracker
+
+    - Switched distribution to Dist::Zilla management
+
+0.006 Sat Oct 24 22:57:07 EDT 2009
+  Fixed:
+    - Fixed bug in testing [Ricardo Signes]
+
+0.005 Mon Feb 23 20:35:53 EST 2009
+  Fixed:
+    - removed Capture::Tiny dependency 
+    - removed unused version.pm prereq
+
+0.004 Mon Feb 23 08:48:49 EST 2009
+  Added:
+    - "-e" option to act like "perl -e"
+    - "--output" option to capture output in a file
+    - examples in visitcpan POD
+
+  Changed:
+    - returned to old-style version numbers
+
+v0.3.1 Fri Dec 12 19:42:21 EST 2008
+    - fixed: usage help text
+
+v0.3.0 Fri Dec 12 15:43:53 EST 2008
+    - added: "--quiet" option to suppress warnings and tar errors
+
+v0.2.0 Fri Dec 12 01:40:23 EST 2008
+    - added: "--append" option to provide path or dist name as an argument
+
+v0.1.0 Fri Nov  7 15:06:55 EST 2008
+    - initial release

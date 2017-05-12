@@ -1,0 +1,54 @@
+NAME
+    App::cpang - CPAN GUI in Gtk2
+
+VERSION
+    version 0.03
+
+DESCRIPTION
+    It's about time we have a GUI for *cpan*. Apparently we're not that into
+    GUI, but users are, so we need^Wshould care about it too.
+
+    This is a rough draft of a basic cpan GUI. It uses App::cpanminus
+    instead of the basic *cpan*. It's not pretty, but it's a start.
+
+    You are more than welcome to help me work this into a beautiful GUI
+    application for users to use in order to search/install/test(?) modules
+    and applications from CPAN.
+
+FOR USERS
+    If you are a user, please check cpang for how to use this.
+
+    This paper describes the module behind the application.
+
+ATTRIBUTES
+    These are the attributes available in "new()".
+
+  title
+    Sets the title of the main window.
+
+        use App::cpang;
+
+        my $app = App::cpang->new( title => 'MY MAIN TITLE!' );
+
+SUBROUTINES/METHODS
+  new
+    Surprisingly this creates a new object of type App::cpang.
+
+  run
+    Packs everything and runs the application.
+
+        $app->run;
+
+   click($event)
+    Clicks on the "Install" step. This is bound to an event of the button in
+    the interface.
+
+AUTHOR
+      Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

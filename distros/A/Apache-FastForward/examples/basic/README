@@ -1,0 +1,18 @@
+*****
+FastForward Demo
+*****
+
+@ In order to test FastForward on the Apache server, do:
+[1] Create eg. /usr/lib/perl5/AAA and put inside the file Demo.pm
+[2] Put into /var/www the file books.csv
+[3] Add to Apache httpd.conf eg:
+    PerlModule AAA::Demo
+    <Location /demo>
+	SetHandler perl-script
+	PerlHandler AAA::Demo
+    </Location>
+[4] Restart Apache
+[5] Call http://localhsot/demo
+
+@ If you like to test calling from a spreadsheet see http://fastforward.sourceforge.net. 
+You can use the template books.csv as the sheet in a spreadsheet application. 

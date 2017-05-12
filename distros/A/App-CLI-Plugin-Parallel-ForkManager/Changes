@@ -1,0 +1,8 @@
+Revision history for Perl extension App::CLI::Plugin::Parallel::ForkManager
+
+1.1     Mon Sep 19 10:58:59 JST 2011
+        - change dependencies module Class::Accessor::Grouped (before Class::Data::Accessor)
+1.01    Wed May  5 08:56:44 2010
+        - pod mini fix
+1.0     Wed May  5 01:28:37 2010
+        - original version

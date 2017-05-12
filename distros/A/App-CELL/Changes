@@ -1,0 +1,871 @@
+Revision history for perl-CELL
+
+NOTE: versions 0.001-0.040 were developed in the 'dochazka' project on
+SourceForge (under the top-level directory 'api'). Versions 0.041 and
+later are in the perl-CELL project repo.
+
+0.001-0.003   2014-01-01
+- start coding
+- add "version bump" functionality to dev.sh script
+- work on initialization
+
+0.004   2014-01-02 15:13
+- revamp CELL.pm
+- use Log::Fast instead of Sys::Syslog
+- some changes to top-level README
+
+0.005-0.007   2014-01-03
+- break out logging into CELL::Log
+- lots of work on CELL::Config
+- finish _import_sysconfig in CELL::Config
+- refactor _import_sysconfig ( broke it into pieces, 
+  iterate over array of subroutine references )
+
+0.008   2014-01-04 17:00
+- first crack at Config::Error (inspired by brian d foy)
+
+0.009-0.010   2014-01-07
+- refactor CELL.pm
+- refactor and merged Error.pm and Log.pm
+- start refactoring Config.pm
+
+0.011-0.013    2014-01-08
+- get 'make test' running on refactored modules
+- WIP: ticket #25
+- fix argument passing issue with CELL::Error->new
+- first crack at CELL::Message (mostly POD for now)
+
+0.014-0.015    2014-01-09
+- CELL::Message now working; testing in progress
+- CELL::Config tweaked 
+- ready to continue working ticket #13
+
+0.016    2014-01-10 23:45
+- Config.pm now loading core configuration parameters
+
+0.017-0.019    2014-01-11
+- Message.pm refinements
+- bring in OBS stuff
+- work on OBS stuff (including new release.sh script)
+- close tickets #13 and #17
+
+0.020-0.024  2014-01-12 15:50
+- work on release script (api/bin/release.sh)
+- implement CELL->config method
+- implement CELL::Config::config and CELL->config
+- implement CELL::Config::set_meta and CELL->set_meta
+- basic unit tests for the above
+- add more unit tests and configuration parameters 
+
+0.025-0.031  2014-01-13
+- work on ticket #38
+- move former api/bin/ to api-dev/ to keep api/ free of distractions
+- another tweak on api-dev/release.sh
+- make API pass manifest.t
+- add unit test for CELL::Util and fix bug in that module
+- rename CELL::Error to CELL::Status
+- stop using tags after they possibly cause origin to get into detached
+  HEAD state
+
+0.032-0.036  2014-01-14
+- revamp Status.pm to enable "OK" status level 
+- add class diagram
+- start working on ticket #44 "Add an 'OK' status to CELL::Status"
+- refactor CELL.pm
+- revamp Status.pm 
+- start splitting off CELL::Config::Meta
+- finish initial write-up of Meta.pm 
+
+0.037-0.039  2014-01-15
+- work on tickets
+- pass all unit tests
+
+0.040  2014-01-16 03:43
+- Log.pm: add new 'arbitrary' function so we can write higher-level log
+  messages without requiring Status.pm
+- Status.pm: avert possible circular dependency problems
+
+0.041-0.043  2014-01-17
+- change all occurrences of 'dochazka' to 'CELL'
+- debug release scripts
+- start initial write-up of CELL.pm (mainly POD)
+
+0.044  2014-01-21 09:44
+- start implementing new features:
+  - multiple config files
+  - flexible names
+  - config files can be in subdirectories of config dir
+  - meta parameters in config files instead of hard-coded
+  - messages in config files instead of hard-coded
+
+0.045  2014-01-21 12:02
+- Config.pm: implement get_param() and set_meta()
+- Load.pm: first crack at find_files()
+
+0.046-0.050  2014-01-22
+- debugging in progress
+- start testing Message.pm
+- implement unit test for CELL::Load::find_files
+- fix some bugs found by unit testing
+- move get_and_load_config_files to CELL::Load and prepare for use with
+  'message' type config files
+- make Load.pm deal with messages better 
+
+0.051  2014-01-23 23:03
+- new Test.pm module for re-useable testing code
+- change t/03-load.pm to use the new module
+- start working on new format for message config files
+  (staging/message-slurp.plx)
+
+0.052  2014-01-25 11:58
+- put message file parsing code into Load.pm
+- write some unit tests for parsing message files and configuration files
+- start CELL Localization Guide (in staging/)
+
+0.053  2014-01-27 11:39
+- implement caching in find_files
+- pass over (and log) duplicate config parameters
+
+0.054  2014-01-27 21:52
+- put finishing touches on Load.pm
+- add a number of unit tests for Load.pm
+
+0.055-0.59  2014-01-28
+- put standard CELL configuration files in dist/config/
+- fix bugs
+- in Load.pm, make parse_message_file get language tag from the
+  filename, so the user doesn't have to enter a language tag for each
+  message she defines
+- fix release script
+- add language tags verbiage to Localization Guide
+- work on Localization Guide 
+
+0.060-0.063  2014-01-29
+- caress Load.pm and get ready to start testing CELL::Config::init 
+- unit tests for Load.pm more or less done
+- Config.pm: _import_config strip double quotes as well as single
+- Log.pm: do not use CELL::Status, convert package variable to state
+- Status.pm: include message object in status object
+- add more unit tests (almost ready to test CELL::Config::init)
+- CELL::Config::init working now
+- CELL::Message::init working now 
+
+0.064  2014-01-30
+- CELL.pm: work on POD and code
+- Log.pm: accept lower/mixed-case level
+- Util.pm: no newline in timestamp
+- 07-cell.t: new unit tests for CELL.pm
+- Config.pm: fix regex, don't use meta param for re-entrantness
+- Message.pm: make init be re-entrant and report errors
+- put unit test of CELL::Message::init in the right file
+
+0.065  2014-01-30 15:26
+- rename to App::CELL (from just plain CELL) 
+
+0.066  2014-01-31 16:54
+- refactor Localization Guide
+- draft Apologia (attempt to justify App::CELL's existence to CPAN gurus)
+
+0.067  2014-04-25 17:21
+- start work on File::ShareDir based 'config' directory (ticket #17)
+
+0.068  2014-04-26 22:11
+- some minor changes left over on laptop from months ago
+- fix bug in Perl script used by release.sh to determine the current version
+
+0.069  2014-04-26 22:48
+- initial File::ShareDir support 
+
+0.070  2014-05-03 12:05
+- dependencies to Makefile.PL
+- File::ShareDir to testing dependencies in t/00-dependencies.t
+
+0.071  2014-05-04 23:22
+- work on ShareDir functionality (ticket #17) 
+
+0.072-0.074  2014-05-05
+- separate CELL and site configuration directories (rewrite config/README)
+- try to pass CPAN Testers smoke test
+- edit Changes file for style
+- clean up comments in release script
+- fix bug: "App::CELL->init not processing argument correctly"
+- note that dist/dev.sh bump depends on Perl::Version
+
+0.075-0.76  2014-05-06
+- remove obsolete dependencies 
+- add some error-checking to the release script
+- use regexp quote-like operator instead of single-quotes (Load.pm)
+- chang App::CELL::Load::find_file so it can walk multiple directories
+  (ticket #18)
+
+0.077  2014-05-07 22:46
+- add tickets/ directory with README
+- Status.pm: croak on CRIT errors
+- start implementing major design change: first, load App::CELL's own
+  internal configuration from the distro sharedir and _then_ load from site
+  configuration directory if it exists
+
+0.078-0.080  2014-05-08 21:16
+- Status.pm: remove croaking on CRIT errors
+- move directory functions from Config.pm to Load.pm
+- move is_directory_viable() to Util.pm
+- major refactoring to implement design change referred to in 0.077
+- clean up unit test files
+- add new unit test 003-debug.t
+- minor POD fix in CELL.pm
+- Config.pm: initialize meta, core, site package variables; fix bug in
+  get_param
+- Load.pm: improve error checking; more useful debugging messages
+- Config.pm: fix bug "get_param, set_meta, and _set_core_site do not
+  respect hash structure"
+
+0.081  2014-05-09 10:23
+- general cleanup
+
+0.082  2014-05-09 14:16
+- Test.pm: 
+  - new cleartmpdir function, use it in unit tests
+  - write proper SYNOPSIS
+  - new unit tests (t/003-test.t)
+- t/030-status.t: add more tests
+- update dependencies in t/000-dependencies.t and Makefile.PL
+- expand release/README
+
+0.083  2014-05-09 17:15
+- CELL.pm: remove 'status_ok' and 'status' wrappers
+- CELL_Config.pm and CELL_MetaConfig.pm: prefix all params with 'CELL_',
+  add comments
+- Message.pm: fix bug "'new' method suffers from flawed logic"
+
+0.084  2014-05-09 17:47
+- CELL.pm: move 'config' logic to Config.pm and make it a wrapper
+- Message.pm: add some comments
+- t/100-cell.t: add a test, fix a test
+
+0.085  2014-05-09 22:23
+- Config.pm: improve error-checking in get_param
+- Log.pm: add $log_level package variable, add 'set_log_level' subroutine,
+- Load.pm: revamp SYNOPSIS, fix POD for 'init' subroutine (close ticket
+  #19), fix white-space bug in parse_message_file
+- CELL.pm: change re-entrancy processing, avoid referring to config params
+  and messages before they have been loaded
+- CELL_Message_en.pm: prefix all messages with CELL_ (close ticket #9)
+
+0.086  2014-05-09 23:21
+- t/050-find-and-parse.t: add whitespace to trigger bug in event of
+  regression
+- config/CELL_Message_en.conf: add CELL_OVERWRITE_META_PARAM message
+- Config.pm: use CELL_OVERWRITE_META_PARAM
+- Load.pm: make functions and log messages easier to follow
+- open bug #23 Put sprintf into eval block in Message->new
+
+0.087  2014-05-11 13:36
+- (Perl::Critic) add .perlcriticrc, disable "no strict 'refs'" warnings
+- (Perl::Critic) use two-argument form of 'bless' 
+- (Perl::Critic) convert nested subroutine into anonymous subroutine 
+- (Perl::Critic) avoid explicit 'return undef'
+- replace 'eval' with Try::Tiny, update dependencies
+- Message.pm turn warnings into exceptions in 'new' (close ticket #23)
+
+0.088  2014-05-11 17:15
+- add 'Testing with Perl::Critic' section to release README
+- (Perl::Critic) unpack @_ in CELL.pm
+- (Perl::Critic) use @ARGV with 'local' in Test.pm
+- Log.pm: remember $ident and re-use it when necessary
+- Message.pm: add 'error' attribute to message class, add 'stringify'
+  method to message class revamp error checking in 'new'
+
+0.089  2014-05-11 20:01
+- implement major design change: migrate to Log::Any (ticket #27)
+- t/001-log.t: rewrite to use Log::Any::Test
+- remove dependency on Log::Fast
+
+0.090  2014-05-11 21:23
+- Log.pm: rename 'configure' subroutine to 'init', tweak POD,
+  expand permitted levels (ticket #28)
+- audit all calls to App::CELL::Status->new (ticket #5)
+
+0.091  2014-05-11 22:29
+- CELL_Config.pm, Message.pm: add CELL_SUPPORTED_LANGUAGES and
+  CELL_LANGUAGE core params (ticket #15)
+- CELL.pm, t/100-cell.t: initialize package variables in Message.pm
+- Config.pm: unpack @_ in 'config' subroutine
+
+0.092  2014-05-12 13:18
+- Load.pm: improve error checking in 'init' (ticket #21); tweak variable
+  names, subroutine names, param names, message names; fix return status
+- tweak param names, variable names, message names in unit test files
+- t/004-debug.t: indicate how to activate logging in a test
+
+0.093  2014-05-12 16:48
+- completely revamp logging in light of migration to Log::Any
+
+0.094  2014-05-12 23:36
+- t/004-log.t: use $ENV{'HOME'} instead of ~
+- CELL.pm, Load.pm: optionally take PARAMHASH (appname, sitedir)
+
+0.095  2014-05-13 17:10
+- add bin/ directory and start demo.plx script there
+- CELL_Message_en.conf: add some testing messages
+- t/001-log.t: test logging via Status->new with testing message
+- Log.pm: attempt to inherit from Log::Any (not working yet)
+
+0.096  2014-05-14 22:23
+- bin/demo.plx now actually does something
+- Config.pm: removed obsolete dependencies
+- t/004-debug.plx: remove obsolete CELL_DEBUG_MODE test and add comment
+  explaining purpose of this unit test file, so I'm not tempted to delete
+  it later
+
+0.097  2014-05-15 14:04
+- CELL_Config.pm: get rid of CELL_DEBUG_MODE
+- Load.pm: generate debug message for each meta/core/site param loaded;
+  make process_stanza slightly less verbose; improve debug messages
+  generated by sitedir search routine; no longer look in home directory or
+  /etc/sysconfig because application developer can now specify a literal
+  sitedir path to App::CELL->init
+- Makefile.PL, t/000-dependencies.t: remove dependency on Config::General
+- Status.pm: log using $log object; fix bug in 'log' method that was
+  causing "at [FILE] line [LINE]" to be appended twice; add 'text' accessor
+  method
+
+0.098  2014-05-15 21:56
+- Load.pm: clean up get_sitedir some more -- now, application is expected
+  to specify sitedir in call to 'App::CELL->init' by providing either a
+  'sitedir' parameter specifying a full path, or an 'enviro' parameter
+  specifying name of environment variable containing a full path. The only
+  alternative considered is the CELL_SITEDIR environment variable. This
+  makes more sense than what we were attempting before, and streamlines the
+  code.
+- t/050-find-and-parse.t renamed -> t/050-load.t
+- t/070-config.h: rewriting (ticket #33) - WIP
+- add LICENSE and WISHLIST files to dist/ directory
+
+0.099-0.0100  2014-05-16
+- Load.pm: tweaked log messages, fixed bug in _report_load_status: "success
+  log message not being logged because status code 'OK'"
+- t/070-config.t: add more tests (ticket #33)
+- Status.pm: add boolean methods for 'notice', 'warn', 'err', etc.
+- config/: add CELL_SiteConfig.pm, add unit testing params
+
+0.101  2014-05-20 10:48
+- t/050-load.t: fix diagnostic log messages
+- add LICENSE file with GPLv3 text
+- add item to WISHLIST
+
+0.102  2014-05-21 12:45
+- CELL.pm, Log.pm: minor cleanup
+- Status.pm: fix bug in 'new' -> "status log messages displaying the wrong
+  caller"
+
+0.103  2014-05-22 21:56
+- Log.pm: change initialization routine so it takes a PARAMHASH, and added
+  a 'show_caller' param to it
+- adapted CELL.pm and t/* to change in Log.pm
+
+0.104  2014-05-22 22:17
+- CELL.pm: fixed bug "App::CELL->init not recognizing appname param"
+- Log.pm: add 'ident' accessor routine
+- demo.plx: expanded demo script
+
+0.105  2014-05-23 21:16
+- CELL.pm, CELL_Config.pm: move verbiage to doc/guide.pod, implement
+  CELL_LOG_SHOW_CALLER
+- Config.pm: spam the log less
+- Message.pm: cleanup 'new', make it return a status object (ticket #26)
+- Status.pm: make it handle status object from Message->new
+- t/005-message.t: adapt tests, add more tests
+
+0.106  2014-05-23 22:54
+- CELL.pm: honor "debug_mode" flag 
+- Log.pm: honor debug_mode flag, replace a bunch of wrappers with a single
+  AUTOLOAD routine
+- t/001-log.t: add some debug_mode-related tests
+
+0.107  2014-05-24 10:19
+- Load.pm: add sanity check to constructor (ticket #21)
+- config/: fix spelling of params, add params for sanity check
+- Message.pm: tell Data::Dumper to not include any newlines
+
+0.108  2014-05-24 12:26
+- Load.pm: suppress caller info in "parsed message" $log->debug call,
+  generate more useful warnings/errors in find_files
+- Log.pm: expand AUTOLOAD routine, improve caller handling, eliminate ok
+  and not_ok wrappers
+- Message.pm: improve caller handling in constructor
+- Status.pm: improve caller handling in constructor, make 'caller' accessor
+  return array ref instead of array
+- t/070-config.t: turn on debug_mode
+- Config.pm, CELL_Message_en.conf: add value to CELL_OVERWRITE_META_PARAM,
+  remove unused error/warning messages
+
+0.109  2014-05-24 15:18
+- Config.pm: cleanup 'get_param'
+- Log.pm: work on POD, fix AUTOLOAD so it passes all calls through to
+  Log::Any, applying pre-processing selectively.
+- t/001-log.t: get rid of $log_any_obj since we can now access testing
+  methods through the App::CELL::Log singleton
+- Guide.pm: new POD-only module with new high-level introduction to
+  App::CELL
+- remove doc/ directory from the distro
+
+0.110-0.013  2014-05-24
+- Guide.pm: include verbiage from config/README (ticket #22) and
+  staging/CELL-Localization-Guide.pod (ticket #13)
+- config/README: make it a stub
+- t/070-config.t: comment out Log::Any::Adapter as this causes local osc
+  build to fail
+- remove t/TEMPLATE (obsolete)
+- remove Data::Printer dependency because (1) this causes build problems in
+  OBS, and (2) no longer needed
+- change license to GPLv3
+- change Makefile.PL to reflect license change
+- README: add copyright and license information
+- LICENSE: new license text
+
+0.114-0.116  2014-05-25
+- update WISHLIST
+- Makefile.PL: correct license string
+- change order of "use" boilerplate in all modules
+- config/ add use strict; use warnings; to config modules in sharedir
+- migrate from ExtUtils::MakeMaker to Module::Build
+- bring back Makefile.PL (someone might still need it)
+- dev.sh: add 'test' command
+
+0.117-0.128  2014-05-25
+- release.sh: run './Build test', add cpan-upload, move generated tarball
+  to 'perl-cell-releases' directory, change order of operations, add
+  comments, fix regression, add CPAN upload option
+- test release script, frivolously reversion the distro
+- fix bug "release script not incrementing version number properly"
+- extend MANIFEST.SKIP
+- dev.sh: use distclean instead of just clean
+- delete 'ignore.txt' and see if it makes any difference
+
+0.129  2014-05-25 17:27 CEST
+- Changes: consolidate entries for better readability, convert dates to ISO
+  format
+- release/timestamp.sh: add timezone
+
+0.130  2014-05-25 20:47 CEST
+- CELL.pm: add LICENSE section, start implementing $CELL singleton (ticket
+  #34)
+- test.sh: use './Build test' instead of 'make test'
+- Status.pm: make log method use '$log->status_obj'
+- Log.pm: fix status_obj method, start implementing message_obj (ticket
+  #37), revamp SYNOPSIS, just use Log::Any (not inherit)
+
+0.131  2014-05-25 21:06 CEST
+- CELL.pm: finish implementing $CELL singleton
+- t/100-cell.pm: use $CELL singleton
+
+0.132  2014-05-26 12:55 CEST
+- Build.PL: remove 'executable' bit to improve Kwalitee score, add "perl =>
+  '5.12.0'" to requires
+
+0.133  2014-05-26 15:13 CEST
+- change perl version to 5.012 everywhere
+
+0.134  2014-05-26 22:56 CEST
+- dev.sh: run './Build disttest' because it re-builds META.yml and
+  META.json
+- release.sh: more refinements
+- CELL.pm: export $log singleton as well as $CELL, re-write POD, put
+  'appname', 'enviro', and 'loaded' attributes into $CELL singleton,
+  provide accessors for them, also provide 'sharedir' and 'sitedir'
+  convenience "accessor" routines, change name of main routine from 'init'
+  to 'load', use new $log-> methods instead of $log->init
+- Load.pm: make 'sharedir', 'sharedir_loaded', 'sitedir', 'sitedir_loaded'
+  be package variables instead of state variables, return 'ERR' statuses
+  instead of 'CRIT'
+- Log.pm: implement 'ident', 'show_caller', 'debug_mode' that will replace
+  'init'
+- CELL_Config.pm: add CELL_CORE_SAMPLE
+
+0.135  2014-05-27 09:05 CEST
+- t/100-cell.t: add several tests
+- Test.pm: export cmp_arrays symbol
+- Build.PL: add 'Data::Dumper' to build_requires, add remote repo URL
+- CELL.pm: add supported_languages method
+
+0.136  2014-05-27 10:09 CEST
+- dev.sh: always run './Build disttest' after 'perl Build.PL' to ensure
+  META.json and META.yml are rebuilt, improve 'stop' routine
+
+0.137  2014-05-27 10:35 CEST
+- tweak Build.PL and release.sh
+
+0.138  2014-05-27 22:54 CEST
+- CELL.pm: add 'msg' method (wrapper to App::CELL::Message->new)
+- t/100-cell.pm: add some tests
+
+0.139  2014-05-28 10:59 CEST
+- t/111-test.t: add "ad hoc testing" test
+- CELL_Config.pm: move 'use' statements to bottom, restore CELL_DEBUG_MODE,
+  improve comment
+- CELL.pm: remove 'loaded' attribute from $CELL, re-implement 'meta' and
+  'config' methods in light of Config.pm change
+- Config.pm: new SYNOPSIS, new DESCRIPTIONS, introduce $meta, $core, and
+  $site "singleton" objects, new AUTOLOAD routine to replace 'get_param'
+- Guide.pm: new verbiage
+- Log.pm: fix bug "Endless recursion between init and AUTOLOAD when logger
+  not explicitly initializd"
+- release.sh: add '-ff' to force push to remote without testing
+- (some unit tests are failing)
+
+0.140  2014-05-28 13:17 CEST
+- dev.sh: clean up after disttest
+- CELL.pm: fix SYNOPSIS, fix exports, change 'loaded' from attribute to
+  method, fix call to no-longer-existent 'App::CELL::Config::config'
+  function, delete 'meta' and 'config' wrappers
+- Config.pm: fix regex, get rid of stupid symbolic reference, delete 'use
+  App::CELL::Load' that was causing grief
+- Load.pm: bring in the new $meta, $core, and $site "singletons", use them
+  in sanity check
+- Log.pm: deal with situations when $log method is called before logger has
+  been explicitly initialized
+- move t/111-test.t to t/006-config.t
+- t/110-cell.t: fix calls to 'meta' and 'config'
+
+0.141  2014-05-28 13:57 CEST
+- globally change \o{12} to \012 in all regexes in attempt to appease Perl
+  5.12
+
+0.142  2014-05-28 14:56 CEST
+- CELL.pm: add missing items to POD
+- t/: commented out lines that were uncommented for debugging and
+  shouldn't have gone to CPAN
+
+0.143  2014-05-28 16:00 CEST
+- Test/LogToFile.pm: new module
+- t/: use the new module in tests
+
+0.144  2014-05-28 22:57 CEST
+- Build.PL: fix/improve metadata
+- CELL.pm, Load.pm, Log.pm: perlcritic fixes
+- Status.pm: delete boolean methods 'notice', 'warn', etc. because the same
+  info can easily be obtained using the 'level' accessor method
+- t/: cleanup
+- release/: update README
+
+0.145  2014-05-29 05:21 CEST
+- Build.PL: add Log::Any::Adapter to build_requires
+- t/000-dependencies.t: update
+
+0.146  2014-05-29 05:28 CEST
+- t/000-dependencies.t: add Log::Any::Adapter, exports
+
+0.147  2014-05-29 10:36 CEST
+- config/: add an error message
+- Status.pm: refactor 'ok' method (perlcritic)
+- Test.pm: make tempdir stuff use File::Temp
+- Util.pm: make timestamp ISO-conformant
+- t/: adjust tests
+
+0.148  2014-05-29 16:58 CEST
+- ticket #48 (new 'set' method in Config.pm) -- WIP
+
+0.149  2014-05-29 21:31 CEST
+- Config.pm: finish implementing new 'set' method
+- t/: update tests
+- Status.pm: new 'dump' method WIP, use $log->status_obj in 'new', refactor
+  accessors
+- Log.pm: new permitted_objects method, refactor status_obj method
+
+0.150  2014-05-30 11:35 CEST
+- remove '/a' regex modifier that doesn't work with Perl 5.012
+  (maybe nobody will miss it?)
+
+0.151  2014-05-30 20:57 CEST
+- Status.pm: move some verbiage to Guide.pm, clarify edge cases
+- t/030-status.pm: add tests for edge cases
+
+0.152  2014-05-31 17:06 CEST
+- change minimum Perl version to 5.012 everywhere 
+- Status.pm: fix constructors in light of testing
+- CELL.pm, Message.pm: begin implementing language functionality
+- t/030-status.t: add lots of tests
+- t/070-config.t: use is_deeply instead of homegrown cmp_arrays
+- t/110-site.t: new tests
+
+0.153  2014-06-01 11:36 CEST
+- Load.pm: removed more instances of 'a' regex modifier that causes Perl
+  5.012 to cry "syntax error"
+
+0.154  2014-06-01 22:44 CEST
+- config/, Load.pm: clean up sanity-testing params (ticket #45)
+- CELL.pm: add "function factory" for status constructors (ticket #39)
+
+0.155  2014-06-02 18:09 CEST
+- Config.pm, Log.pm: tweak AUTOLOAD routines for Perl 5.012
+- CELL.pm: fix bug in "constructor factory" (upper/lower-case)
+- t/100-cell.t: add basic tests for the new status constructors
+
+0.156  2014-06-02 18:20 CEST
+- Config.pm, Log.pm: add formal DESTROY routine (to appease Perl 5.012)
+
+0.157  2014-06-03 13:46 CEST
+- Guide.pm: update to use new status constructors
+- Message.pm, Util.pm: move stringify_args to Util.pm
+- CELL.pm: add "odd number of args" error message to load routine
+- t/002-util.t: remove another 'a' regex modifier that I missed
+- Message.pm: first implementation of 'lang' method
+- t/110-site.t: add test for 'lang' message method
+
+0.158  2014-06-03 23:05 CEST
+- Guide.pm: write new verbiage, edit old verbiage
+
+0.159  2014-06-05 11:26 CEST
+- remove obsolete 'obs' directory from git repo
+- tweak release script
+- CELL_Config.pm: comment out CELL_ALREADY_INITIALIZED
+
+0.160-0.163  2014-06-07 21:49 CEST
+- clean up git repo
+- move unnecessary file MANIFEST.SKIP from dist/ to staging/
+- Build.PL: don't create LICENSE file every time
+- change LICENSE to BSD-3-Clause
+- misc/boilerplate/: add code for prepending copyright/license notice to
+  each source code file
+- CELL.pm - restore 'LICENSE AND COPYRIGHT' POD section
+- move dev.sh and test.sh from dist/ to top level of git repo because they
+  are not in the distro
+
+0.164-0.165  2014-06-09 13:55 CEST
+- pod-coverage.t: add missing tests
+- Guide.pm: add CAVEATs section to warn against running in taint mode
+- Load.pm, Message.pm: fix infinite recursion bug in try .. catch ..
+- Load.pm: return fatal error if running in taint mode
+- Message.pm: if args sent to constructor but text cannot take them,
+  stringify them and append to message text
+- Message.pm: comment out "Creating message object" debug message
+- t/001-log.t: do not test for "Creating message object" debug message
+- Status.pm: if message object creation fails in constructor and args are
+  present, stringify them and append to text
+- Util.pm: fix bug "stringify_args can only take hashrefs"
+
+0.166-0.168  2014-06-09 18:16 CEST
+- masochistically change CELL_SUPPORTED_LANGUAGES and CELL_LANGUAGE to
+  CELL_SUPP_LANG and CELL_DEF_LANG, respectively
+- CELL.pm: make 'load' take sitedir only, make 'appname' method both
+  get and set appname
+- Util.pm: make is_directory_viable return boolean
+- tweak Build.PL to clean App-CELL-* tarballs
+- Load.pm, etc.: support multiple sitedirs (tests for this still to be
+  written, though)
+- t/110-site.t: add a multiple-sitedir-related unit test
+
+0.169  2014-06-10 09:07 CEST
+- clarify that site params cannot be overwritten
+- move CELL_SITEDIR_LOADED and CELL_SITEDIR_LIST to CELL_META_SITEDIR_LOADED 
+  and CELL_META_SITEDIR_LIST, respectively
+- t/110-site.t: add some unit tests for the new "multiple sitedirs" feature
+- work on Guide.pm
+
+0.170  2014-06-10 11:46 CEST
+- fix version
+
+0.171  2014-06-10 12:23 CEST
+- t/111-site.t: add tests for non-existent sitedir
+- CELL.pm: cleanup
+- Load.pm: fix bug "$CELL->loaded returning 'SHARE' even though sharedir
+  and sitedir are loaded"
+
+0.172  2014-06-10 13:42 CEST
+- CELL_Message_en.conf: add reason to CELL_SITEDIR_NOT_FOUND
+- Load.pm: fix bug "Load.pm->init doesn't return meaningful error when
+  get_sitedir fails"
+- Message.pm, t/001-log.t: tweak debug message
+
+0.173-0.175  2014-06-11 13:04 CEST
+- t/: add unit tests for sitedir logic
+- Load.pm, Guide.pm: work on sitedir logic (make it work as documented)
+- t/: add tests for new sitedir logic
+- t/: adapt unit tests
+
+0.176-0.180  2014-06-13 15:41 CEST
+- obs.sh: new OBS CI script
+- Log.pm: debug_mode method can now both set and get the debug_mode package
+  variable
+- Load.pm: tone down (reduce level) of several log messages, re-learn how
+  modulo operator works
+- call obs.sh (OBS CI script) from release script
+
+0.181  2014-06-16 22:20 CEST
+- Message.pm: fix bug caused by failure to properly initialize $mesg
+  package variable
+- load routine was spamming the log: make this "spamming" happen only when
+  caller passes "verbose => 1" to load routine
+- be more careful about which messages actually get logged and under what
+  conditions
+
+0.182  2014-06-17 08:48 CEST
+- Guide.pm, Load.pm: improve documentation
+
+0.183  2014-06-17 22:46 CEST
+- Load.pm: some logging-related fixes
+- Guide.pm: some work on documentation
+
+0.184  2014-06-19 09:38 CEST
+- started adding "cell => 1" to all $log calls to enable the developer to
+  suppress all log messages coming from CELL, if desired
+
+0.185  2014-07-07 22:47 CEST
+- continue implementing 'cell => 1' parameter to $log-> functions so
+  developer can suppress CELL's log messages if desired
+- Build.PL: require Log::Any::Adapter version 0.10 or higher, because
+  earlier versions lack File.pm, which we rely on for log-to-file
+
+0.186  2014-07-08 13:28 CEST
+- Guide.pm: add caveat section about site_perl/vendor_perl conflicts
+
+0.187  2014-07-11 11:56 CEST
+- CELL.pm: have status_XYZ constructors issue a warning when they discard
+  arguments because the argument list has an odd number of elements
+
+0.188  2014-07-11 13:12 CEST
+- fix SF Bug #50 "$CELL->status_err creates status object with bad caller"
+- t/031-status_ok.t: add unit tests for CELL.pm status constructors
+
+0.189  2014-07-11 13:22 CEST
+- LogToFile.pm: move POD up after CPAN started to choke on it
+
+0.190  2014-07-15
+- Message.pm: fix bug (error not reported properly when sprintf generates a warning)
+
+0.191  2014-07-23 07:09 CEST
+- Load.pm: keep track of message line numbers in parse_message_file 
+- Message.pm: when constructing message object for status object, take
+  only selected attributes from the PARAMHASH 
+- Status.pm: add an 'expurgate' method 
+- t/110-site.t: comment out a unit test broken by the message constructor
+  modifications
+
+0.192  2014-07-23 07:16 CEST
+- release/release.sh: fix bug in script that broke timestamp insertion on
+  Ubuntu 12.04
+
+0.193  2014-07-23 07:52 CEST
+- Status.pm: tweak the new 'expurgate' method
+- t/032-status-expurgate.t: add unit tests
+
+0.194  2014-07-23 09:00 CEST
+- Build.PL, t/: update dependencies to include Data::Structure::Util
+
+0.195  2014-08-11 12:06 CEST
+- CELL.pm: minor tweak to eliminate a superfluous line of code
+- Log.pm: if this is a CELL internal debug message, log it only if
+  the CELL_DEBUG_MODE environment variable exists and is true
+- Message.pm: fix POD of 'new' method
+
+0.196  2014-08-12 15:34 CEST
+- Load.pm: when complaining about duplicate message/parameter definitions,
+  include both offending and original file in error message
+
+0.197  2014-10-15 10:25 CEST
+- Config.pm: add 'get_param' routine; rename 'get_all' routine to more
+  descriptive 'get_param_metadata'
+- t/006-config.t: add test case for 'get_param'
+
+0.198  2014-10-16 23:08 CEST
+- t/070-config.t: add test case for Bug #51
+  https://sourceforge.net/p/perl-cell/tickets/51/
+
+0.199  2014-10-17 11:56 CEST
+- Config.pm: fix bug "$meta can be used to access site/core parameters"
+
+0.200  2014-10-22 08:18 CEST
+- Config.pm: fix bug "get_param_meta has same problem where $meta could be used to
+  access $site variables"
+- t/070-config.pm: add test case for this bug
+
+0.201  2014-11-05 14:58 CET
+- remove dependency on Data::Structure::Util, which does not work with perl
+  5.20
+
+0.202  2014-11-28 17:50 CET
+- Status.pm: since 'dclone' might die (e.g., when a siteparam contains a REGEXP
+  literal), put the dclone call in a Try::Tiny block
+
+0.203  2014-12-23 15:38 CET
+- add (CELL) prefix to more App::CELL-internal log messages
+
+0.204  2014-12-23 18:38 CET
+- Config.pm: do not concatenate a variable whose value might be undef
+
+0.205  2015-01-13 23:29 CET
+- Config.pm: add 'exists' method; add 'get' wrapper for 'get_param'
+- t/: add rudimentary test of 'exists' method
+
+0.206  2015-02-11 13:48 CET
+- Config.pm: fix undef bug
+
+0.207  2015-02-12 14:00 CET
+- Status.pm: add 'args' accessor method
+- t/: test case for 'args' accessor method
+
+0.208  2015-03-24 18:26 CET
+- switch over to static README with just a single line (from auto-generated
+  mega-README)
+- Status.pm: in "new" (App::CELL::Status constructor), handle condition when
+  'level' property is undefined
+
+0.209  2015-04-01 17:45 CEST
+- Status.pm: make level, code, and args accessors take an optional 
+  argument -> if present, set property to its value and return it
+- t/033-status-accessor.t: simple test cases for this commit
+
+0.210  2015-04-14 09:46 CEST
+- add missing File::Temp build dependency
+
+0.211  2015-07-21 17:56 CEST
+- update copyright statement to include 2015
+- $VERSION only in CELL.pm and Guide.pm
+
+0.212  2015-07-25 05:10 CEST
+- technical release
+
+0.213  2015-07-27 11:38 CEST
+- Eliminate File::Touch dependency
+
+0.214  2015-07-27 11:46 CEST
+- technical release
+
+0.215  2015-07-30 10:08 CEST
+- add Params::Validate dependency
+- use Params::Validate in CELL.pm->load() and Load.pm->_conf_from_config
+
+0.216  2016-07-30 16:53 CEST
+- Test.pm: export _touch so other modules can use it, too
+- Load.pm: reporting parameter value in _conf_from_config() is problematic;
+  don't do it
+- Load.pm: allow config params to have undef as value
+
+0.217 2015-44-11 11:44 CET
+- global: do not convert warnings into errors
+- tests: use Test::Warnings to test for unexpected warnings
+
+0.218 2015-19-21 16:19 CET
+- Build.PL: do not specify Module::Build build dependency version
+  (fixes OBS build target openSUSE_13.2)
+
+0.219 2015-20-21 22:20 CET
+- README: switch to reStructuredText; add release mgmt instructions
+- README: eliminate README duplication
+- t/000-dependencies.t: do not check Module::Build
+
+0.220 2016-09-04 09:12 CEST
+- t/050-load.t: send too many parameters to set()
+- release: use central release scripting
+- doc: fix POD line in App::CELL::Status
+- Add .travis.yml and badges on the README
+- MANIFEST.SKIP: avoid Perl Critic and Travis config files
+- test: try using TRAVIS_PERL_VERSION to detect Travis
+
+0.221 2016-09-10 23:56 CEST
+- README.rst: drop Release management section
+- build/ops: regenerate Makefile.PL (CPANtesters)
+
+0.222 2016-09-14 07:32 CEST
+- build/ops: use File::ShareDir::Install in Makefile.PL
+

@@ -1,0 +1,30 @@
+NAME
+    Acme::Math::XS::LeanDist - Example module for Inline::Module::LeanDist
+
+SYNOPSIS
+        use Acme::Math::XS::LeanDist;
+
+        print add(4, 3);
+
+DESCRIPTION
+    This is a super simple demonstration module for Inline::Module::LeanDist
+    in the spirit of Acme::Math::XS.
+
+SEE ALSO
+    Acme-Math-XS-LeanDist github repo
+    <https://github.com/hoytech/Acme-Math-XS-LeanDist>
+
+    Inline::Module::LeanDist
+
+    Inline::Module
+
+    Inline
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2015 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

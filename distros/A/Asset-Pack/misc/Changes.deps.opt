@@ -1,0 +1,17 @@
+This file contains changes in OPTIONAL dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.000008
+
+0.000007 2017-03-07T11:25:49Z
+
+0.000006 2015-07-21T13:10:16Z
+
+0.000005 2015-07-19T20:45:18Z
+
+0.000004 2015-07-13T06:11:23Z
+
+0.000003 2015-07-13T05:40:50Z
+ [Changed / test recommends]
+ - App::FatPacker 0 → 0.009017
+
+0.000002 2015-07-11T05:00:03Z

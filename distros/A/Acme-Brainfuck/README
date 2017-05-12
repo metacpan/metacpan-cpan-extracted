@@ -1,0 +1,45 @@
+Acme::Brainfuck version 1.1.1
+=============================
+
+Brainfuck is about the tiniest Turing-complete programming language you
+can get.  A language is Turing-complete if it can model the operations of
+a Turing machine--an abstract model of a computer defined by the British
+mathematician Alan Turing in 1936.  A Turing machine consists only of an
+endless sequence of memory cells and a pointer to one particular memory
+cell.  Yet it is theoretically capable of performing any computation.  
+This module will allow you to mix Brainfuck with your perl code.
+
+INSTALLATION
+
+This module should work with any version of perl from 5.005 on up.  
+However if you are using a version prior to 5.7.0, you will have to
+install the Filter::Simple module and dependencies yourself.  Newer
+versions include this as part of the core.
+
+If you have the Module::Signature module installed, you can verify the 
+integrity of this distribution by typing:
+
+   cpansign -v
+
+Then to install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or 
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+COPYRIGHT AND LICENCE
+
+By Jaldhar H. Vyas <jaldhar@braincells.comE>
+
+Copyright (c) 2004, Consolidated Braincells Inc.
+Licensed with no warranties under the Crowley Public License:
+"Do what thou wilt shall be the whole of the license."
+
+$Id: README,v 1.5 2002/09/23 02:26:31 jaldhar Exp $

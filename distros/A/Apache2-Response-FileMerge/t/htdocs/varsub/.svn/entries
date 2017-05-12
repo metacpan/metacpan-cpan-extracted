@@ -1,0 +1,46 @@
+8
+
+dir
+118
+svn+ssh://svn/var/svn/cpan/trunk/Apache2-Response-FileMerge/t/htdocs/varsub
+svn+ssh://svn/var/svn/cpan
+
+
+
+2010-08-20T17:52:52.601072Z
+115
+trevor
+
+
+svn:special svn:externals svn:needs-lock
+
+foo
+dir
+
+bar
+dir
+
+varsub.js
+file
+
+
+
+
+2010-08-20T16:57:24.000000Z
+b1678be98ace40cd4fb1a598d20db295
+2010-08-20T17:52:52.601072Z
+115
+trevor
+
+varsub-do.js
+file
+
+
+
+
+2010-08-20T17:36:25.000000Z
+f011584ddd5f65fa70185cc0546e6c91
+2010-08-20T17:52:52.601072Z
+115
+trevor
+

@@ -1,0 +1,21 @@
+Revision history for Acme-CPANAuthors-Indonesian
+
+0.04     2014-09-09 (SHARYANTO)
+
+         - Add author: PERLANCAR.
+
+
+0.03     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core since 5.19.
+
+
+0.02    2009-11-11 (SHARYANTO)
+
+	- POD fixes.
+
+
+0.01    2009-11-11 (SHARYANTO)
+
+        - First version, released on an unsuspecting world.

@@ -1,0 +1,24 @@
+---
+abstract: 'Slope One collaborative filtering for rated resources'
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires:
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-SlopeOne
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/creaktive/Algorithm-SlopeOne/issues
+  homepage: https://github.com/creaktive/Algorithm-SlopeOne
+  repository: git://github.com/creaktive/Algorithm-SlopeOne.git
+version: '0.004'
+x_contributors:
+  - 'Сергей Романов <sromanov-dev@yandex.ru>'

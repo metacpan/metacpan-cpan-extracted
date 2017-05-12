@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Error Hash Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Error Hash (%ars_errhash) Structure</H2>
+
+This hash contains any error, warning or informational messages that are
+returned from the C API or Perl API. It is reset whenever you call an
+ARSperl function. Therefor, you should examine it after calling an ARSperl
+function and before calling another ARSperl function.
+
+<PRE>
+  "numItems"    =&gt; integer,
+  "messageType" =&gt; <B>reference</B> to an array of integers,
+  "messageNum"  =&gt; <B>reference</B> to an array of integers,
+  "messageText" =&gt; <B>reference</B> to an array of strings
+</PRE>
+
+Example:<P>
+
+There are two ways of accessing this information:
+<P>
+This will format the information for you.
+<PRE>
+	print "$ars_errstr\n";
+</PRE>
+<P>
+This is the equivalent behind the scenes code.
+<PRE>
+    my(%mTypes) = ( 0 =&gt; "OK", 1 =&gt; "WARNING", 2 =&gt; "ERROR", 3 =&gt; "FATAL",
+                    4 =&gt; "INTERNAL ERROR",
+                   -1 =&gt; "TRACEBACK");
+
+    for($i = 0; $i &lt; $ARS::ars_errhash{numItems}; $i++) {
+        printf("[%s] %s (ARERR \#%d)\n",
+               $mTypes{@{$ARS::ars_errhash{messageType}}[$i]},
+               @{$ARS::ars_errhash{messageText}}[$i],
+               @{$ARS::ars_errhash{messageNum}}[$i]);
+    }
+</PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 16th July 1997 by d.j.adams@soton.ac.uk<br>
+</address>
+</BODY>
+</HTML>

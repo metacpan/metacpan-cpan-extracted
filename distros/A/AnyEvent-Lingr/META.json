@@ -1,0 +1,56 @@
+{
+   "abstract" : "Asynchronous Lingr client.",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Lingr",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "JSON" : "0",
+            "Log::Minimal" : "0",
+            "Mouse" : "1.05",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

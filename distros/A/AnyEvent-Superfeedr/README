@@ -1,0 +1,41 @@
+This is Perl module AnyEvent::Superfeedr.
+
+NOTES
+
+see installation notes below.
+
+- This is still WIP
+- Since Superfeedr has a PubSub implementation bug, it requires a
+  AnyEvent::XMPP patch [*]
+- It also requires a patch to split_uri [*]
+
+[*] see http://github.com/yannk/perl-anyevent-xmpp/
+
+USAGE:
+
+
+INSTALLATION
+
+AnyEvent::Superfeedr installation is straightforward. If your CPAN shell is set up,
+you should just be able to do (well, when this will be on CPAN ;)
+
+    % cpan AnyEvent::Superfeedr
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+AnyEvent::Superfeedr documentation is available as in POD. So you can do:
+
+    % perldoc AnyEvent::Superfeedr
+
+to read the documentation online with your favorite pager.
+
+Yann Kerherve

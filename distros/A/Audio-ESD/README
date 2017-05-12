@@ -1,0 +1,31 @@
+Audio::ESD - Perl interface to the Enlightened Sound Daemon
+-----------------------------------------------------------
+David Huggins-Daines <dhd@cepstral.com>, Cepstral LLC
+http://www.cepstral.com/
+
+About
+-----
+
+This module provides a Perl interface to the Enlightened Sound Daemon,
+which is used on many GNU/Linux systems to mix sound output streams
+from multiple desktop applications.  It allows you to open input,
+output, monitoring, and filtering streams which function like normal
+Perl filehandles, as well as to control various parameters on the ESD
+server.
+
+Installation
+------------
+
+In general, the following sequence of commands should be fine:
+
+  perl Makefile.PL
+  make test
+  make install
+
+Note, however, that the test suite will fail if ESD is not running on
+your machine.  The last two tests also seem to fail on some versions
+of ESD in some configurations, though I haven't investigated why at
+the moment.
+
+Please send other reports on installation or test failure to the
+address at the top of this file.

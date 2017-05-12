@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Assign Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Assign Structure</H2>
+
+<PRE>
+{
+ "none"          =&gt; undef,
+     <I>or</I> 
+ "value"         =&gt; reference to <A HREF="ds_vs.html">Value Structure</A>,
+ "valueType"     =&gt; string,
+     <I>or</I> 
+ "field"         =&gt; reference to <A HREF="ds_afs.html">Assign Field Structure</A>,
+     <I>or</I> 
+ "process"       =&gt; string,
+     <I>or</I> 
+ "arith"         =&gt; reference to <A HREF="ds_aoas.html">Arith Op Assign Structure</A>,
+     <I>or</I> 
+ "function"      =&gt; reference to <A HREF="ds_fncas.html">Function Assign Structure</A>,
+     <I>or</I> 
+ "dde"           =&gt; not implemented
+}
+</PRE>
+
+<B>Notes</B>: All of the above keys are mutually exclusive except for the 
+<CODE>value</CODE> and <CODE>valueType</CODE> keys which always appear 
+together. 
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+Last changes to this page 4th August 1997 by jcmurphy@arsperl.org<br>
+&#169; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org
+</address>
+</BODY>
+</HTML>

@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+
+# Created on: 2016-05-19 08:03:03
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Alt;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use App::JenkinsCli;
+
+our $VERSION = "0.008";
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+exit main();
+
+sub main {
+    my ($options, $cmd, $opt) = get_options(
+        {
+            name        => 'jenkins-cli',
+            conf_prefix => '.',
+            helper      => 1,
+            default     => {
+                colors => {
+                    aborted  => 'grey18 on_grey0',
+                    disabled => 'grey22',
+                    notbuilt => 'grey12',
+                },
+            },
+            sub_command => [
+                ls      => [],
+                list    => [
+                    'long|l',
+                    'recipient|R=s',
+                    'verbose|v+',
+                ],
+                start   => [],
+                delete  => [],
+                status  => [],
+                conf    => [],
+                config  => [
+                    'out|o=s',
+                ],
+                queue   => [],
+                enable  => [],
+                disable => [],
+                change  => [
+                    'test|T!',
+                ],
+                create => [],
+                watch  => [
+                    'long|l',
+                    'recipient|R=s',
+                    'sleep|s=i',
+                    'verbose|v+',
+                ],
+            ],
+            auto_complete => sub {
+                my ($option, $auto, $errors) = @_;
+                my $sub_command = $option->cmd;
+                if ( $sub_command eq '--' ) {
+                    warn '--';
+                }
+            },
+        },
+        [
+            'base_url|base-url|b=s',
+            'username|U=s',
+            'password|P=s',
+            'colors|c=s%',
+            'force|f!',
+            'long|l',
+            'out|o=s',
+            'regexp|r',
+            'recipient|R=s',
+            'sleep|s=i',
+            'test|T!',
+            'verbose|v+',
+        ],
+    );
+
+    # do stuff here
+    my $jenkins = App::JenkinsCli->new(
+        base_url => $options->base_url || _error('Missing base_url!'),
+        api_key  => $options->username || _error('Missing username!'),
+        api_pass => $options->password || _error('Missing password!'),
+        test     => $options->test,
+        colours  => $options->colors,
+        opt      => $options,
+    );
+
+    return $jenkins->$cmd(@ARGV) || 0;
+}
+
+sub _error {
+    my ($msg) = @_;
+
+    warn $msg;
+    exit 1;
+}
+
+__DATA__
+
+=head1 NAME
+
+jenkins-cli - Operate Jenkins from the command line
+
+=head1 VERSION
+
+This documentation refers to jenkins-cli version 0.008
+
+=head1 SYNOPSIS
+
+   jenkins-cli [option] command
+
+ OPTIONS:
+  -b --base-url[=]str
+                The base url of the Jenkins instance to talk to
+  -U --username[=]str
+                The username to interact with Jenkins
+  -P --password[=]str
+                The passowrd of --username
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for jenkins-cli
+
+ COMMANDS:
+  ls|list [search]
+                List jenkins jobs
+  start job     Start the Jenkins job "job"
+  stop job      Stop a Jenkins job (not yet implemented)
+  tail job      Tail a jenkins job (not yet implemented)
+  disable job   Diable a job
+  enable job    Enable a job
+  wipe job      Wipeout workspace for job (not yet implemented)
+  delete job    Delete the jenkins job
+  queue         Show the current job build queue
+  history job   Show a jobs build history (not yet implemented)
+  config job    Show a config for a job
+  create job config.xml
+                Create a new job from "config.xml"
+  watch job(s)  Watch a job or jobs status
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+You can save your configuration into C<~/.jenkins-cli.yml> so that you don't
+have to enter them each time. The following is an example of what the file
+looks like:
+
+  ---
+  base_url: http://localhost:8080/
+  username: admin
+  password: my-secrent-password
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2016 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut
+

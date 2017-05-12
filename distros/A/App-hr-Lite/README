@@ -1,0 +1,12 @@
+DESCRIPTION
+
+    This distribution provides hr-lite which uses Perinci::CmdLine::Lite as
+    the CLI framework instead of Perinci::CmdLine::Inline, mostly for
+    testing purposes. Normal users should just install App::hr and get hr.
+
+SEE ALSO
+
+    App::hr
+
+    hr
+

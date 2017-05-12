@@ -1,0 +1,188 @@
+
+Revision history for Apache2-Controller
+
+1.001.001   2014-06-11
+
+            Was the UNIVERSAL bug fixed in the last version?  It looked 
+            that way.
+
+            Corrected some POD errors.
+
+            t/render.t was failing because I had set the relative_uri
+            with the uri if there was no relative_uri.  That didn't
+            make sense, it resulted in a url /foo/default/default.html.
+            All the other tests seem to pass still.  I don't know why
+            I introduced that bug or why it appeared at the time
+            that the test worked with that regression.
+
+            Look for A2C in Debian!
+
+1.001.000   2012-07-??
+
+            Net::OpenID::Consumer & ::Server required to build in 5.12,
+            even though the OpenID module doesn't work yet.  I really 
+            need to get to figuring that out, but I don't have a use case.
+
+            A2C_Render_Template_Path directive needed assignment of
+            empty arrayref if not specified but used somewhere.
+
+            Dispatch::Simple assigns the requested uri if no matching
+            uri found, to kick back up to "not found" Apache errors.
+
+            Logging a bad request shouldn't limit reason length (as much).
+            It will get cut off anyway by whatever it sends it to,
+            however Apache logging is configured.
+
+            Render::Template now handles error status codes correctly,
+            returning DONE in the case an error occured and an error
+            template was used, so Apache doesn't try to append its own 
+            html error messages to the finished html output.
+
+            Session factored tying and will now generate a new cookie
+            and session if the session store object referenced by the old 
+            cookie is no longer present.
+
+
+1.000.111   2010-12-21
+
+            bad cookie eval only if directive A2C_Skip_Bogus_Cookies.
+
+
+1.000.101   2010-12-21
+
+            mkdir explicitly uses $_ for perl < 5.10.  Fixes RT# 60240.
+
+            Errors from Apache2::Cookie::Jar->new() skipped if the
+            APR::Request::Error code is NOTOKEN.  Bad cookie, buggy 
+            client.  Fixes RT# 61744.
+
+
+1.000.100   2009-02-02
+
+            Fixed MANIFEST. RT# 42979.
+            https://rt.cpan.org/Ticket/Display.html?id=42979
+
+            Switched to Module::Build to better control prereqs,
+            build prereqs etc.  
+
+            Render::Template doesn't assign stash functions anymore,
+            in order to reduce number of dependencies.  Do this yourself
+            by overloading render().
+
+            Test suite uses File::Temp tempdir now so that temp
+            directories get cleaned up properly.
+
+            No longer tries `od` with open3(), so MS Win might work? 
+
+            A2C stash data is put in sub-hash 'a2c' of stash,
+            so it doesn't clutter the namespace and is consistent
+            with the same change that was made to consolidate pnotes.
+
+1.000.011   2009-01-10
+
+            No more setting status_line() with HTTP::Status messages
+            for error conditions - just let Apache set its message.
+            Re-arranged a little bit of error handling so you can
+            set or return a status from error().
+
+            Bugfix for Methods get_cookie_jar - it should not store
+            a reference in pnotes because it contains a ref to the
+            Request.  
+
+            Pushed Session handler now saves a top-level timestamp 
+            to force update of Apache::Session, if you set the
+            directive flag.
+
+            Session save handler is now its own package,
+            concerned about closures keeping the request around.
+            Is this a problem with the DBI rollback handler,
+            which closes on a string var in the setup phase?
+
+            Moved all of the internal notes/pnotes garbage
+            under one structure $r->pnotes->{a2c} because
+            it makes more sense to not clutter the limited
+            notes/pnotes key namespace.
+
+1.000.010   2008-12-2
+
+            Detaints directive values. 
+
+            Controller doesn't double-check allowed_methods
+            in case your dispatch wants freedom from that.
+
+            Improvements/correction to documentation.
+
+            Session now uses a checkum.  Thanks David Ihern.
+
+            OpenID auth module put on backburner until
+            I rewrite it again, I wanted to get this out
+            the door with functional session checksum and
+            correct documentation.
+
+1.000.001   2008-12-20
+
+            Put CPAN upload in the right directory.  Duh.
+
+1.000.000   2008-12-20
+            
+            Session now saves only if status < 300, or if 
+            notes->{a2c_session_force_save} is set.
+
+            OpenID!  Rockin.  It doesn't preserve post or get vars
+            yet from the prior request across the openid redirect cycle,
+            but it's good enough to release.  Hurrah!
+
+            Instead of using PerlCleanupHandler to save session and
+            commit database, it uses PerlLogHandler while the
+            connection is still open.  Otherwise, session untying
+            and database commits may not be processed synchronously
+            before the next request that depends on those changes.
+
+0.110.000   2008-08-06
+
+            Removing the "RUN_ALL" simulated mode from response handler.
+            It's an over-optimization, and A2C:DBI::Connector supports
+            a PerlCleanupHandler to rollback uncommitted transactions.
+            Now Controller.pm does not return DONE, but sets status
+            and returns OK.
+            
+            Apache2::Controller::DBI::Connector works.  Cool!
+
+0.101.111   2008-07-22T18:01:00
+            LAME LAME LAME I hate versions.
+
+0.101.110   2008-07-22T18:00:00
+            Oops I see, Version.pm was not in the MANIFEST, no wonder.
+
+0.101.101   2008-07-22T02:30:00
+            Version numbers are so strange.
+
+0.4.3   2008-07-21T00:22:00
+        Removed ability to limit methods.  Use Apache config for that.
+        A2C:SQL::Controller.  untested.   Controller now passes @path_args
+        as arguments to method.  Version is now in its own package.
+        Some new SQL-related packages that may or may not work.
+        Universal use of Apache2::Controller::Directives - no more
+        PerlSetVar.  Documentation edits.
+
+0.4.1   2008-07-16T00:16:00
+        Changing version number to use 'version' package.
+        I had the version number screwed up before.
+        The numbers below are actually 0.4.0, 0.3.0 etc.
+
+0.0.4   2008-07-16T00:08:00
+        New dispatch method HashTree implements alternative dispatching.
+        Various improvements to documentation.  More tests.
+        Developed unit test infrastructure.
+
+0.0.3   2008-07-06T00:08:00
+        Changed render to always use A2CRenderTemplateDir as INCLUDE_PATH.
+        Various and sundry updates.  Trying to get Directives to work.
+        Bleah.
+
+0.0.2   2008-07-02T00:08:00
+        Woo-hoo!  Rendering and sessions work.  More tests.
+
+0.0.1   2008-06-01T00:00:00
+        First version, released on an unsuspecting world.
+

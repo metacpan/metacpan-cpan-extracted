@@ -1,0 +1,5 @@
+user: "hunter"
+
+servers:
+  - hostname: sasparillo
+    user: mocha

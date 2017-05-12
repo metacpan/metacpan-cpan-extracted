@@ -1,0 +1,6 @@
+name = "APISchema"
+badges = ["travis"]
+authority="cpan:HITODE"
+
+module_maker="ModuleBuildTiny"
+

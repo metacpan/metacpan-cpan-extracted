@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cc694e6c5b00a71c11f3f050c6b3b9548157c83a Changes
+SHA1 167ce68573112b923e074e8d22c2017febe0e622 Czech.pm
+SHA1 2c511157dfdf92a515f663ead7842444270de63a LICENSE
+SHA1 615bc35540fd09e51f4bbea48f942071305ef1ed MANIFEST
+SHA1 2bf855085785ba24687f2d94ccd90bbbf7741b6a META.yml
+SHA1 00ac7b20cf160b07b0d371f1dc348a7a6bd85e73 Makefile.PL
+SHA1 26641f7180d634718d6d1e1fdd4edad10b62a795 README
+SHA1 b44b2e2afb7791e98e2ee53451286decc0754260 examples/ex1.pl
+SHA1 3bbd61c31cccfd545615a5a495ebf473f7ec9f16 examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 e76df2c3b1e7b960b4e4fa36db6b3c1a8b063452 t/Acme-CPANAuthors-Czech/01-use.t
+SHA1 33a4b9c67d3ee1c0cfd317e724576a3154c6047f t/Acme-CPANAuthors-Czech/02-version.t
+SHA1 ff167a4e17b99e92e5fda00970e2a1006a964cdc t/Acme-CPANAuthors-Czech/03-new.t
+SHA1 1ee9b8f11eb9e4b440c8c33d565b8c3d5f13fd9e t/Acme-CPANAuthors-Czech/04-authors.t
+SHA1 195cf9829552d8c99c69da7e285ed6b0b5e888f3 t/Acme-CPANAuthors-Czech/05-count.t
+SHA1 97a239796b9711b4bd8fdd12e16abadef4890513 t/Acme-CPANAuthors-Czech/06-id.t
+SHA1 3837acbdd971034c6c8d1ad7ac484352f4e549ae xt/Acme-CPANAuthors-Czech/01-pod_coverage.t
+SHA1 9324a1fc3f6760cadf63552781c90e434e8fb6c5 xt/Acme-CPANAuthors-Czech/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJX9JJCAAoJEJe+XXKaIuTlIv0IAIhYaJFU2DqwDfdvPHiqR1pg
+xfB47bKgVaOCNUYQuS2ceROici23kUJkRGc+2kweWUH0Ge/EbdvlynbTW2A7Pj51
+cb5sNvFxLj6kiPItuSy5bipmazsUy3QC13SYwS9E0x25FZ5+YzLJNz9Wq1xiZfyQ
+k03rAa85wf9rfNRamBYIr3NlI173xunILroxesHmJjCBRCtjVdZdWdUWW48IJ2t8
+HjbttQhM9oBiXk4fMkvlX7Jj8RvOtnuuf9A8YaMIXmhCi5JvUR7yk9PtpPI3dMVf
+cOWDPDGSKELrc34sBO2Ge7hFZbuReqiLJZ/R8nXaAblxArrPv7OHs+QiHHB8QHU=
+=s2J9
+-----END PGP SIGNATURE-----

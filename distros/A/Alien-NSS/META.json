@@ -1,0 +1,55 @@
+{
+   "abstract" : "Alien wrapper for NSS ( Network Security Services )",
+   "author" : [
+      "Johanna Amann <johanna@icir.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mozilla_1_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-NSS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base" : "0.018",
+            "HTTP::Tiny" : "0",
+            "Module::Build" : "0.38",
+            "Sort::Versions" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.018",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::NSS" : {
+         "file" : "lib/Alien/NSS.pm",
+         "version" : "0.23"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/0xxon/alien-nss/issues"
+      },
+      "homepage" : "https://github.com/0xxon/alien-nss",
+      "license" : [
+         "http://www.mozilla.org/MPL/MPL-1.1.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/0xxon/alien-nss.git"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

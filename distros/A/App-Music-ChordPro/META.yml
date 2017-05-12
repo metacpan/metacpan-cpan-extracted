@@ -1,0 +1,41 @@
+---
+abstract: 'A lyrics and chords formatting program'
+author:
+  - 'Johan Vromans <jvromans@squirrel.nl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Music-ChordPro
+no_index:
+  directory:
+    - t
+    - inc
+    - lib/App/Music/ChordPro/Output
+    - lib/App/Music/ChordPro/Wx
+  file:
+    - lib/App/Music/ChordPro/Songbook.pm
+    - lib/App/Music/ChordPro/Chords.pm
+    - lib/App/Music/ChordPro/Wx.pm
+provides:
+  App::Music::ChordPro:
+    file: lib/App/Music/ChordPro.pm
+    version: '0.75'
+  chordpro:
+    file: script/chordpro
+    version: '0.75'
+requires:
+  App::Packager: '1.42'
+  Font::TTF: '1.04'
+  PDF::API2: '2.02'
+resources:
+  homepage: http://www.chordpro.org
+version: '0.75'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

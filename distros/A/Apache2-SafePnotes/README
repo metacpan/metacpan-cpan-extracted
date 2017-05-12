@@ -1,0 +1,82 @@
+NAME
+    Apache2::SafePnotes - a safer replacement for
+    Apache2::RequestUtil::pnotes
+
+SYNOPSIS
+      use Apache2::SafePnotes;
+      use Apache2::SafePnotes qw/pnotes/;
+      use Apache2::SafePnotes qw/whatever/;
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    mod_perl2
+
+DESCRIPTION
+    This module cures a problem with "Apache2::RequestRec::pnotes" and
+    "Apache2::Connection::pnotes" (available since mod_perl 2.0.3). These
+    functions store perl variables making them accessible from various
+    phases of the Apache request cycle.
+
+    According to the docs there are 2 ways to store data as a pnote:
+
+      $r->pnotes( key=>"value" );
+
+    and
+
+      $r->pnotes->{key}="value";
+
+    Unfortunately, these 2 versions work slightly different. Assuming the
+    following code
+
+      my $v=1;
+      $r->pnotes( 'v'=>$v );
+      $v++;
+      my $x=$r->pnotes('v');
+
+    I'd expect $x to be 1 but it turns out to be 2. Further on, also this
+    code snippet leads to unexpected results:
+
+      my $v=1;
+      $r->pnotes( 'v'=>$v );
+      $r->pnotes->{v}++;
+      my $x=$v;
+
+    Surprise, $x is 2 as well.
+
+    The problem lies in "$r->pnotes( 'v'=>$v )". With "$r->pnotes->{v}=$v"
+    all works as expected ("$x==1").
+
+    With "Apache2::SafePnotes" the problem goes away and $x will be 1 in
+    both cases.
+
+  INTERFACE
+    This module must be "use"'d not "require"'d. It does it's work in an
+    "import" function.
+
+    use Apache2::SafePnotes
+        creates the function "Apache::RequestRec::safe_pnotes" as a
+        replacement for "pnotes". The old "pnotes" function is preserved
+        just in case some code relies on the odd behavior.
+
+    use Apache2::SafePnotes qw/NAME/
+        creates the function "Apache::RequestRec::*NAME*" as a replacement
+        for "pnotes". If "pnotes" is passed as *NAME* the original "pnotes"
+        function is replaced by the safer one.
+
+SEE ALSO
+    modperl2, Apache2::RequestUtil, Apache2::Connection
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

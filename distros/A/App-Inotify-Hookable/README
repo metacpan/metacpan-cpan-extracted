@@ -1,0 +1,108 @@
+NAME
+    App::Inotify::Hookable - blocking command-line interface to inotify
+
+SYNOPSIS
+    Watch a directory, tell us when things change in it:
+
+        inotify-hookable --watch-directories /tmp/watch-this
+
+    Watch a git tree, some configs, and a repository of static assets,
+    restart the webserver or compress those assets if anything changes:
+
+        inotify-hookable \
+            --watch-directories /etc/uwsgi \
+            --watch-directories /git_tree/central \
+            --watch-directories /etc/app-config \
+            --watch-directories /git_tree/static_assets \
+            --on-modify-path-command "^(/etc/uwsgi|/git_tree/central|/etc/app-config)=sudo /etc/init.d/uwsgi restart" \
+            --on-modify-path-command "^/git_tree/static_assets=(cd /git_tree/static_assets && compress_static_assets)"
+
+    Or watch specific files:
+
+        inotify-hookable \
+            --watch-files /var/www/cgi-bin/mod_perl_handler \
+            --on-modify-command "apachectl restart"
+
+DESCRIPTION
+    This simple command-line program is my replacement for the functionality
+    offered by Plack's Filesys::Notify::Simple. I found that on very large
+    git trees Plack would spend an inordinate amount watching the filesystem
+    for changes.
+
+    This program uses Linux::Inotify2, so the kernel will notify it
+    instantly when something changes (actually it's so fast that we have to
+    work around how fast it sends us events).
+
+    The result is that you can run this e.g. in a screen session and have it
+    watch your development environment, and your webserver will have begun
+    restarting before your finger leaves the *save* button.
+
+    vim and emacs temporary files are ignored by default (see
+    "--ignore-paths".) so you can edit your files without your server
+    restarting unnecessarily.
+
+    Currently the command-line interface for this is the only one that
+    really makes sense, this module is entirely blocking (although it could
+    probably run in another process via POE or something). Patches welcome.
+
+OPTIONS
+    Note that boolean options can be negated with "--no-OPTION", e.g.
+    "--no-r" or "--no-recursive" to turn off the "--recursive" option which
+    is on by default.
+
+  "-w" or "--watch-directories"
+    Specify this to watch a directory, you can give this however many times
+    you like to watch lots of directories.
+
+  "-f" or "--watch-files"
+    Watch a file, specify multiple times for multiple files. You can watch
+    files and directories in the same command.
+
+  "-r" or "--recursive"
+    If you supply this any directory you give will be recursively watched.
+    This is on by default.
+
+  "-c" or "--on-modify-command"
+    A command that will be run when something is modified.
+
+  "-C" or "--on-modify-path-command"
+    A key-value pair where the key is a regex that'll be matched against a
+    modified path, and the value is a command that'll be run. See the
+    "SYNOPSIS" for an example.
+
+    Useful for e.g. restarting a webserver if you modify directory A but
+    compressing some static assets if you modify directory B.
+
+  "-t" or "--buffer-time"
+    Linux will send you inotify events really fast, so fast that if you run
+    something like:
+
+        touch foo bar
+
+    You might get an event for foo in one batch, followed by an event for
+    bar later on.
+
+    To deal with this we enter a loop when we start getting events and sleep
+    for a default of 100 microseconds, as long as we keep getting events we
+    keep sleeping for 100 microseconds, but as soon as we haven't received
+    anything new we fire off our event handlers.
+
+  "-i" or "--ignore-paths"
+    Regexes for files/directories to ignore events for. By default this is
+    set to regexes for vim and emacs temporary files, "qr{\..*sw.\z}" and
+    "qr{\.\#[^/]+\z}" respectively.
+
+    The regexes match after any "/" in the path or the beginning of the
+    string.
+
+  "-d" or "--debug"
+    Spew out some verbose debug output while running.
+
+ACKNOWLEDGMENT
+    This module was originally developed at and for Booking.com. With
+    approval from Booking.com, this module was generalized and put on CPAN,
+    for which the authors would like to express their gratitude.
+
+AUTHOR
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+

@@ -1,0 +1,84 @@
+NAME
+
+    App::Prun::Scaled - Provides the sprun script as a command line
+    interface to Parallel::ForkManager::Scaled.
+
+VERSION
+
+    Version 1.05
+
+SYNOPSYS
+
+        for nr in `seq 1 100`; do echo "echo command #$nr" | sprun
+    
+        sprun command_file_to_run_in_parallel
+
+DESCRIPTION
+
+    sprun allows you to utilize multiple CPUs for some workloads from the
+    shell more easily.
+
+    sprun takes a list of commands (stdin and/or from file(s)) and run the
+    commands in parallel.
+
+    sprun is a CLI front end to Paralell::ForkManager::Scaled. It runs
+    commands in parallel while trying to keep the CPUs at a specified level
+    of activity by constantly adjusting the number of running processes.
+
+      * sprun --help
+
+      * Parallel::ForkManager::Scaled
+
+EXAMPLES
+
+    There are also examples available from the command line --help.
+
+    Run tkprof against all .trc files in the current directory while
+    attempting to keep the system 75% idle, don't adjust the number of
+    processes unless idle time goes below 74 or above 76, and re-evaluate
+    after each process exits (update frequency = 0).
+
+      for F in *.trc; do echo "tkprof $F ${F%trc}txt"; done | sprun -t 75 -T 2 -u 0
+
+    Run all commands in a file (command_file), one line at a time. Manually
+    bound the minimum and maximum number of processes to run and start with
+    4. Keep the CPU 100% busy (0% idle) and re-evaluate at most every 3
+    seconds. Ignore any failed processes, but do report to STDOUT any that
+    fail.
+
+      sprun -e -r -m 2 -M 8 -i 4 -u 3 command_file
+
+    Test with the dummy_load script included in the contrib/ directory of
+    this distribution:
+
+      for F in `seq 1 100`; do echo "contrib/dummy_load"; done | sprun -v
+
+AUTHOR
+
+    Jason McCarver <slam@parasite.cc>
+
+SEE ALSO
+
+    App::Prun
+
+    Parallel::ForkManager
+
+    Parallel::ForkManager::Scaled
+
+REPOSITORY
+
+    The mercurial repository for this module may be found here:
+
+      https://bitbucket.org/jmccarv/app-prun-scaled
+
+    clone it:
+
+      hg clone https://bitbucket.org/jmccarv/app-prun-scaled
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Jason McCarver
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

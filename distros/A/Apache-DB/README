@@ -1,0 +1,15 @@
+This package provides debugging and profiling tools for mod_perl:
+
+ Apache::DB        - Hooks for the interactive Perl debugger
+ Apache::DProf     - Hooks for Devel::DProf
+ Apache::SmallProf - Hooks for Devel::SmallProf
+
+These modules are very useful for helping to determine the cause of
+errors and performance problems in mod_perl applications. They should
+function with both mod_perl 1.x and 2.x. 
+
+These modules were originally written by Doug MacEachern. 
+
+They are currently being maintained by Frank Wiles <frank@wiles.org>. 
+Please E-mail him with any bugs you may find. 
+

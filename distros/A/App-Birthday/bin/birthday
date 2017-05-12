@@ -1,0 +1,199 @@
+#! /usr/bin/env perl
+# Description: Send mails due to 'birthday.json' file and a given
+#              configuration file.
+# Author: Farhad Fouladi (2012)
+
+use Getopt::Std;
+use JSON::PP;
+use autodie;
+use App::Birthday;
+
+getopts('yhxvi:c:', \ my %opt) or usage();
+usage()   if $opt{h};
+version() if $opt{v};
+my $today = sprintf("%d.%d", sub {($_[3], $_[4]+1)}->(localtime));#5.2
+
+$opt{i} = $opt{i} // 'birthday.json';
+$opt{c} = $opt{c} // 'config.json';
+
+# Read Input file
+my $input = do {   # narrow scope
+    local $/;      # Enter file slurp mode localized
+    open my $in_fh, '<', $opt{i};
+    <$in_fh>;      # slurp whole input file in a run
+};
+
+# Read Configuration file
+my $conf = do {
+    local $/;
+    open my $conf_fh, '<', $opt{c};
+    <$conf_fh>;
+};
+
+my $json     = JSON::PP->new->allow_nonref;
+my $input_hr = $json->decode( $input );
+my $conf_hr  = $json->decode( $conf );
+
+for (keys %$input_hr) {
+    if ($$input_hr{$_}{date} eq $today or $opt{x}) {
+        if ($opt{y}){
+            verify_mails( $_, $input_hr, $conf_hr, $opt{i} );
+        } else {
+            send_mails( $_, $input_hr, $conf_hr, $opt{i} );
+        }
+    }
+}
+
+1;
+__END__
+
+=head1 NAME
+
+B<birthday> 
+
+=head1 SYNOPSIS
+
+B<birthday> <option>
+
+=head1 OPTION
+
+   -h : help
+   -i <file> : user defined input file, default "birthday.json"
+   -c <file> : user defined configuration file, default "config.json"
+   -x        : send to all users in "config.file", no date verification
+   -y        : verify configuration and input - no mail will be sent
+
+=head1 DESCRIPTION
+
+It sends birthday e-mails to your friends, on their anniversary date.
+
+I have a bad habit that I almost always forget the birthdays of my
+friends and colleagues. To solve this, I try to 'cheat' and write this
+script and add it to my I<crontab>.
+
+It sends an e-mail at his/hers anniversary date to a friend and a
+reminder to me. (The other way, there was a risk that I forget again!)
+Additionally all your common friends receive reminders that your friend
+has his/hers birthday today.
+
+The list of birthday children are saved in a JSON file, default is
+F<birthday.json>, in the same directory as script. Any other file can be
+selected using option I<-i>. See below for file format.
+
+Additionally you need a configuration file for your e-mail system. This
+file is also in JSON format and default is F<configuration.json>, in the
+same directory as script. The file format is described below. Any other
+file can be selected using option I<-c>.
+
+To verify the configuration and input file use I<-y>. Here it prints all
+mails and configuration to STDOUT instead of sending them per mail. It
+is useful for testing and validation.
+
+=head2 Input Format
+
+The format of input file can be best described by an example. Imagin Bob
+has 3 friends: Carol, Ted, Alice. The following JSON structure can be
+saved, e.g. in F<birthday.json>.
+
+    {
+        "carol" : {
+            "date" : "16.9",
+            "friends" : { 
+                "names" : ["ted"],
+                "subject" : "Carol has today birthday!"
+            },
+            "email" : "carol@somewhere.com",
+            "subject" : "Happy Birthday Carol!",
+            "text" : "Dear Carol, \nhappy birthday and all the best wishes \n\nYours,\nBob"
+        },
+        "ted" : {
+            "date" : "25.11",
+            "friends" : { 
+                "names" : ["carol", "alice"],
+                "subject" : "Ted has today birthday!"
+            },
+            "email" : "ted@another.com",
+            "subject" : "*** Happy Birthday! ***",
+            "text" : "Dear Ted, \n happy birthday \n\nRegards,\nBob"
+        },
+        "alice" : {
+            "date" : "5.12",
+            "friends" : { 
+                "names" : ["other"],
+                "subject" : "Alice has today birthday!"
+            },
+            "email" : "alice@somewhere.com",
+            "subject" : "*** Happy Birthday! ***",
+            "text" : "Dear Alice, \n happy birthday \n\nRegards,\nBob"
+        }
+    }
+
+then at 16.9 (16th Sept.) following mails will be sent:
+
+    bob -> carol    # congratulation mail
+    bob -> ted      # reminder mail - carol has birthday
+    bob -> bob      # copy of congratulation mail - bob email in F<configuration.json>
+
+If word B<others> as his/her only friend is inserted, all
+users minus birthday person in input file, will receive an reminder email. For
+example in above file, following reminder e-mails will be sent at 5th of Dec.:
+
+    bob -> ted
+    bob -> carol
+
+The option I<-x> will send to all your friends e-mails without
+consideration to value of the "date" (their birthday). It can be for example
+used for 'xmas' congratulations or an invitation.
+
+=head2 Configuration Format
+
+The format of configuration file can be best described by an example.
+
+    {
+        "from" : "bob@mycompany.com",
+        "maintainer" : "bob@myhome.com",
+        "transport" : {
+            "host" : "mail.mycompany.net",
+            "port" : "25"
+        }
+    }
+
+Maintainer will receive an e-mail reminder, that he sent a
+birthday e-mail.
+
+For example in above example Bob receive a copy of birthday e-mails at
+his "bob@myhome.com".
+
+=head2 Usage Examples
+
+=over 4
+
+=item * send at friend birthday a congratulations mail; use default
+I<birthday.json> and I<configuration.json> configuration file
+
+birthday
+
+=item * send at friend birthday a congratulations mail; use
+I<birthday_colleagues.json> and default configuration file
+
+birthday -i somewhere/birthday_colleagues.json
+
+=item * send immediately to all users Xmas congratulation, with default config file
+
+birthday -x -i somewhere/xmas.json
+
+=item * send immediately to all users Xmas congratulation, use not defalut config file
+
+birthday -x -i xmas.json -c home_config.json
+
+=item * send no mails - only simulates and prints out
+
+birthday -y -i xmas.json -c home_config.json
+
+=back
+
+=head1 AUTHOR
+
+Farhad Fouladi
+
+=cut

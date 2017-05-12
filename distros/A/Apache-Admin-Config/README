@@ -1,0 +1,69 @@
+Apache::Admin::Config 0.95
+==========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+NAME
+    Apache::Admin::Config - A module to read/write Apache like configuration
+    files
+
+DESCRIPTION
+    "Apache::Admin::Config" provides an object oriented interface for
+    reading and writing Apache-like configuration files without affecting
+    comments, indentation, or truncated lines.
+
+    You can easily extract informations from the apache configuration, or
+    manage htaccess files.
+
+    I wrote this class because I work for an IPP, and we often manipulate
+    apache configuration files for adding new clients, activate some
+    features or un/locking directories using htaccess, etc. It can also be
+    useful for writing some one-shoot migrations scripts in few lines.
+
+AUTHOR
+    Olivier Poitrey <rs@rhapsodyk.net>
+
+AVAILABILITY
+    Available on CPAN at:
+
+    http://search.cpan.org/~rsoliv/Apache-Admin-Config/
+
+    Available on GitHub at:
+
+    https://github.com/markwhi/Apache-Admin-Config
+
+    Homepage:
+
+    http://rs.rhapsodyk.net/devel/apache-admin-config/
+
+BUGS
+    Please report bugs using the CPAN RT tracker:
+
+    https://rt.cpan.org/Dist/Display.html?Name=Apache-Admin-Config
+
+LICENCE
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License, or (at
+    your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+    General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+COPYRIGHT
+    Copyright (C) 2001 - Olivier Poitrey
+

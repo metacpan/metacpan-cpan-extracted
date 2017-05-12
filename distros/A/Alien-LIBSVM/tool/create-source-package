@@ -1,0 +1,10 @@
+#!/bin/sh
+
+CURDIR=`dirname "$0"`
+cd "$CURDIR"
+VERSION="3.21"
+SOURCE_PACKAGE="libsvm-$VERSION"".tar.gz"
+TARGET_DIR="../inc/" # relative to $CURDIR
+mkdir "$TARGET_DIR"
+# http://www.csie.ntu.edu.tw/~cjlin/cgi-bin/libsvm.cgi?+http://www.csie.ntu.edu.tw/~cjlin/libsvm+tar.gz
+wget -P "$TARGET_DIR" -c http://www.csie.ntu.edu.tw/~cjlin/libsvm/$SOURCE_PACKAGE

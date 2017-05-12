@@ -1,0 +1,8 @@
+lib/AnyEvent/Pg/Pool/Multiserver.pm
+Makefile.PL
+MANIFEST
+t/01-test.t
+example/ex.pl
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

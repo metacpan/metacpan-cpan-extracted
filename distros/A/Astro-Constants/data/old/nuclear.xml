@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Collection>
+    <title>Astro::Constants</title>
+    <description>Physical constants for astronomy for use in Astro::Constants v0.10</description>
+    <timestamp>Wed Feb 10 11:59:40 2016</timestamp>
+    <version>v0.10</version>
+    <source>2014 CODATA</source>
+    <link href="http://metacpan.org/pod/Astro::Constants" />
+    <items>
+        <PhysicalConstant>
+            <name type="long">ELECTRON_MASS</name>
+            <name type="short">A_me</name>
+            <alternateName />
+            <description>mass of electron</description>
+            <value system="MKS">9.10938356e-31</value>
+            <value system="CGS">9.10938356e-28</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?me" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">PROTON_MASS</name>
+            <name type="short">A_mp</name>
+            <alternateName />
+            <description>mass of proton</description>
+            <value system="MKS">1.672621898e-27</value>
+            <value system="CGS">1.672621898e-24</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?mp" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ATOMIC_MASS_UNIT</name>
+            <name type="short">A_amu</name>
+            <alternateName />
+            <description>atomic mass unit</description>
+            <value system="MKS">1.660539040e-27</value>
+            <value system="CGS">1.660539040e-24</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?amu" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ELECTRON_VOLT</name>
+            <name type="short">A_eV</name>
+            <alternateName />
+            <description>electron volt</description>
+            <value system="MKS">1.6021766208e-19</value>
+            <value system="CGS">1.6021766208e-12</value>
+            <uncertainty type="relative">6.1e-9</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?eV" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">PLANCK</name>
+            <name type="short">A_h</name>
+            <alternateName />
+            <description>Planck constant</description>
+            <value system="MKS">6.626070040e-34</value>
+            <value system="CGS">6.626070040e-27</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?h" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">HBAR</name>
+            <name type="short">A_hbar</name>
+            <alternateName />
+            <description>Planck's constant /2pi</description>
+            <value system="MKS">1.054571800e-34</value>
+            <value system="CGS">1.054571800e-27</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?hbar" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ELECTRON_CHARGE</name>
+            <name type="short">A_e</name>
+            <alternateName />
+            <description>electron charge (defined positive)</description>
+            <value system="MKS">1.6021766208e-19</value>
+            <value system="CGS">4.8032046729e-10 4.8032e-10</value>
+            <uncertainty type="relative">6.1e-9</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?e" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">STEFAN_BOLTZMANN</name>
+            <name type="short">A_sigma</name>
+            <alternateName />
+            <description>Stefan-Boltzmann constant</description>
+            <value system="MKS">5.670367e-8</value>
+            <value system="CGS">5.670367e-5</value>
+            <uncertainty type="relative">2.3e-6</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?sigma" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">NEUTRON_MASS</name>
+            <name type="short">A_mn</name>
+            <alternateName />
+            <description>neutron mass</description>
+            <value system="MKS">1.674927471e-27</value>
+            <value system="CGS">1.674927471e-24</value>
+            <uncertainty type="relative">1.2e-8</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?mn" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">HYDROGEN_MASS</name>
+            <name type="short">A_mH</name>
+            <alternateName />
+            <description>mass of Hydrogen atom</description>
+            <value>1.67372e-24</value>
+            <uncertainty type="relative">1.67372e-27 1e-5</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?mH" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ANGSTROM</name>
+            <name type="short">A_AA</name>
+            <alternateName />
+            <description>Angstrom</description>
+            <value system="MKS">1e-10</value>
+            <value system="CGS">1e-8</value>
+            <uncertainty type="relative">0</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?AA" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">A_RAD</name>
+            <name type="short">A_arad</name>
+            <alternateName />
+            <description>radiation density constant</description>
+            <value system="MKS">7.565723e-16</value>
+            <value system="CGS">7.565723e-15</value>
+            <uncertainty type="relative">2.3e-6</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?arad" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">THOMSON_XSECTION</name>
+            <name type="short">A_sigmaT</name>
+            <alternateName />
+            <description>Thomson cross-section</description>
+            <value system="MKS">6.6524587158e-29</value>
+            <value system="CGS">6.6524587158e-25</value>
+            <uncertainty type="relative">1.4e-9</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?sigmaT" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ELECTRON_RADIUS</name>
+            <name type="short">A_re</name>
+            <alternateName />
+            <description>classical electron radius</description>
+            <value system="MKS">2.8179403227e-15</value>
+            <value system="CGS">2.8179403227e-13</value>
+            <uncertainty type="relative">6.8e-10</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?re" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">BOHR_RADIUS</name>
+            <name type="short">A_a0</name>
+            <alternateName />
+            <description>Bohr radius</description>
+            <value system="MKS">5.2917721067e-11</value>
+            <value system="CGS">5.2917721067e-9</value>
+            <uncertainty type="relative">2.3e-10</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?a0" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">WIEN</name>
+            <name type="short">A_Wien</name>
+            <alternateName />
+            <description>Wien wavelength displacement law constant</description>
+            <value system="MKS">2.8977729e-3</value>
+            <value system="CGS">2.8977729e-1</value>
+            <uncertainty type="relative">5.7e-7</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Wien" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">ALPHA</name>
+            <name type="short">A_alpha</name>
+            <alternateName />
+            <description>fine structure constant</description>
+            <value system="MKS">7.2973525664e-3</value>
+            <value system="CGS">7.2973525664e-3</value>
+            <uncertainty type="relative">2.3e-10</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?alpha" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">VACUUM_IMPEDANCE</name>
+            <name type="short">A_Z0</name>
+            <alternateName />
+            <description>characteristic impedance of vacuum</description>
+            <value>376.730313461</value>
+            <uncertainty type="relative">1e-50</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?Z0" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">PERMITIV_FREE_SPACE</name>
+            <name type="short">A_eps0</name>
+            <alternateName />
+            <description>permittivity of free space</description>
+            <value system="MKS">8.854187817e-12</value>
+            <value system="CGS">1</value>
+            <uncertainty type="relative">1e-30</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?eps0" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+        <PhysicalConstant>
+            <name type="long">PERMEABL_FREE_SPACE</name>
+            <name type="short">A_mu0</name>
+            <alternateName />
+            <description>permeability of free space</description>
+            <value system="MKS">1.2566370614e-6</value>
+            <value system="CGS">1</value>
+            <uncertainty type="relative">1e-10</uncertainty>
+            <dimensions />
+            <maxValue />
+            <minValue />
+            <url href="http://physics.nist.gov/cgi-bin/cuu/Value?mu0" />
+            <categoryList>
+                <category>nuclear</category>
+            </categoryList>
+        </PhysicalConstant>
+    </items>
+</Collection>

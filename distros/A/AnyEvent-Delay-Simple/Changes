@@ -1,0 +1,33 @@
+Revision history for perl module AnyEvent::Delay::Simple
+
+0.06    2014-09-13
+        - Fixed handling of exceptions that may be raised into condvar
+          callbacks.
+
+0.05    2014-02-24
+        [Incompatible changes]
+        - The condition variable in list of callback arguments of delay()
+          function moved to the last position.
+        [New features]
+        - If the first argument of the delay() or easy_delay() functions is
+          blessed reference then all callbacks calls as methods of this
+          reference.
+
+0.04    2013-11-20
+        [Incompatible changes]
+        - Implemented control the flow of events within step. Changed
+          arguments passed to callbacks and handlers.
+        - Changed rule of importing finction it AE namespace. Now function
+          will be prefixed with "AE::".
+        [Other]
+        - The old version of the delay() function is now called as
+          easy_delay().
+
+0.03    2013-11-19
+        - Implemented data transfer along the chain of callbacks.
+
+0.02    2013-11-18
+        - Implemented import of function into AE namespace.
+
+0.01    2013-11-18
+        - Initial public release.

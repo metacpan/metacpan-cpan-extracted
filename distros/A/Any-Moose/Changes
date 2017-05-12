@@ -1,0 +1,120 @@
+Revision history for Any-Moose
+
+0.27      2016-11-08 03:37:04Z
+  - add deprecation warning when this module is used
+
+0.26      2015-01-24 07:52:46Z
+  - change Mouse $VERSION check to avoid dying on bad 'v2.4.0' version
+
+0.25      2015-01-21 04:31:32Z
+  - mark module as deprecated in metadata
+  - add additional checks for too-old Mouse
+
+0.24      2014-06-23 15:53:03Z
+  - fixed bad changelog from last release, doh!
+
+0.23      2014-06-23 13:04:35Z
+  - now always prefers Moose if Moo is loaded, to overcome some
+    incompatibility issues in subclasses (github #1, Graham Knop)
+
+0.22      2014-06-19 02:30:13Z
+  - fix missing =encoding directive in pod
+  - canonical repository moved to https://github.com/moose/Any-Moose
+
+0.21 2013-03-02
+  - Add tokuhirom's translation of the deprecation notice
+
+0.20 2012-12-30
+  - Documentation fixes
+
+0.19 2012-12-30
+  - Deprecated in favor of Moo. Good night, sweet prince.
+
+0.18 2011-11-07
+  - Try to cope with broken smokers better by recording a Moose
+    prereq when it is used. (Chris Williams)
+    - see https://rt.cpan.org/Public/Bug/Display.html?id=72043
+
+0.17 2011-09-16
+  - Better indicate that this module is dynamically configured.
+    - fixes [rt.cpan.org #70996]
+
+0.16 2011-09-15
+  - If you have Moose installed you no longer get the Mouse dependency (rjbs, reported by andk)
+     Any::Moose has long had both runtime and test support for Moose
+     without Mouse, but the toolchain has not, until recently, been
+     good enough to handle alternatives. This change is designed
+     to affect very few people.
+    - fixes [rt.cpan.org #70597]
+
+0.15 2011-06-07
+  - Standardize the tests' Mouse/Moose loading eval/skip code
+    (Sartak, reported by Daniel Macks)
+    - fixes [rt.cpan.org #68657]
+
+0.14 2011-04-29
+  - Skip t/004-x-modules-mouse.t if you don't have MouseX::Types 0.03 since
+    older versions do not work with modern Mouse (Sartak, reported by ewilhelm)
+
+0.13  2010-05-19
+  - Add load_first_existing_class (gfx)
+
+0.12  2010-04-02
+  - t/000-version.t for better diagnostics (tokuhirom)
+  - Slight performance improvements for is_class_loaded,
+      lazily loading Carp, etc (Sartak)
+  - Start some real documentation (Sartak)
+  - Document $ENV{ANY_MOOSE} (Sartak)
+    - fixes [rt.cpan.org #52339]
+  - Test that Moose is loaded, not CMOP (Sartak)
+    - fixes [rt.cpan.org #56093]
+  - Alias class_of and more functions (Sartak)
+    - requested by [rt.cpan.org #52275]
+
+0.11  2009-12-19
+  - Support "use Any::Moose '::Util::TypeConstraints'" (gfx)
+  - Support "no Any::Moose '::Util::TypeConstraints'" (gfx)
+  - $@ related fixes (gfx)
+  - Documentation and other minor improvements (gfx)
+  - Any::Moose should now work when you have Moose but not Mouse. Still need to
+    work out how to encode this in the installation system (Sartak)
+
+0.10  2009-06-19
+  - Fix META.yml
+
+0.09  2009-05-19
+  - Depend on Mouse 0.21.
+
+0.08  2009-05-18
+  - Add moose_is_preferred and mouse_is_preferred functions for when you
+    need to care about which backend is in use (Sartak)
+  - Deprecate the internal is_moose_loaded in favor of moose_is_preferred
+    (Sartak)
+
+0.07  2009-04-10
+  - Depend on Mouse 0.20 for better compatibility with Moose >= 0.74 (rafl).
+
+0.06  2009-03-18
+  - Add Any::Moose::is_class_loaded. (tokuhirom)
+
+0.05  2009-02-25
+  - Stop using ambiguous ways of creating named subtypes in the tests. This
+    makes them pass again with Moose >= 0.72. (rafl)
+
+0.04  2009-02-17
+  - Any::Moose now gives you strict and warnings (oops!)
+  - Support "use Any::Moose 'X::Types'" (tokuhirom)
+
+0.03  2009-02-09
+  - When we load one of Mo*se, we'll continue to load that backer even if
+    Moose had become loaded
+  - Skip some tests if Moose is not installed
+  - Hard dependency on Mouse
+
+0.02  2009-02-08
+  - Fix compilation error (rafl)
+  - Add load_class and is_moose_loaded (stevan)
+
+0.01  2009-02-05
+  - Initial release
+

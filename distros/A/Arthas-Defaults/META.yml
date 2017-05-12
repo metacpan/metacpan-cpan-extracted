@@ -1,0 +1,20 @@
+---
+abstract: "Defaults for coding - Do not use if you're not Arthas"
+author:
+  - 'Michele Beltrame <mb@italpro.net>'
+build_requires:
+  Test::Exception: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Arthas-Defaults
+requires:
+  Try::Tiny: '0'
+  perl: v5.14.2
+  version: '0.77'
+version: 4.0.1

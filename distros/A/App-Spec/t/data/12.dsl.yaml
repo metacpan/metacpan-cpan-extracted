@@ -1,0 +1,57 @@
+---
+# version with short dsl syntax
+name: myapp
+appspec: { version: 0.001 }
+class: App::Spec::Example::MyApp
+title: My Very Cool App
+options:
+  - spec: foo                 --Foo
+  - spec: verbose|v+          --be verbose
+  - spec: +req                --Some required flag
+  - spec: number=i            --integer option
+  - spec: number2|n= +integer --integer option
+  - spec: date|d=s =today
+  - spec: items=s@            --multi option
+  - spec: set=s%              --multiple key=value pairs
+
+---
+# version with verbose syntax
+name: myapp
+appspec: { version: 0.001 }
+class: App::Spec::Example::MyApp
+title: My Very Cool App
+options:
+  - name: foo
+    type: flag
+    summary: Foo
+  - name: verbose
+    summary: be verbose
+    type: flag
+    multiple: true
+    aliases: ["v"]
+  - name: req
+    summary: Some required flag
+    required: true
+    type: flag
+  - name: number
+    summary: integer option
+    type: integer
+  - name: number2
+    summary: integer option
+    type: integer
+    aliases: ["n"]
+  - name: date
+    type: string
+    default: today
+    aliases: ["d"]
+  - name: items
+    type: string
+    multiple: true
+    summary: multi option
+  - name: set
+    type: string
+    multiple: true
+    mapping: true
+    summary: multiple key=value pairs
+
+# vim:et:sts=2:sws=2:sw=2:foldmethod=indent

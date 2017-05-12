@@ -1,0 +1,111 @@
+#!/usr/bin/env perl
+
+package pmodinfo;
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib", "$Bin/lib";
+use App::pmodinfo;
+
+our $VERSION = '0.10'; # VERSION
+
+unless (caller) {
+    my $app = App::pmodinfo->new;
+    $app->parse_options(@ARGV);
+    $app->run or exit(1);
+}
+
+
+
+=pod
+
+=head1 NAME
+
+pmodinfo
+
+=head1 VERSION
+
+version 0.10
+
+=head1 SYNOPSIS
+
+    $ pmodinfo --full Moose
+    Moose version is 2.0007.
+      cpan page  : http://search.cpan.org/dist/Moose
+      filename   : /Users/thiago/perl5/perlbrew/perls/perl-5.14.0/lib/site_perl/5.14.0/darwin-2level/Moose.pm
+        ctime    : 2011-05-30 09:51:47
+      POD content: yes
+      Last cpan version: 2.0010
+
+    $ pmodinfo Config::
+    Config::Any version is 0.21.
+    Config::General version is 2.50.
+    Config::INI version is 0.017.
+    Config::JSON version is 1.5100.
+    Config::MVP version is 2.200001.
+    Config::MVP::Reader::INI version is 2.101461.
+    Config::Tiny version is 2.14.
+
+    $ pmodinfo -u Config::
+    Config::Any local version: 0.21, last version in cpan: 0.23
+    Config::INI local version: 0.017, last version in cpan: 0.018
+    Do you need to update this modules now ? (y/n) [n]
+
+    $ pmodinfo --hash Catalyst::Runtime DBIx::Class Data::Printer
+    {
+        'Catalyst::Runtime' => 5.80032,
+        'DBIx::Class' => 0.08192,
+        'Data::Printer' => 0.21,
+    };
+
+    $ pmodinfo -u
+    Algorithm::Diff local version: 1.1902, last version in cpan: 1.15
+    Any::Moose local version: 0.14, last version in cpan: 0.15
+    (...)
+    Do you need to update this modules now ? (y/n) [n]
+
+=head1 DESCRIPTION
+
+See L<App::pmodinfo> for more information.
+
+=head1 DESCRIPTION
+
+pmodinfo extracts information from the perl modules given the command
+line, usign L<Module::Metadata>, L<Module::CoreList>, L<Module::Build>,
+L<Parse::CPAN::Meta> and L<ExtUtils::Installed>.
+
+I don't want to use more "perl -MModule\ 999".
+
+=head1 OPTIONS
+
+Usage: pmodinfo [options] [Module] [...]
+
+    -v --version            Display software version
+    -f --full               Turns on the most output
+    -h --hash               Show module and version in a hash.
+    -l,--local-modules      Display all local modules
+    -u,--check-updates      Check updates, compare your local version to cpan.
+    -c,--cpan               Show the last version of module in cpan.
+
+With check-updates option, we try to use L<cpanminus> or L<cpan> to update
+modules.
+
+=head1 AUTHOR
+
+Thiago Rondon <thiago@nsms.com.br>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Thiago Rondon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+
+# Abstract: Perl module info command line
+
+

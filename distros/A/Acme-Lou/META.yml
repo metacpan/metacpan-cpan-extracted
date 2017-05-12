@@ -1,0 +1,41 @@
+---
+abstract: "Let's together with Lou Ohshiba "
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  Test::Base: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Lou
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Lou:
+    file: lib/Acme/Lou.pm
+    version: '0.04'
+requires:
+  Encode: '0'
+  Exporter: '0'
+  File::ShareDir: '0'
+  Text::Mecabist: '0.02'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/tomill/Acme-Lou/issues
+  homepage: https://github.com/tomill/Acme-Lou
+  repository: git://github.com/tomill/Acme-Lou.git
+version: '0.04'

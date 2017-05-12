@@ -1,0 +1,69 @@
+<HTML>
+   <HEAD><TITLE>Test Page</TITLE></HEAD>
+   <BODY>
+      <P> This is a sample page. 
+      <p><a href="/sample/site/logout.html">Logout</a></p>
+% if($manager->can($currentUser, "edit", $preferences)) {
+      <FORM ACTION="null" METHOD=POST>
+         <TABLE>
+            <TR>
+               <TD>Name:</TD><TD><% $currentUser %></TD>
+            </TR><TR>
+               <TD>Favorite color:</TD>
+               <TD>
+                  <SELECT NAME="color">
+                     <% colorList($preferences) %>
+                  </SELECT>
+               </TD>
+            </TR><TR>
+               <TD>Age:</TD>
+               <TD>
+                  <INPUT TYPE=TEXT NAME="age" 
+                         VALUE="<% $preferences->{"age"} %>">
+               </TD>
+            </TR>
+         </TABLE>
+	 <P><INPUT TYPE=Submit>
+      </FORM>
+% } else {
+         <TABLE>
+            <TR>
+               <TD>Name:</TD><TD><% $currentUser %></TD>
+            </TR><TR>
+               <TD>Favorite color:</TD>
+               <TD><% $preferences->{"favoriteColor"} %></TD>
+            </TR><TR>
+               <TD>Age:</TD>
+               <TD><% $preferences->{"age"} %></TD>
+            </TR>
+         </TABLE>
+% }
+   </BODY>
+</HTML>
+
+<%init>
+my $currentUser = Apache::SiteControl->getCurrentUser($r);
+my $manager = Apache::SiteControl->getPermissionManager($r);
+
+# This would be where you would access your back-end data store to get
+# data...we will simulate this will literals:
+my $preferences = { favoriteColor => 'Red', age => 20 };
+</%init>
+
+<%once>
+sub colorList($)
+{
+   my $prefs = shift;
+   my $result = "";
+
+   for my $color ("Red", "Green", "Blue", "Purple", "Pink")
+   {
+      if($color eq $prefs->{"favoriteColor"}) {
+         $result .= "<OPTION SELECTED>$color\n";
+      } else {
+         $result .= "<OPTION>$color\n";
+      }
+   }
+   return $result;
+}
+</%once>

@@ -1,0 +1,8 @@
+---
+files:
+  lib/B/Lint.pm: ext/B/B/Lint.pm
+  t/lint.t: ext/B/t/lint.t
+dirs-recursive:
+  lib/B/Lint/: ext/B/B/Lint/
+  t/pluglib/: ext/B/t/pluglib/
+

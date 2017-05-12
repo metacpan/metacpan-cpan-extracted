@@ -1,0 +1,5 @@
+timestamp: 1
+reporter:
+    - Stdout
+    - File
+    - file: hoge

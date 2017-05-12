@@ -1,0 +1,55 @@
+{
+   "abstract" : "Encapsulates the application logic for xssh",
+   "author" : [
+      "Evan Giles <egiles@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Xssh",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "2.4",
+            "Getopt::Long" : "2.37",
+            "Moose" : "1.09",
+            "Pod::Usage" : "1.35",
+            "UNIVERSAL::require" : "0",
+            "X11::Terminal" : "0.2",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "App::Xssh" : {
+         "file" : "lib/App/Xssh.pm",
+         "version" : "v1.0.0"
+      },
+      "App::Xssh::Config" : {
+         "file" : "lib/App/Xssh/Config.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/egiles/app-xssh"
+      }
+   },
+   "version" : "v1.0.0"
+}

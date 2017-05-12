@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build for admin_add_number_range</description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>3</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.28"/>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name>origin</name>
+        <url>ssh://git@example.com.au:45222/eg.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/admin_add_number_range</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <browser class="hudson.plugins.git.browser.Stash">
+      <url>https://example.com.au/eg</url>
+    </browser>
+    <submoduleCfg class="list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.LocalBranch>
+        <localBranch>admin_add_number_range</localBranch>
+      </hudson.plugins.git.extensions.impl.LocalBranch>
+    </extensions>
+  </scm>
+  <assignedNode>slave</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <jdk>(Default)</jdk>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec>@hourly</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash --login
+# the &quot;--login&quot; means that Bash will reload the .bashrc profile
+
+# Switch node version using nvm.
+nvm use 0.12
+
+# Run everything, including updating deps.
+npm run ci</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <org.jenkinsci.plugins.stashNotifier.StashNotifier plugin="stashNotifier@1.8">
+      <stashServerBaseUrl></stashServerBaseUrl>
+      <stashUserName></stashUserName>
+      <stashUserPassword>Q7WMbss05lWqRXm260a==</stashUserPassword>
+      <ignoreUnverifiedSSLPeer>false</ignoreUnverifiedSSLPeer>
+      <commitSha1></commitSha1>
+      <includeBuildNumberInKey>false</includeBuildNumberInKey>
+    </org.jenkinsci.plugins.stashNotifier.StashNotifier>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin="build-timeout@1.16">
+      <strategy class="hudson.plugins.build_timeout.impl.AbsoluteTimeOutStrategy">
+        <timeoutMinutes>25</timeoutMinutes>
+      </strategy>
+      <operationList>
+        <hudson.plugins.build__timeout.operations.FailOperation/>
+      </operationList>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+    <hudson.plugins.ansicolor.AnsiColorBuildWrapper plugin="ansicolor@0.4.1">
+      <colorMapName>xterm</colorMapName>
+    </hudson.plugins.ansicolor.AnsiColorBuildWrapper>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.1">
+      <info>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
+  </buildWrappers>
+</project>

@@ -1,0 +1,72 @@
+NAME
+
+    Alien::Capstone - Perl extension to install Capstone-Engine from
+    www.capstone.org
+
+SYNOPSIS
+
+    Alien::Capstone is a perl module that enables the installation of the
+    open source disassembly library Capstone-Engine from
+    http://www.capstone-engine.org on the system or locate the existing
+    installation if any. It is currently setup to look for version 3.0.4.
+
+    You can use it in the Build.PL file if you're using Module::Build or
+    Makefile.PL file if you're using ExtUtils::MakeMaker.
+
+                use Alien::Capstone;
+                # ...
+                die "Alien::Capstone isn't installed" unless &Alien::Capstone::is_installed();
+                # ...
+                my $capstone= Alien::Capstone->new;
+                my $build = Module::Build->new(
+                    ...
+                    extra_compiler_flags => $capstone->cflags(),
+                    extra_linker_flags => $capstone->libs(),
+                    ...
+                );
+
+VERSION
+
+    0.07
+
+METHODS
+
+    new
+
+      Creates the object. Refer Alien::Base for more information.
+
+    cflags
+
+      This method provides the compiler flags needed to use the library on
+      the system.
+
+    libs
+
+      This method provides the linker flags needed to use the library on
+      the system.
+
+    is_installed
+
+      This method checks to see if Capstone has been installed correctly.
+
+SEE ALSO
+
+    Alien::Base
+
+AUTHORS
+
+    Vikas N Kumar <vikas@cpan.org>
+
+REPOSITORY
+
+    https://github.com/selectiveintellect/p5-alien-capstone.git
+
+COPYRIGHT
+
+    Copyright (C) 2016. Selective Intellect LLC
+    <github@selectiveintellect.com>. All Rights Reserved.
+
+LICENSE
+
+    This is free software under the MIT license.
+

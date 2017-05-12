@@ -1,0 +1,227 @@
+{
+   "abstract" : "Static Image Gallery",
+   "author" : [
+      "Robert Bohne <rbo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-StaticImageGallery",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::MOP" : 0,
+            "DateTime" : 0,
+            "File::Basename" : 0,
+            "File::Path" : 0,
+            "Getopt::Lucid" : 0,
+            "Imager" : 0,
+            "MIME::Base64" : 0,
+            "Path::Class" : 0,
+            "Pod::Usage" : 0,
+            "Template" : 0,
+            "Template::Provider::FromDATA" : 0,
+            "UNIVERSAL" : 0,
+            "parent" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-App-StaticImageGallery@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-StaticImageGallery"
+      },
+      "homepage" : "http://search.cpan.org/dist/App-StaticImageGallery",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rbo/app-staticimagegallery.git",
+         "web" : "http://github.com/rbo/app-staticimagegallery"
+      }
+   },
+   "version" : "0.002",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@RBO/@Basic/GatherDir",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@RBO/@Basic/PruneCruft",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@RBO/@Basic/ManifestSkip",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@RBO/@Basic/MetaYAML",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@RBO/@Basic/License",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@RBO/@Basic/Readme",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@RBO/@Basic/ExtraTests",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@RBO/@Basic/ExecDir",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@RBO/@Basic/ShareDir",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@RBO/@Basic/MakeMaker",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@RBO/@Basic/Manifest",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@RBO/@Basic/TestRelease",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@RBO/@Basic/ConfirmRelease",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@RBO/@Basic/UploadToCPAN",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@RBO/MetaConfig",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@RBO/MetaJSON",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "name" : "@RBO/Git::NextVersion",
+            "version" : "1.103520"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@RBO/Git::Tag",
+            "version" : "1.103520"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@RBO/PkgVersion",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodVersion",
+            "name" : "@RBO/PodVersion",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoMetaResources",
+            "name" : "@RBO/AutoMetaResources",
+            "version" : "1.103080"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@RBO/@Git/Check",
+            "version" : "1.103520"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@RBO/@Git/Commit",
+            "version" : "1.103520"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@RBO/@Git/Tag",
+            "version" : "1.103520"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@RBO/@Git/Push",
+            "version" : "1.103520"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "AutoPrereqs",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "ManifestSkip",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.200000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.200000"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.200000"
+      }
+   }
+}
+

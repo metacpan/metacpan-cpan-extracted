@@ -1,0 +1,15 @@
+# perl_critic setup file
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | DOCUMENTATION | SUBROUTINES/METHODS | BUGS AND LIMITATIONS | COPYRIGHT & LICENSE | SUPPORT | AUTHOR  | SEE ALSO 
+script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR
+
+[Documentation::PodSpelling]
+stop_words = AnnoCPAN CPAN CPAN's CheckOptionNames perldoc blog prefered plog inline Blog perl RCS backend Renderers renderer Asciidoc Agregator aggregator STDOUT stdout blogs rcs asciidoc Nadim Khemir nanoblogger css hilighting git xmlrpc pingback boolean 
+
+[InputOutput::RequireCheckedSyscalls]
+#exclude_functions = print
+
+[Subroutines::ProhibitManyArgs]
+max_arguments = 7
+

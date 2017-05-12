@@ -1,0 +1,8 @@
+Revision history for Perl extension Acme::Curses::Marquee::Extensions.
+
+0.04	Sun Jan 18 12:36 EST 2009
+	- Add missing dependency on Every
+	- Add missing release date for 0.03
+
+0.03	Thu Jan  1 22:48 EST 2009
+	- Initial public release

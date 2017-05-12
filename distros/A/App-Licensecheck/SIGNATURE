@@ -1,0 +1,223 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 0319612e986549c19dafe977d5708fdf25ec65e8 COPYRIGHT
+SHA1 ce3e23887f61fae92fd4f465011fee2161316f38 CREDITS
+SHA1 00c419d5a8c56feca9f3d06ac6f0ace6e4c60c4b Changes
+SHA1 678698b6a97e1eb430eb00bf99b0718237f6823f INSTALL
+SHA1 98589a8f32eeab609a251fa1d16f94278f007612 LICENSE
+SHA1 426a4b3b11cb9b96869be7223f37d73c8fb1db1d MANIFEST
+SHA1 7540d3b746603341e14f727dda74cc388ede76f9 META.json
+SHA1 57b2deb7ac0cbe016661b7061a9f4c27c260dec9 META.yml
+SHA1 364cc3a98c9b781686e599ee0cf25c07687ac4a3 Makefile.PL
+SHA1 25e7977d124ad006602b92c8e7dee54efea1ef59 README
+SHA1 23d91ffffba7b6793fb528e2a0b6617712c5d3c8 bin/licensecheck
+SHA1 c03cb960bea6c5d1f2d7c3410788f599d637e152 dist.ini
+SHA1 293e54e257859ca1712a5393523a665a6503e88a doap.ttl
+SHA1 aa119f1cf3e136e9d85c195e3279ebd8baf0d617 lib/App/Licensecheck.pm
+SHA1 ff877be9b23cf81db6f7f455e8652fe465f33c5d lib/Regexp/Pattern/License.pm
+SHA1 4f1a55d84d36ed422564f0eba438fab3f1a47386 lib/Regexp/Pattern/License/Parts.pm
+SHA1 c0f335d16248b8ca0311188e3f81ee9b3473948f scripts/licensecheck.bash_completion
+SHA1 8c92680311b9e83f5114fa5efb280ee0a9aa7e4a t/SPDX.t
+SHA1 f1faceedf4f7dd4de6d82c0f14e2917c2baa6a2a t/SPDX/AFL-1.1.txt
+SHA1 ddae62bb30dd24e463abfb7a9322a2d91b367456 t/SPDX/AFL-1.2.txt
+SHA1 2bb61d1c9c94a3395bc76851b3944b66e5f51bb7 t/SPDX/AFL-2.0.txt
+SHA1 df55f67815e9a83fa658e1cc2e14126b18c20fe7 t/SPDX/AFL-2.1.txt
+SHA1 569855f6345d1f0b93d75ea6086dbfa2f5b4e7ec t/SPDX/AFL-3.0.txt
+SHA1 2c9c35aa5602fd0b8471d3a98e8339fd5ba3f267 t/SPDX/AGPL-1.0.txt
+SHA1 60b7b212df6027fa36e2d36a29523919fb4bb2dc t/SPDX/AGPL-3.0.txt
+SHA1 6b60484011b11aabd99d132549e2c0d0782ace96 t/SPDX/Aladdin.txt
+SHA1 04b74d1f1f1d48c0bfc9eed74196cb81fac461eb t/SPDX/Apache-1.1.txt
+SHA1 8ffe2c5c25b85e52f42fcde68c2cf6a88b7abd69 t/SPDX/Apache-2.0.txt
+SHA1 e0ecbcd008e60a95ca816f623e910802da474c6e t/SPDX/Artistic-1.0.txt
+SHA1 335b084fa46de46ce10a87fd0505f2db945b74c2 t/SPDX/Artistic-2.0.txt
+SHA1 64647c6f9395570f456daa66d496ecd78e8ffe60 t/SPDX/BSD-2-Clause.txt
+SHA1 a0dcaa7724beb56ed61f4f293277a7f291105b0f t/SPDX/BSD-3-Clause.txt
+SHA1 04f673163996b0418a5aaf38a516268fc8f5f95f t/SPDX/BSD-4-Clause.txt
+SHA1 57a6c1bfde09d7ea1439935785963a66a720ef75 t/SPDX/CC-BY-1.0.txt
+SHA1 86dd7f206b27c44cb2bfc20f34af9d174125f44c t/SPDX/CC-BY-2.0.txt
+SHA1 6e48c646cd106992caf7c657428907f4f25c789b t/SPDX/CC-BY-2.5.txt
+SHA1 2e076b4e45a5d0c28004c1b77ba74a5511747872 t/SPDX/CC-BY-3.0.txt
+SHA1 c2755fd527476835cd7f901e832766ff4aaf8022 t/SPDX/CC-BY-4.0.txt
+SHA1 12ae1d401e61685b20c8afc371f757e880468efe t/SPDX/CC-BY-NC-1.0.txt
+SHA1 fefb0d9bf4e3ab842495889a1d746010cd1807e2 t/SPDX/CC-BY-NC-2.0.txt
+SHA1 cf9918c3e222029ccde2e3f88e9094f469808268 t/SPDX/CC-BY-NC-2.5.txt
+SHA1 b26dae60955043b425b3bd6ab6980609a916446a t/SPDX/CC-BY-NC-3.0.txt
+SHA1 61ae7fe47fd86d6c8c30e11144784db7e79731af t/SPDX/CC-BY-NC-4.0.txt
+SHA1 3bd8b42ac60b12f7fba6455afaf3f939a1ae1b44 t/SPDX/CC-BY-NC-ND-1.0.txt
+SHA1 44c2e56def734b9ebd117d962635ba9d2f144579 t/SPDX/CC-BY-NC-ND-2.0.txt
+SHA1 651d45c6f1803f76f4392d82965582d83e4559d8 t/SPDX/CC-BY-NC-ND-2.5.txt
+SHA1 3eea3b142fcac81f075d27149aac3d4903759d63 t/SPDX/CC-BY-NC-ND-3.0.txt
+SHA1 032f2dc554b3ce6def864a22f8e6c5d1eff2f9be t/SPDX/CC-BY-NC-ND-4.0.txt
+SHA1 76ae79e9adcef00f1f8fdfdf2a30f692ce1b35b4 t/SPDX/CC-BY-NC-SA-1.0.txt
+SHA1 38b96309808f038c2742b7a475a4e7dfec28137c t/SPDX/CC-BY-NC-SA-2.0.txt
+SHA1 ab9f6198ddba0a0ca6cf5b7f4f416927ca8907a1 t/SPDX/CC-BY-NC-SA-2.5.txt
+SHA1 36c263aac3babe9976cb63b2395e566e1b0bd878 t/SPDX/CC-BY-NC-SA-3.0.txt
+SHA1 f2d4f097a0aecacd8969725e14262c5e40ac39a5 t/SPDX/CC-BY-NC-SA-4.0.txt
+SHA1 e5b52c63ac97548007b20c391b654dcea717edd2 t/SPDX/CC-BY-ND-1.0.txt
+SHA1 c14fda3d008e8b3b4e202e44e6d043b4c394fe44 t/SPDX/CC-BY-ND-2.0.txt
+SHA1 8edef838de6ee3881d3c669ecea5288916e0b6ef t/SPDX/CC-BY-ND-2.5.txt
+SHA1 79a8797fb7004417467cdab1afed2bf4f26208b3 t/SPDX/CC-BY-ND-3.0.txt
+SHA1 cb8bb432ea969e25dea0edff20a172d5f6537b87 t/SPDX/CC-BY-ND-4.0.txt
+SHA1 ae7aaa7a321b611ea95cea12381ae0b05620468a t/SPDX/CC-BY-SA-1.0.txt
+SHA1 af58f3cb99ecdbfc01cf724b9a8890dff671e4ed t/SPDX/CC-BY-SA-2.0.txt
+SHA1 240b1dde3affc686cf305d584c3297448b028721 t/SPDX/CC-BY-SA-2.5.txt
+SHA1 1c77d4bffce5044d4c859e325dad7615f058a094 t/SPDX/CC-BY-SA-3.0.txt
+SHA1 da6b4094c325dd8c59f94582cc063251328949e5 t/SPDX/CC-BY-SA-4.0.txt
+SHA1 f5bf465966a6948e5242808b781629696c1ed54a t/SPDX/CC0-1.0.txt
+SHA1 95dbd26189892e040c80f0a7fc931526b81c3690 t/SPDX/CDDL-1.0.txt
+SHA1 9d1b6e1e0b82f92cd251e641d929855534c26a43 t/SPDX/CDDL-1.1.txt
+SHA1 46ebe8c487ec3e321842ed1325d98d757f965e14 t/SPDX/CECILL-1.0.txt
+SHA1 d02abe75166c25ff8169e29c679610bb0ad4ccd4 t/SPDX/CECILL-1.1.txt
+SHA1 c8ddd94454934cb1869ef96bddc93ff44039c591 t/SPDX/CECILL-2.0.txt
+SHA1 743c813b667e545f990ba359e10e28237b823aca t/SPDX/CECILL-2.1.txt
+SHA1 04e73e027c1f47dbf743cb013480bbc974e3a8c3 t/SPDX/CECILL-B.txt
+SHA1 1308e5090e66dcba2e594950dc4a8021551fa540 t/SPDX/CECILL-C.txt
+SHA1 a2ad9fc4707af540c69e0df4f373c604fc88f8e9 t/SPDX/Cube.txt
+SHA1 0ed84541e42c24f8fcc9f3955cc072a7e66f6723 t/SPDX/Eurosym.txt
+SHA1 9a43e1699861c0ab73c25015bf177b4db44c07ac t/SPDX/FTL.txt
+SHA1 325b0274ef90de5660528175a2dc7626a7203063 t/SPDX/ICU.txt
+SHA1 18f98daf7abe3959a3a7a0642ec6106f55c4a54d t/SPDX/ISC.txt
+SHA1 9ac4e86bb3b863f294d5108ac050700341591327 t/SPDX/LGPL-2.0.txt
+SHA1 1797d09881b11131dcec910f1d28ecc4a3df3296 t/SPDX/LGPL-2.1.txt
+SHA1 20c99ad76c5e2ea55e85968d484471766b9bc5a6 t/SPDX/Libpng.txt
+SHA1 783f32b57991bf5571b0b4cf2f89f73cdefbe429 t/SPDX/MIT-CMU.txt
+SHA1 a7f3e166e5cb9232fc14f43ed2991b72ca7abcfd t/SPDX/MIT-advertising.txt
+SHA1 9a7638c59c65a5e74f5d99aa4aa684650a838ad3 t/SPDX/MIT-enna.txt
+SHA1 7d745d4930d73d7a8688b291cf54d521eeeb6a5c t/SPDX/MIT-feh.txt
+SHA1 a95777e208e43f01ef16d67ca52080fba69e645c t/SPDX/MIT.txt
+SHA1 e37e1cbd809de1bb5f965cef18a871f5cd30c2e0 t/SPDX/MPL-1.0.txt
+SHA1 ca2fd1439eb3e23507f13855e5450c5d617db83d t/SPDX/MPL-1.1.txt
+SHA1 2d1db1c10b9f3c0e7fd0f085776522eab8cdc987 t/SPDX/MPL-2.0.txt
+SHA1 1dd99b45aca277de7ecac789a52e955b6ac39539 t/SPDX/MS-PL.txt
+SHA1 0aedfef7791254043d46af1eb4e3297cb5bbb610 t/SPDX/MS-RL.txt
+SHA1 707c6d033a5c861cd60fe28d278cf3be9b1c8c0d t/SPDX/NTP.txt
+SHA1 045bf5ca32d84123658277b543dfdc18996eb975 t/SPDX/OFL-1.0.txt
+SHA1 faa2a5802564b040d04f6ca869a3618168e4751f t/SPDX/OFL-1.1.txt
+SHA1 ffd7ec6573f5a0046e4091c3ccb6c8562e620c76 t/SPDX/PostgreSQL.txt
+SHA1 5be0070380b4fbba2d321ad13d48b514d50c6942 t/SPDX/Python-2.0.txt
+SHA1 c658b9425cf6fbfe08247497a89b9958c0d44dc4 t/SPDX/QPL-1.0.txt
+SHA1 9f6972825eafa1a09f554ea136a677752dea9ccc t/SPDX/RPSL-1.0.txt
+SHA1 231d85d74a6867b592efa6b41a40c2250c23537a t/SPDX/SGI-B-1.0.txt
+SHA1 5720a5cba920eae37a1d7ecda62c7bafe68b49f1 t/SPDX/SGI-B-1.1.txt
+SHA1 51987d86b169f708adbf7eaf1809af93a3c1fc09 t/SPDX/Unicode-TOU.txt
+SHA1 aafa8341a781a7bfd3b390c03680d4cf2e474488 t/SPDX/WTFPL.txt
+SHA1 d6f0cfb47693159b34e3eccab612613ddcc9eb26 t/SPDX/Zlib.txt
+SHA1 2ada094d1f55314ad2f66210c3ccac326caedba8 t/SPDX/curl.txt
+SHA1 f851a1391294b3b52ab9c16ba8b88cc369aeed58 t/SPDX/zlib-acknowledgement.txt
+SHA1 78f53cf7f717eda359d8ebc373ec20745b8c8096 t/Software-License.t
+SHA1 7fd996b432fa727d2ad396fd95a5948fb600a961 t/devscripts.t
+SHA1 7ee9752c19d94ed23af18067048109d6d1057d3e t/devscripts/academic.h
+SHA1 8c83418149581447af32cca223a3ec26f92842c4 t/devscripts/artistic-2-0-modules.pm
+SHA1 679355dd768da00aebaf20531f9fc9e58dab725e t/devscripts/artistic-2-0.txt
+SHA1 dc84480e0552cc29b972d9d62abe03562b4a2339 t/devscripts/beerware.cpp
+SHA1 e3c90b46539f5aa7056ac8dd992721cd4663e47e t/devscripts/boost.h
+SHA1 8cf1c4eecd397d73e227a6fc8535de3df7fe51ca t/devscripts/bsd-1-clause-1.c
+SHA1 797ba5c21672c42a9e1df83e238da91d38842645 t/devscripts/bsd-3-clause-authorsany.c
+SHA1 dbb9a0f3183a9ef59da0e125d8c73c3ea1546100 t/devscripts/bsd-3-clause.cpp
+SHA1 4008c1ffe52a5f23ffd4a1fcef5e072490708e94 t/devscripts/bsd-regents.c
+SHA1 3aec6d7535bea8b8d678afbf9303c0e3a801e29f t/devscripts/bsd.f
+SHA1 cf7ca937b10fe23e584522a1c3bb092a1169c748 t/devscripts/bug-559429
+SHA1 d603a7d9fc1953602f9685778220583de9e38976 t/devscripts/cddl.h
+SHA1 8b2ed1a668a989cffed28a0695a75d917c8b1b1f t/devscripts/comments-detection.h
+SHA1 d3f4ab510063dbc41c5c75cd924fcf325272d5ff t/devscripts/comments-detection.txt
+SHA1 fdd616895fd38ac61fdc814f686c76e097148b05 t/devscripts/copr-iso8859.h
+SHA1 34bf7757e41ae6542d02169bce2c0f558490fa1a t/devscripts/copr-utf8.h
+SHA1 5443f5be222eb6bffd28a16c74a38334e386a99f t/devscripts/dual.c
+SHA1 efe7f791a98357b71119489630f50f19a43ea635 t/devscripts/epl.h
+SHA1 0949ffed796690bbf91f75e4aac25553c9d746ab t/devscripts/false-positives
+SHA1 e942df1bcecfc0751f8410b20c8520de1ecac3ac t/devscripts/freetype.c
+SHA1 4d22dfb23e7b142d4cad02dc7f5ada15ff8fff1e t/devscripts/gpl-1
+SHA1 36ef9f2725c8c6d30459fd0ee86c1ff3b3bc90e2 t/devscripts/gpl-2
+SHA1 c6e37715599ead5c3be6137c9740ae40b696a898 t/devscripts/gpl-2+
+SHA1 1befbcc5fce1b691542a1b2957f2cc6fb0a0f618 t/devscripts/gpl-2+.scm
+SHA1 a1cb318a45dd124013d423f5ef72448502b944db t/devscripts/gpl-2-comma.sh
+SHA1 df8ccac53d2f7ec2ad8bfbe11cd27740ead67f38 t/devscripts/gpl-2-incorrect-address
+SHA1 8e9ed0c40c7f6040466f8a0850f86aaa7ba0c779 t/devscripts/gpl-3+
+SHA1 d2c1718297c1a177ef9bf526576401a4f4b7dd74 t/devscripts/gpl-3+-with-rem-comment.xml
+SHA1 0bd6e778a2ce9286427e45626015740a0ac3d98a t/devscripts/gpl-3+.el
+SHA1 937584c06f3c3c77729f5816c450333cae0123b8 t/devscripts/gpl-3-only.c
+SHA1 915a29bd32bf7432b70b8cd2127caaf6cff831c0 t/devscripts/gpl-3.sh
+SHA1 495af2921bab2698ad063e2f7bad204cb50c4924 t/devscripts/gpl-no-version.h
+SHA1 d47ae178156aa831af43ec9a5bf9aea0536dc67c t/devscripts/gpl-variation.c
+SHA1 e7858099f2d9bab47f15c80246eec813d62008da t/devscripts/info-at-eof.h
+SHA1 513fbe41ba23c6f39304d32c7b531a70d1de373d t/devscripts/libuv-isc.am
+SHA1 a831c059ac5f9c1d1eac7f3f31799e33997f6541 t/devscripts/llgpl.lisp
+SHA1 065e71dd1b2e4004885a084d119c1876068d5655 t/devscripts/mame-style.c
+SHA1 6d35177ee29f230acdb7aaab35a4b3bed7659ab2 t/devscripts/mpl-1.1.sh
+SHA1 6080a8a0ed91989cdc5bc6b0c071f4b623477720 t/devscripts/mpl-2.0-comma.sh
+SHA1 6f0b95e597343602df577f0bcbae9049fdedf813 t/devscripts/mpl-2.0.sh
+SHA1 6f275c370ea5c677087b6724367e0355eb3d69fd t/devscripts/multi-line-copyright.c
+SHA1 2343980835e5507775ab7f7cb1d8a9c82b845aca t/devscripts/regexp-killer.c
+SHA1 851f20dc3d9348185491155575733088e23cfd32 t/devscripts/texinfo.tex
+SHA1 4dc177a7150413b34f67609b737649b3cc3e5201 t/fedora.t
+SHA1 0c86f8d34b8513757dd815984df967f860ebb101 t/fedora/MIT
+SHA1 c2682387bd3c352a10a7345d5f7aa33be43e40f6 t/fedora/README
+SHA1 d533ec3a53f12844e5c3400cbb3a5708e725196a t/grant.t
+SHA1 5ec8cfa9bea6e8310b8566999a07374d342f5253 t/grant/AFL_and_more/xdgmime.c
+SHA1 004b1c19b2d094a2f43b5778972adb9c8eae0735 t/grant/AGPL/fastx.c
+SHA1 0b0fab767783b6415030a9491725463751b78714 t/grant/AGPL/fet.cpp
+SHA1 022378c77136cf75510f155c675b2dc2efe7b6a0 t/grant/AGPL/setup.py
+SHA1 4e2f82a6c34fe4f9b9d6e445e2e8f969b86d660a t/grant/Apache/one_helper.rb
+SHA1 77e9bfcdce32810d9bb405010386d19ec88192cd t/grant/Apache_and_more/PIE.htc
+SHA1 43d5a741733f0a870607eb6884dfe05be0c5bfe1 t/grant/Apache_and_more/rust.lang
+SHA1 2a79249e426ef4b89184f0b154c50930722610af t/grant/Apache_and_more/select2.js
+SHA1 79ab70abf1c392232bb773da5bb1e4bcc88d3ebf t/grant/Apache_and_more/test_run.py
+SHA1 d0903b900fb4d3f691e7a04201e21cbaa4590ed6 t/grant/CC-BY-SA_and_more/WMLA
+SHA1 57a8d034c8cb1a802712fd962ea3aa188a8c728b t/grant/CC-BY-SA_and_more/cewl.rb
+SHA1 9b1c6273e778c8c11f81f9282c0cfb187a379e13 t/grant/CC-BY-SA_and_more/utilities.scad
+SHA1 caf721083adfb0105f168f3ecac3f10da74d5d7c t/grant/EPL_and_more/Base64Coder.java
+SHA1 15bad6677cbfdfd14d2a49f36762a23da8969c71 t/grant/LGPL/Model.pm
+SHA1 9f9ece00e0a1659bfdf5580f0bfbe61399e078aa t/grant/LGPL/PKG-INFO
+SHA1 e4b946bc39f17baba9d8f833c41d76e5ab04eaba t/grant/LGPL/criu.h
+SHA1 a3ac46a4e60422772b2def010d36c13ddffa18b9 t/grant/LGPL/dqblk_xfs.h
+SHA1 29d3d16587d03e17bd8b46b5060afd357239e4e4 t/grant/LGPL/exr.h
+SHA1 f33dc6ae4d7bc8f1663a9305ad810ad7653383bc t/grant/LGPL/gnome.h
+SHA1 5483ac9f6480fc8d78b315c287dd548586259bbe t/grant/LGPL/jitterbuf.h
+SHA1 2b3cd9c3242916c48e92433267f0eb309975c8de t/grant/LGPL/libotr.m4
+SHA1 6cec6c622767daf9b486549ec9f83a27c816abde t/grant/LGPL/pic.c
+SHA1 b19e7c8d563d17b0457d80dc69559a11e526c3d5 t/grant/LGPL/strv.c
+SHA1 5e7efc926e592a504f98f23833615c3f9f8b93e9 t/grant/LGPL/table.py
+SHA1 31012a364cc2eea289f85a13f17b8a89688ae01a t/grant/LGPL/videoplayer.cpp
+SHA1 640407c43f150befe8b471791775b8c8d755f1e5 t/grant/LGPL_and_more/da.aff
+SHA1 e3ecd621f2193f0a88b7ba8c95606ad78abd2373 t/grant/MIT/harfbuzz-impl.c
+SHA1 6b015b81bcb199a75108cbc1e6ba73841344e8b4 t/grant/MIT/spaces.c
+SHA1 57309bf618980e0439b6cb03e498eb815e240903 t/grant/MPL_and_more/symbolstore.py
+SHA1 469a1a78ec2fd8eac77d0f3c70f0029f26b85abf t/grant/NTP/directory.h
+SHA1 bd785cdf4a5a4328af011f3725964513674456cd t/grant/NTP/gslcdf-module.c
+SHA1 6679c0486f5691f4000800ee9e863d24bf93edae t/grant/NTP/helvO12.bdf
+SHA1 575344b8e0b5187191c706ce16216116bc0a3bd3 t/grant/NTP/install.sh
+SHA1 998216c8301cafc8998e73fbc22e8b5cef144a48 t/grant/NTP/map.h
+SHA1 4ba92a306fced7cedaee269b2e2a3e408e453037 t/grant/NTP/monlist.c
+SHA1 6abab9b804100f3faf47132ba282baff70865d8c t/grant/WTFPL/COPYING.WTFPL
+SHA1 110bb1acac196e796e808b86a55bf3857ee96583 t/grant/misc/rpplexer.h
+SHA1 7b7c557fb8181bab25c5dfade0da8796adf04d0c t/license.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEn+Ppw2aRpp/1PMaELHwxRsGgASEFAliG1FcACgkQLHwxRsGg
+ASF8QA/+P9UHVRY8KX9tqABIe+osbTcSjyaRtqv/WAl9dezKyIo0B6wjvM0HcXTD
+um4e3hcsNOY3nv3AytW6Xg3500uWDnbb+R8dNYl1zJfpHIOxnAx10voZCubNzLKG
+p7IUIbp3KQ2lYWZByL1Iw1VzXL9E875BsdOe1uqrRpO+xp3Ix2FBf96siGRYC3Gv
+fFcuvDRv+pcFJC3J90kEMKrKuqE+4fgD+hg+67EIq8dXk8ERWFe/B3bI+6WBG3tt
+ao4QftLjEsUTQdXu/qxUuSEBG7ZT7Y23KwfyW54KHTRl1ANGCQ5DLArO95pcuMzT
+rG04iEJaszPM9rPcrMH60e5rkhrF9EmGMSJ5vuXrBeHZ4hi+oC1xxixasaLf+2I+
+pyi/qvh6NGyphpoI1C0dUejhI6igMzTCBJkcz+5MF2KreWu5217tMWj7nlKxNgD5
+7+PHBDpKxHb5Xu1tjHmWtQZVvRNzew1aLKiKP8D4JNZ4PpSzojPklm7ogzAkaB2W
+O+B8nkG7A8EaG/bej1AcDF4U2bFU2uw2V/uOLTfktL3xNmhJAn4HT4Xf+pwdPKk3
+hrt1QHf2NlSPJOEGOh9F1D6/V3N46Tcqx4V+5o5NrOwIy308cWy8IH+Rz0QYywKn
+5Id+acmzqJlxVeFNrcC7K6xE2t8zMbnrBHO47p4tdMUwnaRPSZQ=
+=SmU0
+-----END PGP SIGNATURE-----

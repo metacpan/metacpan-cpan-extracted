@@ -1,0 +1,5 @@
+---
+files:
+  lib_pm.PL: lib/lib_pm.PL
+  t/01lib.t: lib/lib.t
+

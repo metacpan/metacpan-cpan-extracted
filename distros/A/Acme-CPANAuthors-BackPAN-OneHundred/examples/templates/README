@@ -1,0 +1,40 @@
+Acme-CPANAuthors-BackPAN-OneHundred
+================================
+
+This module was created to capture all those CPAN Authors who have valiantly
+submitted their modules and distributions to CPAN, and now have the honour of
+maintaining 100 or more distributions on CPAN.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  Acme::CPANAuthors
+
+For testing the module requires these modules:
+
+  IO::File
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) [% COPYRIGHT %] Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

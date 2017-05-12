@@ -1,0 +1,6 @@
+type: test
+architecture: i386
+architecture_all: yes
+distribution: squeeze-opera
+distribution_aliases: [squeeze]
+bin_nmu_for: [unstable]

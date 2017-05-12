@@ -1,0 +1,12 @@
+0.01 Jan 11, 2012
+   * Seems to work.
+
+0.02 Jan 11, 2012
+   * fixed version.
+
+0.03 Jan 12, 2012
+   * Hopefully fixing a PDL::Graphics2D optional dependency
+      which caused this to fail most automated tests.
+   * Added Modern::Perl and ExtUtils::MakeMaker dependencies
+      which caused this to fail the rest of the tests.
+

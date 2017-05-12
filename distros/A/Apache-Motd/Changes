@@ -1,0 +1,30 @@
+Revision history for Perl extension Apache::Motd.
+
+0.01  Mon Jul 17 14:28:19 2000
+	- original version; created by h2xs 1.18
+
+0.02  Sun Dec 10 05:23:52 2000
+	- Fixed Cookie-less browser problems
+          Browsers with cookies turned off or that do not support
+          them are handled correctly, although still lacking a real
+          working implementation for these scenerios. 
+	- Added module directive, SupportCookieLess
+        - Omitted requirement of MessageFile directive
+	- Documentation changes and corrections
+
+0.03  Sun Dec 13 15:30:00 2000
+	- Added no-cache pragma to outgoing headers of motd display
+	- Added bypass motd on sub-directories and location matches example in pod
+	- Added Credits section in pod
+	- Added Notes secion in pod
+
+0.04  Thu Jul 19 01:15:55 2001
+	- Fixed port bug
+        - Fixed motd file existance check
+        - Updated documentation credits
+1.00  Thu Oct 31 16:19:33 2002
+        - Imported in CVS
+        - Updated to latest version
+        - Updated README
+        - Updated Makefile.PL to include Apache::Cookie dependency as
+          suggested by CPAN Testers results

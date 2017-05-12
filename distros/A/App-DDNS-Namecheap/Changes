@@ -1,0 +1,16 @@
+Revision history for Perl module App::DDNS::Namecheap
+
+0.014 Sun Nov 30 08:10:08 EST 2014
+    - add optional ip attribute
+
+0.013 Tue Apr 22 05:24:30 EDT 2014
+    - remove unnecessary methods
+
+0.012 Thu Apr 10 06:05:22 EDT 2014
+    - multi update script, fix blunder
+
+0.011 Wed Apr 9 09:38:36 EDT 2014
+    - ip constraints, concise warnings
+
+0.01 Tue Mar 18 12:41:21 EDT 2014
+    - initial release

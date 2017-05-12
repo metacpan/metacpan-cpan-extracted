@@ -1,0 +1,124 @@
+=head1 NAME
+
+Nama - digital audio workstation
+
+=head1 DESCRIPTION
+
+Nama is a digital audio workstation. It is suitable for
+multitrack recording, effects-processing, editing, mixing,
+and other audio tasks. Nama uses Ecasound, developed by Kai
+Vehmanen, for audio processing. Nama hosts LADSPA and LV2
+plugins, Ecasound effects and controllers. It works well
+under JACK and ALSA.
+
+New projects begin with a mixer, and may include tracks
+(multiple takes), buses, effects, sends, inserts,
+marks, regions, fades, edits, sequences and submixes, with
+mixdown to wav, ogg, mp3, etc.
+
+Nama has a full-featured command interpreter with TAB
+completion, keyword help and command history; a hotkey mode
+for tweaking effect parameters, a Tk-based GUI, and project
+management (history, branching, tags) based on git.  Users
+can define command aliases, custom commands, and key
+bindings for the hotkey mode. 
+
+The help system provides searchable access to documentation
+for all Nama commands and shortcuts, and for LADSPA, LV2 and
+Ecasound effects. In addition to executing its own commands,
+Nama will pass commands to Ecasound, Midish, the perl
+interpreter and the shell. 
+
+Nama has several templating options for project reuse:
+Effect chains are presets for one or more effects. Effect
+profiles (used to create Nama's mastering network) are
+templates for placing effects on multiple tracks. User
+scripting provides another way to reuse functionality.
+
+Nama's GUI will display if Tk is available.  Nama can spawn
+Audacity or MHWaveedit to view/edit selected waveforms. 
+
+=head2 Project management
+
+Project state is serialized as JSON files and the entire
+project history is managed by Git. Projects can be branched,
+tagged, and easily restored to earlier states. 
+
+=head2 Project reuse
+
+Three types of templates are available to reuse project
+components: effect chains, effect profiles, and project
+templates. An effect chain is a series of effects with
+parameters.  An effect profile includes one or more tracks
+with their effects and inserts. Nama's mastering network is
+stored as an effect profile.  Project templates duplicate an
+entire project without audio files. 
+
+=head1 INSTALLATION
+
+=head2 Installing Nama and its Perl Dependencies from CPAN
+
+The following command will install Nama, automatically
+pulling in all Perl modules required to run Nama in text mode:
+
+		cpanm Audio::Nama
+
+However if you don't have cpanm, this should still work:
+
+		PERL_MM_USE_DEFAULT=1 cpan Audio::Nama
+
+To use the GUI, you will need to install Tk:
+
+		cpanm Tk
+
+You may optionally install Audio::Ecasound to run Ecasound
+via libecasoundc:
+
+		cpanm Audio::Ecasound
+
+You can browse the sources or download a tarball via:
+
+		http://search.cpan.org/dist/Audio-Nama
+
+=head2 Building from Source
+
+If you want to inspect or modify Nama's internals, or keep
+up with new developments, you can pull the source code as
+follows: 
+
+		git clone git://github.com/bolangi/nama.git
+
+Consult the F<BUILD> file for build instructions.
+
+=head2 Non-Perl Dependencies
+
+The Ecasound audio processing libraries should be installed.
+Ecasound should be compiled with support for LADSPA, libsndfile,
+libsamplerate and JACK. Ecasound may be obtained from
+http://ecasound.seul.org/ecasound/ or as precompiled binary
+package for your Un*x distribution.
+
+The LADSPA SDK is required to autosense LADSPA plugins and
+scaling hints.  It is available at:
+
+http://www.ladspa.org/ladspa_sdk/download.html  
+
+In particular the utility program 'analyseplugin' must be
+installed in a directory in your execution PATH.  
+
+Nama's mastering mode uses a number of LADSPA plugins
+in a reasonably flat starting configuration.
+provided that the user installs the plugins
+listed in the default configuration file .namarc.
+
+Git is required to utilize Nama's project 
+management and  and undo features. 
+
+=head2 COPYRIGHT
+
+Unless specified otherwise, this code is 
+2003 - 2014, copyright Joel Roth
+
+All rights are reserved except as provided by the Gnu Public
+License, version 3, as detailed in the file COPYING provided
+with this distribution.

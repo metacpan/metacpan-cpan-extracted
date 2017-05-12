@@ -1,0 +1,40 @@
+Asset::Pack
+
+This module allows you to construct Perl modules containing the content
+of arbitrary files, which may then be installed or fat-packed.
+
+In most cases, this module is not what you want, and you should use a
+"File::ShareDir" based system instead, but "File::ShareDir" based
+systems are inherently not fat-pack friendly.
+
+However, if you need embedded, single-file applications, aggregating not
+only Perl Modules, but templates, JavaScript and CSS, this tool will
+make some of your work easier.
+
+If anything fails it throws an exception. This is meant for scripts that
+will be tended by a human (or analyzed if it fails as part of a build).
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by James Laver on time generously
+donated by Anomalio.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

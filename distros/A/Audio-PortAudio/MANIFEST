@@ -1,0 +1,13 @@
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+PortAudio.pm
+PortAudio.pod
+PortAudio.xs
+ppport.h
+t/01basic.t
+typemap
+eg/vumeter.pl
+COPYING
+README
+META.yml                                 Module meta-data (added by MakeMaker)

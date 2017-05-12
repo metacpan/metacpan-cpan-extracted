@@ -1,0 +1,67 @@
+--- include/wx/msw/setup.h	2009-09-04 06:53:17.000000000 +0200
++++ include/wx/msw/setup.h	2009-10-18 14:52:51.000000000 +0200
+@@ -361,7 +361,7 @@
+ // Default is 1
+ //
+ // Recommended setting: 1 (but may be safely disabled if you don't use it)
+-#define wxUSE_FSVOLUME      1
++#define wxUSE_FSVOLUME      0
+ 
+ // Use wxStandardPaths class which allows to retrieve some standard locations
+ // in the file system
+@@ -496,7 +496,7 @@
+ #define wxUSE_FS_ARCHIVE    1
+ 
+ // Set to 1 to enable virtual Internet filesystem (requires wxUSE_FILESYSTEM)
+-#define wxUSE_FS_INET       1
++#define wxUSE_FS_INET       0
+ 
+ // wxArchive classes for accessing archives such as zip and tar
+ #define wxUSE_ARCHIVE_STREAMS     1
+@@ -542,8 +542,8 @@
+ 
+ // The settings for the individual URL schemes
+ #define wxUSE_PROTOCOL_FILE 1
+-#define wxUSE_PROTOCOL_FTP 1
+-#define wxUSE_PROTOCOL_HTTP 1
++#define wxUSE_PROTOCOL_FTP 0
++#define wxUSE_PROTOCOL_HTTP 0
+ 
+ // Define this to use wxURL class.
+ #define wxUSE_URL 1
+@@ -1098,7 +1098,7 @@
+ // Default is 0.
+ //
+ // Recommended setting: 1 if you intend to use OpenGL, 0 otherwise
+-#define wxUSE_GLCANVAS       0
++#define wxUSE_GLCANVAS       1
+ 
+ // wxRichTextCtrl allows editing of styled text.
+ //
+@@ -1159,7 +1159,7 @@
+ 
+ #define wxUSE_DRAGIMAGE 1
+ 
+-#define wxUSE_IPC         1
++#define wxUSE_IPC         1
+                                 // 0 for no interprocess comms
+ #define wxUSE_HELP        1
+                                 // 0 for no help facility
+@@ -1260,7 +1260,7 @@
+ #define wxUSE_PCX           1
+ 
+ // Set to 1 for IFF format support (Amiga format)
+-#define wxUSE_IFF           0
++#define wxUSE_IFF           1
+ 
+ // Set to 1 for XPM format support
+ #define wxUSE_XPM           1
+@@ -1309,7 +1309,7 @@
+ //
+ // Recommended setting: 0 (1 if you want to deploy Unicode apps on 9x systems)
+ #ifndef wxUSE_UNICODE_MSLU
+-    #define wxUSE_UNICODE_MSLU 0
++    #define wxUSE_UNICODE_MSLU 1
+ #endif
+ 
+ // Set this to 1 if you want to use wxWidgets and MFC in the same program. This

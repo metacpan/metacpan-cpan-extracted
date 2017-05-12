@@ -1,0 +1,12 @@
+clear
+power on
+regs
+
+op a0 55
+op 8c efbe
+
+# mem[$BEEF] and IY should = $55
+test iy = 55
+test m:beef = 55
+
+save verify_8C.txt

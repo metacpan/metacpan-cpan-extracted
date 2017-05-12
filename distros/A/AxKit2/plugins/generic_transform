@@ -1,0 +1,68 @@
+#!/usr/bin/perl -w
+
+# Copyright 2001-2006 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+=head1 NAME
+
+generic_transform - generic transformation of XML
+
+=head1 SYNOPSIS
+
+  Plugin generic_transform
+  Transformation XSLT(styles/foo.xsl) XSLT(styles/main.xsl) TAL(styles/global.html)
+
+=head1 DESCRIPTION
+
+This plugin allows you to configure generic transformation pipelines
+like they were common in AxKit1. These pipelines are always static.
+
+=head1 CONFIG
+
+=head2 Transformation I<list>
+
+Specifies the transformation steps to be executed. <list> consists
+of white-space separated entries of the form I<METHOD(PARAM)>, where
+I<METHOD> is one of the known processors, like C<XSLT>, C<XPathScript>
+or C<TAL> and I<PARAM> is the stylesheet for that method.
+
+=cut
+
+
+sub _get_handler {
+    my ($stage) = @_;
+    my ($sub, $style) = split(/\(/,$stage,2);
+    $style =~ s/\)$//;
+    $sub = __PACKAGE__->can($sub);
+    die "Unknown transformation: $stage" if !ref($sub);
+    return $sub->($style);
+}
+
+sub conf_Transformation {
+    shift;
+    return map { _get_handler($_) } @_;
+}
+
+sub hook_xmlresponse {
+    my ($self, $input) = @_;
+
+    my @transform = $self->config('Transformation');
+    
+    $self->log(LOGDEBUG, "Generic Transform: ".join(",",@transform));
+    
+    my $out = $input->transform(@transform);
+    
+    return OK, $out;
+}

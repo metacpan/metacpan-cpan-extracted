@@ -1,0 +1,2 @@
+[paths]
+default = ssh://hg@bitbucket.org/tobyink/p5-acme-rundoc

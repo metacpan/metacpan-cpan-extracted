@@ -1,0 +1,6 @@
+0.33
+  - Fix documentation to refer to the Authen::NTLM::HTTP::Base module so
+    that 'Authen::NTLM' isn't claimed by the PAUSE indexer.
+0.32
+   - Rename Authen::NTLM to Authen::NTLM::HTTP::Base to avoid namespace clash
+

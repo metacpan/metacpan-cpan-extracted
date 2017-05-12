@@ -1,0 +1,15 @@
+body { color: #111111; font-size: 10pt; font-family: Verdana, Helvetica, Arial; }
+H1 { color: black;  font-size: 16pt; font-weight: bold; font-family: Helvetica, Arial; }
+H2 { color: black;  font-size: 14pt; font-weight: bold; font-family: Helvetica, Arial; }
+H3 { color: black; font-size: 12pt; font-family: Helvetica, Arial; }
+PRE { color: black; font-size: 12pt; font-family: courier; }
+TD { color: black; font-size: 10pt; font-family: Verdana, Helvetica, Arial; }
+TH { color: white; font-size: 10pt; font-weight: bold; font-family: Verdana, Helvetica, Arial; }
+TH A:visited { color: white; };
+TH A:link { color: white; };
+.menu { color: black; font-size: 10pt; font-family: Verdana, Helvetica, Arial; }
+.submenu { color: black; font-size: 10pt; font-family: Verdana, Helvetica, Arial; }
+.content { color: black; font-family: Verdana, Arial, Helvetica; }
+.toc { font-family: Verdana, Arial, Helvetica; color: #666666; }
+.loc { font-family: Verdana, Arial, Helvetica; color: #999999; font-size: 8pt; }
+.login { text-align: center; border-width: 2px; border-color: gray; }

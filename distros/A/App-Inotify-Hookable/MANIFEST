@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.pod
+bin/inotify-hookable
+dist.ini
+lib/App/Inotify/Hookable.pm
+t/00-compile.t
+t/release-pod-syntax.t

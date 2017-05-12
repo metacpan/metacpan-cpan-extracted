@@ -1,0 +1,4 @@
+bob:tIYAwma5mxexA:admin:bob@universe.org
+bill:$apr1$Zg9Z8/..$npqzK0gFp6HgU8OxUhUnr/
+fred:{SHA}h6AWXy9FexW0z5c86amnaGvZkhE=
+joe:secret

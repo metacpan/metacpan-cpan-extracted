@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+BEGIN {
+        my $default_cmd = "commands";
+        # unshift @ARGV, $default_cmd unless $ARGV[0] =~ /^\w/;
+}
+
+use App::Report::Generator;
+my $app = App::Report::Generator->new();
+$app->run();
+

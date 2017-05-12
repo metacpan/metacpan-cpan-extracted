@@ -1,0 +1,21 @@
+$Id: /local/CPAN/AxKit-XSP-L10N/Changes 1402 2008-03-08T20:28:41.664717Z claco  $
+Revision history for Perl module AxKit::XSP::L10N
+
+0.05000 Sat Mar 8 14:24:37 2008
+    - Convert to Module::Install
+    - Make META/CPANTS happy
+    - Fixed maketext bug
+
+0.04 Mon Sep 25 18:48:27 2006
+    - Fixed META.yml to make CPANTS happy
+
+0.03 Sat Mar 26 19:09:13 2005
+    - Just messing with META.yml. Nothing so see here.
+
+0.02 Sat Mar 26 17:43:28 2005
+    - Pod cleanup
+    - Added no_index in hopes of fixing the 0.01 CPAN index results
+    - Added utf8 fixup code for perl > 5.8.0
+
+0.01 Thur Mar 24 23:37:13 2005
+    - Initial release

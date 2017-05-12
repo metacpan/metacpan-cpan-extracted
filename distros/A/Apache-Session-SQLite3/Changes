@@ -1,0 +1,4 @@
+[Changes for 0.03 - 2005-02-02]
+
+* Fixed clobbering of $_ and $@ during ->store calls.
+* First version under svk management.

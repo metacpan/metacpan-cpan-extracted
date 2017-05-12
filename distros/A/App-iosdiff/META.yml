@@ -1,0 +1,28 @@
+---
+abstract: 'Cisco IOS Config Diff Utility'
+author:
+  - 'Oliver Gorwits <oliver@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-iosdiff
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Diff: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  List::Util: '0'
+  Net::DNS: '0'
+  Regexp::Common: '0'
+version: '1.200001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

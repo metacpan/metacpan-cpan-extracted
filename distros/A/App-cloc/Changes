@@ -1,0 +1,16 @@
+2016-06-22 v1.68
+
++ Fixed PAUSE release
++ Added cloc 1.68
+
+2016-04-11 v1.66
+
++ Updated to latest cloc version
++ Reference to new GitHub cloc repo
++ Asked Al Danial to merge into original repo https://github.com/AlDanial/cloc/issues/83#issuecomment-208105676
+
+2015-22-02 v0.02
+
++ Added cloc POD
++ Added Al Danial as author and other proper metadata like original CLOC homepage and license
+

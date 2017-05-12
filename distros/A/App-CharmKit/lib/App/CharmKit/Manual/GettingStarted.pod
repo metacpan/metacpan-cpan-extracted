@@ -1,0 +1,91 @@
+# PODNAME: GettingStarted
+# ABSTRACT: Quickly get up and running with CharmKit
+
+__END__
+
+=pod
+
+=head1 NAME
+
+GettingStarted - Quickly get up and running with CharmKit
+
+=head1 Getting Started
+
+Follow the same guidelines as normal for creating a Juju charm.
+
+=head2 Directory Layout
+
+Structure your project should look similar to:
+
+  charm-project/
+    hooks/
+      install
+      config-changed
+      start
+      stop
+    tests/
+      00-basic.test
+    lib/
+      myplugin.pm
+    t/
+      00_unittest1.t
+    config.yaml
+    metadata.yaml
+    LICENSE
+    README.md
+
+=head2 Writing charm hooks
+
+Hooks are written using perl with automatically imported helpers for convenience.
+When developing hooks they should reside in B<hooks>.
+
+A requirement for all charms using this library is to make sure to "bootstrap" the
+B<install> hook. For example, edit B<hooks/install>
+
+   #!/usr/bin/env perl
+   BEGIN {
+       # Install charmkit
+       system "curl -L http://charmkit.pl/setup.sh | sh";
+   }
+
+   use charm;
+
+   pkg [
+    'nginx-full', 'php-fpm',      'php-cgi',      'php-curl', 'php-gd', 'php-json',
+    'php-mcrypt', 'php-readline', 'php-mbstring', 'php-xml'
+   ],
+   ensure    => "present",
+   on_change => sub { say "All latest packages installed."; };
+
+   my $hook_path = $ENV{JUJU_CHARM_DIR};
+
+The B<BEGIN> block is the important bit here where we make sure that
+L<App::CharmKit> is installed prior to use.
+
+Now all other charms can simply B<use charm> and continue the hook processing.
+
+A typical hook starts with
+
+   #!/usr/bin/env perl
+
+   use charm;
+
+   pkg ['mysql-server', 'nginx', 'php5-fpm'];
+
+   my $dbhost = run 'relation-get dbhost';
+   my $dbuser = run 'relation-get dbuser';
+
+   service 'nginx' => 'restart';
+
+=head1 AUTHOR
+
+Adam Stokes <adamjs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Adam Stokes.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,2397 @@
+# PODNAME: Archive::Libarchive::XS::Function
+# ABSTRACT: libarchive function reference
+# VERSION
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Archive::Libarchive::XS::Function - libarchive function reference
+
+=head1 VERSION
+
+version 0.0901
+
+=head1 SYNOPSIS
+
+ use Archive::Libarchive::XS qw( :func );
+
+=head1 DESCRIPTION
+
+This is the function reference for the Perl bindings to libarchive.  
+
+This document provides example calls to each function with argument and return
+value variable names that infer their types.  Functions that take multiple 
+arguments or return multiple values of the same type will use numbered suffixes
+to distinguish them (example: $archive1, $archive2).
+
+=over 4
+
+=item $archive
+
+An archive object identifier (actually a pointer to the C structure used by
+libarchive as the archive object).
+
+These are created with L<archive_read_new|Archive::Libarchive::XS::Function#archive_read_new>, L<archive_write_new|Archive::Libarchive::XS::Function#archive_write_new> or
+L<archive_write_disk_new|Archive::Libarchive::XS::Function#archive_write_disk_new> and deleted with L<archive_read_free|Archive::Libarchive::XS::Function#archive_read_free> or 
+L<archive_write_free|Archive::Libarchive::XS::Function#archive_write_free>.
+
+=item $entry
+
+An archive entry identifier (actually a pointer to the C structure used by
+libarchive as the archive entry object).
+
+These are created with L<archive_entry_new|Archive::Libarchive::XS::Function#archive_entry_new> and deleted with
+L<archive_entry_free|Archive::Libarchive::XS::Function#archive_entry_free>.  They can also be returned by L<archive_read_next_header|Archive::Libarchive::XS::Function#archive_read_next_header>,
+but in that case libarchive will handle the allocation and freeing of
+resources for the entry.
+
+=item $status
+
+Integer value indicating the success or failure of an operation.  Most functions
+use this as their return value.  This value may be compared to any of these
+constants:
+
+=over 4
+
+=item ARCHIVE_OK
+
+Operation was successful
+
+=item ARCHIVE_EOF
+
+Fond end of archive
+
+=item ARCHIVE_RETRY
+
+Retry might succeed
+
+=item ARCHIVE_WARN
+
+Partial success
+
+=item ARCHIVE_FAILED
+
+Current operation cannot complete
+
+=item ARCHIVE_FATAL
+
+No more operations are possible
+
+=back
+
+(There are additional non-status code constants provided by libarchive,
+see L<Archive::Libarchive::XS::Constant> for a full listing).
+
+=item $count_or_status
+
+Returns the number of bytes read/written on success (or 0 at EOF),
+returns a negative status value (see $status above) on error or
+warning.
+
+=item $callback
+
+A code reference pointing to a Perl callback subroutine.  The arguments
+that are passed into the callback and the return values expected from
+the callback are documented in L<Archive::Libarchive::XS::Callback>.
+
+=item $string
+
+A plain string scalar value.
+
+=item $bool
+
+A boolean value, either 0 or 1 (probably not C<undef> for return values).
+
+=back
+
+If you are linking against an older version of libarchive, some of these 
+functions may not be available.  You can use the C<can> method to test if
+a function or constant is available, for example:
+
+ if(Archive::Libarchive::XS->can('archive_read_support_filter_grzip')
+ {
+   # grzip filter is available.
+ }
+
+Functions with the prefix C<archive_perl_> are not part of libarchive
+and are provided with this module for perl specific needs when operating
+with the library.
+
+=head1 FUNCTIONS
+
+=head2 archive_clear_error
+
+ my $status = archive_clear_error($archive);
+
+Clears any error information left over from a previous call Not
+generally used in client code.  Does not return a value.
+
+=head2 archive_copy_error
+
+ my $status = archive_copy_error($archive1, $archive2);
+
+Copies error information from one archive to another.
+
+=head2 archive_entry_acl
+
+ my $acl = archive_entry_acl($entry);
+
+Return an opaque ACL object.
+
+There's not yet anything you can actually do with this...
+
+=head2 archive_entry_acl_add_entry
+
+ my $status = archive_entry_acl_add_entry($entry, $type, $permset, $tag, $qual, $name);
+
+Adds a single ACL entry.  For the access ACL and non-extended principals, the classic
+UNIX permissions are updated.
+
+=head2 archive_entry_acl_clear
+
+ my $status = archive_entry_acl_clear($entry);
+
+removes all ACL entries and resets the enumeration pointer.
+
+=head2 archive_entry_acl_count
+
+ my $count = archive_entry_acl_count($entry, $want_type);
+
+counts the ACL entries that have the given type mask.
+$type can be the bitwise-or of C<ARCHIVE_ENTRY_ACL_TYPE_ACCESS> and
+C<ARCHIVE_ENTRY_ACL_TYPE_DEFAULT>.  If C<ARCHIVE_ENTRY_ACL_TYPE_ACCESS>
+is included and at least one extended ACL entry is found, the three
+non-extended ACLs are added.
+
+=head2 archive_entry_acl_next
+
+ my $status = archive_entry_acl_next($entry, $want_type, $type, $permset, $tag, $qual, $name);
+
+return the next entry of the ACL list.  This functions may only be called after L<archive_entry_acl_reset|Archive::Libarchive::XS::Function#archive_entry_acl_reset>
+has indicated the presence of extended ACL entries.
+
+=head2 archive_entry_acl_reset
+
+ my $status = archive_entry_acl_reset($entry, $want_type);
+
+prepare reading the list of ACL entries with
+L<archive_entry_acl_next|Archive::Libarchive::XS::Function#archive_entry_acl_next> or L<archive_entry_acl_next_w|Archive::Libarchive::XS::Function#archive_entry_acl_next_w>.  The function returns
+either 0, if no non-extended ACLs are found.  In this case, the access permissions
+should be obtained by L<archive_entry_mode|Archive::Libarchive::XS::Function#archive_entry_mode> or set using L<chmod|perlfunc#chmod>.
+Otherwise, the function returns the same value as L<archive_entry_acl_count|Archive::Libarchive::XS::Function#archive_entry_acl_count>.
+
+=head2 archive_entry_acl_text
+
+ my $string = archive_entry_acl_text($entry, $flags);
+
+converts the ACL entries for the given type mask into a string.  In addition to the normal type flags,
+C<ARCHIVE_ENTRY_ACL_STYLE_EXTRA_ID> and C<ARCHIVE_ENTRY_ACL_STYLE_MARK_DEFAULT> can be specified
+to further customize the result.  The returned long string is valid until the next call to 
+L<archive_entry_acl_clear|Archive::Libarchive::XS::Function#archive_entry_acl_clear>, L<archive_entry_acl_add_entry|Archive::Libarchive::XS::Function#archive_entry_acl_add_entry>, L<archive_entry_acl_text|Archive::Libarchive::XS::Function#archive_entry_acl_text>.
+
+=head2 archive_entry_atime
+
+ my $atime = archive_entry_atime($entry);
+
+Returns the access time property for the archive entry.
+
+=head2 archive_entry_atime_is_set
+
+ my $bool = archive_entry_atime_is_set($entry);
+
+Returns true if the access time property has been set on the archive entry.
+
+=head2 archive_entry_atime_nsec
+
+ my $atime = archive_entry_atime_nsec($entry);
+
+Returns the access time (nanoseconds).
+
+=head2 archive_entry_birthtime
+
+ my $birthtime = archive_entry_birthtime($entry);
+
+Returns the birthtime (creation time) for the archive entry.
+
+=head2 archive_entry_birthtime_is_set
+
+ my $bool = archive_entry_birthtime_is_set($entry);
+
+Returns true if the birthtime (creation time) property has been set on the archive entry.
+
+=head2 archive_entry_birthtime_nsec
+
+ my $birthtime = archive_entry_birthtime_nsec($entry);
+
+Returns the birthtime (creation time) for the archive entry.
+
+=head2 archive_entry_clear
+
+ my $status = archive_entry_clear($entry);
+
+Erases the object, resetting all internal fields to the same state as a newly-created object.  This is provided
+to allow you to quickly recycle objects without thrashing the heap.
+
+=head2 archive_entry_clone
+
+ my $entry1 = archive_entry_clone($entry2);
+
+A deep copy operation; all text fields are duplicated.
+
+=head2 archive_entry_copy_fflags_text
+
+ my $status = archive_entry_copy_fflags_text($entry, $string);
+
+Sets the fflags_text property for the archive entry object.
+
+This is an alias for L<archive_entry_set_fflags_text|Archive::Libarchive::XS::Function#archive_entry_set_fflags_text>.
+
+=head2 archive_entry_copy_mac_metadata
+
+An Alias for L<archive_entry_set_mac_metadata|Archive::Libarchive::XS::Function#archive_entry_set_mac_metadata>.
+
+=head2 archive_entry_copy_sourcepath
+
+ my $status = archive_entry_set_sourcepath($entry, $sourcepath);
+
+Sets the sourcepath property for the archive entry object.
+
+This is an alias for archive_entry_set_sourcepath.
+
+=head2 archive_entry_copy_stat
+
+ my $status = archive_entry_stat($entry, $dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $atime, $mtime, $ctime);
+
+Converts the various fields in the format used by L<stat|perlfunc#stat> to the fields store in the archive entry.
+
+The fields C<$blksize>, C<$blocks> supported by L<stat|perlfunc#stat>, are not supported by this function.
+
+This is an alias for L<archive_entry_set_stat|Archive::Libarchive::XS::Function#archive_entry_set_stat>.
+
+=head2 archive_entry_ctime
+
+ my $ctime = archive_entry_ctime($entry);
+
+Returns the ctime (last time an inode property was changed) property for the archive entry.
+
+=head2 archive_entry_ctime_is_set
+
+ my $bool = archive_entry_ctime_is_set($entry);
+
+Returns true if the ctime (last time an inode property was changed) property has been set
+on the archive entry.
+
+=head2 archive_entry_ctime_nsec
+
+ my $ctime = archive_entry_ctime_nsec($entry);
+
+Returns the ctime (last time an inode property was changed) property (nanoseconds).
+
+=head2 archive_entry_dev
+
+ my $device = archive_entry_dev($entry);
+
+Returns the device property for the archive entry.
+
+The device property is an integer identifying the device, and is used by
+C<archive_entry_linkify> (along with the ino64 property) to find hardlinks.
+
+=head2 archive_entry_dev_is_set
+
+ my $bool = archive_entry_dev_is_set($entry);
+
+Returns true if the device property on the archive entry is set.
+
+The device property is an integer identifying the device, and is used by
+C<archive_entry_linkify> (along with the ino64 property) to find hardlinks.
+
+=head2 archive_entry_devmajor
+
+ my $device_major = archive_entry_devmajor($entry);
+
+Returns the device major property for the archive entry.
+
+=head2 archive_entry_devminor
+
+ my $device_minor = archive_entry_devminor($entry);
+
+Returns the device minor property for the archive entry.
+
+=head2 archive_entry_fflags
+
+ my $status = archive_entry_fflags($entry, $set, $clear);
+
+Gets the file flag properties for the archive entry.  The
+C<$set> and C<$clear> arguments are updated to return their
+values.
+
+=head2 archive_entry_fflags_text($entry)
+
+ my $string = archive_entry_fflags_text($entry);
+
+Returns the file flags property as a string.
+
+=head2 archive_entry_filetype
+
+ my $code = archive_entry_filetype($entry);
+
+Gets the filetype of the archive entry.  Code should be one of
+
+=over 4
+
+=item AE_IFMT
+
+=item AE_IFREG
+
+=item AE_IFLNK
+
+=item AE_IFSOCK
+
+=item AE_IFCHR
+
+=item AE_IFBLK
+
+=item AE_IFDIR
+
+=item AE_IFIFO
+
+=back
+
+=head2 archive_entry_free
+
+ my $status = archive_entry_free($entry);
+
+Releases the struct archive_entry object.
+
+=head2 archive_entry_gid
+
+ my $gid = archive_entry_gid($entry);
+
+Returns the group id property for the archive entry.
+
+=head2 archive_entry_gname
+
+ my $string = archive_entry_gname($entry);
+
+Retrieve the gname for the archive entry object.
+
+=head2 archive_entry_hardlink
+
+ my $string = archive_entry_hardlink($entry);
+
+Retrieve the hardlink for the archive entry object.
+
+=head2 archive_entry_ino
+
+ my $ino = archive_entry_ino($entry);
+
+Get the inode property for the entry.
+
+The inode property is an integer identifying the file within a filesystem
+and is used by C<archive_entry_linkify> (along with the dev property) to
+find hardlinks.
+
+This actually uses the libarchive C<archive_entry_set_ino64> function
+(in libarchive C<archive_entry_set_ino> is a legacy interface).
+
+=head2 archive_entry_ino_is_set
+
+ my $bool = archive_entry_ino_is_set($entry);
+
+Returns true if the inode property for the entry has been set.
+
+=head2 archive_entry_linkify
+
+ my $status = archive_entry_linkify($linkresolver, $entry1, $entry2)
+
+Behavior depends on the link resolver strategy 
+(L<archive_entry_linkresolver_set_strategy|Archive::Libarchive::XS::Function#archive_entry_linkresolver_set_strategy>).  See libarchive documentation
+(C<archive_entry_linkify(3)>) for details.
+
+Note that $entry1 and $entry2 are passed by value and may be changed or
+set to undef after this function is called.
+
+=head2 archive_entry_linkresolver_free
+
+ my $status = archive_entry_linkresolver_free($linkresolver);
+
+Deallocates a link resolver instance.
+All deferred entries are flushed and the internal storage is freed.
+
+=head2 archive_entry_linkresolver_new
+
+ my $linkresolver = archive_entry_linkresolver_new();
+
+Allocate a new link resolver.
+
+=head2 archive_entry_linkresolver_set_strategy
+
+ my $status = archive_entry_linkresolver_set_strategy($linkresolver, $format);
+
+Set the link resolver strategy.  $format should be an archive format constant
+(a constant with ARCHIVE_FORMAT_ prefix see L<Archive::Libarchive::XS::Constant>.
+
+=head2 archive_entry_mac_metadata
+
+ my $buffer = archive_entry_mac_metadata($entry);
+
+The mac_metadata property is Storage for Mac OS-specific
+AppleDouble metadata information.  Apple-format tar files
+store a separate binary blob containing encoded metadata
+with ACL, extended attributes, etc. This provides a place
+to store that blob.
+
+This method gets the blob.  The C name for this function is
+C<archive_entry_copy_mac_metadata>.
+
+=head2 archive_entry_mode
+
+ my $mode = archive_entry_mode($entry);
+
+Get a combination of file type and permission and provide the equivalent of st_mode.
+use of L<archive_entry_filetype|Archive::Libarchive::XS::Function#archive_entry_filetype> and L<archive_entry_perm|Archive::Libarchive::XS::Function#archive_entry_perm> for getting and
+L<archive_entry_set_filetype|Archive::Libarchive::XS::Function#archive_entry_set_filetype> and L<archive_entry_set_perm|Archive::Libarchive::XS::Function#archive_entry_set_perm> for setting is
+recommended.
+
+=head2 archive_entry_mtime
+
+ my $mtime = archive_entry_mtime($entry);
+
+Gets the mtime (modify time) property for the archive entry.
+
+=head2 archive_entry_mtime_is_set
+
+ my $bool = archive_entry_mtime_is_set($entry);
+
+Returns true if the mtime (modify time) property has been set on the archive entry.
+
+=head2 archive_entry_mtime_nsec
+
+ my $mtime = archive_entry_mtime_nsec($entry);
+
+Gets the mtime property (modify time) property for the archive entry (nanoseconds).
+
+=head2 archive_entry_new
+
+ my $entry = archive_entry_new();
+
+Allocate and return a blank struct archive_entry object.
+
+=head2 archive_entry_new2
+
+ my $entry = archive_entry_new2($archive)
+
+This form of C<archive_entry_new2> will pull character-set
+conversion information from the specified archive handle.  The
+older C<archive_entry_new> form will result in the use of an internal
+default character-set conversion.
+
+=head2 archive_entry_nlink
+
+ my $nlink = archive_entry_nlink($entry);
+
+Gets the number of hardlinks for the entry.
+
+=head2 archive_entry_pathname
+
+ my $string = archive_entry_pathname($entry);
+
+Retrieve the pathname for the archive entry object.
+
+=head2 archive_entry_perm
+
+ my $perm = archive_entry_perm($entry);
+
+Get the permission bits for the entry.  This is the usual UNIX octal permission thing.
+
+=head2 archive_entry_rdev
+
+ my $device = archive_entry_rdev($entry);
+
+Returns the rdev property for the archive entry.
+
+=head2 archive_entry_rdevmajor
+
+ my $device_major = archive_entry_rdevmajor($entry);
+
+Returns the major component of the rdev property for the archive entry.
+
+=head2 archive_entry_rdevminor
+
+ my $device_minor = archive_entry_rdevminor($entry);
+
+Returns the minor component of the rdev property for the archive entry.
+
+=head2 archive_entry_set_atime
+
+ my $status = archive_entry_set_atime($entry, $atime, $nsec);
+
+Sets the access time property for the archive entry.
+
+=head2 archive_entry_set_birthtime
+
+ my $status = archive_entry_set_birthtime($entry, $birthtime, $nsec);
+
+Sets the birthtime (creation time) for the archive entry.
+
+=head2 archive_entry_set_ctime
+
+ my $status = archive_entry_set_ctime($entry, $ctime, $nsec);
+
+Sets the ctime (last time an inode property was changed) property for the archive entry.
+
+=head2 archive_entry_set_dev
+
+ my $status = archive_entry_set_dev($entry, $device);
+
+Sets the device property for the archive entry.
+
+The device property is an integer identifying the device, and is used by
+C<archive_entry_linkify> (along with the ino64 property) to find hardlinks.
+
+=head2 archive_entry_set_devmajor
+
+ my $status = archive_entry_set_devmajor($entry, $devmajor);
+
+Sets the device major property for the archive entry.
+
+The device property is an integer identifying the device, and is used by
+C<archive_entry_linkify> (along with the ino64 property) to find hardlinks.
+
+=head2 archive_entry_set_devminor
+
+ my $status = archive_entry_set_devminor($entry, $devminor);
+
+Sets the device minor property for the archive entry.
+
+The device property is an integer identifying the device, and is used by
+C<archive_entry_linkify> (along with the ino64 property) to find hardlinks.
+
+=head2 archive_entry_set_fflags
+
+ my $status = archive_entry_set_fflags($entry, $set, $clear);
+
+Sets the file flag properties for the archive entry.
+
+=head2 archive_entry_set_fflags_text
+
+ my $status = archive_entry_set_fflags_text($entry, $string);
+
+Sets the fflags_text property for the archive entry object.
+
+=head2 archive_entry_set_filetype
+
+ my $status = archive_entry_set_filetype($entry, $code);
+
+Sets the filetype of the archive entry.  Code should be one of
+
+=over 4
+
+=item AE_IFMT
+
+=item AE_IFREG
+
+=item AE_IFLNK
+
+=item AE_IFSOCK
+
+=item AE_IFCHR
+
+=item AE_IFBLK
+
+=item AE_IFDIR
+
+=item AE_IFIFO
+
+=back
+
+=head2 archive_entry_set_gid
+
+ my $status = archive_entry_set_gid($gid).
+
+Sets the group id property for the archive entry.
+
+=head2 archive_entry_set_gname
+
+ my $status = archive_entry_set_gname($entry, $string)
+
+Sets the gname for the archive entry object.
+
+=head2 archive_entry_set_hardlink
+
+ my $status = archive_entry_set_hardlink($entry, $string)
+
+Sets the hardlink for the archive entry object.
+
+=head2 archive_entry_set_ino
+
+ my $status = archive_entry_set_ino($entry, $ino);
+
+Set the inode property for the entry.
+
+The inode property is an integer identifying the file within a filesystem
+and is used by C<archive_entry_linkify> (along with the dev property) to
+find hardlinks.
+
+This actually uses the libarchive C<archive_entry_set_ino64> function
+(in libarchive C<archive_entry_set_ino> is a legacy interface).
+
+=head2 archive_entry_set_link
+
+ my $status = archive_entry_set_link($entry, $string);
+
+Set symlink if symlink is already set, else set hardlink.
+
+=head2 archive_entry_set_mac_metadata
+
+ my $status = archive_entry_set_mac_metadata($entry, $buffer);
+
+The mac_metadata property is Storage for Mac OS-specific 
+AppleDouble metadata information.  Apple-format tar files 
+store a separate binary blob containing encoded metadata 
+with ACL, extended attributes, etc. This provides a place 
+to store that blob.
+
+This method sets the blob.  The C name for this function is
+C<archive_entry_copy_mac_metadata>.
+
+=head2 archive_entry_set_mode
+
+ my $status = archive_entry_set_mode($entry, $mode);
+
+Set a combination of file type and permission and provide the equivalent of st_mode.
+use of L<archive_entry_filetype|Archive::Libarchive::XS::Function#archive_entry_filetype> and L<archive_entry_perm|Archive::Libarchive::XS::Function#archive_entry_perm> for getting and
+L<archive_entry_set_filetype|Archive::Libarchive::XS::Function#archive_entry_set_filetype> and L<archive_entry_set_perm|Archive::Libarchive::XS::Function#archive_entry_set_perm> for setting is
+recommended.
+
+=head2 archive_entry_set_mtime
+
+ my $status = archive_entry_set_mtime($entry, $sec, $nanosec);
+
+Set the mtime (modify time) for the entry object.
+
+=head2 archive_entry_set_nlink
+
+ my $status = archive_entry_set_nlink($entry, $nlink);
+
+Sets the number of hardlinks for the entry.
+
+=head2 archive_entry_set_pathname
+
+ my $status = archive_entry_set_pathname($entry, $string)
+
+Sets the pathname for the archive entry object.
+
+=head2 archive_entry_set_perm
+
+ my $status = archive_entry_set_perm($entry, $perm);
+
+Set the permission bits for the entry.  This is the usual UNIX octal permission thing.
+
+=head2 archive_entry_set_rdev
+
+ my $status = archive_entry_set_rdev($entry, $device);
+
+Set the rdev property for the archive entry.
+
+=head2 archive_entry_set_rdevmajor
+
+ my $status = archive_entry_set_rdevmajor($entry, $major);
+
+Set the major component of the rdev property for the archive entry.
+
+=head2 archive_entry_set_rdevminor
+
+ my $status = archive_entry_set_rdevminor($entry, $minor);
+
+Sets the minor component of the rdev property for the archive entry.
+
+=head2 archive_entry_set_size
+
+ my $status = archive_entry_set_size($entry, $size);
+
+Sets the size property for the archive entry.
+
+=head2 archive_entry_set_sourcepath
+
+ my $status = archive_entry_set_sourcepath($entry, $sourcepath);
+
+Sets the sourcepath property for the archive entry object.
+
+=head2 archive_entry_set_stat
+
+ my $status = archive_entry_stat($entry, $dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $atime, $mtime, $ctime);
+
+Converts the various fields in the format used by L<stat|perlfunc#stat> to the fields store in the archive entry.
+
+The fields C<$blksize>, C<$blocks> supported by L<stat|perlfunc#stat>, are not supported by this function.
+
+=head2 archive_entry_set_symlink
+
+ my $status = archive_entry_set_symlink($entry, $string)
+
+Sets the symlink for the archive entry object.
+
+=head2 archive_entry_set_uid
+
+ my $status = archive_entry_set_uid($entry, $uid);
+
+Set the UID (user id) property for the archive entry.
+
+=head2 archive_entry_set_uname
+
+ my $status = archive_entry_set_uname($entry, $string)
+
+Sets the uname for the archive entry object.
+
+=head2 archive_entry_size($entry)
+
+ my $size = archive_entry_size($entry);
+
+Returns the size of the entry in bytes.
+
+=head2 archive_entry_size_is_set
+
+ my $bool = archive_entry_size_is_set($entry)
+
+Returns true if the size property for the archive entry has been set.
+
+=head2 archive_entry_sourcepath
+
+ my $sourcepath = archive_entry_sourcepath($entry);
+
+Gets the sourcepath property for the archive entry object.
+
+=head2 archive_entry_sparse_add_entry
+
+ my $status = archive_entry_sparse_add_entry($entry, $offset, $length)
+
+Add a sparse region to the entry.
+
+=head2 archive_entry_sparse_clear
+
+ my $status = archive_entry_sparse_clear($entry)
+
+Remove all sparse region from the archive entry.
+
+=head2 archive_entry_sparse_count
+
+ my $count = archive_entry_sparse_count($entry);
+
+Return the number of sparse entries in the entry.
+
+=head2 archive_entry_sparse_next
+
+ my $status = archive_entry_sparse_next($entry, $offset, $length);
+
+Return the next sparse region for the entry.  Example:
+
+ archive_entry_sparse_reset($entry);
+ while(my $r = archive_entry_sparse_next($entry, $offset, $length))
+ {
+   last if $r == ARCHIVE_WARN;
+   die archive_error_string($a) if $r < ARCHIVE_OK;
+   
+   # do something with $name and $value
+ }
+
+=head2 archive_entry_sparse_reset
+
+ my $count = archive_entry_sparse_reset($entry);
+
+Reset the internal sparse region iterator for the entry (see L<archive_entry_sparse_next|Archive::Libarchive::XS::Function#archive_entry_sparse_next> for an example).
+
+=head2 archive_entry_stat
+
+ my($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $atime, $mtime, $ctime) = archive_entry_stat($entry);
+
+Converts the various fields stored in the archive entry to the format used by L<stat|perlfunc#stat>.
+
+The fields C<$blksize>, C<$blocks> supported by L<stat|perlfunc#stat>, are not supported by this function.
+
+=head2 archive_entry_strmode
+
+ my $strmode = archive_entry_strmode($entry);
+
+Returns a string representation of the archive entry's permission mode,
+a la the Unix C<ls> command (example: a mode of C<0644> should come back
+as C<-rw-r--r-->.
+
+=head2 archive_entry_symlink
+
+ my $string = archive_entry_symlink($entry);
+
+Retrieve the symlink for the archive entry object.
+
+=head2 archive_entry_uid
+
+ my $uid = archive_entry_uid($entry);
+
+Get the UID (user id) property for the archive entry.
+
+=head2 archive_entry_uname
+
+ my $string = archive_entry_uname($entry);
+
+Retrieve the uname for the archive entry object.
+
+=head2 archive_entry_unset_atime
+
+ my $status = archive_entry_unset_atime($entry);
+
+Removes the value for the atime property on the archive.
+
+=head2 archive_entry_unset_birthtime
+
+ my $status = archive_entry_unset_birthtime($entry);
+
+Unset the birthtime (creation time) property for the archive entry.
+
+=head2 archive_entry_unset_ctime
+
+ my $status = archive_entry_set_ctime($entry);
+
+Unsets the ctime (last time an inode property was changed) property for the archive entry.
+
+=head2 archive_entry_unset_mtime
+
+ my $status = archive_entry_unset_mtime($entry);
+
+Unset the mtime (modify time) for the entry object.
+
+=head2 archive_entry_unset_size
+
+ my $status = archive_entry_unset_size($entry);
+
+Unsets the size property for the archive entry.
+
+=head2 archive_entry_xattr_add_entry
+
+ my $status = archive_entry_xattr_add_entry($entry, $name, $buffer);
+
+Add an extended attribute (xattr) to the archive entry.
+
+=head2 archive_entry_xattr_clear
+
+ my $status = archive_entry_xattr_clear($entry);
+
+Remove all extended attributes (xattr) to the archive entry.
+
+=head2 archive_entry_xattr_count
+
+ my $count = archive_entry_xattr_count($entry);
+
+Returns the number of extended attributes (xattr) for the archive entry.
+
+=head2 archive_entry_xattr_next
+
+ my $status = archive_entry_xattr_next($entry, $name, $buffer);
+
+Retrieve the extended attribute (xattr) at the extended attributes (xattr) cursor, and
+increment the cursor.  If the cursor is already at the end, it will return ARCHIVE_WARN,
+$name and $buffer will be undef.  Here is an example which loops through all extended
+attributes (xattr) for an archive entry:
+
+ archive_entry_xattr_reset($entry);
+ while(my $r = archive_entry_xattr_next($entry, my $name, my $value))
+ {
+   last if $r == ARCHIVE_WARN;
+   die archive_error_string($a) if $r < ARCHIVE_OK;
+   
+   # do something with $name and $value
+ }
+
+=head2 archive_entry_xattr_reset
+
+ my $status = archive_entry_xattr_reset($entry);
+
+Reset the internal extended attributes (xattr) cursor for the archive entry.
+
+=head2 archive_errno
+
+ my $errno = archive_errno($archive);
+
+Returns a numeric error code indicating the reason for the most
+recent error return.
+
+Return type is an errno integer value.
+
+=head2 archive_error_string
+
+ my $string = archive_error_string($archive);
+
+Returns a textual error message suitable for display.  The error
+message here is usually more specific than that obtained from
+passing the result of C<archive_errno> to C<strerror>.
+Returns C<undef> if there is not error.
+
+=head2 archive_file_count
+
+ my $count = archive_file_count($archive);
+
+Returns a count of the number of files processed by this archive object.  The count
+is incremented by calls to C<archive_write_header> or C<archive_read_next_header>.
+
+=head2 archive_filter_bytes
+
+ my $count = archive_filter_bytes($archive, $level);
+
+Byte count for the given filter level.  See L<archive_filter_count|Archive::Libarchive::XS::Function#archive_filter_count> for details of the
+level numbering.
+
+=head2 archive_filter_code
+
+ my $code = archive_filter_code($archive, $level);
+
+Returns a numeric code identifying the indicated filter.  See L<archive_filter_count|Archive::Libarchive::XS::Function#archive_filter_count>
+for details of the level numbering.
+
+=head2 archive_filter_count
+
+ my $count = archive_filter_count($archive);
+
+Returns the number of filters in the current pipeline. For read archive handles, these 
+filters are added automatically by the automatic format detection. For write archive 
+handles, these filters are added by calls to the various C<archive_write_add_filter_XXX>
+functions. Filters in the resulting pipeline are numbered so that filter 0 is the filter 
+closest to the format handler. As a convenience, functions that expect a filter number 
+will accept -1 as a synonym for the highest-numbered filter. For example, when reading 
+a uuencoded gzipped tar archive, there are three filters: filter 0 is the gunzip filter, 
+filter 1 is the uudecode filter, and filter 2 is the pseudo-filter that wraps the archive 
+read functions. In this case, requesting C<archive_position(a,(-1))> would be a synonym
+for C<archive_position(a,(2))> which would return the number of bytes currently read from 
+the archive, while C<archive_position(a,(1))> would return the number of bytes after
+uudecoding, and C<archive_position(a,(0))> would return the number of bytes after decompression.
+
+=head2 archive_filter_name
+
+ my $string = archive_filter_name($archive, $level);
+
+Returns a textual name identifying the indicated filter.  See L<archive_filter_count|Archive::Libarchive::XS::Function#archive_filter_count> for
+details of the numbering.
+
+=head2 archive_format
+
+ my $code = archive_format($archive);
+
+Returns a numeric code indicating the format of the current archive
+entry.  This value is set by a successful call to
+C<archive_read_next_header>.  Note that it is common for this value
+to change from entry to entry.  For example, a tar archive might
+have several entries that utilize GNU tar extensions and several
+entries that do not.  These entries will have different format
+codes.
+
+=head2 archive_format_name
+
+ my $string = archive_format_name($archive);
+
+A textual description of the format of the current entry.
+
+=head2 archive_match_exclude_entry
+
+ my $status = archive_match_exclude_entry($archive, $flag, $entry);
+
+Add exclusion entry
+
+=head2 archive_match_exclude_pattern
+
+ my $status = archive_match_exclude_pattern($archive, $pattern);
+
+Add exclusion pathname pattern.
+
+=head2 archive_match_exclude_pattern_from_file
+
+ my $status = archive_match_exclude_pattern_from_file($archive, $filename, $null_separator);
+
+Add exclusion pathname pattern from file.
+
+=head2 archive_match_excluded
+
+ my $bool = archive_match_excluded($archive, $entry);
+
+Test if archive_entry is excluded. This is a convenience function. This is the
+same as calling all L<archive_match_path_excluded|Archive::Libarchive::XS::Function#archive_match_path_excluded>, L<archive_match_time_excluded|Archive::Libarchive::XS::Function#archive_match_time_excluded>
+and L<archive_match_owner_excluded|Archive::Libarchive::XS::Function#archive_match_owner_excluded>.
+
+=head2 archive_match_free
+
+ my $status = archive_match_free($archive);
+
+Free the resources previously allocated with L<archive_match_new|Archive::Libarchive::XS::Function#archive_match_new>.
+
+=head2 archive_match_include_date
+
+ my $status = archive_match_include_date($archive, $flag, $date_string);
+
+Set inclusion time by a date string
+
+=head2 archive_match_include_file_time
+
+ my $status = archive_match_include_file_time($archive, $flag, $pathname);
+
+Set inclusion time by a particular file
+
+=head2 archive_match_include_gid
+
+ my $status = archive_match_include_gid($archive, $gid);
+
+The match object $archive should match entries with the given $gid
+
+=head2 archive_match_include_gname
+
+ my $status = archive_match_include_gname($archive, $gname);
+
+The match object $archive should match entries with the given group name
+
+=head2 archive_match_include_pattern
+
+ my $status = archive_match_include_pattern_from_file($archive, $pattern);
+
+Add inclusion pathname pattern
+
+=head2 archive_match_include_pattern_from_file
+
+ my $status = archive_match_include_pattern_from_file($archive, $filename, $null_separator);
+
+Add inclusion pathname pattern from file
+
+=head2 archive_match_include_time
+
+ my $status = archive_match_include_time($archive, $flag, $sec, $nsec);
+
+Set inclusion time
+
+=head2 archive_match_include_uid
+
+ my $status = archive_match_include_uid($archive, $uid);
+
+The match object $archive should match entries with the given $uid
+
+=head2 archive_match_include_uname
+
+ my $status = archive_match_include_uname($archive, $uname);
+
+The match object $archive should match entries with the given user name
+
+=head2 archive_match_new
+
+ my $archive = archive_match_new();
+
+Allocates and initializes a archive object suitable for reading and matching with an archive.
+
+=head2 archive_match_owner_excluded
+
+ my $bool = archive_match_owner_excluded($archive, $entry);
+
+Test if a file is excluded by its uid, gid, user name or group name.
+
+=head2 archive_match_path_excluded
+
+ my $bool = archive_match_path_excluded($archive, $entry);
+
+Test if pathname is excluded.
+
+=head2 archive_match_path_unmatched_inclusions
+
+ my $count = archive_match_path_unmatched_inclusions($archive);
+
+Return the amount number of unmatched inclusion patterns
+
+=head2 archive_match_path_unmatched_inclusions_next
+
+ my $status = archive_match_path_unmatched_inclusions_next($archive, $pattern);
+
+Fetch the next unmatched pattern.
+
+=head2 archive_match_time_excluded
+
+ my $bool = archive_match_time_excluded($archive, $entry);
+
+Test if a file is excluded by its time stamp.
+
+=head2 archive_perl_codeset
+
+ my $string = archive_perl_codeset();
+
+Returns the name of the "codeset" (character encoding, example: "UTF-8" for
+UTF-8 or "ANSI_X3.4-1968" for ASCII) of the currently configured locale.
+
+=head2 archive_perl_utf8_mode
+
+ my $bool = archive_perl_utf8_mode();
+
+Returns true if the internal "codeset" used by libarchive is UTF-8.
+
+=head2 archive_read_append_filter
+
+ my $status = archive_read_append_filter($archive, $code)
+
+Add the given filter by its code.
+
+The C<_append_> form is to manually set the format and filters to be used. This is useful
+to bypass the bidding process when the format and filters to use is known in advance.
+
+=head2 archive_read_append_filter_program
+
+ my $status = archive_read_append_filter_program($archive, $command);
+
+Data is feed through the specified external program before being
+dearchived.  Note that this disables automatic detection of the
+compression format, so it makes no sense to specify this in
+conjunction with any other decompression option.
+
+The C<_append_> form is to manually set the format and filters to be used. This is useful
+to bypass the bidding process when the format and filters to use is known in advance.
+
+=head2 archive_read_append_filter_program_signature
+
+ my $status = archive_read_append_filter_program_signature($archive, $command, $signature);
+
+Data is feed through the specified external program before being dearchived, if the signature
+matches.
+
+The C<_append_> form is to manually set the format and filters to be used. This is useful
+to bypass the bidding process when the format and filters to use is known in advance.
+
+=head2 archive_read_close
+
+ my $status = archive_read_close($archive);
+
+Complete the archive and invoke the close callback.
+
+=head2 archive_read_data
+
+ my $count_or_status = archive_read_data($archive, $buffer, $max_size);
+
+Read data associated with the header just read.  Internally, this is a
+convenience function that calls C<archive_read_data_block> and fills
+any gaps with nulls so that callers see a single continuous stream of
+data.  Returns the actual number of bytes read, 0 on end of data and
+a negative value on error.
+
+=head2 archive_read_data_block
+
+ my $count_or_status = archive_read_data_block($archive, $buffer, $offset);
+
+Return the next available block of data for this entry.  Unlike
+C<archive_read_data>, this function allows you to correctly
+handle sparse files, as supported by some archive formats.  The
+library guarantees that offsets will increase and that blocks
+will not overlap.  Note that the blocks returned from this
+function can be much larger than the block size read from disk,
+due to compression and internal buffer optimizations.
+
+=head2 archive_read_data_into_fh
+
+ my $status = archive_read_data_into_fh($archive, $fh);
+
+A convenience function that repeatedly calls L<archive_read_data_block|Archive::Libarchive::XS::Function#archive_read_data_block> to copy the entire entry to the provided file handle.
+
+=head2 archive_read_data_skip
+
+ my $status = archive_read_data_skip($archive);
+
+A convenience function that repeatedly calls C<archive_read_data> to skip
+all of the data for this archive entry.
+
+=head2 archive_read_disk_can_descend
+
+ my $bool = archive_read_disk_can_descend($archive);
+
+Undocumented libarchive function.
+
+=head2 archive_read_disk_current_filesystem
+
+ my $status = archive_read_disk_current_filesystem($archive);
+
+Undocumented libarchive function.
+
+=head2 archive_read_disk_current_filesystem_is_remote
+
+ my $status = archive_read_disk_current_filesystem_is_remote($archive);
+
+Undocumented libarchive function.
+
+=head2 archive_read_disk_current_filesystem_is_synthetic
+
+ my $status = archive_read_disk_current_filesystem_is_synthetic($archive);
+
+Undocumented libarchive function.
+
+=head2 archive_read_disk_descend
+
+ my $status = archive_read_disk_descend($archive);
+
+Request that current entry be visited.  If you invoke it on every
+directory, you'll get a physical traversal.  This is ignored if the
+current entry isn't a directory or a link to a directory.  So, if
+you invoke this on every returned path, you'll get a full logical
+traversal.
+
+=head2 archive_read_disk_entry_from_file
+
+ my $status = archive_read_disk_entry_from_file($archive, $entry, $fh, undef);
+ my $status = archive_read_disk_entry_from_file($archive, $entry, $fh, \@stat);
+ my $status = archive_read_disk_entry_from_file($archive, $entry, undef, \@stat);
+
+Populates a struct archive_entry object with information about a particular file.  The archive_entry object must have already been created with L<archive_entry_new|Archive::Libarchive::XS::Function#archive_entry_new> and at least one of the
+source path or path fields must already be set.  (If both are set, the source path will be used.)
+
+Information is read from disk using the path name from the struct archive_entry object.  If a file handle ($fh) is provided, some information will be obtained using that file handle, on
+platforms that support the appropriate system calls.
+
+Note: The C API supports passing in a stat structure for some performance benefits.  Currently this is unsupported in the Perl version, and you must pass undef in as the forth argument,
+for possible future compatibility.
+
+Where necessary, user and group ids are converted to user and group names using the currently registered lookup functions above.  This affects the file ownership fields and ACL values in the
+struct archive_entry object.
+
+=head2 archive_read_disk_gname
+
+ my $string = archive_read_disk_gname($archive, $gid);
+
+Returns a group name given a gid value.  By default always
+returns C<undef>.
+
+=head2 archive_read_disk_new
+
+ my $archive = archive_read_disk_new();
+
+Allocates and initializes an archive object suitable for reading object information
+from disk.
+
+=head2 archive_read_disk_open
+
+ my $status = archive_read_disk_open($archive, $string)
+
+Allocates and initializes an archive object suitable for reading objects from disk.
+
+=head2 archive_read_disk_set_atime_restored
+
+ my $status = archive_read_disk_set_atime_restored($archive);
+
+Request that the access time of the entry visited by traversal be restored.
+
+=head2 archive_read_disk_set_behavior
+
+ my $status = archive_read_disk_set_behavior($archive, $flags);
+
+Undocumented libarchive function.
+
+=head2 archive_read_disk_set_gname_lookup
+
+ my $status = archive_read_disk_set_gname_lookup($archive, $data, $lookup_callback, $cleanup_callback);
+
+Register a callback for the lookup of GID from group names.  In order to deregister call
+C<archive_read_disk_set_gname_lookup> with both callback functions set to C<undef>.
+
+See L<Archive::Libarchive::XS::Callback> for calling conventions for the lookup and cleanup callbacks.
+
+=head2 archive_read_disk_set_standard_lookup
+
+ my $status = archive_read_disk_set_standard_lookup($archive);
+
+This convenience function installs a standard set of user and group name lookup functions.
+These functions use C<getpwuid> and C<getgrgid> to convert ids to names, defaulting to C<undef>.
+if the names cannot be looked up.  These functions also implement a simple memory cache to
+reduce the number of calls to C<getpwuid> and C<getgrgid>.
+
+=head2 archive_read_disk_set_symlink_hybrid
+
+ my $status = archive_read_disk_set_symlink_hybrid($archive);
+
+This sets the mode used for handling symbolic links.  The "hybrid" mode currently
+behaves identically to the "logical" mode.
+
+=head2 archive_read_disk_set_symlink_logical
+
+ my $status = archive_read_disk_set_symlink_logical($archive);
+
+This sets the mode used for handling symbolic links.  The "logical" mode follows
+all symbolic links.
+
+=head2 archive_read_disk_set_symlink_physical
+
+ my $status = archive_read_disk_set_symlink_physical($archive);
+
+This sets the mode used for handling symbolic links.  The "physical" mode does not
+follow any symbolic links.
+
+=head2 archive_read_disk_set_uname_lookup
+
+ my $status = archive_read_disk_set_uname_lookup($archive, $data, $lookup_callback, $cleanup_callback);
+
+Register a callback for the lookup of UID from user names.  In order to deregister call
+C<archive_read_disk_setugname_lookup> with both callback functions set to C<undef>.
+
+See L<Archive::Libarchive::XS::Callback> for calling conventions for the lookup and cleanup callbacks.
+
+=head2 archive_read_disk_uname
+
+ my $string = archive_read_disk_uname($archive, $gid);
+
+Returns a user name given a uid value.  By default always
+returns C<undef>.
+
+=head2 archive_read_extract
+
+ my $status = archive_read_extract($archive, $entry, $flags);
+
+A convenience function that wraps the corresponding archive_write_disk interfaces.  The first call to L<archive_read_extract|Archive::Libarchive::XS::Function#archive_read_extract> creates a restore object using L<archive_write_disk_new|Archive::Libarchive::XS::Function#archive_write_disk_new> and
+L<archive_write_disk_set_standard_lookup|Archive::Libarchive::XS::Function#archive_write_disk_set_standard_lookup>, then transparently invokes L<archive_write_disk_set_options|Archive::Libarchive::XS::Function#archive_write_disk_set_options>, L<archive_write_header|Archive::Libarchive::XS::Function#archive_write_header>, L<archive_write_data|Archive::Libarchive::XS::Function#archive_write_data>, and L<archive_write_finish_entry|Archive::Libarchive::XS::Function#archive_write_finish_entry> to
+create the entry on disk and copy data into it.  The flags argument is passed unmodified to L<archive_write_disk_set_options|Archive::Libarchive::XS::Function#archive_write_disk_set_options>.
+
+=head2 archive_read_extract2
+
+ my $status = archive_read_extract2($archive1, $entry, $archive2);
+
+This is another version of archive_read_extract() that allows you to provide your own restore object.  In particular, this allows you to override the standard lookup functions using
+L<archive_write_disk_set_group_lookup|Archive::Libarchive::XS::Function#archive_write_disk_set_group_lookup>, and L<archive_write_disk_set_user_lookup|Archive::Libarchive::XS::Function#archive_write_disk_set_user_lookup>.  Note that L<archive_read_extract2|Archive::Libarchive::XS::Function#archive_read_extract2> does not accept a flags argument; you should use
+L<archive_write_disk_set_options|Archive::Libarchive::XS::Function#archive_write_disk_set_options> to set the restore options yourself.
+
+=head2 archive_read_extract_set_skip_file
+
+ my $status = archive_read_extract_set_skip_file($archive, $dev, $ino);
+
+Record the dev/ino of a file that will not be written.  This is
+generally set to the dev/ino of the archive being read.
+
+=head2 archive_read_free
+
+ my $status = archive_read_free($archive);
+
+Invokes L<archive_read_close|Archive::Libarchive::XS::Function#archive_read_close> if it was not invoked manually, then
+release all resources.
+
+=head2 archive_read_header_position
+
+ my $offset = archive_read_header_position($archive);
+
+Retrieve the byte offset in UNCOMPRESSED data where last-read
+header started.
+
+=head2 archive_read_new
+
+ my $archive = archive_read_new();
+
+Allocates and initializes a archive object suitable for reading from an archive.
+Returns an opaque archive which may be a perl style object, or a C pointer
+(depending on the implementation), either way, it can be passed into
+any of the read functions documented here with an C<$archive> argument.
+
+=head2 archive_read_next_header
+
+ my $status = archive_read_next_header($archive, $entry);
+
+Read the header for the next entry and return an entry object
+Returns an opaque archive which may be a perl style object, or a C pointer
+(depending on the implementation), either way, it can be passed into
+any of the functions documented here with an <$entry> argument.
+
+=head2 archive_read_next_header2
+
+ my $status = archive_read_next_header2($archive, $entry);
+
+Read the header for the next entry and populate the provided entry object.
+
+=head2 archive_read_open
+
+ my $status = archive_read_open($archive, $data, $open_cb, $read_cb, $close_cb);
+
+The same as C<archive_read_open2>, except that the skip callback is assumed to be C<undef>.
+
+=head2 archive_read_open1
+
+ my $status = archive_read_open1($archive);
+
+Opening freezes the callbacks.
+
+=head2 archive_read_open2
+
+ my $status = archive_read_open2($archive, $data, $open_cb, $read_cb, $skip_cb, $close_cb);
+
+Freeze the settings, open the archive, and prepare for reading entries.  This is the most
+generic version of this call, which accepts four callback functions.  Most clients will
+want to use C<archive_read_open_filename>, C<archive_read_open_FILE>, C<archive_read_open_fd>,
+or C<archive_read_open_memory> instead.  The library invokes the client-provided functions to 
+obtain raw bytes from the archive.
+
+=head2 archive_read_open_fh
+
+ my $status = archive_read_open_fh($archive, $fh, $block_size);
+
+Like L<archive_read_open_filename|Archive::Libarchive::XS::Function#archive_read_open_filename>, except that it accepts a file handle and block
+size rather than a filename.  Note that the file handle will not be automatically
+closed at end-of-archive.
+
+If not specified, a block size of 10240 will be used.
+
+There is no corresponding archive_read_open_fh in the C version of libarchive.
+This is provided in the place of C<archive_read_open_FILE> and C<archive_read_open_fd>,
+which are not in the Perl bindings for libarchive.
+
+=head2 archive_read_open_filename
+
+ my $status = archive_read_open_filename($archive, $filename, $block_size);
+
+Like C<archive_read_open>, except that it accepts a simple filename
+and a block size.  This function is safe for use with tape drives
+or other blocked devices.
+
+If you pass in C<undef> as the C<$filename>, libarchive will use
+standard in as the input archive.
+
+=head2 archive_read_open_filenames
+
+ my $status = archive_read_open_filenames($archive, \@filenames, $block_size);
+
+Use this for reading multivolume files by filenames.
+
+=head2 archive_read_open_memory
+
+ my $status = archive_read_open_memory($archive, $buffer);
+
+Like C<archive_read_open>, except that it uses a Perl scalar that holds the 
+content of the archive.  This function does not make a copy of the data stored 
+in C<$buffer>, so you should not modify the buffer until you have free the 
+archive using C<archive_read_free>.
+
+Bad things will happen if the buffer falls out of scope and is deallocated
+before you free the archive, so make sure that there is a reference to the
+buffer somewhere in your programmer until C<archive_read_free> is called.
+
+=head2 archive_read_set_callback_data
+
+ my $status = archive_read_set_callback_data($archive, $data);
+
+Set the client data for callbacks.
+
+=head2 archive_read_set_close_callback
+
+ my $status = archive_read_set_close_callback($archive, $callback);
+
+Set the close callback for the archive object.
+
+=head2 archive_read_set_filter_option
+
+ my $status = archive_read_set_filter_option($archive, $module, $option, $value);
+
+Specifies an option that will be passed to currently-registered filters 
+(including decompression filters).
+
+If option and value are both C<undef>, these functions will do nothing 
+and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value is 
+not, these functions will do nothing and C<ARCHIVE_FAILED> will be 
+returned.
+
+If module is not C<undef>, option and value will be provided to the filter 
+or reader named module.  The return value will be that of the module.  
+If there is no such module, C<ARCHIVE_FAILED> will be returned.
+
+If module is C<NULL>, option and value will be provided to every registered 
+module.  If any module returns C<ARCHIVE_FATAL>, this value will be 
+returned immediately.  Otherwise, C<ARCHIVE_OK> will be returned if any 
+module accepts the option, and C<ARCHIVE_FAILED> in all other cases.
+
+=head2 archive_read_set_format
+
+ my $status = archive_read_set_format($archive, $format);
+
+Undocumented libarchive function.
+
+=head2 archive_read_set_format_option
+
+ my $status = archive_read_set_format_option($archive, $module, $option, $value);
+
+Specifies an option that will be passed to currently-registered format 
+readers.
+
+If option and value are both C<undef>, these functions will do nothing 
+and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value is 
+not, these functions will do nothing and C<ARCHIVE_FAILED> will be 
+returned.
+
+If module is not C<undef>, option and value will be provided to the filter 
+or reader named module.  The return value will be that of the module.  
+If there is no such module, C<ARCHIVE_FAILED> will be returned.
+
+If module is C<NULL>, option and value will be provided to every registered 
+module.  If any module returns C<ARCHIVE_FATAL>, this value will be 
+returned immediately.  Otherwise, C<ARCHIVE_OK> will be returned if any 
+module accepts the option, and C<ARCHIVE_FAILED> in all other cases.
+
+=head2 archive_read_set_open_callback($archive, $callback)
+
+ my $status = archive_read_set_open_callback($archive, $callback);
+
+Set the open callback for the archive object.
+
+=head2 archive_read_set_option
+
+ my $status = archive_read_set_option($archive, $module, $option, $value);
+
+Calls C<archive_read_set_format_option> then 
+C<archive_read_set_filter_option>.  If either function returns 
+C<ARCHIVE_FATAL>, C<ARCHIVE_FATAL> will be returned immediately.  
+Otherwise, greater of the two values will be returned.
+
+=head2 archive_read_set_options
+
+ my $status = archive_read_set_options($archive, $options);
+
+options is a comma-separated list of options.  If options is C<undef> or 
+empty, C<ARCHIVE_OK> will be returned immediately.
+
+Calls C<archive_read_set_option> with each option in turn.  If any 
+C<archive_read_set_option> call returns C<ARCHIVE_FATAL>, 
+C<ARCHIVE_FATAL> will be returned immediately.
+
+=over 4
+
+=item option=value
+
+The option/value pair will be provided to every module.  Modules that do 
+not accept an option with this name will ignore it.
+
+=item option
+
+The option will be provided to every module with a value of "1".
+
+=item !option
+
+The option will be provided to every module with an C<undef> value.
+
+=item module:option=value, module:option, module:!option
+
+As above, but the corresponding option and value will be provided only 
+to modules whose name matches module.
+
+=back
+
+=head2 archive_read_set_read_callback
+
+ my $status = archive_read_set_read_callback($archive, $callback);
+
+Set the read callback for the archive object.
+
+=head2 archive_read_set_seek_callback
+
+ my $status = archive_read_set_seek_callback($archive, $callback);
+
+Set the seek callback for the archive object.
+
+=head2 archive_read_set_skip_callback
+
+ my $status = archive_read_set_skip_callback($archive, $callback);
+
+Set the skip callback for the archive object.
+
+=head2 archive_read_support_filter_all
+
+ my $status = archive_read_support_filter_all($archive);
+
+Enable all available decompression filters.
+
+=head2 archive_read_support_filter_bzip2
+
+ my $status = archive_read_support_filter_bzip2($archive);
+
+Enable bzip2 decompression filter.
+
+=head2 archive_read_support_filter_compress
+
+ my $status = archive_read_support_filter_compress($archive);
+
+Enable compress decompression filter.
+
+=head2 archive_read_support_filter_grzip
+
+ my $status = archive_read_support_filter_grzip($archive);
+
+Enable grzip decompression filter.
+
+=head2 archive_read_support_filter_gzip
+
+ my $status = archive_read_support_filter_gzip($archive);
+
+Enable gzip decompression filter.
+
+=head2 archive_read_support_filter_lrzip
+
+ my $status = archive_read_support_filter_lrzip($archive);
+
+Enable lrzip decompression filter.
+
+=head2 archive_read_support_filter_lzip
+
+ my $status = archive_read_support_filter_lzip($archive);
+
+Enable lzip decompression filter.
+
+=head2 archive_read_support_filter_lzma
+
+ my $status = archive_read_support_filter_lzma($archive);
+
+Enable lzma decompression filter.
+
+=head2 archive_read_support_filter_lzop
+
+ my $status = archive_read_support_filter_lzop($archive);
+
+Enable lzop decompression filter.
+
+=head2 archive_read_support_filter_none
+
+ my $status = archive_read_support_filter_none($archive);
+
+Enable none decompression filter.
+
+=head2 archive_read_support_filter_program
+
+ my $status = archive_read_support_filter_program($archive, $command);
+
+Data is feed through the specified external program before being
+dearchived.  Note that this disables automatic detection of the
+compression format, so it makes no sense to specify this in
+conjunction with any other decompression option.
+
+=head2 archive_read_support_filter_program_signature
+
+ my $status = archive_read_support_filter_program_signature($archive, $command, $signature);
+
+Data is feed through the specified external program before being
+dearchived, if the signature matches.
+
+=head2 archive_read_support_filter_rpm
+
+ my $status = archive_read_support_filter_rpm($archive);
+
+Enable rpm decompression filter.
+
+=head2 archive_read_support_filter_uu
+
+ my $status = archive_read_support_filter_uu($archive);
+
+Enable uu decompression filter.
+
+=head2 archive_read_support_filter_xz
+
+ my $status = archive_read_support_filter_xz($archive);
+
+Enable xz decompression filter.
+
+=head2 archive_read_support_format_7zip
+
+ my $status = archive_read_support_format_7zip($archive);
+
+Enable 7zip archive format.
+
+=head2 archive_read_support_format_all
+
+ my $status = archive_read_support_format_all($archive);
+
+Enable all available archive formats.
+
+=head2 archive_read_support_format_ar
+
+ my $status = archive_read_support_format_ar($archive);
+
+Enable ar archive format.
+
+=head2 archive_read_support_format_by_code
+
+ my $status = archive_read_support_format_by_code($archive, $code);
+
+Enables a single format specified by the format code.
+
+=head2 archive_read_support_format_cab
+
+ my $status = archive_read_support_format_cab($archive);
+
+Enable cab archive format.
+
+=head2 archive_read_support_format_cpio
+
+ my $status = archive_read_support_format_cpio($archive);
+
+Enable cpio archive format.
+
+=head2 archive_read_support_format_empty
+
+ my $status = archive_read_support_format_empty($archive);
+
+Enable empty archive format.
+
+=head2 archive_read_support_format_gnutar
+
+ my $status = archive_read_support_format_gnutar($archive);
+
+Enable gnutar archive format.
+
+=head2 archive_read_support_format_iso9660
+
+ my $status = archive_read_support_format_iso9660($archive);
+
+Enable iso9660 archive format.
+
+=head2 archive_read_support_format_lha
+
+ my $status = archive_read_support_format_lha($archive);
+
+Enable lha archive format.
+
+=head2 archive_read_support_format_mtree
+
+ my $status = archive_read_support_format_mtree($archive);
+
+Enable mtree archive format.
+
+=head2 archive_read_support_format_rar
+
+ my $status = archive_read_support_format_rar($archive);
+
+Enable rar archive format.
+
+=head2 archive_read_support_format_raw
+
+ my $status = archive_read_support_format_raw($archive);
+
+Enable raw archive format.
+
+=head2 archive_read_support_format_tar
+
+ my $status = archive_read_support_format_tar($archive);
+
+Enable tar archive format.
+
+=head2 archive_read_support_format_xar
+
+ my $status = archive_read_support_format_xar($archive);
+
+Enable xar archive format.
+
+=head2 archive_read_support_format_zip
+
+ my $status = archive_read_support_format_zip($archive);
+
+Enable zip archive format.
+
+=head2 archive_seek_data
+
+ my $count_or_status = archive_seek_data($archive, $offset, $whence);
+
+Seek within the body of an entry.  Similar to C<lseek>.
+
+=head2 archive_set_error
+
+ my $status = archive_set_error($archive, $errno, $format, @args);
+
+Sets the numeric error code and error description that will be returned by
+L<archive_errno|Archive::Libarchive::XS::Function#archive_errno> and L<archive_error_string|Archive::Libarchive::XS::Function#archive_error_string>.  This function should be
+used within I/O callbacks to set system-specific error codes and error
+descriptions.  This function accepts a printf-like format string and
+arguments (via perl's L<sprintf|perlfunc#sprintf>.
+
+=head2 archive_version_number
+
+ my $version = archive_version_number();
+
+Return the libarchive version as an integer.
+
+=head2 archive_version_string
+
+ my $string = archive_version_string();
+
+Return the libarchive as a version.
+
+Returns a string value.
+
+=head2 archive_write_add_filter
+
+ my $status = archive_write_add_filter($archive, $code);
+
+A convenience function to set the filter based on the code.
+
+=head2 archive_write_add_filter_b64encode
+
+ my $status = archive_write_add_filter_b64encode($archive);
+
+Add b64encode filter
+
+=head2 archive_write_add_filter_by_name
+
+ my $status = archive_write_add_filter_by_name($archive, $name);
+
+A convenience function to set the filter based on the name.
+
+=head2 archive_write_add_filter_bzip2
+
+ my $status = archive_write_add_filter_bzip2($archive);
+
+Add bzip2 filter
+
+=head2 archive_write_add_filter_compress
+
+ my $status = archive_write_add_filter_compress($archive);
+
+Add compress filter
+
+=head2 archive_write_add_filter_grzip
+
+ my $status = archive_write_add_filter_grzip($archive);
+
+Add grzip filter
+
+=head2 archive_write_add_filter_gzip
+
+ my $status = archive_write_add_filter_gzip($archive);
+
+Add gzip filter
+
+=head2 archive_write_add_filter_lrzip
+
+ my $status = archive_write_add_filter_lrzip($archive);
+
+Add lrzip filter
+
+=head2 archive_write_add_filter_lzip
+
+ my $status = archive_write_add_filter_lzip($archive);
+
+Add lzip filter
+
+=head2 archive_write_add_filter_lzma
+
+ my $status = archive_write_add_filter_lzma($archive);
+
+Add lzma filter
+
+=head2 archive_write_add_filter_lzop
+
+ my $status = archive_write_add_filter_lzop($archive);
+
+Add lzop filter
+
+=head2 archive_write_add_filter_none
+
+ my $status = archive_write_add_filter_none($archive);
+
+Add none filter
+
+=head2 archive_write_add_filter_program
+
+ my $status = archive_write_add_filter_program($archive, $cmd);
+
+The archive will be fed into the specified compression program. 
+The output of that program is blocked and written to the client
+write callbacks.
+
+=head2 archive_write_add_filter_uuencode
+
+ my $status = archive_write_add_filter_uuencode($archive);
+
+Add uuencode filter
+
+=head2 archive_write_add_filter_xz
+
+ my $status = archive_write_add_filter_xz($archive);
+
+Add xz filter
+
+=head2 archive_write_close
+
+ my $status = archive_write_close($archive)
+
+Complete the archive and invoke the close callback.
+
+=head2 archive_write_data
+
+ my $status = archive_write_data($archive, $buffer);
+
+Write data corresponding to the header just written.
+
+This function returns the number of bytes actually written, or -1 on error.
+
+=head2 archive_write_data_block
+
+ my $count_or_status = archive_write_data_block($archive, $buffer, $offset);
+
+Writes the buffer to the current entry in the given archive
+starting at the given offset.
+
+=head2 archive_write_disk_gid
+
+ my $int64 = archive_write_disk_gid($archive, $string, $int64);
+
+Undocumented libarchive function.
+
+=head2 archive_write_disk_new
+
+ my $archive = archive_write_disk_new();
+
+Allocates and initializes a struct archive object suitable for
+writing objects to disk.
+
+Returns an opaque archive which may be a perl style object, or a C pointer
+(Depending on the implementation), either way, it can be passed into
+any of the write functions documented here with an C<$archive> argument.
+
+=head2 archive_write_disk_set_group_lookup
+
+ my $status = archive_write_disk_set_group_lookup($archive, $data, $lookup_callback, $cleanup_callback);
+
+Register a callback for the lookup of group names from group id numbers.  In order to deregister
+call C<archive_write_disk_set_group_lookup> with both callback functions set to C<undef>.
+
+See L<Archive::Libarchive::XS::Callback> for calling conventions for the lookup and cleanup callbacks.
+
+=head2 archive_write_disk_set_options
+
+ my $status = archive_write_disk_set_options($archive, $flags);
+
+The options field consists of a bitwise OR of one or more of the 
+following values:
+
+=over 4
+
+=item ARCHIVE_EXTRACT_OWNER
+
+=item ARCHIVE_EXTRACT_PERM
+
+=item ARCHIVE_EXTRACT_TIME
+
+=item ARCHIVE_EXTRACT_NO_OVERWRITE
+
+=item ARCHIVE_EXTRACT_UNLINK
+
+=item ARCHIVE_EXTRACT_ACL
+
+=item ARCHIVE_EXTRACT_FFLAGS
+
+=item ARCHIVE_EXTRACT_XATTR
+
+=item ARCHIVE_EXTRACT_SECURE_SYMLINKS
+
+=item ARCHIVE_EXTRACT_SECURE_NODOTDOT
+
+=item ARCHIVE_EXTRACT_SPARSE
+
+=back
+
+=head2 archive_write_disk_set_skip_file
+
+ my $status = archive_write_disk_set_skip_file($archive, $device, $inode);
+
+Records the device and inode numbers of a file that should not be 
+overwritten.  This is typically used to ensure that an extraction 
+process does not overwrite the archive from which objects are being 
+read.  This capability is technically unnecessary but can be a 
+significant performance optimization in practice.
+
+=head2 archive_write_disk_set_standard_lookup
+
+ my $status = archive_write_disk_set_standard_lookup($archive);
+
+This convenience function installs a standard set of user and
+group lookup functions.  These functions use C<getpwnam> and
+C<getgrnam> to convert names to ids, defaulting to the ids
+if the names cannot be looked up.  These functions also implement
+a simple memory cache to reduce the number of calls to 
+C<getpwnam> and C<getgrnam>.
+
+=head2 archive_write_disk_set_user_lookup
+
+ my $status = archive_write_disk_set_user_lookup($archive, $data, $lookup_callback, $cleanup_callback);
+
+Register a callback for the lookup of user names from user id numbers.  In order to deregister
+call C<archive_write_disk_set_user_lookup> with both callback functions set to C<undef>.
+
+See L<Archive::Libarchive::XS::Callback> for calling conventions for the lookup and cleanup callbacks.
+
+=head2 archive_write_disk_uid
+
+ my $int64 = archive_write_disk_uid($archive, $string, $int64);
+
+Undocumented libarchive function.
+
+=head2 archive_write_fail
+
+ my $status = archive_write_fail($archive);
+
+Marks the archive as FATAL so that a subsequent C<free> operation
+won't try to C<close> cleanly.  Provides a fast abort capability
+when the client discovers that things have gone wrong.
+
+=head2 archive_write_finish_entry
+
+ my $status = archive_write_finish_entry($archive)
+
+Close out the entry just written.  Ordinarily, 
+clients never need to call this, as it is called 
+automatically by C<archive_write_next_header> and 
+C<archive_write_close> as needed.  However, some
+file attributes are written to disk only after 
+the file is closed, so this can be necessary 
+if you need to work with the file on disk right away.
+
+=head2 archive_write_free
+
+ my $status = archive_write_free($archive);
+
+Invokes C<archive_write_close> if it was not invoked manually, then
+release all resources.
+
+=head2 archive_write_get_bytes_in_last_block
+
+ my $count = archive_write_get_bytes_per_block($archive);
+
+Retrieve the currently-set value for last block size.  A value of -1 
+here indicates that the library should use default values.
+
+=head2 archive_write_get_bytes_per_block
+
+ my $count = archive_write_get_bytes_per_block($archive);
+
+Retrieve the block size to be used for writing.  A value of -1 here 
+indicates that the library should use default values.  A value of zero 
+indicates that internal blocking is suppressed.
+
+=head2 archive_write_header
+
+ my $status = archive_write_header($archive, $entry);
+
+Build and write a header using the data in the provided struct archive_entry structure.
+You can use C<archive_entry_new> to create an C<$entry> object and populate it with
+C<archive_entry_set*> functions.
+
+=head2 archive_write_new
+
+ my $archive = archive_write_new();
+
+Allocates and initializes a archive object suitable for writing an new archive.
+Returns an opaque archive which may be a perl style object, or a C pointer
+(depending on the implementation), either way, it can be passed into
+any of the write functions documented here with an C<$archive> argument.
+
+=head2 archive_write_open
+
+ my $status = archive_write_open($archive, $data, $open_cb, $read_cb, $close_cb);
+
+Freeze the settings, open the archive, and prepare for writing entries.  This is the most
+generic form of this function, which accepts pointers to three callback functions which will
+be invoked by the compression layer to write the constructed archive.
+
+=head2 archive_write_open_fh
+
+ my $status = archive_write_open_fh($archive, $fh);
+
+A convenience form of archive_write_open() that accepts a file descriptor.  Note
+that the file handle will not be automatically closed.
+
+There is no corresponding archive_read_write_fh in the C version of libarchive.
+This is provided in the place of C<archive_write_open_FILE> and C<archive_write_open_fd>,
+which are not in the Perl bindings for libarchive.
+
+=head2 archive_write_open_filename
+
+ my $status = archive_write_open_filename($archive, $filename);
+
+A convenience form of C<archive_write_open> that accepts a filename.  If you have 
+not invoked C<archive_write_set_bytes_in_last_block>, then 
+C<archive_write_open_filename> will adjust the last-block padding depending on the 
+file: it will enable padding when writing to standard output or to a character or 
+block device node, it will disable padding otherwise.  You can override this by 
+manually invoking C<archive_write_set_bytes_in_last_block> before C<calling 
+archive_write_open>.  The C<archive_write_open_filename> function is safe for use 
+with tape drives or other block-oriented devices.
+
+If you pass in C<undef> as the C<$filename>, libarchive will write the
+archive to standard out.
+
+=head2 archive_write_open_memory
+
+ my $status = archive_write_open_memory($archive, \$scalar);
+
+A convenience form of L<archive_write_open|Archive::Libarchive::XS::Function#archive_write_open> that accepts a reference to a scalar that will receive the archive.
+
+=head2 archive_write_set_bytes_in_last_block
+
+ my $status = archive_write_set_bytes_in_last_block($archive, $bytes_in_last_block);
+
+Sets the block size used for writing the last block.  If this value is 
+zero, the last block will be padded to the same size as the other 
+blocks.  Otherwise, the final block will be padded to a multiple of this 
+size.  In particular, setting it to 1 will cause the final block to not 
+be padded.  For compressed output, any padding generated by this option 
+is applied only after the compression.  The uncompressed data is always 
+unpadded.  The default is to pad the last block to the full block size 
+(note that C<archive_write_open_filename> will set this based on the file 
+type).  Unlike the other "set" functions, this function can be called 
+after the archive is opened.
+
+=head2 archive_write_set_bytes_per_block
+
+ my $status = archive_write_set_bytes_per_block($archive, $bytes_per_block);
+
+Sets the block size used for writing the archive data.  Every call to 
+the write callback function, except possibly the last one, will use this 
+value for the length.  The default is to use a block size of 10240 
+bytes.  Note that a block size of zero will suppress internal blocking 
+and cause writes to be sent directly to the write callback as they 
+occur.
+
+=head2 archive_write_set_filter_option($archive, $module, $option, $value)
+
+ my $status = archive_write_set_filter_option($archive, $module, $option, $value);
+
+Specifies an option that will be passed to currently-registered filters
+(including decompression filters).
+
+If option and value are both C<undef>, these functions will do nothing 
+and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value
+is not, these functions will do nothing and C<ARCHIVE_FAILED> will
+be returned.
+
+If module is not C<undef>, option and value will be provided to the
+filter or reader named module.  The return value will be that of
+the module.  If there is no such module, C<ARCHIVE_FAILED> will be
+returned.
+
+If module is C<undef>, option and value will be provided to every
+registered module.  If any module returns C<ARCHIVE_FATAL>, this
+value will be returned immediately.  Otherwise, C<ARCHIVE_OK> will
+be returned if any module accepts the option, and C<ARCHIVE_FAILED>
+in all other cases.
+
+=head2 archive_write_set_format
+
+ my $status = archive_write_set_format($archive, $code);
+
+A convenience function to set the format based on the code.
+
+=head2 archive_write_set_format_7zip($archive)
+
+ my $status = archive_write_set_format_7zip($archive);
+
+Set the archive format to 7zip
+
+=head2 archive_write_set_format_ar_bsd($archive)
+
+ my $status = archive_write_set_format_ar_bsd($archive);
+
+Set the archive format to ar_bsd
+
+=head2 archive_write_set_format_ar_svr4($archive)
+
+ my $status = archive_write_set_format_ar_svr4($archive);
+
+Set the archive format to ar_svr4
+
+=head2 archive_write_set_format_by_name
+
+ my $status = archive_write_set_format_by_name($archive, $name);
+
+A convenience function to set the format based on the name.
+
+=head2 archive_write_set_format_cpio($archive)
+
+ my $status = archive_write_set_format_cpio($archive);
+
+Set the archive format to cpio
+
+=head2 archive_write_set_format_cpio_newc($archive)
+
+ my $status = archive_write_set_format_cpio_newc($archive);
+
+Set the archive format to cpio_newc
+
+=head2 archive_write_set_format_gnutar($archive)
+
+ my $status = archive_write_set_format_gnutar($archive);
+
+Set the archive format to gnutar
+
+=head2 archive_write_set_format_iso9660($archive)
+
+ my $status = archive_write_set_format_iso9660($archive);
+
+Set the archive format to iso9660
+
+=head2 archive_write_set_format_mtree($archive)
+
+ my $status = archive_write_set_format_mtree($archive);
+
+Set the archive format to mtree
+
+=head2 archive_write_set_format_mtree_classic($archive)
+
+ my $status = archive_write_set_format_mtree_classic($archive);
+
+Set the archive format to mtree_classic
+
+=head2 archive_write_set_format_old_tar($archive)
+
+ my $status = archive_write_set_format_old_tar($archive);
+
+Set the archive format to old_tar
+
+=head2 archive_write_set_format_option
+
+ my $status = archive_write_set_format_option($archive, $module, $option, $value);
+
+Specifies an option that will be passed to currently-registered format 
+readers.
+
+If option and value are both C<undef>, these functions will do nothing 
+and C<ARCHIVE_OK> will be returned.  If option is C<undef> but value
+is not, these functions will do nothing and C<ARCHIVE_FAILED> will
+be returned.
+
+If module is not C<undef>, option and value will be provided to the
+filter or reader named module.  The return value will be that of
+the module.  If there is no such module, C<ARCHIVE_FAILED> will be
+returned.
+
+If module is C<undef>, option and value will be provided to every
+registered module.  If any module returns C<ARCHIVE_FATAL>, this
+value will be returned immediately.  Otherwise, C<ARCHIVE_OK> will
+be returned if any module accepts the option, and C<ARCHIVE_FAILED>
+in all other cases.
+
+=head2 archive_write_set_format_pax($archive)
+
+ my $status = archive_write_set_format_pax($archive);
+
+Set the archive format to pax
+
+=head2 archive_write_set_format_pax_restricted($archive)
+
+ my $status = archive_write_set_format_pax_restricted($archive);
+
+Set the archive format to pax_restricted
+
+=head2 archive_write_set_format_shar($archive)
+
+ my $status = archive_write_set_format_shar($archive);
+
+Set the archive format to shar
+
+=head2 archive_write_set_format_shar_dump($archive)
+
+ my $status = archive_write_set_format_shar_dump($archive);
+
+Set the archive format to shar_dump
+
+=head2 archive_write_set_format_ustar($archive)
+
+ my $status = archive_write_set_format_ustar($archive);
+
+Set the archive format to ustar
+
+=head2 archive_write_set_format_v7tar($archive)
+
+ my $status = archive_write_set_format_v7tar($archive);
+
+Set the archive format to v7tar
+
+=head2 archive_write_set_format_xar($archive)
+
+ my $status = archive_write_set_format_xar($archive);
+
+Set the archive format to xar
+
+=head2 archive_write_set_format_zip($archive)
+
+ my $status = archive_write_set_format_zip($archive);
+
+Set the archive format to zip
+
+=head2 archive_write_set_option
+
+ my $status = archive_write_set_option($archive, $module, $option, $value);
+
+Calls C<archive_write_set_format_option>, then 
+C<archive_write_set_filter_option>. If either function returns 
+C<ARCHIVE_FATAL>, C<ARCHIVE_FATAL> will be returned immediately.  
+Otherwise, greater of the two values will be returned.
+
+=head2 archive_write_set_options
+
+ my $status = archive_write_set_options($archive, $options);
+
+options is a comma-separated list of options.  If options is C<undef> or 
+empty, C<ARCHIVE_OK> will be returned immediately.
+
+Individual options have one of the following forms:
+
+=over 4
+
+=item option=value
+
+The option/value pair will be provided to every module.  Modules that do 
+not accept an option with this name will ignore it.
+
+=item option
+
+The option will be provided to every module with a value of "1".
+
+=item !option
+
+The option will be provided to every module with a NULL value.
+
+=item module:option=value, module:option, module:!option
+
+As above, but the corresponding option and value will be provided only 
+to modules whose name matches module.
+
+=back
+
+=head2 archive_write_set_skip_file
+
+ my $status = archive_write_set_skip_file($archive, $dev, $ino);
+
+The dev/ino of a file that won't be archived.  This is used
+to avoid recursively adding an archive to itself.
+
+=head2 archive_write_zip_set_compression_deflate
+
+ my $status = archive_write_zip_set_compression_deflate($archive);
+
+Set the compression method for the zip archive to deflate.
+
+=head2 archive_write_zip_set_compression_store
+
+ my $status = archive_write_zip_set_compression_store($archive);
+
+Set the compression method for the zip archive to store.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Archive::Libarchive::XS>
+
+=item L<Archive::Libarchive::XS::Constant>
+
+=item L<Archive::Libarchive::XS::Callback>
+
+=back
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

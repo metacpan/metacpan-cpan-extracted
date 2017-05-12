@@ -1,0 +1,94 @@
+2.10 - Mon Mar 31 20:05:00 EST 2014
+
+Update Makefile.PL to call build_config before referencing it as that seems to no longer happen automatically. Fixes build issue with perl 5.14 and later
+
+2.09 - Tues Mar 4 15:58:00 EST 2008
+
+Only process request if we're enabled for this uri (Patch from Gozer)
+
+Improve apr header detection for build. (Some distributions install in ../include/apr, some in ../include/apr-1)
+
+
+2.07 - dev
+
+Apache::Scoreboard::image() now does magic so that image(new APR::Pool) doesn't segfault    - Stas
+
+ported to modperl 2.0 API changes   - MJH
+
+2.06 - Fri Mar 18 13:50:49 EST 2005
+
+fix the buggy reconstruction of the fetched binary image in thaw()
+
+fix start_time(), stop_time() to return usecs as the second argument
+
+Revamping docs (still needs more work) 
+
+Extending tests to test all worker score methods
+
+
+2.05 - Sun Feb 27 11:16:46 EST 2005
+
+apxs/mod_scoreboard_send.c has been ported to Apache 2.0
+
+Apache::DummyScoreboard was ported to mp2 (this is used to process a
+scoreboard outside running Apache).
+
+when freezing/sending don't try to figure out what are the live
+servers, since a sequential search doesn't work. if a server went
+away, there will be a hole, e.g. if C goes down in ABCDE, we will get
+ABXDE and send only AB info. so just send them all
+
+added new methods $image->thread_limit and $image->server_limit and
+deprecated the Apache::Const::SERVER_LIMIT and
+Apache::Const::THREAD_LIMIT constants, since those are correct and
+useful only for the image of the Apache server parsed from within the
+running server.
+
+use the passed image object, rather than accessing the global
+ap_scoreboard_image. Previously we have switched to use Apache
+accessors, instead of accessing the struct directly, but the problem
+was that we no longer processed the real image object. So if the
+script has acquired a different image (not the one seen by the current
+process), we were handing bogus information. Now this has been fixed
+by copying the apache accessors and changing them to use the passed
+image.
+
+correct docs s/parent/parent_score/
+
+
+2.04 - Sat Jan 22 00:13:35 EST 2005
+
+s/sv_setpvf/Perl_sv_setpvf/ to support perls that don't have this
+macro [Markus Wichitill <mawic@gmx.de>]
+
+tests config: s/PerlHandler/PerlResponseHandler/ [Markus Wichitill
+<mawic@gmx.de>]
+
+
+
+2.03 - Sun Jan  2 17:24:54 EST 2005
+
+in thaw() replace the usage of memmove with apr_pmemdup, since objects
+created by the pool, can't mix memmove with apr pool allocation (found
+this problem after apr was compiled with CPPFLAGS="-DAPR_BUCKET_DEBUG"
+--enable-pool-debug, were getting segfaults when the pool was
+destroyed)
+
+
+
+2.02 - Tue Nov  9 18:50:29 EST 2004
+
+- sync with mp2 API changed (s/APR::OS::Thread/U32/) and require
+  1.99_17 where that change has happened
+
+
+
+2.01 - Mon Dec 22 12:52:11 PST 2003
+
+- forgot to require mod_perl 1.99_12
+
+
+
+2.0 - Mon Dec 22 12:00:11 PST 2003
+
+- First new generation release: work with Apache 2.0

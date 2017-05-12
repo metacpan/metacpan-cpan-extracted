@@ -1,0 +1,22 @@
+---
+default_site: homepage
+sites:
+    homepage:
+        base_upload_cmd:
+            - 'rsync'
+            - '-a'
+            - '-v'
+            - '--progress'
+            - '--inplace'
+        dest_upload_prefix: 'hostgator:public_html/'
+        dest_upload_url_prefix: 'http://www.shlomifish.org/'
+        sections:
+            code:
+                basename_re: '\.(?:pl|pm|c|py|js)\z'
+                target_dir: 'Files/files/code/'
+            music:
+                basename_re: '\.(?:mp3|ogg|wav|aac|m4a)\z'
+                target_dir: 'Files/files/music/mp3-ogg/'
+            video:
+                basename_re: '\.(?:webm|flv|avi|mpeg|mpg|mp4|ogv)\z'
+                target_dir: 'Files/files/video/'

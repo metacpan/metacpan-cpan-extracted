@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+eg/fact.pl
+lib/Acme/Takahashi/Method.pm
+t/0-require.t
+META.yml                                 Module meta-data (added by MakeMaker)

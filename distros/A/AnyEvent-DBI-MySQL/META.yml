@@ -1,0 +1,50 @@
+---
+abstract: 'Asynchronous MySQL queries'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Test::Database: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-DBI-MySQL
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  AnyEvent::DBI::MySQL:
+    file: lib/AnyEvent/DBI/MySQL.pm
+    version: v2.1.0
+  AnyEvent::DBI::MySQL::db:
+    file: lib/AnyEvent/DBI/MySQL.pm
+    version: v2.1.0
+  AnyEvent::DBI::MySQL::st:
+    file: lib/AnyEvent/DBI/MySQL.pm
+    version: v2.1.0
+  AnyEvent::DBI::MySQL::st::ready:
+    file: lib/AnyEvent/DBI/MySQL.pm
+    version: v2.1.0
+requires:
+  AnyEvent: '0'
+  DBD::mysql: '0'
+  DBI: '0'
+  Scalar::Util: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/perl-AnyEvent-DBI-MySQL/issues
+  homepage: https://github.com/powerman/perl-AnyEvent-DBI-MySQL
+  repository: https://github.com/powerman/perl-AnyEvent-DBI-MySQL.git
+version: v2.1.0

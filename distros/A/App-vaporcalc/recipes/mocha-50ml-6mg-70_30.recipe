@@ -1,0 +1,38 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Sweet Cream",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Marshmallow",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Tiramisu",
+            "percentage" : "1"
+         },
+         {
+            "type" : "PG",
+            "tag" : "E.M.",
+            "percentage" : "1"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Chocolate Dark",
+            "percentage" : "4"
+         }
+      ],
+      "target_pg" : "30",
+      "base_nic_per_ml" : "100",
+      "base_nic_type" : "PG",
+      "target_quantity" : "50",
+      "target_nic_per_ml" : "6",
+      "target_vg" : 70,
+      "notes" : []
+   }
+}

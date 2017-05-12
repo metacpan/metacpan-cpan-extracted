@@ -1,0 +1,52 @@
+Apache2-Mogile-Dispatch
+
+Apache2::Mogile::Dispatch is an apache 2.x mod_perl module that makes it easy
+to dispatch incoming requests between mogile storage nodes and regular web
+servers. Consider it like a fancy pure perl mod_rewrite replacement that can
+intelligently reproxy requests.
+
+This is ideal for websites that server a sizable amount of static content and
+would like to transition to mogileFS.
+
+The goal of this module is to be as small and simple as possible but flexible
+enough for large websites to run efficiently and effectively. This module is
+meant to up sub-classed and the default configuration will more than likely
+NOT work. Please see the section on subclassing for more information. The test
+suite also includes several example subclasses ranging from simple to complex.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Apache2::Mogile::Dispatch
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Apache2-Mogile-Dispatch
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache2-Mogile-Dispatch
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Apache2-Mogile-Dispatch
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Apache2-Mogile-Dispatch
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Nick Gerakines
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

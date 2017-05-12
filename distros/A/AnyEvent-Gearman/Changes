@@ -1,0 +1,57 @@
+Revision history for Perl extension AnyEvent::Gearman
+
+0.10  2013-02-05T11:14:40
+      - Fix memory leak (patch by athomason@github)
+
+0.09  2010-10-12T16:55:14+09:00
+      - added MouseX::Foreign support.
+      - to adding above change, depands latest Mouse and MouseX::Foreign
+
+0.08  2010-03-15T10:06:54+09:00
+      - fixed a typo at documentation (reported by clkao++)
+
+0.07  2010-03-11T12:04:42+09:00
+      - added prefix support on AnyEvent::Gearman::Client
+
+0.06  2009-11-19T19:49:33+09:00
+      - return on_fail event when unexpected connection error
+
+0.05  2009-10-31T11:25:39+09:00
+      - run test both Mouse/Moose
+      - remove Data::UUID dependency its no longer necessary
+      - add melo to stopwords ;)
+      - fix wrong deep coercion (reported by miyagawa++)
+
+0.04  2009-10-15T10:23:42+09:00
+      - melo++ did several fixes listed below
+      - added the add_task_bg() API for background jobs;
+      - a couple of fixes here and there:
+      - the usage gearman_worker('127.0.0.1') or gearman_client('127.0.0.1')
+        was failing with "modification of read-only value message";
+      - Added missing dependencies: Test::Base and others. I wonder why you use Test::Base though, I don't think its maintained anymore, and the latest Test::More with the done_testing() API do most of what I liked on Test::Base;
+      - fixed a bug in Worker where he would not grab a new job after being done with the first one;
+      - a bit of cleanups in the test directory;
+
+0.03002 2009-09-15T14:33:50+09:00
+      - depends latest Test::TCP
+
+0.03001 2009-09-07T12:06:50+09:00
+      - fix test worker perl path (Reported by Kentaro Kuribayashi)
+
+0.03  2009-09-07T10:46:26+09:00
+      - remove isa constraints for 'Guard', it's not used when PP mode.
+      - add sleep in testcases for waiting server available
+
+0.02  2009-09-03T18:25:40+09:00
+      - change task uuid default value to ''
+      - fix pod typos
+
+0.01002 2009-09-03T10:19:58+09:00
+      - add a missing prereq
+
+0.01001 2009-09-02T18:05:37+09:00
+      - fixed test's stupid END block (miyagawa++)
+      - depends latest AnyEvent (tokuhirom++)
+
+0.01  2009-09-02T16:13:24+09:00
+      - original version

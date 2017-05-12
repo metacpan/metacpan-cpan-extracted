@@ -1,0 +1,22 @@
+<article>
+<header>
+  <h1>
+    Oops!
+  </h1>
+</header>
+<section>
+  <p class="lead text-danger">
+    <b>[% error.http_code | html %]</b>
+    <i>[% error.simple_message | html %]</i>
+  </p>
+  [% IF error.http_code == 403 || error.http_code == 401 %]
+  <p>Do you need to log in?</p>
+  [% ELSE %]
+  <p>That means something went wrong...</p>
+  [% END %]
+  <p>Since this is just a bit of fun, let's dump the whole stack trace so you can see the full story:</p>
+  <pre>[% error.stack_trace.as_string | html %]</pre>
+</section>
+<footer>
+</footer>
+</article>

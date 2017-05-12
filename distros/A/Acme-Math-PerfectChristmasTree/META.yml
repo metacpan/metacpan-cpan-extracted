@@ -1,0 +1,31 @@
+---
+abstract: 'Calculate the perfect Christmas tree'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::Exception: 0.31
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Math-PerfectChristmasTree
+no_index:
+  directory:
+    - inc
+provides:
+  Acme::Math::PerfectChristmasTree:
+    file: lib/Acme/Math/PerfectChristmasTree.pm
+    version: 0.02
+requires:
+  Carp: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/moznion/p5-Acme--Math--PerfectChristmasTree.git
+version: 0.02

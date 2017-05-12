@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - 'Sergey Leschenko <sergle.ua at gmail.com>'
+  - 'PortaOne <perl-radius at portaone.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Radius
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle::UDP: '0'
+  Class::Accessor::Fast: '0'
+  Data::Radius: '0'
+  perl: v5.10.0
+version: v1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

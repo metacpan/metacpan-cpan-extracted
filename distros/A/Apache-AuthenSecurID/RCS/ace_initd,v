@@ -1,0 +1,267 @@
+head	1.4;
+access;
+symbols;
+locks;
+comment	@# @;
+
+
+1.4
+date	2001.06.22.19.08.46;	author root;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2001.06.19.17.15.33;	author root;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2001.06.19.17.13.44;	author root;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2001.06.15.18.45.54;	author root;	state Exp;
+branches;
+next	;
+
+
+desc
+@Created
+@
+
+
+1.4
+log
+@docs
+@
+text
+@#!/usr/local/bin/perl
+
+# $Id: ace_initd,v 1.3 2001/06/19 17:15:33 root Exp root $
+
+use Authen::ACE;
+use IO::Socket::INET;
+use Sys::Syslog;
+use Crypt::CBC;
+use Config::General;
+
+my $conf = new Config::General("/etc/ace_initd.conf");
+my %config = $conf->getall;
+
+$ENV{'VAR_ACE'} = $config{'VAR_ACE'};
+
+my $port = $config{'port'} || 1969;
+my $syslog = $config{'syslog'} || "local2";
+my $secret = $config{'AuthCryptKey'} || "secret";
+
+my $crypt = new Crypt::CBC ( $secret, "Blowfish" );
+
+my $server = IO::Socket::INET->new (	LocalPort	=>	$port,
+                                        Proto		=>	'udp' )
+    or die "Couldn't be a tcp server on port $port: $!\n";
+
+
+openlog ( 'ace_initd', 'nowait', $syslog );
+
+my %ACE;
+my $mesg;
+my $result;
+my $request;
+my $info;
+my $pid;
+my $rand;
+
+
+
+while ( $server->recv($mesg, 1024) ) {
+   $mesg = $crypt->decrypt_hex ( $mesg );
+   my ( $rand, $request, $type, $username, $passcode ) = split /\:/, $mesg;
+      eval {
+   	if ( ! $ACE{$request} ) {
+	   $ACE{$request} = new Authen::ACE;
+   	}
+   	if ( $type eq "check" ) {
+	   ($result,$info) = $ACE{$request}->Check($passcode,$username);
+   	}
+   	if ( $type eq "next" ) {
+	   ($result,$info) = $ACE{$request}->Next($passcode);
+    	}
+   	if ( $type eq "pin" ) {
+	   ($result,$info) = $ACE{$request}->PIN($passcode);
+   	}
+   	if ( $result != 5 && $result != 2 ) {
+	   delete $ACE{$request};
+	} 
+      };
+   if ( $@@ ) {
+	$result = 1;	   
+   	syslog ( 'err', '$type $username $result via exception');
+   }
+
+   syslog ( 'info', '$type $username $result:$$info{system_pin}:$$info{min_pin_len}:$$info{max_pin_len}:$$info{alphanumeric}:$$info{user_selectable}');
+	if ( $result ) {
+   		$mesg = "$rand:$result:$$info{system_pin}:$$info{min_pin_len}:$$info{max_pin_len}:$$info{alphanumeric}:$$info{user_selectable}";
+	} else {
+		$mesg = "$rand:$result:::::";
+	}
+   $mesg = $crypt->encrypt_hex ( $mesg );
+   $server->send ($mesg);
+}
+
+
+
+
+__END__
+
+=head1 NAME
+
+ace_initd -  ACE Authentication daemon for Apache::AuthenSecurID::Auth 
+
+=head1 SYNOPSIS
+
+ # Configuration in /etc/ace_initd.conf   
+
+ VAR_ACE /the/ace/data/directory
+ port 1969 
+ AuthCryptKey Encryption_Key
+ syslog local2
+
+
+=head1 DESCRIPTION
+
+This daemon handles the ACE authentication requests for the 
+Apache::SecurID::Auth module.  It is a single threaded, single
+fork server that listens on a specified UDP port.  Incoming requests
+are decrypted and requests forwarded to the ACE server.  If a specific
+request is in either in NEXT TOKEN MODE or SET PIN MODE the Authen::ACE
+object is not deleted.  It is instead kept in memory to handle those
+specific requests later.
+
+
+=head1 LIST OF TOKENS
+
+
+=item *
+VAR_ACE
+
+Specifies the location of the F<sdconf.rec> file.  It defaults to 
+F</opt/ace/data> if this variable is not set.
+
+=item *
+AuthCryptKey
+
+The Blowfish key used to encrypt and decrypt the authentication cookie. 
+It defaults to F<my secret> if this variable is not set.
+
+=item *
+ace_initd_port
+
+The port the that the Ace request daemon listens on.  It defaults to F<1969> 
+if this variable is not set.
+
+=item *
+syslog
+
+The syslog facility ace_initd logs to.  It defaults to F<local2> 
+if this variable is not set.
+
+
+=head1 CONFIGURATION
+
+Either run from the command line;
+
+prompt$ nohup ./ace_initd &
+
+or write the appropriate scripts in the /etc/rc directories.
+
+=head1 PREREQUISITES
+
+
+ace_initd requires Crypt::Blowfish, Crypt::CBC and Authen::ACE.
+
+
+=head1 SEE ALSO
+
+L<Authen::ACE> L<Apache::AuthenSecurID> L<Apache::AuthenSecurID::Auth>
+
+=head1 AUTHORS
+
+=item *
+mod_perl by Doug MacEachern <dougm@@osf.org>
+
+=item *
+Authen::ACE by Dave Carrigan <Dave.Carrigan@@iplenergy.com>
+
+=item *
+Apache::AuthenSecurID by David Berk <dberk@@lump.org>
+
+=item *
+Apache::AuthenSecurID::Auth by David Berk <dberk@@lump.org>
+
+=head1 COPYRIGHT
+
+ace_initd is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+=cut
+
+@
+
+
+1.3
+log
+@*** empty log message ***
+@
+text
+@d3 1
+a3 1
+# $Id: ace_initd,v 1.2 2001/01/18 20:50:27 root Exp $
+d17 1
+a17 1
+my $syslog = $config{'syslog'} || LOG_LOCAL_2;
+d24 1
+a24 1
+    or die "Couldn't be a tcp server on port 1010: $!\n";
+d27 1
+a27 1
+openlog ( 'ace_initd', '', $syslog );
+d76 94
+@
+
+
+1.2
+log
+@*** empty log message ***
+@
+text
+@d3 2
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d7 1
+d9 2
+a10 1
+$ENV{'VAR_ACE'} = "/opt/ace/data";
+d12 1
+a12 1
+$SIG{CHLD} = 'IGNORE';
+d14 3
+a16 1
+my $crypt = new Crypt::CBC ( "this is the key", "Blowfish" );
+d18 1
+d20 1
+a20 1
+my $server = IO::Socket::INET->new (	LocalPort	=>	1969,
+d25 1
+a25 1
+openlog ( 'ace_initd', '', 'LOG_LOCAL_2' );
+d66 1
+a66 1
+		$mesg = "$rand:$results:::::";
+@

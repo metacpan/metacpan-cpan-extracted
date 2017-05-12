@@ -1,0 +1,41 @@
+Revision history for Perl extension Acme::Nyaa
+
+0.0.10  Wed, 25 Sep 2013 19:22:22 +0900 (JST)
+    - Convert a character entity reference to a character itself for parsing HTML.
+    - Support Shift-JIS, ISO-2022-JP, and EUC-JP at Acme::Nyaa::Ja.
+
+0.0.9   Thu, 19 Sep 2013 00:22:22 +0900 (JST)
+    - Tiny code refactoring at Acme::Nyaa::Ja.
+    - Sample PSGI application: eg/nyaaproxy.psgi
+
+0.0.8   Wed, 10 Jul 2013 20:06:23 +0900 (JST)
+    - Module::Install => Minilla
+
+0.0.7   Mon, 25 Mar 2013 12:22:59 +0900 (JST)
+    - Fixed an issue that Acme-Nyaa-0.0.6 fails for lack of t/a-part-of-i-am-a-cat.ja.txt.
+      Thanks to CPAN Testers.
+    - Fixed straycat() method in Acme::Nyaa::Ja.
+
+0.0.6   Sun, 24 Mar 2013 06:12:02 +0900 (JST)
+    - Implement new instance method ``straycat''.
+    - Improved sample script bin/nyaa .
+
+0.0.5   Tue, 26 Feb 2013 12:22:22 +0900 (JST)
+    - use 5.10.1 (parent.pm has been appeared from 5.10.1) at Acme::Nyaa::Ja.
+      See http://www.cpantesters.org/cpan/report/65daccb2-7d93-11e2-a7ac-bc45f1f528ea
+      Thanks to Chris Williams (BINGOS)
+
+0.0.4   Fri, 22 Feb 2013 20:24:56 +0900 (JST)
+    - 22 Feb, Happy Cat Day !
+    - Code and test refactoring.
+
+0.0.3   Thu, 14 Feb 2013 20:24:45 +0900 (JST)
+    - First Release on CPAN.
+    - Register bin/nyaa as a sample script.
+
+0.0.2   Wed, 13 Feb 2013 19:48:13 +0900 (JST)
+    - use version;
+    - Acme::Nyaa::Ja support EUC-JP, ISO-2022-JP, and Shift-JIS.
+
+0.01    Sat Feb 11 17:00:00 2013
+    - First release

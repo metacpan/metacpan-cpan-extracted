@@ -1,0 +1,9 @@
+Revision history for Perl extension App::PLab.
+
+0.01  Thu Sep 30 17:41:47 1999
+	- original version; created by h2xs 1.18
+
+0.02  Aug 12 2015
+        - some refreshments
+
+0.03  s/IPA/Prima::IPA/

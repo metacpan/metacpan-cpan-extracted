@@ -1,0 +1,102 @@
+This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
+
+0.001002
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / develop recommends]
+ - Test::More 0.99
+
+ [Added / develop requires]
+ - Dist::Zilla 5
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.004002
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0.001002
+ - Dist::Zilla::Plugin::Bootstrap::lib
+ - Dist::Zilla::Plugin::BumpVersionAfterRelease
+ - Dist::Zilla::Plugin::CopyFilesFromBuild
+ - Dist::Zilla::Plugin::ExecDir
+ - Dist::Zilla::Plugin::Git::Contributors 0.006
+ - Dist::Zilla::Plugin::MetaYAML::Minimal
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+ - Dist::Zilla::Plugin::PruneFiles
+ - Dist::Zilla::Plugin::Readme::Brief
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized
+ - Dist::Zilla::Plugin::Test::EOL
+ - English
+ - Software::License::Perl_5
+ - Test::EOL
+ - Test::MinimumVersion
+ - Test::More 0.96
+
+ [Added / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.002006
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.025021
+
+ [Added / runtime recommends]
+ - Path::Tiny 0.058
+
+ [Added / test requires]
+ - File::Spec
+ - perl 5.006
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.94 → 7.00
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Git::NextRelease 0 → 0.004000
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 0 → 1.004000
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+ - Test::Kwalitee 1.12 → 1.21
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test recommends]
+ - CPAN::Meta 0 → 2.120900
+ - ExtUtils::MakeMaker 6.94 → 7.00
+ - Test::More 1.001003 → 0.99
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::EOLTests
+ - Dist::Zilla::Plugin::Git::NextVersion::Sanitized
+ - Dist::Zilla::Plugin::MetaYAML
+ - Dist::Zilla::Plugin::PkgVersion
+ - Dist::Zilla::Plugin::ReadmeFromPod
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.012001
+
+ [Removed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.3.0
+
+ [Removed / runtime requires]
+ - utf8
+
+ [Removed / test recommends]
+ - CPAN::Meta::Requirements 2.120900
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+0.001001 2014-03-30T20:31:50Z
+ [Added / develop requires]
+ - Pod::Coverage::TrustPod
+ - Test::Pod::Coverage 1.08
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.90 → 6.94
+
+ [Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.012000 → 2.012001
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.90 → 6.94
+ - Test::More 1.001002 → 1.001003

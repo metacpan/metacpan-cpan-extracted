@@ -1,0 +1,55 @@
+Revision history for Acme-CPANAuthors-Japanese
+
+0.161210 2016/12/10
+  - YAPC::Hokkaido update
+
+0.161021 2016/10/21
+  - hurray for ISUCON #6 / Fukuoka.pm #27 update
+
+0.150912 2015/09/12
+  - Fukuoka.pm #26 update
+
+0.140828 2014/08/28
+  - YAPC::Asia 2014 update
+
+0.131002 2013/10/02
+  - applied more liberal detection rule and added twelve people
+    (again)
+
+0.130930 2013/09/30
+  - applied more liberal detection rule and added twelve people
+
+0.130919 2013/09/19
+  - YAPC::Asia 2013 update
+
+0.130307 2013/03/07
+  - turned out to have long ignored authors whose emails are CENSORED;
+    added nearly hundred people to the list.
+
+0.130104 2013/01/04
+  - Happy new year 2013 update
+
+0.120927 2012/09/27
+  - YAPC::Asia 2012 update
+
+0.111012 2011/10/12
+  - no list changes; just forgot to update Changes
+
+0.111011 2011/10/11
+  - YAPC::Asia 2011 update
+
+0.101014 2010/10/14
+  - YAPC::Asia 2010 update
+
+0.090911 2009/09/11
+  - YAPC::Asia 2009 update
+
+0.090101 2009/01/01
+  - Happy new year 2009 update
+
+0.080522 2008/05/22
+  - YAPC::Asia 2008 update
+  - bumped up the version requirement of the dependencies
+
+0.071226 2007/12/26
+  - initial release

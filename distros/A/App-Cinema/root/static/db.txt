@@ -1,0 +1,123 @@
+mysql> show tables;
++--------------------+
+| Tables_in_cinemadb |
++--------------------+
+| comment            |
+| event              |
+| genre              |
+| genre_items        |
+| item               |
+| news               |
+| roles              |
+| user_roles         |
+| users              |
++--------------------+
+9 rows in set (0.00 sec)
+
+mysql> desc comment;
++--------+--------------+------+-----+---------+----------------+
+| Field  | Type         | Null | Key | Default | Extra          |
++--------+--------------+------+-----+---------+----------------+
+| id     | int(11)      | NO   | PRI | NULL    | auto_increment |
+| uid    | varchar(20)  | YES  | MUL | NULL    |                |
+| content| varchar(100) | YES  |     | NULL    |                |
+| e_time | varchar(20)  | YES  |     | NULL    |                |
++--------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc event;
++--------+-------------+------+-----+---------+----------------+
+| Field  | Type        | Null | Key | Default | Extra          |
++--------+-------------+------+-----+---------+----------------+
+| id     | int(11)     | NO   | PRI | NULL    | auto_increment |
+| uid    | varchar(20) | YES  | MUL | NULL    |                |
+| content| varchar(20) | YES  |     | NULL    |                |
+| target | varchar(20) | YES  |     | NULL    |                |
+| e_time | varchar(20) | YES  |     | NULL    |                |
++--------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> desc genre;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| name  | varchar(50) | YES  |     | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> desc genre_items;
++-------+---------+------+-----+---------+-------+
+| Field | Type    | Null | Key | Default | Extra |
++-------+---------+------+-----+---------+-------+
+| g_id  | int(11) | NO   | PRI | 0       |       |
+| i_id  | int(11) | NO   | PRI | 0       |       |
++-------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc item;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| id           | int(11)      | NO   | PRI | NULL    | auto_increment |
+| title        | varchar(20)  | YES  |     | NULL    |                |
+| plot         | varchar(100) | YES  |     | NULL    |                |
+| year         | int(11)      | YES  |     | NULL    |                |
+| release_date | varchar(20)  | YES  |     | NULL    |                |
+| uid          | varchar(20)  | NO   | MUL | NULL    |                |
+| img          | varchar(100) | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+7 rows in set (0.00 sec)
+
+mysql> desc news;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| id           | int(11)      | NO   | PRI | NULL    | auto_increment |
+| title        | varchar(30)  | YES  |     | NULL    |                |
+| content        | varchar(200) | YES  |     | NULL    |                |
+| release_date | varchar(20)  | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc roles;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| role  | varchar(20) | YES  |     | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> desc user_roles;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| user_id | varchar(20) | NO   | PRI |         |       |
+| role_id | int(11)     | NO   | PRI | 0       |       |
++---------+-------------+------+-----+---------+-------+
+2 rows in set (0.01 sec)
+
+mysql> desc users;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| username      | varchar(20) | NO   | PRI | NULL    |       |
+| password      | varchar(20) | YES  |     | NULL    |       |
+| first_name    | varchar(20) | YES  |     | NULL    |       |
+| last_name     | varchar(20) | YES  |     | NULL    |       |
+| email_address | varchar(30) | YES  |     | NULL    |       |
+| active        | int(11)     | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+
+
+

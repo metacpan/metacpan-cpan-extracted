@@ -1,0 +1,3 @@
+%%retry 5
+http://cpan.org/ /Python/ Y branding
+http://perl.org/ /Perl/ Y branding

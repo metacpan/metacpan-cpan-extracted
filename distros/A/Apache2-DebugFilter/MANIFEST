@@ -1,0 +1,11 @@
+Changes
+lib/Apache2/DebugFilter.pm
+Makefile.PL
+MANIFEST
+run_version_tests
+t/debugfilter/bb_dump.t
+t/debugfilter/snoop.t
+t/response/TestDebugFilter/bb_dump.pm
+t/response/TestDebugFilter/snoop.pm
+t/TEST.PL
+META.yml                                 Module meta-data (added by MakeMaker)

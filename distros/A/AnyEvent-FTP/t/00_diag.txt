@@ -1,0 +1,10 @@
+AnyEvent
+EV
+File::HomeDir
+File::chdir
+List::MoreUtils
+Module::Build
+Moo
+Path::Class
+PerlIO::eol
+URI

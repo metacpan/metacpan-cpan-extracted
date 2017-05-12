@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+README.pod
+cpanfile
+lib/AI/Classifier/Japanese.pm
+minil.toml
+t/add_texts.t
+t/all.t
+t/base.t
+t/labels.t
+t/save_state.t
+META.yml
+MANIFEST

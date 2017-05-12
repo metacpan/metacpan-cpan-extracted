@@ -1,0 +1,36 @@
+Apache2-BalanceLogic version 0.0.1
+==================================
+
+This is a simple extention for 'mod_proxy_balancer'.
+You can put your original Plungin code that distribute 
+the requests among the backend servers by your algorithm.
+In other words, this is a  inner cookie trick for "stickysession" in mod_proxy_balancer.
+Let's enjoy!
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+SET CONFIG FILE
+
+Set 'MainConfig.yaml' ( and includes "Plugin" ) to the path written in 'httpd.conf'.
+  PerlRequire /foo/bar/perl/startup.pl
+  PerlHeaderParserHandler +Apache2::BalanceLogic
+  perlSetVar CONFIG_PATH '/foo/bar/perl/Apache2/BalanceLogic/Config/MainConfig.yaml'
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Takeshi Miki 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

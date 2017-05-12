@@ -1,0 +1,264 @@
+{
+   "abstract" : "mass upload of files via SCP/FTP/...",
+   "author" : [
+      "Torsten Raudssus <torsten@raudssus.de>",
+      "Apocalypse <APOCAL@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Shotgun",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "3.33",
+            "Expect" : "1.21",
+            "Moose" : "2.0007",
+            "MooseX::Getopt" : "0.37",
+            "MooseX::LogDispatch" : "1.2002",
+            "MooseX::POE::SweetArgs" : "0.213",
+            "MooseX::Types::Path::Class" : "0.05",
+            "Net::SFTP::Foreign" : "1.64",
+            "POE::Component::Client::SimpleFTP" : "0.003",
+            "POE::Component::Generic" : "0.1205",
+            "Path::Class::Dir" : "0.23"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/Getty/p5-app-shotgun",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/Getty/p5-app-shotgun",
+         "web" : "http://github.com/Getty/p5-app-shotgun"
+      }
+   },
+   "version" : "0.001",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@GETTY/@Basic/GatherDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@GETTY/@Basic/PruneCruft",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@GETTY/@Basic/ManifestSkip",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@GETTY/@Basic/MetaYAML",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@GETTY/@Basic/License",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@GETTY/@Basic/Readme",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@GETTY/@Basic/ExtraTests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@GETTY/@Basic/ExecDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@GETTY/@Basic/ShareDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@GETTY/@Basic/MakeMaker",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@GETTY/@Basic/Manifest",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@GETTY/@Basic/TestRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@GETTY/@Basic/ConfirmRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@GETTY/@Basic/UploadToCPAN",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::NextVersion",
+            "name" : "@GETTY/Git::NextVersion",
+            "version" : "1.110500"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@GETTY/PkgVersion",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@GETTY/MetaConfig",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@GETTY/MetaJSON",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@GETTY/NextRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@GETTY/PodSyntaxTests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Repository",
+            "name" : "@GETTY/Repository",
+            "version" : "0.18"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "@GETTY/GithubMeta",
+            "version" : "0.12"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallRelease",
+            "name" : "@GETTY/InstallRelease",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@GETTY/Authority",
+            "version" : "1.004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@GETTY/TestMoreWithSubtests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@GETTY/PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@GETTY/@Git/Check",
+            "version" : "1.110500"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@GETTY/@Git/Commit",
+            "version" : "1.110500"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@GETTY/@Git/Tag",
+            "version" : "1.110500"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@GETTY/@Git/Push",
+            "version" : "1.110500"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.200006"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.200006"
+      }
+   },
+   "x_authority" : "cpan:GETTY"
+}
+

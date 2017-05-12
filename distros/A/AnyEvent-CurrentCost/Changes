@@ -1,0 +1,17 @@
+Revision history for Perl extension AnyEvent::CurrentCost.
+
+1.130190  2013-01-19 17:38:04 Europe/London
+    - Fix unstable test.
+    - Use AnyEvent::SerialPort.
+
+1.112970  2011-10-24 22:25:54 Europe/London
+    - Fix prereqs.
+
+1.110792  2011-03-20 13:07:21 Europe/London
+    - More discard timeout fixes.
+
+1.110791  2011-03-20 12:12:41 Europe/London
+    - Avoid pointless discard timeout.
+
+1.110790  2011-03-20 11:55:39 Europe/London
+    - Initial release.

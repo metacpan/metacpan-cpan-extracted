@@ -1,0 +1,20 @@
+Revision history for App-WithSound
+
+1.2.1 2015-08-03T16:04:19Z
+    - Fix a bug which is caused by hash randomization (@papix)
+
+1.2.0  Thu Mar 14 00:42:43 JST 2013
+    - Changed using environment variables name.
+    - Added a function to play the different sound corresponded to discrete command.
+
+1.1.0  Wed Mar 06 00:45:10 JST 2013
+    - Add a new function that playbacks sound during executing the command.
+
+1.0.2  Tue Mar 05 02:03:55 JST 2013
+    - Corresponded plural audio playing application.
+
+1.0.1  Fri Mar 01 08:11:20 JST 2013
+    - Reworded description.
+
+1.0.0  Fri Mar 01 01:00:52 JST 2013
+    - Initial release.

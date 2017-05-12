@@ -1,0 +1,24 @@
+
+                    Memoize Example
+                    ===============
+
+Shows how to memoize a set of subs using a regular expression. Two
+calibrators are created, and some colors are calibrated on them. We
+use several sets of parameters to demo that Memoize is using keys
+correctly.
+
+Sample output:
+
+  Trying [RGB:acme:red] twice
+          Computed result: 255 0 0
+          Memoized result: 255 0 0
+
+  Trying [RGB:zerox:red]
+          Computed result: 255 0 0
+
+  Trying [RGB:acme:blue]
+          Computed result: 0 0 255
+
+  Trying [CYMK:acme:cyan] twice
+          Computed result: 100 0 0 0
+          Memoized result: 100 0 0 0

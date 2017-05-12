@@ -1,0 +1,45 @@
+{
+   "abstract" : "The great new Acme::JMOLLY::Utils!",
+   "author" : [
+      "Alexander Saenko <sajenko@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4208",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-JMOLLY-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::JMOLLY::Utils" : {
+         "file" : "lib/Acme/JMOLLY/Utils.pm",
+         "version" : "0.02"
+      },
+      "Tie::Cycle" : {
+         "file" : "lib/Tie/Cycle.pm",
+         "version" : "1.21"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.01"
+}

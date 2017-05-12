@@ -1,0 +1,63 @@
+=encoding utf8
+
+
+This is Perl module B<App::FromUnixtime>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/App-FromUnixtime"><img src="https://secure.travis-ci.org/bayashi/App-FromUnixtime.png?_t=1425089336"/></a> <a href="https://coveralls.io/r/bayashi/App-FromUnixtime"><img src="https://coveralls.io/repos/bayashi/App-FromUnixtime/badge.png?_t=1425089336&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+=head2 Installing to system perl
+
+App::FromUnixtime installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan App::FromUnixtime
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+=head2 Downloading the standalone executable
+
+You can also copy the standalone executable to whatever location you'd like.
+
+    % cd ~/bin
+    % curl -LO http://bit.ly/from_unixtime
+    % chmod +x from_unixtime
+
+NOTE: edit shebang if you don't have /usr/bin/env
+
+
+=head1 DOCUMENTATION
+
+App::FromUnixtime documentation is available as in POD. So you can do:
+
+    % perldoc App::FromUnixtime
+
+
+=head1 REPOSITORY
+
+App::FromUnixtime is hosted on github
+L<http://github.com/bayashi/App-FromUnixtime>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

@@ -1,0 +1,15 @@
+blib/
+_build_params
+\.git/
+\.gitignore
+.*\.swp
+.*~
+^\.\#
+.*\.tar\.gz
+MYMETA\..*
+MANIFEST\.bak
+README\.pod
+^Build$
+Acme-Holy-Shit-Here-Comes-An-S-.*
+nytprof.*
+metamerge\.*

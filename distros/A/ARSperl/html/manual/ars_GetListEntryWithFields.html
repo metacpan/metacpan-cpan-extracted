@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      ARSperl Manual - ars_GetListEntryWithFields
+    </title>
+    <style type="text/css">
+/*<![CDATA[*/
+    body {
+    background-color: #FFFFFF;
+    }
+    dt.c1 {font-weight: bold}
+    /*]]>*/
+    </style>
+  </head>
+  <body>
+    <h2>
+      <code>ars_GetListEntryWithFields( ctrl, schema, qualifier, maxRetrieve=0, firstRetrieve=0, #
+      standard [ fieldID_list ], # OPTIONAL sortID1,sortdir1,sortID2,sortdir2,...) #
+      OPTIONAL</code>
+    </h2>
+    <pre>
+
+</pre>This function is used to query a specified schema and return actual field values - not
+formatted strings as per <code>ars_GetListEntry</code> - from all matching entries.
+    <p>
+      <code>[ fieldID_list ]</code> is an optional array reference; the list is a list of FieldIDs.
+      Because only the actual fieldIDs need to be passed, this is a list of scalar values, not a
+      list of hash references a la <code>ars_GetListEntry</code>. If not specified, the default
+      result list fields for the schema are returned.
+    </p>
+    <p>
+      The other arguments are identical in function to <code><a href=
+      "ars_GetListEntry.html">ars_GetListEntry</a></code>.
+    </p>
+    <p>
+      The format of the returned list/hash is <i>(entry_id, {field_value_hash})</i> pairs. The
+      returned list can be stored in an array or hash. Using an array preserves the sort order, if
+      one was specified. Each referenced field_value_hash looks like the return of a single
+      <code>ars_GetEntry</code> call: the hash keys are the fieldIDs and the hash values are the
+      field values.
+    </p>
+    <p></p>
+    <dl>
+      <dt class="c1">
+        On success
+      </dt>
+      <dd>
+        Returns a list of <i>(entry_id, {field_value_hash})</i> pairs.
+      </dd>
+      <dt class="c1">
+        On failure
+      </dt>
+      <dd>
+        Returns <code>undef</code>.
+      </dd>
+    </dl>
+    <p></p>
+    <p>
+      Example:
+    </p>
+    <pre>
+    # Read all Completed entries from Sample:Enrollments
+    # fetch Class Title, Location and Enrollee Login
+    
+    my $schema      = "Sample:Enrollments";
+    my $querystring = qq/'7' = "Completed"/;
+   ( my $lq = ars_LoadQualifier( $ctrl, $schema, $qs ) )
+      || die("LoadQualifier Failed: $ars_errstr");
+    
+    my %fieldname_to_id = ars_GetFieldTable( $ctrl, $schema );
+    my $class_title     = $fieldname_to_id{'Class Title'};
+    my $class_location  = $fieldname_to_id{'Class Location'};
+    my $enrollee_login  = $fieldname_to_id{'Enrollee Login'};
+    
+   (
+       my %entries = ars_GetListEntryWithFields(
+           $ctrl, $schema, $lq, 0, 0,
+           [ $class_title, $class_location, $enrollee_login ],
+       )
+   ) || die("GLEWF Failed: $ars_errstr");
+   
+   foreach my $entry_id (keys %entries) {
+       print
+   "$entry_id\t $entries{$entry_id}{$class_title}\t $entries{$entry_id}{$class_location}\t $entries{$entry_id}{$enrollee_login}\n";
+   }
+</pre>
+    <p>
+      <b>Notes:</b> This is a high-performance command that returns a lot of data with one API
+      call. Care should be taken to delete the returned data structure (e.g., with "<code>undef
+      %entries</code>") when it is no longer needed, to avoid memory problems.
+    </p>
+    <p>
+      See Also: <a href="ars_GetListEntry.html">ars_GetListEntry</a>, <a href=
+      "ars_GetMultipleEntries.html">ars_GetMultipleEntries</a>
+    </p>
+    <p>
+      <a href="toc.html">Back to Table of Contents</a>
+    </p>
+    <p></p>
+    <address>
+      Last changes to this page 14 April 2009 by michiel.beijen@gmail.com
+      <p>
+        © J.C.Murphy, J.W.Murphy 1998 arsperl@arsperl.org
+      </p>
+    </address>
+  </body>
+</html>

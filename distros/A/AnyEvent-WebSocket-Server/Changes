@@ -1,0 +1,50 @@
+Revision history for AnyEvent-WebSocket-Server
+
+0.09    2016-11-05
+        [ENHANCEMENT]
+        - Add "max_payload_size" option. (gh #3 by rp3u)
+        - Now it requires AnyEvent::WebSocket::Client 0.37
+
+0.08    2016-08-11
+        - No functional change from 0.07.
+        - TLS tests are now optional. They are run when Net::SSLeay and AnyEvent::TLS are installed.
+
+0.071   2016-08-07
+        No functional change from 0.07.
+        CPAN somehow failed to publish 0.07. So I just bumped the version and uploaded it again.
+
+0.07    2016-08-06
+        [ENHANCEMENT]
+        - Add "ssl_key_file" and "ssl_cert_file" options.
+          Now this module officially supports TLS (gh #2 by izarraga)
+          
+        [PACKAGING]
+        - Require AnyEvent::WebSocket::Client 0.35. It has a bug fix for TLS mode.
+
+0.06    2015-10-27
+        [ENHANCEMENT]
+        - add "handshake" option. (gh#1 by mephinet)
+
+0.05    2014-08-17
+        - No change to the code.
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.04    2014-04-13
+        - No change to the code.
+        - establish_psgi() method is no longer beta.
+          The API is fine, I guess.
+
+0.03    2013-11-10
+        - No change to the code.
+        - Now the cpanfile requires AnyEvent::WebSocket::Client 0.20, which includes
+          some important new features and bug fixes.
+        - Improved author testing.
+
+0.02    2013-11-03
+        - Documentation update.
+        - Now it explicitly supports WebSocket protocol version 13 only.
+          (It has been actually, but now it can detect protocol incompatibility in
+           the handshake phase)
+
+0.01    2013-10-21
+        First version, released on an unsuspecting world.

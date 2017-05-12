@@ -1,0 +1,17 @@
+---
+GLOBALS:
+  base_dir: '/tmp'
+BUCKETS:
+  -
+    method: http
+    name: localhost
+    port: 80
+  -
+    method: http
+    name: localhost
+    port: 8080
+METHOD:
+  GET:
+    root_uri: '/getFile'
+  PUT:
+    root_uri: '/storeFile'

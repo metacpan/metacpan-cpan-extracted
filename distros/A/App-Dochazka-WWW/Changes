@@ -1,0 +1,272 @@
+Revision history for App-Dochazka-WWW
+
+0.101  2014-09-11
+- deleted pre-App::MFILE::WWW code
+
+0.102  2014-09-11 16:23 CEST
+- project restart from clean slate
+
+0.103  2014-09-19 20:27 CEST
+- get it working with demo JS code
+
+0.104  2014-09-22 09:58 CEST
+- dmenu-init.js, dform-init.js: start bringing back in the Dochazka-specific
+  targets
+
+0.105  2014-09-22 16:09 CEST
+- bring in more 'dochazka-www' JS code, adapting it to new targets setup
+
+0.106  2014-09-22 21:36 CEST
+- dform-init.js: get forms working again (without actions for now)
+
+0.107  2014-09-22 21:50 CEST
+- dform-init.js: restore 'empProfileEdit' target; fix punctuation errors
+  that were ignored by Firefox
+
+0.108  2014-09-22 22:08 CEST
+- bring in 000boilerplate.js
+- start emp-profile-update.js (to be a dependency of daction-init.js or maybe
+  we'll make it a separate file and call it daction-start.js)
+
+0.109  2014-09-23 09:29 CEST
+- bring in empProfileUpdate action (adapt from pre-split version)
+
+0.110  2014-09-23 18:10 CEST
+- prototypes.js: bring in Dochazka-specific prototype
+- emp-profile-update.js: create empProfile object and merge into it the object
+  we get from form submit - this endows our object with the "sanitize" method
+- status: 'empProfileUpdate' target working now
+
+0.111  2014-09-24 08:03 CEST
+- restore basic change password functionality
+
+0.112  2014-09-24 10:21 CEST
+- redesign changePassword dialog - it now asks for confirmation, but the
+  password is still displayed on-screen (ick!)
+
+0.113  2014-09-24 11:55 CEST
+- emp-lib.js: when password change is saved successfully, display "Password
+  changed" message instead of "Employee profile updated"
+
+0.114  2014-09-24 16:41 CEST
+- js/: migrate lots of employee profile code from previous incarnation
+- status: new employee functionality works as long as non-ASCII characters
+  are not entered; when non-ASCII characters are entered, the REST server
+  inserts the employee properly but 500 Internal Server Error is returned
+  because Plack::MiddleWare::Lint detects wide characters in the entity
+  body (unknown ATM whether request or response)
+
+0.115  2014-09-25 09:27 CEST
+- js/: start work on renewing "employee search" functionality; cleanup
+
+0.116  2014-09-27 10:56 CEST
+- js/: bring in "simple employee browser" code
+
+0.117  2014-10-03 12:48 CEST
+- js/: 'hookGetObj' has been renamed to just plain 'hook'
+
+0.118  2014-10-11 22:11 CEST
+- daction-init.js: get rid of extraneous demo actions, keeping just one;
+  get rid of deprecated 'browseEmpMultPrev' and 'browseEmpMultNext'
+  actions; bring in 'returnToBrowser' action from App::MFILE::WWW
+- daction-start.js: get rid of extraneous demo actions, keeping just one;
+  fix name of internal library function implementing the
+  'passChangePending' action; activate 'masqEmployee' action; bring in
+  'returnToBrowser' action
+- dform-init.js: cleanup
+- emp-lib.js: get rid of deprecated 'simpleEmployeeBrowser' custom action;
+  use the new dbrowser feature to implement searchEmp; bring in
+  masqEmployee code from before the split
+- target-init.js: bring in new code from App::MFILE::WWW for the dbrowser
+  feature
+- dbrowser-init.js: new file brought in from App::MFILE::WWW and adapted to
+  provide "Employee search" functionality
+- lib.js: bring in new application-specific library module from
+  App::MFILE::WWW containing the new 'fillUserBox' method
+- STATUS: employee search and masquerade working once again; all features
+  that were working before the code split have been restored/reimplemented
+
+0.119  2014-10-11 22:44 CEST
+- lib.js: add 'fillNoticesLine' method with copyright notice, link for
+  opening a bug, etc.
+
+0.120  2014-10-11 23:16 CEST
+- daction-start.js: when masquerading, 'logout' becomes a synonym for 'end
+  the masquerade'
+- emp-lib.js: move masquerade-ending code into a separate function
+
+0.121  2014-10-13 16:47 CEST
+- js/: CSS tweaks
+
+0.122  2014-10-14 09:36 CEST
+- js/: enable new dnotice feature and use it to implement privhistory listing
+
+0.123  2014-10-14 11:21 CEST
+- js/: refine privHistory dnotice
+
+0.124  2014-10-16 15:42 CEST
+- js/emp-lib.js: fix "Edit employee profile" functionality (was using PUT
+  on 'employee/eid' resource, which is no longer supported by the server)
+
+0.125  2015-07-22 09:59 CEST
+- update copyright statement to 2015
+- migrate repo to Github
+- new release script
+- drop t/boilerplate.t
+
+0.126 2016-09-04 20:40 CEST
+- packaging tweaks
+- Travis CI
+
+0.127 2016-09-12 09:10 CEST
+- build/ops: MANIFEST update, Build.PL update
+- lib.js: update copyright notice and bug report link
+- bin/dochazka-www: show how to pass sitedir to mfile-www
+- build/ops: require App::MFILE::WWW 0.140
+- Dispatch.pm: new file
+- config: introduce DOCHAZKA_WWW_BACKEND_URI param and tweak defaults
+
+0.128 2016-09-12 10:23 CEST
+- Dispatch.pm: uncomment some debug messages
+- Dispatch.pm: properly set currentUserPriv
+- build/ops: require App::MFILE::WWW 0.141
+
+0.129 2016-09-12 10:27 CEST
+- build/ops: change OBS project to Application:Dochazka:staging
+- build/ops: add Dispatch.pm to MANIFEST
+
+0.130 2016-09-12 11:58 CEST
+- add systemd unit file (Theo Chatzimichos)
+
+0.131 2016-09-12 20:43 CEST
+- js: fix "Change my password" functionality
+- config: add new file WWW_Message_en.conf
+- js: fix "New employee" functionality
+- js: fix "Search employee" functionality
+
+0.132 2016-09-15 13:41 CEST
+- js: percent-encode employee search keys
+- bin/dochazka-www: uncomment --sitedir /etc/dochazka-www
+- build/ops: new file WWW_SiteConfig.pm.example
+
+0.133 2016-09-16 00:24 CEST
+- config: drop derived distro site config file
+- MANIFEST: drop share/config/WWW_SiteConfig.pm
+- js: replace EID with sec_id in Employee profile
+- build/ops: require most recent App::MFILE::WWW
+- js: drop password change option from Employee profile menu
+
+0.134 2016-09-19 12:48 CEST
+- build/ops: require App::MFILE::WWW 0.143
+- js: minor reformatting in dochazka-www/dform-init.js
+- Use employee/self/full resource instead of employee/current/priv
+- In employee/self/full resource, current_emp prop renamed to "emp"
+
+0.135 2016-09-25 10:01 CEST
+- build/ops: require REST 0.546 and MFILE::WWW 0.144
+
+0.136 2016-09-25 12:03 CEST
+- dform-init.js: add status, statusSince empProfile entries
+- js: drop dispEmployee target
+- Make "My profile" display "Status" and "Status since"
+- Rename empProfileEdit target to empProfileEditRemark
+- emp-lib.js: separate myProfile function
+- Make "Edit remark" display updated employee profile
+
+0.137 2016-09-25 21:47 CEST
+- Fix hook in empProfileEditRemark
+- Rip out password change feature
+- Fix "My profile" + Masquerade mode
+- Replace "newEmployee" target with "ldapLookup"
+- Replace "newEmplSubmit" with "ldapLookupSubmit"
+- Rip out "insertEmployee" target
+- Implement "LDAP lookup" feature
+- Provide masquerade option if LDAP lookup succeeds
+
+0.138 2016-09-27 16:59 CEST
+- Move privHistory target to Employee menu
+- ldapLookup: always display AJAX error
+- Improve AJAX error reporting
+- Dispatch.pm: revamp/simplify session management
+- Rip out entry definitions for deprecated newEmployee target
+- Plumb in an empObject prototype distinct from empProfile
+- js: make ldapLookupSubmit GET instead of PUT
+- dispatch: tweak debug log messages
+- js: lower ACL profile of ldapLookupSubmit and privHistory targets
+- Revamp LDAP lookup feature (GET first)
+- js: handle empty nick in ldapLookupSubmit
+- Add "Sync" option to LDAP lookup result miniMenu
+- js: simplify LDAP lookup failure handling
+- Reinstate "Priv (status) menu" with privHistory target
+- Display workforce ID instead of EID in simpleEmployeeBrowser
+- Change "Status"/"Since" to "Privlevel"/"Effective"
+- dmenu: add Schedule menu
+- js: Tweak text of menu entries
+- js: rename "searchEmp" to "actionEmplSearch" in emp-lib.js
+- js: move dform and dbrowser entries to lib.js
+
+0.139 2016-09-28 19:12 CEST
+- Drop LDAPdochazka entry from simpleEmployeeBrowser
+- Clarify difference between LDAP and Dochazka employees
+- Put masquerade at end of Employee menu
+- Dispatch.pm: reduce log verbosity
+- Implement LDAP sync miniMenu entry in simpleEmployeeBrowser
+
+0.140 2016-09-29 00:16 CEST
+- build/ops: change OBS_PROJECT to Application:Dochazka
+- build/ops: require App::MFILE::WWW 0.147 for dtable feature
+- Implement basic (read-only) Privhistory table
+
+0.141 2016-11-01 15:40 CET
+- Display effective date more readably
+- Dispatch.pm: AJAX call session/terminate on logout
+- js: Enable active users to "LDAP sync" themselves
+
+0.142 2016-11-05 22:40 CET
+- js: implement "REST server details" dform
+- js: make REST server details form return to mainMenu
+- build/ops: require App::MFILE::WWW 0.152
+- Plumb in drowselect target, privhistory edit menu option
+- lib.js: add aclProfileWrite prop to pHeffective and pHpriv
+- Implement "Add record" option in privhistory drowselect
+- emp-lib.js: call lib.displayError() whenever AJAX fails
+- Implement "Delete record" option in Privhistory drowselect
+
+0.143 2017-02-25 09:28 CET
+- Dispatch.pm: implement user agent lookup table
+- Dispatch.pm: refactor session management
+- Fix "incoming AJAX calls on a dead session don't return"
+- script: proper arg handling in dochazka-www startup script
+
+0.144 2017-02-27 22:38 CET
+- MANIFEST: add new JavaScript files
+- Implement feature: "look up schedule by code or ID"
+- build/ops: require App::MFILE::WWW 0.154
+- Implement "browse all schedules" functionality
+- cleanup: remove dead code from dform-init.js
+- emp-lib.js: improve AJAX call error-reporting
+
+0.145 2017-02-28 15:23 CET
+- build/ops: require App::MFILE::WWW 0.155
+- Add "Adminitrivia" menu and move REST server details to it
+- "Create new schedule" menu structure and dforms
+- Basic "Create a new schedule" functionality
+- Improve the "Create a schedule" experience
+
+0.146 2017-03-01 17:13 CET
+- build/ops: require App::MFILE::WWW 0.156
+- Implement "Schedule history (browse and edit)" feature
+
+0.147 2017-03-02 22:59 CET
+- Drop SHID column from schedule history table
+- build/ops: designed to work with App::Dochazka::REST >=0.549
+- Add scode field to schedhistory dtable and drowselect
+- Make schedule menu visible to all
+- Implement schedule update dform
+- Improve usability of "employee profile edit" feature
+- Implement "schedule edit (from schedule display)" feature
+- Implement "delete schedule from lookup" feature
+- sched-lib.js: refactor schedEditSave and schedDelete
+- Implement "schedule edit and delete from browser" feature
+- Move "{priv,schedule} history EDIT" to miniMenu
+

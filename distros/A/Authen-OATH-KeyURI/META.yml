@@ -1,0 +1,40 @@
+---
+abstract: 'Key URI generator for mobile multi factor authenticator app'
+author:
+  - 'ritou <ritou.06@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Authen-OATH-KeyURI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Authen::OATH::KeyURI:
+    file: lib/Authen/OATH/KeyURI.pm
+    version: '0.02'
+requires:
+  Class::Accessor::Fast: '0.34'
+  Convert::Base32: '0.06'
+  Params::Validate: '1.13'
+  URI: '1.64'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ritou/p5-authen-oath-keyuri/issues
+  homepage: https://github.com/ritou/p5-authen-oath-keyuri
+  repository: git://github.com/ritou/p5-authen-oath-keyuri.git
+version: '0.02'

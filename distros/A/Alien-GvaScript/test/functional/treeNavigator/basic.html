@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <style type="text/css">
+  .TN_node em {color: blue;}
+  </style>
+  <script>
+    document.observe('dom:loaded', function() {
+      new GvaScript.TreeNavigator('TN_tree', {tabIndex: 1}); 
+    });
+  </script>
+</head>
+
+  <body>
+    
+    <h1>Basic Tree Navigator</h1>
+    <div id='TN_tree'>
+
+      <div class="TN_node">
+        <span class="TN_label">Product info</span> 
+        <div class="TN_content">
+          <div class="TN_leaf"><span class="TN_label">What's new</span></div>
+          <div class="TN_leaf"><span class="TN_label">Features</span></div>
+          <div class="TN_leaf"><span class="TN_label">Installation</span></div>
+          <div class="TN_leaf"><span class="TN_label">Functions</span></div>
+          <div class="TN_leaf"><span class="TN_label">Supported Browsers</span></div>
+        </div>
+      </div>
+ 
+     <div class="TN_node">
+        <span class="TN_label">Samples</span>
+        <div class="TN_content">
+
+          <div class="TN_node TN_closed">
+            <span class="TN_label">KeyMap</span>
+            <div class="TN_content"><em>key map sample details</em></div>
+          </div>
+
+          <div class="TN_node TN_closed">
+            <span class="TN_label">Autocompleter</span>
+            <div class="TN_content"><em>autocompleter sample details</em></div>
+          </div>
+
+
+          <div class="TN_node TN_closed">
+            <span class="TN_label"><i>More Samples...</i></span>
+            <div class="TN_content">
+
+              <div class="TN_node TN_closed">
+                <span class="TN_label">Buttons</span>
+                <div class="TN_content"><em>buttons sample details</em></div>
+              </div>
+
+              <div class="TN_node TN_closed">
+                <span class="TN_label">Form</span>
+                <div class="TN_content"><em>form sample details</em></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="TN_node TN_closed">
+        <span class="TN_label">node 3 closed</span> 
+        <div class="TN_content">still some content here</div>
+      </div>
+
+    </div>
+  </body>
+</html>

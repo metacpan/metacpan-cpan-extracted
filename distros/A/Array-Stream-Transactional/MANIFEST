@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+Build.PL
+META.yml
+MANIFEST
+README
+lib/Array/Stream/Transactional.pm
+t/1.t
+MANIFEST.SKIP

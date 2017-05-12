@@ -1,0 +1,50 @@
+---
+abstract: ~
+author:
+  - 'Lee Aylward <leedo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.86
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.03'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alice
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Any::Moose: 0
+  AnyEvent: 5.2
+  AnyEvent::AIO: 0
+  AnyEvent::DBI: 0
+  AnyEvent::HTTP: 0
+  AnyEvent::IRC: 0.95
+  Class::Throwable: 0
+  DBD::SQLite: 0
+  EV: 0
+  File::Copy: 0
+  File::ShareDir: 0
+  Fliggy: 0
+  IRC::Formatting::HTML: 0.28
+  JSON: 2.12
+  List::MoreUtils: 0
+  Net::SSLeay: 0
+  Plack: 0
+  Plack::Session: 0
+  Protocol::WebSocket: 0.00906
+  SQL::Abstract: 0
+  Text::MicroTemplate: 0.09
+  Try::Tiny: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.20

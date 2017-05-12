@@ -1,0 +1,61 @@
+<style>
+  .groupname     { font-weight: bold; color: navy; font-size: 120% }
+  .colname       { font-weight: bold }
+  .actions       { float: right; text-align: right; background-color: LightCyan;
+                   margin-left: 1em; margin-top: 1em; padding-left: 0.5em }
+  .remarks       { font-size: 90%; font-style: italic}
+  .pk            { text-decoration: underline }
+  .TN_node .remarks { margin-left: 28% }
+</style>
+<script>
+  function setup() {  
+      new GvaScript.TreeNavigator(
+         'TN_tree', 
+         {selectFirstNode: true,
+          tabIndex: 0}
+      );
+  }
+  window.onload = setup;
+</script>
+
+
+<h1>[% data.table %]</h1>
+
+<div class="actions">
+  <a href="search">search</a> this table
+</div>
+
+<div class="remarks">[% data.descr %]</div>
+
+<h2>Columns</h2>
+
+<div id="TN_tree">
+
+[% FOREACH group IN data.colgroups;
+     node_status = group.node or "open"; %]
+<div class="TN_node[% " TN_closed" IF node_status == "closed" %]">
+  <span class="TN_label groupname">[% group.name %]</span>
+  <div class="TN_content">
+    [% FOREACH col IN group.columns %]
+    <div class="TN_node">
+      <span class="TN_label colname[% ' pk' IF col.is_pk %]">[% col.COLUMN_NAME %]</span>
+      <span class="after_label">
+        [% col.TYPE_NAME; "($col.COLUMN_SIZE)" IF col.COLUMN_SIZE %]
+        [% "NOT NULL" IF col.NULLABLE == 0; # see L<DBI/column_info> %]
+        [% FOREACH path IN col.paths;
+           loop.first ? "&rArr;" : ", "; %]
+           <a href="../[% path.to_table %]/descr">[% path.name %]</a>
+        [% END; # FOREACH path IN col.paths %]
+      </span>
+      <div class="TN_content remarks">
+        [% col.REMARKS %] [% col.descr %]
+      </div>
+    </div>
+    [% END; # FOREACH col IN group.columns %]
+  </div>
+</div>
+[% END; # FOREACH group IN data.colgroups %]
+
+</div>
+
+

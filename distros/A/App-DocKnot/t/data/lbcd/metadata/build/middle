@@ -1,0 +1,9 @@
+lbcd looks for `$sysconfdir/nolbcd` and returns the maximum load if that
+file is present, allowing one to effectively drop a system out of a
+load-balanced pool by touching that file.  By default, the path is
+`/usr/local/etc/nolbcd`, but you may want to pass `--sysconfdir=/etc` to
+configure to use `/etc/nolbcd`.
+
+lbcdclient is written in Perl, so you may have to edit the first line of
+the script to point to the correct Perl location on your system.  It does
+not use any sophisticated Perl features or add-on modules.

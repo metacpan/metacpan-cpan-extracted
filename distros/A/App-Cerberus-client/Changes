@@ -1,0 +1,5 @@
+0.08    2012-08-06
+        Renamed Changes.txt to Changes
+0.07    2012-07-28
+        Separated App::Cerberus::Client into its own distro
+

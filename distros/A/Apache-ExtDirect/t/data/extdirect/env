@@ -1,0 +1,94 @@
+[
+    {
+        name => 'http list', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/env.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content => raw_post(
+            'http://localhost/router',
+            '{"type":"rpc","tid":1,"action":"Env",'.
+            ' "method":"http_list","data":[]}'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content =>
+            q|{"action":"Env","method":"http_list","result":|.
+            q|["HTTP_ACCEPT","HTTP_USER_AGENT","HTTP_CONNECTION",|.
+            q|"HTTP_ACCEPT_CHARSET","HTTP_COOKIE","HTTP_HOST"],|.
+            q|"tid":1,"type":"rpc"}|,
+    },
+    {
+        name => 'http header', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/env.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content => raw_post(
+            'http://localhost/router',
+            '{"type":"rpc","tid":1,"action":"Env",'.
+            ' "method":"http_header","data":["HTTP_USER_AGENT"]}'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content => 
+            q|{"action":"Env","method":"http_header","result":|.
+            q|"CGI::Test",|.
+            q|"tid":1,"type":"rpc"}|,
+    },
+    {
+        name => 'param list', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/env.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content => raw_post(
+            'http://localhost/router',
+            '{"type":"rpc","tid":1,"action":"Env",'.
+            ' "method":"param_list","data":[]}'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content =>
+            q|{"action":"Env","method":"param_list","result":|.
+            q|["POSTDATA"],|.
+            q|"tid":1,"type":"rpc"}|,
+    },
+    {
+        name => 'param get', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/env.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content => raw_post(
+            'http://localhost/router',
+            '{"type":"rpc","tid":1,"action":"Env",'.
+            ' "method":"param_get","data":["POSTDATA"]}'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content =>
+            q|{"action":"Env","method":"param_get","result":|.
+            q|"{\"type\":\"rpc\",\"tid\":1,\"action\":\"Env\",\"method\":\"param_get\",\"data\":[\"POSTDATA\"]}",|.
+            q|"tid":1,"type":"rpc"}|,
+    },
+    {
+        name => 'cookie list', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/env.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content => raw_post(
+            'http://localhost/router',
+            '{"type":"rpc","tid":1,"action":"Env",'.
+            ' "method":"cookie_list","data":[]}'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content =>
+            q|{"action":"Env","method":"cookie_list","result":|.
+            q|["foo"],|.
+            q|"tid":1,"type":"rpc"}|,
+    },
+    {
+        name => 'cookie get', method => 'POST',
+        cgi_url  => 'http://localhost/cgi-bin/env.cgi',
+        plack_url => 'http://localhost:8529/router',
+        plack_input => [ router_path => '/router', debug => 1, ],
+        input_content => raw_post(
+            'http://localhost/router',
+            '{"type":"rpc","tid":1,"action":"Env",'.
+            ' "method":"cookie_get","data":["foo"]}'),
+        http_status => 200, content_type => qr|^application/json\b|,
+        expected_content =>
+            q|{"action":"Env","method":"cookie_get","result":|.
+            q|"bar",|.
+            q|"tid":1,"type":"rpc"}|,
+    },
+]
+

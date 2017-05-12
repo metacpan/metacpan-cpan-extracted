@@ -1,0 +1,88 @@
+
+##--------------------------------------------------------------------------
+##
+##  Copyright (c) 2001 Gerald Richter / ecos gmbh www.ecos.de
+##
+##  You may distribute under the terms of either the GNU General Public 
+##  License or the Artistic License, as specified in the Perl README file.
+## 
+##  THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+##  WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+##  MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+##
+##  $Id: README,v 1.4 2001/08/13 06:52:57 richter Exp $
+##
+##--------------------------------------------------------------------------
+
+
+Apache::ImageMagick - Convert and manipulate images on the fly
+==============================================================
+
+This module uses the Image::Magick library to process or create an image on 
+the fly. It is able to convert the source image to any type you request that
+is supported by Image::Magick (e.g. TIFF, PPM, PGM, PPB, GIF, JPEG and more). 
+Additionaly you can specify (multiple) image manipulation filters in the 
+additional path info and format options in the query string.
+Apache::ImageMagick caches the result image so multiple requested with 
+the same parameters only needs one computation. To do more sophisticated
+manipulation, Apache::ImageMagick can run a script that does the image
+manipulation/creation. Last but not least Apache::ImageMagick comes with
+a proxy module, that can be linked into a non mod_perl frontend proxy server
+and which will delivers cached images which highest possible speed.
+
+For detailed information see 
+
+  perldoc Apache::ImageMagick
+
+ 
+
+Prerequisites
+=============
+
+ ImageMagick 
+	Home 		http://www.imagemagick.org
+        Installation    http://www.imagemagick.org/www/install.html
+	Download	ftp://ftp.nluug.nl/pub/ImageMagick
+
+
+Installation
+============
+
+perl Makefile.PL
+make
+make install
+
+
+Installation mod_aimproxy
+=========================
+
+mod_aimproxy is only necessary if you are running a non mod_perl frontend proxy server
+which delivers static content. To compile mod_aimproxy staticly into the Apache binary
+use the following options when you configure Apache. NOTE: mod_proxy must be also compiled
+into Apache. Add other options as desired.
+
+    ./configure --enable-module=proxy --add-module=/path/to/mod_aimproxy.c 
+
+
+to create aim_proxy as DSO, do a
+
+    apxs -c mod_aimproxy.c
+    apxs -i -a -n aimproxy mod_aimproxy.so
+
+and add a
+
+    LoadModule aimproxy_module mod_aimproxy.so
+
+to your httpd.conf
+
+
+
+
+Author
+======
+
+G.Richter (richter@dev.ecos.de)
+
+Based on work from Lincoln Stein and Doug MacEachern publish in 
+"Writing Apache Modules with Perl and C" see www.modperl.com
+

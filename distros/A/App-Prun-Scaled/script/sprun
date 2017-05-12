@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use App::Prun::Scaled;
+use Getopt::Long;
+use File::Spec;
+use Parallel::ForkManager::Scaled;
+
+my $me = (File::Spec->splitpath($0))[2];
+
+exit main();
+
+sub usage {
+    my $pm = Parallel::ForkManager::Scaled->new;
+    my %defs = map { $_ => $pm->$_ } qw(
+        hard_min_procs hard_max_procs initial_procs
+        idle_target idle_threshold update_frequency
+    );
+
+    print <<EOT;
+$me v$App::Prun::Scaled::VERSION - run commands in parallel
+
+usage: $me [OPTIONS] [FILE]...
+
+Run commands, one per line, from either FILEs or stdin if no FILEs specified.
+
+$me will adjust the number of running processes between --min-procs and
+--max-procs to try to keep the system at --idle-target percent idle.
+
+Each command is passed to perl's system() function to be executed. system() 
+may use your system's shell to run the command. See perldoc -f system.
+
+If --exit-on-failure is specified, and a command exits with a failed status, 
+$me will wait for any running children to complete then exit with an error
+without running any more commands.
+
+OPTIONS
+  -e, --exit-on-failure        exit when a command returns a failed status
+  -h, -?, --help               display this help
+  -i, --initial-procs=<num>    number of prcesses to initially start, this may
+                               change over time to try to reach idle_target
+                               (default: $defs{initial_procs})
+  -m  --min-procs=<num>        minimum number of processes to run in parallel
+                               (default: $defs{hard_min_procs})
+  -M  --max-procs=<num>        maximum number of processes to run in parallel
+                               (default: $defs{hard_max_procs})
+  -r  --report-failed          print a message to STDERR for each command the fails
+  -t, --idle-target=<pct>      endeavor to keep CPU idle % at this percentage
+                               (default: $defs{idle_target})
+  -T  --idle-threshold         CPU idle must be this far away from the target
+                               before any adjustments will be made to the number
+                               of running processes. (default: $defs{idle_threshold})
+  -u, --update-frequency=<sec> how frequently to make updates to the number of
+                               running processed. Set to 0 to evaluate before running
+                               each process. (default: $defs{update_frequency})
+  -v, --verbose                write stats to STDERR
+  -V, --version                print version and exit
+
+NOTES
+  Embedded newlines in any command will break this script as it stupidly
+  treats each line as a command without any special parsing.
+
+  Empty lines and comments (lines beginning with '#') are ignored.
+
+EXAMPLES
+  # Run tkprof against all .trc files in the current directory
+  # while attempting to keep the system 75% idle, don't adjust the
+  # number of processes unless idle time goes below 74 or above 76, and
+  # re-evaluate after each process exits (update frequency = 0).
+  for F in *.trc; do echo "tkprof \$F \${F%trc}txt"; done | $me -t 75 -T 2 -u 0
+
+  # Run all commands in a file (command_file), one line at a time.  Manually
+  # bound the minimum and maximum number of processes to run and start with 4.
+  # Keep the CPU 100% busy (0% idle) and re-evaluate at most every 3 seconds.
+  # Ignore any failed processes, but do report to STDOUT any that fail.
+  $me -e -r -m 2 -M 8 -i 4 -u 3 command_file
+EOT
+    exit 1;
+}
+
+sub get_opts {
+    my %opts;
+
+    Getopt::Long::Configure('bundling');
+
+    GetOptions (
+        \%opts,
+        'exit_on_failure|exit-on-failure|e',
+        'help|h|?',
+        'initial_procs|initial-procs|i=i',
+        'hard_min_procs|min-procs|m=i',
+        'hard_max_procs|max-procs|M=i',
+        'report_failed|report-failed|r',
+        'idle_target|idle-target|t=f',
+        'idle_threshold|idle-threshold|T=f',
+        'update_frequency|update-frequency|u=i',
+        'test_dump|test-dump',
+        'verbose|v',
+        'version|V',
+    ) or usage();
+
+    if ($opts{version}) {
+        print "$me v$App::Prun::Scaled::VERSION\n";
+        exit 0;
+    }
+
+    usage() if $opts{help};
+
+    %opts;
+}
+
+sub main {
+    my %opts = get_opts();
+
+    my @keys = grep { defined $opts{$_} } qw( 
+        initial_procs hard_min_procs hard_max_procs
+        idle_target idle_threshold update_frequency
+    );
+
+    my %args;
+    @args{@keys} = @opts{@keys} if @keys;
+
+    my $ar = App::Prun::Scaled->new(
+        pm => Parallel::ForkManager::Scaled->new(%args),
+        report_failed_procs => $opts{report_failed},
+        exit_on_failed_proc => $opts{exit_on_failure},
+    );
+
+    $ar->pm->run_on_update(\&Parallel::ForkManager::Scaled::dump_stats)
+        if $opts{verbose};
+
+    $ar->_test_dump if $opts{test_dump};
+
+    $ar->run_command($_) while (<>);
+    $ar->done;
+}

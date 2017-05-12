@@ -1,0 +1,156 @@
+NAME
+    App::Pocosi - A command line tool for launching a
+    POE::Component::Server::IRC instance
+
+DESCRIPTION
+    This distribution provides a generic way to launch a
+    POE::Component::Server::IRC instance.
+
+    *   Prints useful status information (to your terminal and/or a log
+        file)
+
+    *   Will daemonize if you so wish
+
+    *   Supports a configuration file
+
+    *   Offers a user friendly way to pass arguments to
+        POE::Component::Server::IRC
+
+    *   Has an interactive mode where you can issue issue commands and call
+        methods on the IRCd component.
+
+CONFIGURATION
+     class:    POE::Component::Server::IRC
+     log_file: /my/log.file
+     pid_file: /my/pid.file
+     lib:      /my/modules
+     flood:    false
+     auth:     true
+
+     config:
+       servername: myserver.com
+       motd:
+         - "Welcome to this great server"
+         - ""
+         - "Enjoy your stay"
+
+     plugins:
+       - [OperServ]
+
+     listeners:
+       - bindaddr: "127.0.0.1"
+         port:     10023
+
+     denials:
+       - ["12.34.56.0/24", "I don't like this IP block"]
+
+     exemptions:
+       - "12.34.56.78"
+
+     operators:
+       - username: jack
+         password: foo
+         ipmask:   ["127.0.0.1", "1.2.3.4", "192.168.1.0/24"]
+       - username: locke
+         password: bar
+         ipmask:   "10.0.0.*"
+
+     auths:
+       - mask:     "*@example.com"
+         password: hlagh
+         spoof:    jacob
+         no_tilde: true
+
+     peers:
+       - name:     otherserver.com
+         rpass:    hlaghpass
+         pass:     hlaghpass
+         type:     r
+         raddress: "127.0.0.1"
+         rport:    12345
+         auto:     true
+
+    The configuration file is in YAML or JSON format. It consists of a hash
+    containing the options described in the above code example. Only
+    "config" is required.
+
+  "lib"
+    Either the name of a directory containing Perl modules (e.g. plugins),
+    or an array of such names. Kind of like Perl's *-I*.
+
+  "pid_file"
+    Path to a pid file, as used by most daemons. If is specified,
+    App::Pocosi will refuse to run if the file already exists.
+
+  "log_file"
+    Path to a log file to which status messages will be written.
+
+  "class"
+    The IRC server component class. Defaults to
+    POE::Component::Server::IRC::State.
+
+  "config"
+    This is a hash of various configuration variables for the IRCd. See
+    PoCo-Server-IRC's "configure" for a list of parameters.
+
+  "plugins"
+    An array of arrays containing a short plugin class name (e.g.
+    'OperServ') and optionally a hash of arguments to that plugin. When
+    figuring out the correct package name, App::Pocosi will first try to
+    load POE::Component::Server::IRC::Plugin::*YourPlugin* before trying to
+    load *YourPlugin*.
+
+  "listeners"
+    An array of hashes. The keys should be any of the options listed in the
+    docs for PoCo-Server-IRC-Backend's "add_listener" method.
+
+  "auths"
+    An array of hashes. The keys are described in the docs for
+    PoCo-Server-IRC's "add_auth" method.
+
+  "operators"
+    An array of hashes. The keys are described in the docs for
+    PoCo-Server-IRC's "add_operator" method. You you can supply an array of
+    netmasks (the kind accepted by Net::Netmask's constructor) for the
+    'ipmask' key.
+
+  "peers"
+    An array of hashes. The keys should be any of the options listed in the
+    docs for PoCo-Server-IRC's "add_peer" method.
+
+  "denials"
+    An array of arrays. The first element of the inner array should be a
+    netmask accepted by Net::Netmask's constructor. The second (optional)
+    element should be a reason for the denial.
+
+  "exemptions"
+    An array of netmasks (the kind which Net::Netmask's constructor
+    accepts).
+
+OUTPUT
+    Here is some example output from the program:
+
+     $ pocosi -f example/config.yml
+     2011-05-22 15:30:02 Started (pid 13191)
+     2011-05-22 15:30:02 Constructing plugins
+     2011-05-22 15:30:02 Spawning IRCd component (POE::Component::Server::IRC)
+     2011-05-22 15:30:02 Registering plugins
+     2011-05-22 15:30:02 Added plugin PocosiStatus_1
+     2011-05-22 15:30:02 Added plugin OperServ_1
+     2011-05-22 15:30:02 Started listening on 127.0.0.1:10023
+     2011-05-22 15:30:02 Connected to peer otherserver.com on 127.0.0.1:12345
+     2011-05-22 15:30:02 Server otherserver.com (hops: 1) introduced to the network by myserver.com
+     ^C2011-05-22 15:30:18 Exiting due to SIGINT
+     2011-05-22 15:30:18 Deleted plugin OperServ_1
+     2011-05-22 15:30:18 Deleted plugin PocosiStatus_1
+     2011-05-22 15:30:18 IRCd component shut down
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,23 @@
+Revision history for App-count
+
+v0.1.1    2013-12-20 23:21:31 Asia/Tokyo
+    [Non-functional changes]
+        - Specify Getopt::Long version for GetOptionsFromArray (gh-14).
+
+v0.1.0    2013-12-18 22:28:23 Asia/Tokyo
+    [Functional changes]
+        - Add column reorder (-r) option (gh-7).
+        - Add shorthand notation '*' for all columns for -g (gh-8).
+        - Unquote a string specified by -t by using String::Unescape (gh-13).
+        - Warn too few fields explicitly, possible for wrong delimiter (gh-10).
+    [Non-functional changes]
+        - Add tests for exceptional cases (gh-6).
+        - Use DZPB::Author::YAKEX (gh-9).
+        - Use Getopt::Config::FromPod.
+
+v0.0.2    2013-05-10 08:17:55 Asia/Tokyo
+    - Add missing help options.
+    - Fix RT#85163 (Thanks to report, Alexandr Ciornii).
+
+v0.0.1    2013-05-03 08:53:41 Asia/Tokyo
+    - Initial release.

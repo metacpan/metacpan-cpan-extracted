@@ -1,0 +1,49 @@
+{
+   "abstract" : "declare and retrieve named attributes about CODE",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Attribute-Storage",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0.88",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Module::Build::Compat" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Attribute::Storage" : {
+         "file" : "lib/Attribute/Storage.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.09"
+}

@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/App/Nopaste/Service/Linode.pm
+t/00-compile.t

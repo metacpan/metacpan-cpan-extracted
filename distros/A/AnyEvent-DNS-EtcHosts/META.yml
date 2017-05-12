@@ -1,0 +1,27 @@
+---
+abstract: 'Use /etc/hosts before DNS'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+  - 'Marc Lehmann <schmorp@schmorp.de>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0.98'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-DNS-EtcHosts
+provides:
+  AnyEvent::DNS::EtcHosts:
+    file: lib/AnyEvent/DNS/EtcHosts.pm
+    version: '0.0103'
+requires:
+  AnyEvent: '7'
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-AnyEvent-DNS-EtcHosts
+version: '0.0103'

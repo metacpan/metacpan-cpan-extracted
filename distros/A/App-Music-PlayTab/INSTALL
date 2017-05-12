@@ -1,0 +1,23 @@
+INSTALLATION
+
+  - Type 'perl Makefile.PL'
+  - Type 'make'
+
+    blib/script/playtab is the playtab program
+
+  - Type 'make install' to install the program and the documentation
+    on your system. This usually requires super user privileges.
+
+EXAMPLES
+
+  You will find several examples in directory 'zzexamples'.
+  Most examples are from the 'Herbie White Big Band', a big band
+  started by Herman de Wit (knicknamed Herbie White). After his death
+  the bigband renamed itself to 'Herbie White Big Band' to his memorial.
+  http://johan.vromans.org/music/hwbb.html
+
+REQUIREMENTS
+
+  - Perl 5 standard installation, version 5.6 or higher.
+  - The test suite requires Test::More.
+

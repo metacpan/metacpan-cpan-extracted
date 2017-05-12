@@ -1,0 +1,18 @@
+#!/home/ivan/bin/perl
+
+use strict;
+use warnings;
+
+use AnnoCPAN::DBI;
+use AnnoCPAN::Feed;
+
+my @dists = AnnoCPAN::DBI::Dist->recent(0, 30);
+my $link = AnnoCPAN::Config->option('root_uri_abs') . "/recent_dists.rss";
+my $rss = AnnoCPAN::Feed->dist_rss(
+    dists           => \@dists,
+    link            => $link, 
+    title           => 'Recent CPAN distributions',
+    updateFrequency => 4,
+);
+
+print $rss->as_string;

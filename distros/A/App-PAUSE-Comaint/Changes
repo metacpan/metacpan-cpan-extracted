@@ -1,0 +1,25 @@
+Revision history for Perl extension App::PAUSE::Comaint
+
+0.07  2017-03-20 11:38:21 PDT
+        - Handle users who already have comaints (ilmari) #7
+
+0.06  2016-07-24 11:51:44 PDT
+        - Add missing YAML dependency
+
+0.05  2016-07-24 11:43:28 PDT
+        - remove the option to show the current maintainer
+
+0.04  2016-07-24 11:37:17 PDT
+        - Add Pause::Permissions #6
+
+0.03  2016-07-24 11:22:55 PDT
+        - Show the current maintainer
+        - Get the list of packages from cpanmetadb, no need for cpanm mirror cache (karupanerura) #5
+
+0.02  2014-09-18 14:02:55 JST
+        - Fix dependencies
+        - Detect errors in the argument order
+        - Use Milla
+
+0.01  Fri Mar  8 19:35:22 2013
+        - original version

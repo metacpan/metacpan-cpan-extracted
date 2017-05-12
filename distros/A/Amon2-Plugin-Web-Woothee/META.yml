@@ -1,0 +1,32 @@
+---
+abstract: 'The Amon2 Plugin for detecting the User Agent by Woothee'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+  Test::Requires: 0.06
+  Test::WWW::Mechanize::PSGI: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Amon2-Plugin-Web-Woothee
+provides:
+  Amon2::Plugin::Web::Woothee:
+    file: lib/Amon2/Plugin/Web/Woothee.pm
+    version: 0.02
+  Amon2::Plugin::Web::Woothee::Object:
+    file: lib/Amon2/Plugin/Web/Woothee.pm
+requires:
+  Amon2: 0
+  Woothee: 0
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/Amon2-Plugin-Web-Woothee/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Amon2-Plugin-Web-Woothee
+version: 0.02

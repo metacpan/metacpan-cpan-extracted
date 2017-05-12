@@ -1,0 +1,82 @@
+App::Raps2 0.54 - Sun Oct 04 2015
+
+    * add dump-all command
+    * Fix smartmatch warnings on perl ≥ 5.18
+
+App::Raps2 0.53 - Mon Jul 25 2011
+
+    * Make xclip command configurable (for chrome users, mostly)
+    * New --chrome and --xclip-cmd options
+
+App::Raps2 0.52 - Wed Jul 20 2011
+
+    * raps2 add: Fix pwgen usage (remove trailing whitespace)
+
+App::Raps2 0.51 - Wed Jul 20 2011
+
+    * Major usability improvements
+    * New dependency Config::Tiny
+    * New configuration file .config/raps2/defaults
+    * Add --cost option to set cost for raps2 add
+    * raps2 add: Use pwgen to create password if none is specified
+    * Add --no-echo, --paste and --pwgen-cmd options for raps2 add / pwgen
+
+    [App::Raps2]
+    * new: Add pwgen_cmd argument
+    * Add create_defaults, load_defaults, conf and generate_password methods
+    * pw_save: Add optional cost argument
+    * pw_load, pw_load_info: Now also return the key setup cost
+
+    [App::Raps2::Password]
+    * encrypt, decrypt: Now take hash as argument, keys are data/salt/cost
+
+    [App::Raps2::UI]
+    * to_clipboard: Return undef if xclip dosn't run, true otherwise
+
+App::Raps2 0.50 - Fri Jul 08 2011
+
+    * Switch to perl version scheme
+    * Remove Test::MockObject dependency
+    * Declare Test::Fatal dependency
+
+    [App::Raps2]
+    * Move cmd_* functions into raps2
+    * Rename pw_add t pw_save
+    * Rename pw_get to pw_load
+    * pw_load now also returns the salt
+    * file_to_hash now returns a hashref instead of a hash
+    * Allow password to be passed as argument to get_master_password
+    * Add pw_load_info method
+    * The 'salt' argument to pw_add is now optional
+    * Add the 'master_password' option to the 'new' method
+    * Add the no_cli option to App::Raps2->new()
+
+App::Raps2 0.4 - Sun Jul 03 2011
+
+    * Rename App::Raps2::Password's crypt method to bcrypt to avoid name
+      confusion with Perl's builtin function
+    * Add pw_add / pw_get methods
+    * Accept salt parameter in App::Raps2::Password encrypt/decrypt
+    * Mock Term::ReadLine to make tests run without tty
+    * Automatically run sanity_check and load_config when creating a new
+      App::Raps2 object
+    * raps2: Print error message when an invalid action is specified
+
+App::Raps2 0.3 - Wed May 18 2011
+
+    * Terminal input is now read via Term::ReadLine (included in perl core)
+    * New commands: "raps2 del <account>" and "raps2 edit <account>"
+    * Remove autodie, it caused a major performance loss
+    * raps2 list now sorts by account name
+
+raps2 0.2 - Fri May 13 2011
+
+    * Fix XDG_CONFIG_HOME / XDG_DATA_HOME handling bug. Adds new dependency
+      File::BaseDir
+    * Add "raps2 list" to list all saved accounts
+
+raps2 0.1 - Fri May 06 2011
+
+    * Eksblowfish crypto
+    * raps2 add/dump/get/info commands
+    * Supports URL, Login, Password and Extra fields

@@ -1,0 +1,14 @@
+#################################
+# Definitions
+%%query_1  zorch
+
+###################
+# URLs - web
+%%generic_web_url http://<intl><release>.search.blork.com?<query>
+
+%%english_success '(?:Success)'
+
+%%query <query_1>
+%%intl uk. ca. au. in.
+%%release staging
+<generic_web_url> /<english_success>/ Y <intl> results

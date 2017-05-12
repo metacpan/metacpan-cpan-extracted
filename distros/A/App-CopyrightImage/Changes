@@ -1,0 +1,21 @@
+Revision history for App-CopyrightImage
+
+0.04    UNRELEASED
+        - added tests for 'dst' and 'remove'
+        - updated POD with warnings that 'remove' DOES edit original files
+          without making copies
+
+0.03    2016-07-28
+        - tests for 'force'
+        - cleaned up other tests
+        - added more documentation
+        - added Travis and Appveyor CI integration
+
+0.02    2016-07-28
+        - most EXIF functionality working
+        - basic unit tests
+        - basic documentation
+
+0.01    2016-07-28
+        First version, released on an unsuspecting world.
+

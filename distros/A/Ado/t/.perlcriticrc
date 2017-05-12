@@ -1,0 +1,29 @@
+#Set severity to 'gentle' and then try stern. If we achieve 'harsh' the code is good enough.
+#5:gentle;4:stern;3:harsh
+severity  = harsh
+#only      = 1
+#force     = 1
+#verbose   = 11
+top       = 50
+#theme     = (pbp and security and bugs and maintenance and complexity and security)
+#include   = NamingConventions ClassHierarchies
+#exclude   = Variables  Modules::RequirePackage
+#criticism-fatal = 1
+#color     = 1
+#allow-unsafe = 0
+pager     = less
+
+#Perl::Critic::Policy::Subroutines::RequireArgUnpacking - Always unpack @_ first.
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 4
+allow_delegation_to = get_obj_args get_args _get_obj_args initialise
+
+[Variables::ProhibitPackageVars]
+add_packages = Carp Email::Address Ado::I18n
+
+#Shorten allowed lenght of regexp for more readability.
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 40
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 18

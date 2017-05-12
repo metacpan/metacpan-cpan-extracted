@@ -1,0 +1,14 @@
+diff -ru iup/srcplot/iup_plot.cpp iup.patched/srcplot/iup_plot.cpp
+--- iup/srcplot/iup_plot.cpp	2016-05-23 05:04:30.000000000 +0200
++++ iup.patched/srcplot/iup_plot.cpp	2016-09-04 23:00:00.888021300 +0200
+@@ -2728,7 +2728,9 @@
+ void IupPlotOpen(void)
+ {
+   IupGLCanvasOpen();
++#ifdef USE_CONTEXTPLUS
+   cdInitContextPlus();
++#endif
+ 
+   if (!IupGetGlobal("_IUP_PLOT_OPEN"))
+   {
+

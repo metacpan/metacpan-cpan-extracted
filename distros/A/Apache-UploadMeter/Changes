@@ -1,0 +1,67 @@
+Revision history for mod_perl library Apache::UploadMeter.
+
+0.10 : Oct  28, 2001 - Restarted when file got wiped :-(
+###
+0.11 : Nov  12, 2001 - Added new SSI to replace JS handler and increase unique-id reliability
+###
+0.12 : Nov  17, 2001 - Switched output to XML
+###
+0.14 : Dec  11, 2001 - Added configuration code
+###
+0.15 : Dec  12, 2001 - Improved configuration code to auto-detect namespace (for possible future subclassing)
+###
+0.16a: Jan  08, 2002 -  Added basic JIT handlers to configuration
+###
+0.17 : Jan  13, 2002 - Cleaned up some more code and documentation - seems beta-able
+###
+UploadMeter_port.patch:  Adds the port number to the generated Refresh URL
+
+UploadMeter_finished.patch:  Stops the Meter from Refreshing endlessly
+when the upload is complete
+
+UploadMeter_starttime.patch:  Adds the time the upload started to the
+output to allow upload rate calculations
+
+(Patches submitted by Cees Hek <cees@sitesuite.org>)
+###
+XSLT + XML Patch submitted by Cees Hek <cees@sitesuite.org>
+Started migrating internal calculations to XSLT
+Updated Schema (switch from DTD to xsd)
+###
+0.21 : Feb   3, 2002 - Prebundled "basic" skin on sourceforge.  Migrate from DTD to schema.  Time/Date formatting currently server-side.
+###
+0.22 : Feb   4, 2002 - Fixed incorrect XSLT address.
+###
+0.99_03 : Jan  22, 2007
+* Ported to Apache2/mod_perl2
+* Fixed logging utilities to use internal log_level instead of our own $DEBUG level
+* Get rid of function prototypes
+* Use closure to pass $hook_data
+* Use output filter instead of legacy Apache::SSI
+* Doc changes
+* Added normal configuration
+* Added simple test suite (tests sample upload handler, but not meter)
+(Developer release - unstable API)
+###
+0.99_05 : Jan  23, 2007
+* Fix XSLT URL
+* Fix output filter
+* Fix popup window
+###
+0.99_12 : Jan  23, 2007
+* Added needed use for Apache2::Connection and APR::Pool
+* Use handlers to serve XSL/XSD files
+* RC1 for 1.00 release
+###
+0.99_13 : Feb  11, 2007
+* Added JavaScript routines (UploadMeter object + JSON response handler)
+* Docs probably still not up-to-date
+* Not yet RC status for JSON - still need embedded JS example (ala Web 2.0)
+###
+9.99_14 : Feb  15, 2007
+* Added/fixed lots of documentation
+* Fixed config directive lookups
+###
+9.99_14 : Feb  21, 2007
+* Fixed MSIE-specific JS issues
+* Formatted documentation a bit better

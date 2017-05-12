@@ -1,0 +1,25 @@
+---
+abstract: 'The great new Acme::GILLIGAN::Utils!'
+author:
+  - 'Paul Cantalupo <pcantalupo@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-GILLIGAN-Utils
+provides:
+  Acme::GILLIGAN::Utils:
+    file: lib/Acme/GILLIGAN/Utils.pm
+    version: 0.02
+  Tie::Cycle:
+    file: lib/Tie/Cycle.pm
+    version: 0.01
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 0.02

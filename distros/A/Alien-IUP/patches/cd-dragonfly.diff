@@ -1,0 +1,16 @@
+diff -ru cd.orig\src\pdflib\pdflib\p_document.c cd\src\pdflib\pdflib\p_document.c
+--- cd.orig\src\pdflib\pdflib\p_document.c	Wed Aug 01 15:42:51 2012
++++ cd\src\pdflib\pdflib\p_document.c	Wed Aug 01 16:03:28 2012
+@@ -1411,7 +1411,12 @@
+ #endif
+ 
+         doc->fp = fp;
++#ifdef __DragonFly__
++/* ugly hack by kmx, however otherwise it does not compile on DragonFly BSD */
++        doc->len = 1;
++#else
+         doc->len = sizeof(FILE);
++#endif
+     }
+     else if (filename && (*filename || len > 0))
+     {

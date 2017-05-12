@@ -1,0 +1,4 @@
+name = "Acme-MilkyHolmes"
+badges = ["travis","coveralls"]
+authority="cpan:TSUCCHI"
+

@@ -1,0 +1,50 @@
+Revision history for AlignDB-IntSpan
+
+1.1.1  2016-12-14 02:10:08 CST
+    - Cleanup namespaces
+
+1.1.0  2016-12-11 07:42:50 CST
+    - Add codecov badge
+    - Remove run_list(), empty(), contain(), member() and duplicate() as aliases
+    - Add tests for errors
+    - Add tests for banish_span() and substr_span()
+
+1.0.7  2016-05-10 19:14:21 CST
+    - For empty sets, spans(), sets() and runlists() returns nothing.
+
+1.0.6  2016-05-07 16:17:52 CST
+    - Travis CI
+
+1.0.5  2016-04-12 04:05:26 CST
+    - Shortcuts for empty sets
+
+1.0.4  2016-04-10 04:16:07 CST
+    - Reduce internally using ranges()
+
+1.0.3  2016-04-08 14:45:12 CST
+    - Clean PODs
+
+1.0.2  2016-04-01 08:31:59 CST
+    - Remove YAML in tests
+
+1.0.1  2016-04-01 08:23:45 CST
+    - Add travis-ci
+
+1.0.0  2016-01-15 15:12:02 CST
+    - Switch to Dist::Milla
+    - Use isint() from Scalar::Util::Numeric
+
+0.06   Fri Nov 28 01:29:13 2008
+    - Polish PODs
+
+0.05   Thu Nov 27 18:45:35 2008
+    - Switch to Dist::Zilla
+
+0.003  2008/6/2 2:18:04
+    - Don't use Module::Build
+
+0.002  2008/4/18 19:46:25
+    - Make AlignDB::IntSpan to be a standalone cpan-style dist
+
+0.001  Tue Jan  8 03:54:56 2008
+    - Initial release.

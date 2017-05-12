@@ -1,0 +1,80 @@
+{
+   "abstract" : "the combination wrapper of Algorithm::NaiveBayes and Text::MeCab.",
+   "author" : [
+      "Shinichi Goto <shingtgt @ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AI-Classifier-Japanese",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::NaiveBayes" : "0",
+            "Mouse" : "0",
+            "Text::MeCab" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::File" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "AI::Classifier::Japanese" : {
+         "file" : "lib/AI/Classifier/Japanese.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shin-en/AI-Classifier-Japanese/issues"
+      },
+      "homepage" : "https://github.com/shin-en/AI-Classifier-Japanese",
+      "repository" : {
+         "url" : "git://github.com/shin-en/AI-Classifier-Japanese.git",
+         "web" : "https://github.com/shin-en/AI-Classifier-Japanese"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "shin-en <van.s.ver@gmail.com>"
+   ]
+}

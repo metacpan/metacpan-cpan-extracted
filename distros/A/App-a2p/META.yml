@@ -1,0 +1,30 @@
+---
+abstract: 'Awk to Perl translator'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Devel::FindPerl: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  IPC::Open2: '0'
+  Test::More: '0.89'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-a2p
+provides:
+  App::a2p:
+    file: lib/App/a2p.pm
+    version: '1.009'
+requires:
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-a2p
+  repository: git://github.com/Leont/app-a2p.git
+version: '1.009'

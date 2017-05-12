@@ -1,0 +1,46 @@
+SYNOPSIS
+
+     use App::hr qw(hr hr_r);
+     hr;
+
+    Sample output:
+
+     =============================================================================
+
+    Set pattern:
+
+     hr('x----');
+
+    Sample output:
+
+     x----x----x----x----x----x----x----x----x----x----x----x----x----x----x----x-
+
+    Use random color and random pattern:
+
+     hr_r;
+
+    You can also use the provided CLI hr.
+
+prepend:FUNCTIONS
+
+ hr([ PATTERN [, COLOR ] ]) => optional STR
+
+    Print (under void context) or return (under scalar/array context) a
+    horizontal ruler with the width of the terminal.
+
+    Terminal width is determined using Term::Size.
+
+    PATTERN is optional, can be multicharacter, but cannot be empty string.
+    The defautl is =.
+
+    Under Windows, will shave one character at the end because the terminal
+    cursor will move a line down when printing at the last column.
+
+ hr_r => optional STR
+
+    Like hr, but will set random pattern and random color.
+
+SEE ALSO
+
+    ruler (App::ruler)
+

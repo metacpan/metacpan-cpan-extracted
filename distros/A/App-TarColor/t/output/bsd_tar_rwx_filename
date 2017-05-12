@@ -1,0 +1,8 @@
+-rwxr-xr-x  1 marca  CHEGG\domain users 0 Jan 15 09:41 [01;32m09[0m
+-rwxr-xr-x  1 marca  CHEGG\domain users 0 Jan 15 09:41 [01;32mJan[0m
+-rwxr-xr-x  1 marca  admin              0 Jan 15 10:25 [01;32mJan2[0m
+-rw-r--r--  1 marca  admin              0 Jan 15 10:27 filename with spaces
+-rwxr-xr-x  1 marca  CHEGG\domain users 0 Jan 15 09:31 [01;32mrwx[0m
+lrwxr-xr-x  1 marca  CHEGG\domain users 0 Jan 15 13:21 [40;34msymlink with spaces[0m -> filename with spaces
+-rwxr-xr-x  1 marca  CHEGG\domain users 0 Jan 15 09:39 [01;32musers[0m
+lrwxr-xr-x  1 marca  CHEGG\domain users 0 Jan 15 09:33 [40;34mw[0m -> rwx

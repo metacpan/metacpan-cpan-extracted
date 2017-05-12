@@ -1,0 +1,761 @@
+#!perl
+
+our $DATE = '2016-03-10'; # DATE
+our $VERSION = '0.22'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+#use experimental 'smartmatch';
+
+use Getopt::Long qw(:config no_ignore_case);
+use Text::CSV_XS qw(csv);
+
+my %Opts = (
+    format => undef,
+    action => 'query',
+    hash   => 0,
+    functions => [],
+    function_defs => [],
+);
+my %Tables;
+
+our $DEBUG = $ENV{DEBUG};
+
+sub _debug {
+    my $msg = shift;
+
+    $msg .= "\n" unless $msg =~ /\n$/;
+    warn "DEBUG: $msg" if $DEBUG;
+}
+
+sub _prepare_tempdir {
+    require File::Temp;
+
+    state $tempdir;
+
+    return $tempdir if $tempdir;
+    $tempdir = File::Temp::tempdir(
+        CLEANUP => $ENV{DEBUG_KEEP_TEMPDIR} ? 0:1);
+    _debug("Created tempdir: $tempdir");
+    return $tempdir;
+}
+
+# parse filename and tablename from arg, copy stdin to tempfile
+sub _preprocess_arg {
+    my ($arg, $opts) = @_;
+
+    $opts->{copy_stdin_to_tempfile} //= 1;
+
+    state $stdin_specified;
+
+    my ($file, $table);
+    if ($arg =~ /(.+):(.+)/) {
+        $file  = $1;
+        $table = $2;
+    } elsif ($arg eq '-') {
+        $file  = '-';
+        $table = 'stdin';
+    } else {
+        $file  = $arg;
+        $table = $file;
+        $table =~ s!.+[/\\]!!; # strip path
+        $table =~ s!\.\w+\z!!; # strip filename extension
+        $table =~ s/[^A-Za-z_0-9]+/_/g;
+    }
+
+    unless ($table =~ /\A[A-Za-z_][A-Za-z_0-9]*\z/) {
+        warn "fsql: Invalid table name $table, ".
+            "please use letter+alphanums only\n";
+        exit 99;
+    }
+    if (exists $Tables{$table}) {
+        warn "fsql: Duplicate table name $table, please use another name\n";
+        exit 99;
+    }
+
+    my ($fh, $tempfile);
+    if ($file eq '-') {
+        if ($stdin_specified++) {
+            warn "fsql: stdin cannot be specified more than once\n";
+            exit 99;
+        }
+        if ($opts->{copy_stdin_to_tempfile}) {
+            my $tempdir = _prepare_tempdir();
+            $tempfile = "$tempdir/$table";
+            open $fh, ">", $tempfile
+                or die "fsql: Can't write to tempfile $tempfile: $!\n";
+            print $fh $_ while ($_ = <STDIN>);
+            open $fh, "<", $tempfile
+                or die "fsql: BUG: Can't reopen tempfile $tempfile: $!\n";
+        } else {
+            $fh = *STDIN;
+        }
+    } else {
+        open $fh, "<", $file
+            or die "fsql: Can't open $file: $!\n";
+    }
+
+    return {
+        orig_file => $file,
+        file      => $tempfile // $file,
+        fh        => $fh,
+        table     => $table,
+    };
+}
+
+sub _register_table {
+    my ($arginfo, %overrides) = @_;
+    $Tables{$arginfo->{table}} = {
+        file      => $arginfo->{file},
+        orig_file => $arginfo->{orig_file},
+        fmt       => 'csv',
+        %overrides,
+    };
+}
+
+sub _add {
+    my ($arg, $arginfo) = @_;
+    $arginfo //= _preprocess_arg($arg);
+
+    # try to detect type
+    my $type;
+    {
+        if ($arginfo->{orig_file} =~ /\.(\w+)\z/) {
+            my $ext = lc $1;
+            if ($ext =~ /^csv$/) {
+                $type = 'csv'; last;
+            } elsif ($ext =~ /^tsv$/) {
+                $type = 'tsv'; last;
+            } elsif ($ext =~ /^ltsv$/) {
+                $type = 'ltsv'; last;
+            } elsif ($ext =~ /^(json|js)$/) {
+                $type = 'json'; last;
+            } elsif ($ext =~ /^ya?ml$/) {
+                $type = 'yaml'; last;
+            } elsif ($ext =~ /^(perl|pl|pm)$/) {
+                $type = 'perl'; last;
+            }
+        }
+
+        # read a few lines from file
+        my $fh = $arginfo->{fh};
+        my $i = 1;
+        my $content = '';
+        my $firstline;
+        while (<$fh>) {
+            $firstline = $_ if $i == 1;
+            $content .= $_;
+            last if ++$i > 5;
+        }
+
+        last unless defined $firstline;
+        if ($firstline =~ /\t/) {
+            if ($firstline =~ /:/) {
+                $type = 'ltsv';
+            } else {
+                $type = 'tsv';
+            }
+        } elsif ($content =~ /=>/) {
+            $type = 'perl';
+        } elsif ($content =~ /[A-Za-z_]\w*, / || # bareword element, e.g. [foo, bar]
+                     $content =~ /[A-Za-z_]\w*:\s/i) { # bareword key, e.g. [foo: bar]
+            $type = 'yaml';
+        } elsif ($content =~ /"[^"]*":\S/) { # yaml requires space
+            $type = 'json';
+        } else {
+            $type = 'csv';
+        }
+        # put file pointer back at the beginning
+        seek $arginfo->{fh}, 0, 0;
+    }
+
+    $type //= "";
+    if ($type eq 'csv') {
+        _add_csv($arg, $arginfo);
+    } elsif ($type eq 'tsv') {
+        _add_tsv($arg, $arginfo);
+    } elsif ($type eq 'ltsv') {
+        _add_ltsv($arg, $arginfo);
+    } elsif ($type eq 'json') {
+        _add_json($arg, $arginfo);
+    } elsif ($type eq 'yaml') {
+        _add_yaml($arg, $arginfo);
+    } elsif ($type eq 'perl') {
+        _add_perl($arg, $arginfo);
+    } else {
+        die "fsql: Can't determine table type for '$arg'\n";
+    }
+}
+
+sub _add_csv {
+    my ($arg, $arginfo) = @_;
+    $arginfo //= _preprocess_arg($arg);
+    _register_table($arginfo);
+}
+
+sub _add_tsv {
+    my ($arg, $arginfo) = @_;
+    $arginfo //= _preprocess_arg($arg);
+
+    my $tempdir = _prepare_tempdir();
+    my $aoa = csv(in => $arginfo->{file}, sep_char=>"\t");
+    my $outfile = "$tempdir/$arginfo->{table}";
+    csv(in => $aoa, out=>$outfile);
+    _register_table($arginfo, file=>$outfile, fmt=>'tsv');
+}
+
+sub _add_ltsv {
+    require Text::LTSV;
+
+    my ($arg, $arginfo) = @_;
+    $arginfo //= _preprocess_arg($arg);
+
+    my $tempdir = _prepare_tempdir();
+    my $ltsv = Text::LTSV->new;
+    my $aoh = $ltsv->parse_file($arginfo->{fh});
+    my $outfile = "$tempdir/$arginfo->{table}";
+    csv(in => $aoh, out => $outfile);
+    _register_table($arginfo, file=>$outfile, fmt=>'ltsv');
+}
+
+sub _res_to_csv {
+    require Perinci::Result::Util;
+
+    my ($res, $arginfo, $fmt) = @_;
+    my $tf;
+    if (Perinci::Result::Util::is_env_res($res)) {
+        $tf = $res->[3]{"table.fields"}
+            if $res->[3] && $res->[3]{"table.fields"};
+        $res = $res->[2];
+    }
+
+    unless (ref($res) eq 'ARRAY') {
+        warn "fsql: Data is not an array: $arginfo->{file}\n";
+        exit 99;
+    }
+
+    my $tempdir = _prepare_tempdir();
+    my $outfile = "$tempdir/$arginfo->{table}";
+
+    # handle special case of zero rows
+    unless (@$res) {
+        csv(in => [], headers => $tf ? $tf : ["column0"],
+            out => $outfile);
+        goto END;
+    }
+
+    my $row0 = $res->[0];
+
+    # handle another special case of array of scalars
+    unless (ref($row0) eq 'ARRAY' || ref($row0) eq 'HASH') {
+        csv(in => [map {[$_]} @$res], headers=>["column0"],
+            out => $outfile);
+        goto END;
+    }
+
+    # produce headers for aoa without tf
+    if (ref($row0) eq 'ARRAY' && !$tf) {
+        $tf = [map {"column$_"} 0..@$row0-1];
+    }
+
+    csv(in=>$res, headers=>$tf, out=>$outfile);
+
+  END:
+    _register_table($arginfo, file => $outfile, fmt => $fmt);
+}
+
+sub _add_json {
+    require JSON::MaybeXS;
+
+    my ($arg, $arginfo) = @_;
+    $arginfo //= _preprocess_arg($arg, {copy_stdin_to_tempfile=>0});
+
+    state $json = JSON::MaybeXS->new->allow_nonref;
+    my $res;
+    {
+        local $/;
+        my $fh = $arginfo->{fh}; # perl's diamond syntax limitation
+        my $content = <$fh>;
+        $res = $json->decode($content);
+    }
+    _res_to_csv($res, $arginfo, 'json');
+}
+
+sub _add_yaml {
+    require YAML::XS;
+
+    my ($arg, $arginfo) = @_;
+    $arginfo //= _preprocess_arg($arg);
+
+    # YAML::XS::LoadFile doesn't accept filehandle
+    my $res = YAML::XS::LoadFile($arginfo->{file});
+    _res_to_csv($res, $arginfo, 'yaml');
+}
+
+sub _add_perl {
+    my ($arg, $arginfo) = @_;
+    $arginfo //= _preprocess_arg($arg, {copy_stdin_to_tempfile=>0});
+
+    my $res;
+    {
+        local $/;
+        my $fh = $arginfo->{fh};
+        my $content = <$fh>;
+        $res = eval $content;
+        die if $@;
+    }
+    _res_to_csv($res, $arginfo, 'perl');
+}
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'format|f=s'     => \$Opts{format},
+        'add|a=s'        => sub { _add($_[1]) },
+        'add-csv=s'      => sub { _add_csv($_[1]) },
+        'add-tsv=s'      => sub { _add_tsv($_[1]) },
+        'add-ltsv=s'     => sub { _add_ltsv($_[1]) },
+        'add-json=s'     => sub { _add_json($_[1]) },
+        'add-yaml=s'     => sub { _add_yaml($_[1]) },
+        'add-perl=s'     => sub { _add_perl($_[1]) },
+        'load-function|F=s' => sub {
+            die "Invalid function name syntax '$_[1]', please use alphanums only\n"
+                unless $_[1] =~ /\A[A-Za-z_][A-Za-z_0-9]*(:[A-Za-z_][A-Za-z_0-9]*)?\z/;
+            push @{ $Opts{functions} }, uc($_[1]);
+        },
+        'define-function|D=s' => sub {
+            die "Invalid function definition syntax, please provide name:code\n"
+                unless $_[1] =~ /(.+?):(.+)/;
+            my ($name, $code) = ($1, $2);
+            die "Invalid function name syntax '$name', please use alphanums only\n"
+                unless $name =~ /\A[A-Za-z_][A-Za-z_0-9]*\z/;
+            my $compiled_code = eval "sub { $code }";
+            die "Invalid Perl code in function definition of '$name': $@ (code is: $code)\n" if $@;
+            push @{ $Opts{function_defs} }, {name=>uc($name), code=>$compiled_code};
+        },
+        'show-schema|s'  => sub { $Opts{action} = 'show-schema' },
+        'aoh'            => sub { $Opts{hash} = 1 },
+        'aoa'            => sub { $Opts{hash} = 0 },
+        'help|h'         => sub {
+            print <<USAGE;
+Usage:
+  fsql [OPTIONS]... [ <QUERY> | --show-schema|-s ]
+  fsql --help|h
+  fsql --version|-v
+Options:
+  --add=s
+  --add-csv=s
+  --add-tsv=s
+  --add-ltsv=s
+  --add-json=s
+  --add-yaml=s
+  --add-perl=s
+  --load-function=s, -F
+  --define-function=s, -D
+  --format=s, -f
+  --aoh, --aoa
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+        'version|v'      => sub {
+            say "fsql version ", ($main::VERSION // "dev"),
+                ($main::DATE ? " ($main::DATE)" : "");
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+    unless (keys %Tables) {
+        _add("-");
+    }
+
+    # pick default format from the most used input format
+    unless ($Opts{format}) {
+        my %fmts;
+        $fmts{$Tables{$_}{fmt}}++ for keys %Tables;
+        my @fmts = sort {$fmts{$b} <=> $fmts{$a} || $a cmp $b} keys %fmts;
+        $Opts{format} = $fmts[0];
+    }
+}
+
+sub run {
+    require DBI;
+
+    my $res;
+
+    if ($Opts{action} eq 'show-schema') {
+
+        my $tt = {};
+        for my $t (sort keys %Tables) {
+            open my($fh), "<", $Tables{$t}{file}
+                or die "fsql: Can't open $Tables{$t}{file}: $!\n";
+            my $line1 = <$fh>;
+            $line1 =~ s/\r?\n//;
+            $Tables{$t}{columns} = [
+                # XXX we should perhaps ask DBD::CSV directly
+                map {s/\A"(.*)"\z/$1/; s/\W/_/g; lc $_}
+                    split /,/, $line1];
+        }
+        $res = [200, "OK", {tables => \%Tables}];
+	$Opts{format} = 'text' if $Opts{format} =~ /^(c|t|lt)sv$/;
+
+    } elsif ($Opts{action} eq 'query') {
+        unless (@ARGV) {
+            warn "fsql: Please specify query\n";
+            exit 99;
+        }
+        if (@ARGV > 1) {
+            warn "fsql: Too many arguments, ".
+                "please specify only 1 argument (query)\n";
+            exit 99;
+        }
+        my $query = $ARGV[0];
+
+        my $tempdir = _prepare_tempdir();
+        my $dbh = DBI->connect(
+            "dbi:CSV:", undef, undef,
+            {
+                RaiseError => 1,
+                csv_tables => {
+                    map { $_=>{f_file=>$Tables{$_}{file}} }
+                        keys %Tables,
+                },
+            });
+
+        for my $func (@{ $Opts{functions} }) {
+            my ($name, $newname);
+            if ($func =~ /(.+):(.+)/) {
+                $name = $1;
+                $newname = $2;
+            } else {
+                $name = $newname = $func;
+            }
+            my $mod = "SQL::Statement::Function::ByName::$name";
+            (my $mod_pm = $mod) =~ s!::!/!g; $mod_pm .= ".pm";
+            require $mod_pm;
+            if (defined &{"$mod\::SQL_FUNCTION_$name"}) {
+                $dbh->do(qq{CREATE FUNCTION $newname NAME "$mod\::SQL_FUNCTION_$name"});
+            } else {
+                # old, deprecated, will be removed someday
+                $dbh->do(qq{CREATE FUNCTION $newname NAME "$mod\::$name"});
+            }
+        }
+
+        for my $entry (@{ $Opts{function_defs} }) {
+            no strict 'refs';
+            my $addr = "$entry->{code}"; $addr =~ s/CODE\(0x(.+)\)/$1/;
+            my $name = "App::fsql::SQL_FUNCTIONS::f$addr";
+            *{$name} = $entry->{code};
+            $dbh->do(qq{CREATE FUNCTION $entry->{name} NAME "$name"});
+        }
+
+        my $sth = $dbh->prepare($query);
+        $sth->execute;
+
+        # not SELECT query, no need to display result
+        unless ($query =~ /\A\s*SELECT\b/is) {
+            return;
+        }
+
+        my @rows;
+        if ($Opts{hash}) {
+            while (my $row = $sth->fetchrow_hashref) {
+                push @rows, $row;
+            }
+        } else {
+            while (my @row = $sth->fetchrow_array) {
+                push @rows, \@row;
+            }
+        }
+        $res = [200, "OK", \@rows, {"table.fields" => $sth->{NAME}}];
+
+    } else {
+
+        die "BUG: Unknown action\n";
+
+    }
+
+    show_result($res);
+}
+
+sub show_result {
+    my $res = shift;
+
+    my $ff = $res->[3]{"table.fields"};
+    if ($Opts{format} =~ /^[ct]sv$/) {
+        csv(in => $res->[2], headers => $ff, out => *STDOUT,
+	    sep_char => $Opts{format} eq 'tsv' ? "\t" : ',');
+    } elsif ($Opts{format} eq 'ltsv') {
+        # Text::LTSV expects a format of [[k=>v, k2=>v2, ...], ...]. we might as
+        # well print it ourselves.
+        for my $row (@{ $res->[2] }) {
+            if (ref($row) eq 'HASH') {
+                say join("\t", map {"$_:".($row->{$_} // '')} @$ff);
+            } else {
+                say join("\t", map {"$ff->[$_]:".($row->[$_] // '')} 0..@$ff-1);
+            }
+        }
+    } elsif ($Opts{format} eq 'perl') {
+        require Data::Format::Pretty::Perl;
+        print Data::Format::Pretty::Perl::format_pretty($res->[2]);
+    } elsif ($Opts{format} eq 'json') {
+        require Data::Format::Pretty::JSON;
+        print Data::Format::Pretty::JSON::format_pretty($res->[2]);
+    } elsif ($Opts{format} eq 'text') {
+        require Data::Format::Pretty::Console;
+        print Data::Format::Pretty::Console::format_pretty($res->[2]);
+    } elsif ($Opts{format} eq 'yaml') {
+        require Data::Format::Pretty::YAML;
+        print Data::Format::Pretty::YAML::format_pretty($res->[2]);
+    } else {
+        die "fsql: Invalid output format, please see documentation ".
+            "for known output formats\n";
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Perform SQL queries against files in CSV/TSV/LTSV/JSON/YAML formats
+# PODNAME: fsql
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fsql - Perform SQL queries against files in CSV/TSV/LTSV/JSON/YAML formats
+
+=head1 VERSION
+
+This document describes version 0.22 of fsql (from Perl distribution App-fsql), released on 2016-03-10.
+
+=head1 SYNOPSIS
+
+ fsql [OPTIONS] [ <QUERY> | --show-schema|-s ]
+
+=head1 DESCRIPTION
+
+B<fsql> lets you perform SQL queries against one or several "flat" files of
+various formats. Each file will be regarded as a SQL table. By using SQL
+queries, you can do various calculations or manipulations that are otherwise
+hard/cumbersome to do with traditional text-manipulating Unix commands like
+B<cut>, B<sort>, B<head>, B<tail>, B<uniq>, and so on. Particularly: data
+grouping, joining, or filtering with SQL expressions and functions.
+
+As a bonus, you can also modify data (currently CSV only) via SQL INSERT or
+DELETE commands.
+
+The query result will then be printed out, in one of several available formats.
+
+The magic of all this is performed by L<DBD::CSV> and L<SQL::Statement>.
+
+To use C<fsql>, you must at least specify one file/table (with C<--add> or one
+of the C<--add-TYPE> options). If none of those options are specified, a table
+is assumed in STDIN with name C<stdin> and the format will be detected. You must
+also specify a SQL query.
+
+=head1 EXAMPLES
+
+Filter CSV (table from stdin is aptly named so):
+
+ % prog-that-produces-csv | fsql 'SELECT id,name FROM stdin WHERE id <= 1000' > final.csv
+
+Pick output format, produce array of hashes instead of the default array of
+arrays:
+
+ % fsql -a ~/book.pl 'SELECT title,name FROM book WHERE year >= 2010' --aoh -f json
+
+You can perform joins, of course:
+
+ % fsql -a t.json -a 2.csv:t2 'SELECT * FROM t1 LEFT JOIN t2 ON t1.uid=t2.id'
+
+Show schema:
+
+ % fsql -a table1.json -a 2.csv:table2 -s
+
+Insert row to CSV:
+
+ % fsql -a file.csv 'INSERT INTO file VALUES (1, 2, 3)'
+
+Delete rows from CSV:
+
+ % fsql -a file.csv 'DELETE FROM file WHERE c1 < 10'
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O or SQL error.
+
+99 on command-line options or input data error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --add=FILENAME[:TABLENAME], -a
+
+Add a table from a file. Type will be detected from filename extension (and some
+heuristics, if there is no file extension or extension is unrecognized). Die if
+type cannot be detected.
+
+Sometimes the detection will miss. Alternatively, you can use one of the
+C<--add-TYPE> options to add a specific table type.
+
+=item * --add-csv=FILENAME[:TABLENAME]
+
+Add a table from a CSV file. If C<TABLENAME> is not specified, it will be taken
+from C<FILENAME> (e.g. with filename C<foo-bar.csv>, table name will be
+C<foo_bar>). C<FILENAME> can be C<-> to mean the standard input (the default
+table name will be C<stdin>). Will croak if duplicate table name is detected.
+
+Table name must match regex C</\A[A-Za-z_][A-Za-z_0-9]*\z/>.
+
+=item * --add-tsv=FILENAME[:TABLENAME]
+
+Like C<--add-csv>, but will load file as TSV (tab-separated value).
+
+=item * --add-ltsv=FILENAME[:TABLENAME]
+
+Like C<--add-csv>, but will load file as LTSV (labeled tab separated value, see
+L<Text::LTSV>). Names of columns will be taken from the first row.
+
+=item * --add-json=FILENAME[:TABLENAME]
+
+Like C<--add-csv>, but will load file as JSON.
+
+Data can be array, or array of arrays, or array of hashes, or an enveloped
+response (see L<Rinci::function>), so it is suitable to accept piped output of
+L<Perinci::CmdLine>-based programs.
+
+=item * --add-yaml=FILENAME[:TABLENAME]
+
+Like C<--add-json>, but will load file as YAML.
+
+=item * --add-perl=FILENAME[:TABLENAME]
+
+Like C<--add-json>, but will load file as Perl.
+
+=item * --load-function=NAME, -F
+
+Load a SQL function. This will load Perl module
+C<SQL::Statement::Function::ByName::NAME>. See CPAN for list of available
+modules.
+
+If you use C<NAME:NEWNAME>, you can load a SQL function as another name, for
+example:
+
+ -F DAYOFYEAR:DOY
+
+=item * --define-function=NAME:CODE, -D
+
+Define a SQL function. You need to specify name as well as perl code that
+implements it. Perl code will be wrapped in a subroutine, it should expect the
+function argument in C<$_[2]> (for more details see
+L<SQL::Statement::Functions>). Example:
+
+ --define-function 'MONTH:$_[2] =~ /^\d{4}-(\d{2})-/ or return undef; $1+0'
+
+=item * --aoa
+
+Return array of array (the default). Only relevant to outputs like C<perl>,
+C<json>, C<yaml>, C<text>.
+
+=item * --aoh
+
+Return array of hashes instead of the default array of array, where each row is
+represented as a hash (dictionary/associated array) instead of an array. Only
+relevant to output formats like C<perl>, C<json>, C<yaml>, C<text>.
+
+Returning a hash is convenient when you want column name information on each
+row, but you can't specify the same column twice and order of columns are not
+guaranteed.
+
+=item * --format=FORMAT (default: text), -f
+
+Set output format.
+
+The value C<csv> or C<tsv> or C<ltsv> will cause query results to be output as a
+comma-separated or TAB-separated list or labeled-TAB separated list,
+respectively. As this isn't very useful for a schema listing, these values will
+be silently converted to C<text> if C<--show-schema> (C<-s>) is also present.
+
+The other values C<perl>, C<json>, C<yaml>, and C<text> will be formatted using
+appropriate L<Data::Format::Pretty> formatter.
+
+The default value is the most used table format. So if your tables are mostly
+CSV, B<fsql> will also output CSV by default.
+
+=item * --show-schema, -s
+
+Instead of running a query, show schema instead. This is useful for debugging.
+
+=back
+
+=head1 FAQ
+
+=head2 What SQL dialect is supported? Why is SQL feature "X" not supported?
+
+See L<SQL::Statement::Syntax> for the range of supported SQL syntax. In short,
+you can do select with several kinds of joins, almost/around 100 builtin
+functions (with additional functions available from Perl modules, see next FAQ
+entry), etc.
+
+Also, sometimes if there is SQL parsing error, the error message is not
+immediately obvious and can be a bit confusing. That is usually a
+parsing limitation/bug within SQL::Statement.
+
+=head2 How do I define more SQL functions? Why aren't there more date/time/X functions?
+
+SQL::Statement allows loading Perl functions as SQL functions. There are several
+CPAN modules (see the C<SQL::Statement::Function::ByName::> namespace) which
+nicely package them so you can load them from B<fsql> simply by using the C<-F>
+option, e.g. to load the YEAR() function:
+
+ % fsql -F YEAR --add-csv sometable.csv 'SELECT c1, YEAR(c2) FROM sometable ...'
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG => bool
+
+If set to true, print debugging messages.
+
+=head2 DEBUG_KEEP_TEMPDIR => bool
+
+If set to true, will not cleanup tempdir.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-fsql>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-fsql>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-fsql>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

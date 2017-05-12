@@ -1,0 +1,82 @@
+NAME
+    Apache::Log::Parser - Parser for Apache Log (common, combined, and any
+    other custom styles by LogFormat).
+
+SYNOPSIS
+      my $parser = Apache::Log::Parser->new( fast => 1 );
+
+      my $log = $parser->parse($logline);
+      $log->{rhost}; #=> remote host
+      $log->{agent}; #=> user agent
+
+DESCRIPTION
+    Apache::Log::Parser is a parser module for Apache logs, accepts
+    'common', 'combined', and any other custom style. It works relatively
+    fast, and process quoted double-quotation properly.
+
+    Once instanciate a parser, it can parse all of types specified with one
+    method 'parse'.
+
+USAGE
+    This module requires a option 'fast' or 'strict' with instanciate.
+
+    'fast' parser works relatively fast. It can process only 'common',
+    'combined' and custom styles with compatibility with 'common', and
+    cannot work with backslash-quoted double-quotes in fields.
+
+      # Default, for both of 'combined' and 'common'
+      my $parser = Apache::Log::Parser->new( fast => 1 );
+  
+      my $log1 = $parser->parse(<<COMBINED);
+      192.168.0.1 - - [07/Feb/2011:10:59:59 +0900] "GET /path/to/file.html HTTP/1.1" 200 9891 "-" "DoCoMo/2.0 P03B(c500;TB;W24H16)"
+      COMBINED
+  
+      # $log1->{rhost}, $log1->{date}, $log1->{path}, $log1->{refer}, $log1->{agent}, ...
+  
+      my $log2 = $parser->parse(<<COMMON); # parsed as 'common'
+      192.168.0.1 - - [07/Feb/2011:10:59:59 +0900] "GET /path/to/file.html HTTP/1.1" 200 9891
+      COMMON
+  
+      # For custom style(additional fields after 'common'), 'combined' and common
+      # custom style: LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" \"%v\" \"%{cookie}n\" %D"
+      my $c_parser = Apache::Log::Parser->new( fast => [[qw(refer agent vhost usertrack request_duration)], 'combined', 'common'] );
+  
+      my $log3 = $c_parser->parse(<<CUSTOM);
+      192.168.0.1 - - [07/Feb/2011:10:59:59 +0900] "GET /index.html HTTP/1.1" 200 257 "http://example.com/referrer" "Any User-Agent" "example.com" "192.168.0.1201102091208001" 901
+      CUSTOM
+  
+      # $log3->{agent}, $log3->{vhost}, $log3->{usertrack}, ...
+
+    'strict' parser works relatively slow. It can process any style format
+    logs, with specification about separator, and checker for perfection. It
+    can also process backslash-quoted double-quotes properly.
+
+      # 'strict' parser is available for log formats without compatibility for 'common', like 'vhost_common' ("%v %h %l %u %t \"%r\" %>s %b")
+      my @customized_fields = qw( rhost logname user datetime request status bytes refer agent vhost usertrack request_duration );
+      my $strict_parser = Apache::Log::Parser->new( strict => [
+          ["\t", \@customized_fields, sub{my $x=shift;defined($x->{vhost}) and defined($x->{usertrack}) }], # TABs as separator
+          [" ", \@customized_fields, sub{my $x=shift;defined($x->{vhost}) and defined($x->{usertrack}) }],
+          'combined',
+          'common',
+          'vhost_common',
+      ]);
+  
+      my $log4 = $strict_parser->parse(<<CUSTOM);
+      192.168.0.1 - - [07/Feb/2011:10:59:59 +0900] "GET /index.html HTTP/1.1" 200 257 "http://example.com/referrer" "Any \"Quoted\" User-Agent" "example.com" "192.168.0.1201102091208001" 901
+      CUSTOM
+  
+      $log4->{agent} #=> 'Any "Quoted" User-Agent'
+  
+      my $log5 = $strict_parser->parse(<<VHOST);
+      example.com 192.168.0.1 - - [07/Feb/2011:10:59:59 +0900] "GET /index.html HTTP/1.1" 200 257
+      VHOST
+
+LICENSE
+    This software is licensed under the same terms as Perl itself.
+
+AUTHOR
+    TAGOMORI Satoshi <tagomoris at gmail.com>
+
+SEE ALSO
+    <http://httpd.apache.org/docs/2.2/mod/mod_log_config.html#formats>
+

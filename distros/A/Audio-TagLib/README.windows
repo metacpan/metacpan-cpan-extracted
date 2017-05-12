@@ -1,0 +1,82 @@
+To build/use Audio::Taglib on Windows, here are the steps, courtesy of
+Festus Hagen <festushagen2002 AT yahoo DOT com>
+
+NOTICE! At the time of this writing (12/26/2012), Taglib v1.9 has not
+ been released, However you can use current source at the
+ official Taglib repository: https://github.com/taglib/taglib
+
+To build/install Taglib for use with Audio-Taglib, The following
+ are needed:
+   1. Strawberry Perl (Others untested, no desire to use others personally)
+   2. CMake (v2.6 or greater)
+
+   They work out of the box if they get added to the Path environment
+   variable during installation.
+
+Download and extract the Taglib sources. (requires v1.9 or greater)
+I personally would never recommend downloading Taglib binaries!
+  1. There is no OFFICIAL source.
+  2. Compiler Author and Version incompatibility issues.
+
+The commands to build Taglib:
+  #cd <to extracted Taglib source location>
+  #cmake <needs various options SEE EXAMPLE BELOW>
+  #gmake
+  #gmake install
+
+**** EXAMPLE CMAKE commandline to build a Taglib Shared Library:
+  ** Must be one line with whitespace between each option, Wrapped here
+      for readability.
+  ** Don't miss the spaced period on the end.
+
+#cmake -G "MinGW Makefiles" -DENABLE_STATIC=OFF -DCMAKE_BUILD_TYPE=Release
+  -DBUILD_EXAMPLES=ON
+  -DCMAKE_INSTALL_PREFIX=C:/Libraries/Taglib
+  -DZLIB_INCLUDE_DIR=C:/Strawberry/c/include
+  -DZLIB_LIBRARY=C:/Strawberry/c/lib/libzlib.a
+  -DCMAKE_MAKE_PROGRAM=C:/Strawberry/c/bin/gmake.exe
+  -DCMAKE_CXX_COMPILER=C:/Strawberry/c/bin/g++.exe .
+                                      DON'T MISS  ^^
+
+**** -DCMAKE_INSTALL_PREFIX=C:/Libraries/Taglib
+  ** USER PREFERENCE, Must be set according to users preference!
+  ** The CMAKE Default is "C:/Program files/Taglib".
+  ** Regardless, The location MUST be in the Path environment variable!
+  ** Spaces in the path will cause you pain sooner or later, best without.
+
+**** ZLIB is not REQUIRED for a Shared Library build, however it does not
+      hurt for it to be there, it'll be ignored, it is REQUIRED for a
+      Static build.
+
+**** To build a Taglib Static Library make the following CMAKE
+      commandline changes:
+  -DENABLE_STATIC=ON
+  -DBUILD_EXAMPLES=OFF
+
+That's it for Taglib ...
+
+The CPAN Installation of Audio-Taglib should work
+ at this point for a Shared Taglib installation.
+ To use Static Taglib libraries one must build manually.
+
+To build Audio-Taglib-1.62 or greater manually ...
+
+Download and Extract Audio-Taglib.
+
+The commands to build Audio-Taglib linked to a Shared Taglib library are:
+  #cd <to extracted Audio-Taglib location>
+  #Makefile.PL
+  #dmake
+  #dmake install
+
+To build Audio-Taglib linked to a Static Taglib library change the above
+ Makefile.PL line to include -DTAGLIB_STATIC like so:
+  #Makefile.PL -DTAGLIB_STATIC
+
+I am not a Doc writer!
+
+Hopefully this clears things up a bit.
+
+-Enjoy
+fh :)_~
+

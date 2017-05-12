@@ -1,0 +1,129 @@
+Revision history for App::MFILE
+
+0.147  2014-08-07 15:57 CEST
+- split off from App::Dochazka::REST into a separate distro
+
+0.148  2014-08-08 08:59 CEST
+- t/100-model-shared.t: add unit testing script for Model/Shared.pm
+- t/: add stub testing scripts for other modules in Model/
+- ../release: adapt scripts
+
+0.149  2014-08-08 10:11 CEST
+- test release script
+- t/: add some tests
+
+0.150  2014-08-08 10:58 CEST
+- Model/Shared.pm: make_accessor now takes an optional TYPE argument, 
+  which must be a type constant from Params::Validate; so the accessors
+  are no longer hardcoded to take only SCALAR values
+- t/: add some tests
+
+0.151  2014-08-08 11:03 CEST
+- Build.PL: fix requires and build_requires
+
+0.152  2014-08-08 11:35 CEST
+- Build.PL: add 'dist_abstract' line
+
+0.153  2014-08-08 11:40 CEST
+- testing release script
+
+0.154  2014-08-08 12:13 CEST
+- Build.PL: more adjustments of build_requires, requires, release scripts
+
+0.155  2014-08-08 12:14 CEST
+- add a sleep to release script to allow NFS to settle
+
+0.156  2014-08-10 18:40 CEST
+- Model/Employee.pm: add 'priv' and 'schedule' accessors
+- t/: update to current state
+
+0.157  2014-08-10 22:07 CEST
+- add Session class to the data model
+
+0.158  2014-08-15 15:59 CEST
+- rename Model/Shared.pm to Shared.pm and refactor
+- bring in HTTP.pm from App-Dochazka-CLI (LWP and session code will be used 
+  by both ::CLI and ::WWW)
+
+0.159  2014-08-16 07:53 CEST
+- HTTP.pm: wholesale refactor
+
+0.160  2014-08-16 10:11 CEST
+- HTTP.pm: fix multiple bugs
+
+0.161  2014-08-21 12:42 CEST
+- MANIFEST: add missing HTTP.pm
+
+0.162  2014-08-24 20:22 CEST
+- minor cleanup
+
+0.163  2014-08-28 11:59 CEST
+- HTTP.pm->rest_req: encode/decode UTF-8 when encoding/decoding JSON
+
+0.164  2014-08-29 13:19 CEST
+- HTTP.pm: make 'rest_req' return hashref with the HTTP::Response object
+  from the REST server (stripped of the body), along with JSON body as
+  before
+
+0.165  2014-09-01 07:53 CEST
+- Unicode hell
+
+0.166  2014-09-01 16:41 CEST
+- Unicode hell
+
+0.167  2014-09-02 17:55 CEST
+- HTTP.pm: run 'encode_utf8' on the path before calling LWP::UserAgent with it
+
+0.168  2014-09-03 17:31 CEST
+- HTTP.pm: use Encode->encode_utf8 to encode the JSON string instead of 
+  JSON->new->utf8
+
+0.169  2014-09-10 14:58 CEST
+- change name to App::MFILE
+
+0.170  2014-09-10 15:01 CEST
+- ../release/: fix current_version.plx which still had references to
+  "Dochazka"
+
+0.171  2014-09-10 16:33 CEST
+- Build.PL: add App::CELL dependency
+
+0.172  2014-09-11 09:36 CEST
+- Build.PL: update dependencies
+
+0.173  2015-08-07 13:05 CEST
+- migrate to GitHub
+- Set version in top-level module only
+
+0.174 2016-09-04 10:58 CEST
+- convert to global release scripting
+
+0.175 2016-09-04 11:06 CEST
+- MANIFEST.SKIP: add several missing files
+- Merge README files and convert them to reStructuredText
+
+0.176 2016-09-04 11:19 CEST
+- HTTP.pm: fix module name in POD
+- README.rst: slightly saner description
+
+0.177 2016-09-04 21:24 CEST
+- tests: drop t/boilerplate.t
+- Add .travis.yml file
+- Changes: fix heading
+- README.rst: add Travis CI badges
+
+0.178 2016-09-04 21:35 CEST
+- MANIFEST.SKIP: skip .travis.yml
+- Drop ignore.txt
+
+0.179 2016-09-26 09:53 CEST
+- HTTP.pm: return body even on error in rest_req()
+- HTTP.pm: convert non-JSON bodies to JSON
+
+0.180 2016-09-27 17:01 CEST
+- HTTP.pm: remove $body / $body_json confusion
+
+0.181 2016-11-05 22:32 CET
+- build/ops: change OBS project back to Application:Dochazka
+- HTTP.pm: Allow rest_req() to send DELETE requests
+

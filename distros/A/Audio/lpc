@@ -1,0 +1,161 @@
+#!/usr/local/bin/perl -w
+use strict;
+use Audio::Data;
+use File::Temp qw(tempfile);
+use Carp;
+$SIG{__DIE__} = \&Carp::confess;
+
+my $N    = 256;
+my $STEP = $N/2;
+my $POLES = 14;
+
+my $au;
+if (@ARGV)
+ {
+  my $file = shift;
+  open(my $fh,$file) || die "Cannot open $file;$!";
+  binmode($fh);
+  $au =  Audio::Data->new(Load => $fh);
+  $au->comment("From $file") unless defined $au->comment;
+  close($fh);
+ } 
+else
+ {
+  $au = Audio::Data->new(rate => 8000);
+  $au->tone(500,0.5,0.6);
+  $au->comment("500Hz tone");
+# $au->noise(0.5,0.6);
+ } 
+ 
+print "Using ",$au,"\n"; 
+my $rate = $au->rate;
+
+my @temp;
+my ($ph,$plot) = tempfile();
+push(@temp,$plot);
+print $ph "set data style lines\n";
+my $sep = "plot";
+
+open(my $dh,">3d.dat") || die "Cannot open 3d.dat:$!";
+
+my $x = 0;
+# plot_it($au,"samples");
+my $d = $au->difference;
+# plot_it($d,"diff");
+my $n = $d;
+for (my $st = 0; $st < $n; $st += $STEP)
+ {
+  #my $rwindow = $d->hamming($N,$st);
+  #$rwindow->r2_fft; 
+  #fft_plot($rwindow,"raw$st");
+
+  # plot_it($window,"window");
+  my $window = $d->hamming($N,$st);
+  # plot_it($window,"window");
+  my ($auto,$ref);
+  my $lpc = $window->lpc($POLES,$auto,$ref);
+#  plot_it($lpc,"new lpc");
+#  plot_it($auto,"new auto");
+#  plot_it($ref,"ref");
+  my $durbin;
+  if (1)
+   {
+    my $auto2   = $window->autocorrelation($POLES);
+    #plot_it($auto2,'auto');
+    $durbin = $auto2->durbin;
+    #plot_it($durbin,'durbin');
+    my $gain = $durbin->[0];
+    warn "Durbin gain is $gain\n";
+    $durbin *= -1;
+    $durbin->[0] = 1.0;
+    $durbin->length($N);
+    #plot_it($durbin,'prep');
+    my $fft = $gain/$durbin->fft($N);
+    $fft->comment("durbin");
+    fft_plot($fft,"$fft");
+   }
+  
+  if (0)
+   {
+    my $mod = Audio::Data->new(rate => $rate);
+    $mod .= [1.0,map { -$_ } $durbin->amplitude(1,$POLES)];
+    $mod->length($N); 
+    plot_it($mod,'mod lpc');
+    $mod->r2_fft; 
+    #fft_plot($mod,"mod$st");
+   } 
+  if (0)
+   {
+    $lpc->length(0);
+    $lpc .= [1.0, map { -$_} $ref->amplitude(1,$POLES)];
+    plot_it($lpc,'mod ref');
+   } 
+   
+  if (0)
+   { 
+    $ref->length($N); 
+    $ref->r2_fft; 
+    fft_plot($ref,"ref$st");
+   } 
+
+  if (0)
+   {
+    $lpc->length($N);
+    $lpc->r2_fft;
+    my @data = map { 1/$_ } $lpc->amplitude;
+    $lpc->length(0);
+    $lpc .= \@data;
+    fft_plot($lpc,"lpc$st");
+   } 
+  $x++;
+  print $dh "\n";
+ }
+ 
+close($dh); 
+print $ph "\n";
+close($ph);
+system("gnuplot",'-persist',$plot);
+unlink(@temp);
+
+sub fft_plot
+{
+ my ($au,$lab) = @_;
+ my $N = $au->samples;
+ my $rate = $au->rate;
+ # print "$lab has ",$N," samples\n";
+ my ($fh,$data) = tempfile();
+ push(@temp,$data);
+ my @amp = $au->dB(0,$N/2+1);
+ my @phase = $au->phase(0,$N/2+1);
+ for my $i (0..$#amp)
+  {
+   my $f = $i*$rate/$N;
+   print $fh $f,' ',$amp[$i],' ',$phase[$i]*50/Audio::Data::PI()+50,"\n"; 
+   print $dh $x,' ',$f,' ',$amp[$i],"\n"; 
+  }
+ close($fh);
+ print $ph qq[$sep "$data" using 1:2 title "$lab fft dB"];
+#print $ph qq[$sep "$data" using 1:3 title "$lab fft ph"];
+ $sep = ",\\\n";
+}
+
+sub plot_it
+{
+ my ($au,$lab) = @_;
+ my $n = $au->samples;
+ print "$lab has $n samples\n";
+ if (1 || $n < 16)
+  {
+   print "$lab:",join(',',map { sprintf("%.3g",$_) } $au->amplitude(0,20)),"\n";
+  }
+
+ my ($fh,$data) = tempfile();
+ push(@temp,$data);
+ foreach my $samp ($au->amplitude)
+  {
+   print $fh $samp,"\n"; 
+  }
+ print $ph qq[$sep "$data" using 0:1 title "$lab"];
+ $sep = ",\\\n";
+}
+

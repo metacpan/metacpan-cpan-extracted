@@ -1,0 +1,10 @@
+Revision history for AnyEvent::GDB
+
+0.2  Thu May 15 12:18:07 CEST 2014
+	- add AnyEvent dependency (reported by Alexandr Ciornii).
+
+0.1  Mon Dec 31 14:00:56 CET 2012
+	- initial, but very limited, release.
+
+0.0  Fri Dec 21 10:50:32 CET 2012
+	- original version, an AnyEvent::DBI clone.

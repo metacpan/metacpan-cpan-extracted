@@ -1,0 +1,85 @@
+# Plain
+c2	C	8	(C) root
+cis	C#		(C) root sharp
+
+des	Db		(D) root flat
+d	D		(D) root
+dis	D#		(D) root sharp
+
+ees	Eb		(E) root flat
+e	E		(E) root
+
+f	F		(F) root
+fis	F#		(F) root sharp
+
+ges	Gb		(G) root flat
+g	G		(G) root
+gis	G#		(G) root sharp
+
+aes	Ab		(A) root flat
+a	A		(A) root
+ais	A#		(A) root sharp
+
+bes	Bb		(B) root flat
+b	B		(B) root
+
+# Minor.
+c2:m	Cm	8	(C) root minus
+cis:m	C#m		(C) root sharp minus
+
+des:m	Dbm		(D) root flat minus
+d:m	Dm		(D) root minus
+dis:m	D#m		(D) root sharp minus
+
+ees:m	Ebm		(E) root flat minus
+e:m	Em		(E) root minus
+
+f:m	Fm		(F) root minus
+fis:m	F#m		(F) root sharp minus
+
+ges:m	Gbm		(G) root flat minus
+g:m	Gm		(G) root minus
+gis:m	G#m		(G) root sharp minus
+
+aes:m	Abm		(A) root flat minus
+a:m	Am		(A) root minus
+ais:m	A#m		(A) root sharp minus
+
+bes:m	Bbm		(B) root flat minus
+b:m	Bm		(B) root minus
+
+# Augmented.
+c2:aug	C+	8	(C) root plus
+
+# Diminished.
+c:dim	Co	8	(C) root dim
+
+# Major7 (delta).
+c4:maj	Cmaj7	4	(C) root delta
+c4:maj7	Cmaj7	4	(C) root delta
+
+# Suspended (4 and 2).
+c8:sus	Csus4	2	(C) root (4) susp
+c4.:sus4	Csus4	6	(C) root (4) susp
+c4..:sus2	Csus2	9	(C) root (2) susp
+
+# Minor mods.
+c4:m7	Cm7	4	(C) root minus (7) addn
+c:m2	Cm2	4	(C) root minus (2) addn
+
+# Additions.
+# Note that 9, 11, etc imply 7 but this is only shown if
+# the addition is not plain. C13 -> C13 but C_b13 -> C7b13.
+c:6	C6	4	(C) root (6) addn
+c:9	C9	4	(C) root (9) addn
+c:6.9	C6.9	4	(C) root (6) addn (9) addn
+c:11	C11	4	(C) root (11) addn
+c:13	C13	4	(C) root (13) addn
+
+# Subtractions. Cno3rd = Csus2.
+c:^3	Csus2	4	(C) root (2) susp
+c:^5	Cno5	4	(C) root (no5) addn
+
+# Some harder ones.
+c:sus4.13-	C7sus4(b13)	4	(C) root (7) addn (4) susp (13) addf
+

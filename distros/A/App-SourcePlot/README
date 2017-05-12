@@ -1,0 +1,58 @@
+App::SourcePlot
+===============
+
+Source Plot was created to help observers decide which sources to observe
+at particular times to optimize the observing time at the telescope.
+The main purpose of this program is to plot the movement of a source
+throughout the night.  The movement can be plotted by the source's
+elevation, azimuth, parallactic angle, or by time.
+
+Requirements
+------------
+
+  Tk
+  Astro::Coords
+  Astro::Catalog
+  Astro::Telescope
+  Astro::PAL
+  Config::IniFiles
+  DateTime
+  File::HomeDir
+  File::ShareDir
+  File::Spec
+
+Building
+--------
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+Authors
+-------
+
+This application was originally written by Casey Best <cbest@uvic.ca> and
+Pam Shimek <pshimek@uvic.ca>.   It also includes patches by Remo Tilanus
+<r.tilanus@jach.hawaii.edu> and Tim Jenness <tjenness@cpan.org>.  For
+version 1.17 it was updated to use the Astro::Coords and Astro::Catalog
+modules by Graham Bell <g.bell@eaobservatory.org>.
+
+It is currently supported by Graham Bell <g.bell@eaobservatory.org>.
+
+Copyright (C) 2012-2014 Science and Technology Facilities Council.
+Copyright (C) 1998, 1999 Particle Physics and Astronomy Research
+Council. All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.

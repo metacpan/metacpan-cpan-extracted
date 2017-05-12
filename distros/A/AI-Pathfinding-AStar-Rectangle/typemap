@@ -1,0 +1,13 @@
+TYPEMAP
+pmap      MAP_OBJ
+
+INPUT 
+MAP_OBJ
+    if ( !sv_isobject( $arg ) )
+    	croak_xs_usage( cv, \"Need object\" );
+    $var = (pmap)SvPV_nolen(SvRV($arg));
+
+OUTPUT
+MAP_OBJ
+           sv_setiv($arg, (I32) $var);
+

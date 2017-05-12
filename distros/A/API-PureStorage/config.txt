@@ -1,0 +1,19 @@
+### Config
+
+$module = 'API::PureStorage';
+
+$author  = 'Phil Pollard <bennie@cpan.org>';
+$license = 'artistic_2';
+
+$abstract    = 'API Wrapper for Pure Storage devices.';
+$description = $abstract;
+
+$perl_ver = '5.006001';
+
+%requires = (
+    'JSON' => 0,
+    'Net::SSL' => 0,
+    'REST::Client' => 0,
+    'Test::More' => 0,
+    'Test::Simple' => '0',
+);

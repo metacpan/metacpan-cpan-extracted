@@ -1,0 +1,10 @@
+Changes for Perl extension Alien-Win32-LZMA
+
+4.66 Fri 29 May 2009
+	- Updating to Module::Install 0.91
+	- Changes the lzma.exe svn:executable flag to true so that it
+	  will run on Cygwin (I hope).
+	- Noting copyright and license for lzma.exe in the POD.
+
+4.65 Sat  2 May 2009
+	- Created initial implementation

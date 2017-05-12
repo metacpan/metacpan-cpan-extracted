@@ -1,0 +1,2 @@
+name = "Ark"
+badges = ["travis", "coveralls"]

@@ -1,0 +1,75 @@
+<html>
+<head>
+  <title>Aw:: Test and Demonstration Scripts</title>
+</head>
+<body bgcolor="#fffffh">
+
+<h3><u>Aw:: Test and Demonstration Scripts</u></h3>
+
+<table border=1>
+<tr>
+  <th><a href="PerlDemo.adl">PerlDemo.adl</a></th>
+  <td>An ADL file for use with the EventType Editor to import
+      event type and client group definitions required by the
+      eol.pl, demo_adapter.pl, demo_client.pl, tictactoe and ttt_adapter.pl
+  </td>
+</tr>
+<tr>
+  <th><a href="demo_adapter.pl">demo_adapter.pl</a><br>
+      <a href="demo_client.pl">demo_client.pl</a>
+  </th>
+  <td>An example adapter and client to demonstrate publishing of a
+      modestly complex event.  The client will also create a
+      <a href="HelloWorld.pm">HelloWorld</a> object, set internal data,
+      dump (serialize) the object with Data::Dumper and send it within the
+      event.  The adapter will revive the dumped object and invoke a method
+      to show it can be done (this usage is considered exotic).  The
+      HelloWorld module must be installed where both the adapter and
+      client reside.</td>
+</tr>
+<tr>
+  <th><a href="time_adapter.pl">time_adapter.pl</a><br>
+      <a href="time_test.pl">time_test.pl</a></th>
+  <td>The Perl analogs to the ActiveWorks 3.0 demonstration adapter and client.</td>
+</tr>
+<tr>
+  <th><a href="eod.pl">eod.pl</a></th>
+  <td>A client to test the much pheared Event of Doom.</td>
+</tr>
+<tr>
+  <th><a href="eod-autotest.pl">eod-autotest.pl</a></th>
+  <td>The most comprehensive test supplied.  Provide a host:port as an argument and the script will connect to it, create a test broker, create a client group, create the Event of Doom event type, give subscribe permission to the client group, create a client and an actual populated Event of Doom.  The scripts cleans up after itself.</td>
+</tr>
+<tr>
+  <th><a href="client_finger.pl">client_finger.pl</a></th>
+  <td>Similar to adapter_ping, the script reports all the data it finds on all clients attached to a given broker (passed as an arguement).</td>
+</tr>
+<tr>
+  <th><a href="terr_finger.pl">terr_finger.pl</a></th>
+  <td>Crawls a territory and lists everything it can find.  Takes a broker@host as an argument.</td>
+</tr>
+<tr>
+  <th><a href="typedef-test1.pl">typedef-test1.pl</a></th>
+  <td>Demonstrates creating a TypeDef field by field.</td>
+</tr>
+<tr>
+  <th><a href="typedef-test2.pl">typedef-test2.pl</a></th>
+  <td>Demonstrates creating a TypeDef in a single step with a hash.</td>
+</tr>
+<tr>
+  <th><a href="ttt_client.pl">ttt_client.pl</a></th>
+  <td>A client to play the venerable game "TicTacToe" against a user also running the same client. The client may also play against the ttt_adapter.pl script.</td>
+</tr>
+<tr>
+  <th><a href="ttt_adapter.pl">ttt_adapter.pl</a></th>
+  <td>The TicTacToe adapter.  Originally intended to play against web clients,
+      may also play against the tictactoe client script.</td>
+</tr>
+<tr>
+  <th><a href="apache/">apache/</a></th>
+  <td>Files to configure mod_perl to play TicTacToe with an Aw::Client against the ttt_adapter.pl running on a broker elsewhere.</td>
+</tr>
+</table>
+
+</body>
+</html>

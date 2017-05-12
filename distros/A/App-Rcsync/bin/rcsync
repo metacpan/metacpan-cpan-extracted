@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+use App::Rcsync;
+App::Rcsync->run;
+
+=head1 NAME
+
+rcsync - Synchronize configuration files across machines
+
+=head1 SYNOPSIS
+
+In your C<$HOME/.rcsync>:
+
+    base_dir /home/supermario/rcsync
+
+    <vim>
+        filename /home/supermario/.vimrc
+        template vimrc.tt
+        <params>
+            backupdir /tmp/vim
+        </params>
+    </vim>
+
+In C<$HOME/rcsync/vimrc.tt>:
+
+    set nocompatible
+    set backup
+    set backupdir=[% backupdir %]
+    ...
+
+From the command line:
+
+    rcsync vim
+
+=head1 USAGE
+
+C<rcsync> is a script to assist in synchronizing configuration files across different machines. Create templates for the configuration files you want synchronized, using template variables whereever you have machine-specific settings. Keep this folder synchronized across machines using whatever tool you choose - a version control system, a file syncing service such as Dropbox, rsync, etc. In a C<$HOME/.rcsync> configuration file specify the directory with sycnronized templates as C<base_dir>, and then for each configuration file (a.k.a. profile) create a section with the following parameters: C<filename> - the location of the config file that needs syncing (i.e. the filename where the processed template will be written), C<template> - the name of the tempalte to be used for this configuration file (under C<base_dir>), and C<params> - a block of parameter to be passed to the template. Run C<rcsync profile1 profile2 ...> to sync the specified profiles. L<Template::Toolkit> is used for template processing, and the settings (C<.rcsync>) are in L<Config::General> format.
+
+=head1 OPTIONS
+
+=over
+
+=item --all
+
+Sync all profiles
+
+=item --list
+
+List the names of all profiles
+
+=item --which
+
+Print the path to the template for the specified profile
+
+=item --config
+
+Specify a configuration file to use
+
+=item --init
+
+Create a stub configuration file in <$HOME/.rcsync> if one does not exist yet
+
+=item --stdout
+
+Print processed templates to STDOUT rather than to a file
+
+=item --help
+
+Display a help message
+
+=back
+
+=head1 CAVEATS
+
+This is an experimental module. New features will be added, such as syncing of multiple files per profile, and the API and configuration file syntax may need to change. So, before we hit version 1.0, make sure to read the C<Changes> file before upgrading.
+
+=head1 AUTHOR
+
+Peter Shangov <pshangov at yahoo dot com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Peter Shangov.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,82 @@
+#!perl
+use strict;
+use warnings;
+use Docopt;
+use App::WhatTimeIsIt;
+
+my $opt = docopt(
+    argv    => \@ARGV,
+    version => $App::WhatTimeIsIt::VERSION
+);
+my $now = App::WhatTimeIsIt->new($opt)->run;
+
+__END__
+
+=head1 NAME
+
+what_time_is_it - Now?
+
+=head1 SYNOPSIS
+
+    what_time_is_it [--format=<format>] [--city=<city>...] [--stderr] [--rc=<rcfile>]
+
+    OPTIONS:
+
+        --format    POSIX time format (default: "%a, %d %b %Y %H:%M")
+        --city      colon separated string like City_Name:Time_Offset (ex. Tokyo:9)
+        --stderr    output to STDERR (default: STDOUT)
+        --rc        your rcfile path (default: .what_time_is_it)
+
+        --version    show the version
+        -h --help    show this help
+
+=head2 EXAMPLE
+
+    $ what_time_is_it --format "%a, %d %H:%M" --city Tokyo:9 --city NY:-4 --city London:0
+    Tokyo   Sat, 20 09:25
+    NY      Fri, 19 20:25
+    London  Sat, 20 00:25
+
+
+=head1 RECOMMEND
+
+To set a short cut in your C<.bashrc>
+
+    alias now='what_time_is_it'
+
+
+=head1 CONFIGURATION
+
+C<.what_time_is_it> was read for configuration.
+
+    format: "%a, %d %H:%M"
+    city: Tokyo:9, NY:-4, London:0
+    stderr: 1
+
+If you set the C<--rc> option, you can use your custom rcfile.
+
+    what_time_is_it --rc ./.foo
+
+
+=head1 CAVEAT
+
+This command does NOT have considered offset about DST. Adjust it yourself.
+
+
+=head1 SEE ALSO
+
+<http://www.timeanddate.com/time/map/>
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=cut

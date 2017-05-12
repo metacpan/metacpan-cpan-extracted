@@ -1,0 +1,5 @@
+<& header.mason &>
+
+% $m->call_next;
+
+<& footer.mason &>

@@ -1,0 +1,15 @@
+=head1 Name
+
+sqitch-revert-usage - Sqitch revert usage statement
+
+=head1 Usage
+
+  sqitch [options] revert [change options] [<database>]
+
+=head1 Options
+
+    -t --target <target>    database to which to connect
+       --to-change <change> revert to change
+    -s --set <key=value>    set a database client variable
+       --log-only           log changes without running them
+    -y                      disable the prompt before reverting

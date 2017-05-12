@@ -1,0 +1,15 @@
+
+Patches are welcome, send them to ask@netcetera.dk, thanks!
+
+ - Documentation for the stat scripts
+
+ - webstat_web.pl script
+
+ - real tests
+
+ - some options for what we want to log
+
+ - webstat_mail should count the top 20 in users, not hits
+
+ - make install should install the scripts somewhere
+

@@ -1,0 +1,127 @@
+NAME
+    Apache2::DirBasedHandler - Directory based Location Handler helper
+
+VERSION
+    This documentation refers to <Apache2::DirBasedHandler> version 0.03
+
+SYNOPSIS
+      package My::Thingy
+
+      use strict
+      use Apache2::DirBasedHandler
+      our @ISA = qw(Apache2::DirBasedHandler);
+      use Apache2::Const -compile => qw(:common);
+
+      sub root_index {
+          my $self = shift;
+          my ($r,$uri_args,$args) = @_;
+
+          if (@$uri_args) {
+              return Apache2::Const::NOT_FOUND;
+          }
+
+          return (
+              Apache2::Const::OK,
+              qq[this is the index],
+              qq[text/plain; charset=utf-8]
+          );
+      }
+
+      sub super_page {
+          my $self = shift;
+          my ($r,$uri_args,$args) = @_;
+
+          return (
+              Apache2::Const::OK,
+              qq[this is $location/super and all it's contents],
+              qq[text/plain; charset=utf-8]
+          );
+      }
+
+      sub super_dooper_page {
+          my $self = shift;
+          my ($r,$uri_args,$args) = @_;
+
+          return (
+              Apache2::Const::OK,
+              qq[this is $location/super/dooper and all it's contents],
+              qq[text/plain; charset=utf-8]
+          );
+      }
+
+      1;
+
+DESCRIPTION
+    This module is designed to allow people to more quickly implement uri to
+    function style handlers. This module is intended to be subclassed.
+
+    A request for
+
+      $r->location . qq[/foo/bar/baz/]
+
+    will be served by the first of the following functions with is defined
+
+      foo_bar_baz_page
+      foo_bar_page
+      foo_page
+      root_index
+
+METHODS
+    The following methods (aside from 'handler') are meant to be overridden
+    in your subclass if you want to modify its behavoir.
+
+  handler
+    "handler" is the guts of DirBasedHandler. It provides the basic
+    structure of the module, turning the request uri into an array, which is
+    then turned into possible function calls.
+
+  init
+    "init" is used to include objects or data you want to be passed into
+    your page functions. To be most useful it should return a hash
+    reference. The default implementation returns a reference to an empty
+    hash.
+
+  parse_uri
+    "parse_uri" takes an Apache::RequestRec (or derived) object, and returns
+    a reference to an array of all the non-slash parts of the uri. It strips
+    repeated slashes in the same manner that they would be stripped if you
+    do a request for static content.
+
+  uri_to_function
+    "uri_to_function" converts an Apache2::RequestRec (or derived) object
+    and an array reference and returns and returns the name of a function to
+    handle the request it's arguments describe.
+
+  root_index
+    "root_index" handles requests for $r->location, and any requests that
+    have no other functions defined to handle them. You must subclass it (or
+    look silly)
+
+  set_debug
+    "set_debug" enables or disables debug output to the apache error log
+
+DEPENDENCIES
+    This module requires modperl 2 (http://perl.apache.org), and libapreq
+    (http://httpd.apache.org/apreq/) which must be installed seperately.
+
+INCOMPATIBILITIES
+    There are no known incompatibilities for this module.
+
+BUGS AND LIMITATIONS
+    There are no known bugs in this module. Please report any problems
+    through
+
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Apache2-DirBasedHandler
+
+AUTHOR
+    Adam Prime (adam.prime@utoronto.ca)
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2008 by Adam Prime (adam.prime@utoronto.ca). All rights
+    reserved. This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself. See perlartistic.
+
+    This module is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,456 @@
+#PLEASE NOTE: this Makefile was designed to be compatible with GNU make and dmake
+
+CC       = gcc
+AR       = ar
+ARFLAGS  = csr
+PERL     = perl
+
+CP     = $(PERL) -MExtUtils::Command -e cp --
+RM_F   = $(PERL) -MExtUtils::Command -e rm_f --
+MKPATH = $(PERL) -MExtUtils::Command -e mkpath --
+
+### GLOBAL PART ###
+
+BUILDBITS= 32
+BUILDNICK= mingw
+
+PREFIX   = ../../_output_
+INCDIR   = $(PREFIX)/include
+LIBDIR   = $(PREFIX)/lib
+
+CF_ALL   = -DTEC_UNAME=gcc4 -DTEC_SYSNAME=Win$(BUILDBITS) -DTEC_LITTLEENDIAN -DTEC_$(BUILDBITS) -DWIN32 -DNDEBUG -I"$(INCDIR)"
+LF_ALL   = -L../lib/$(BUILDNICK) -L"$(LIBDIR)"
+
+VER_OBJ      = version.o
+VER_RC       = version.rc
+
+BUILD_DIRS   = ../obj/$(BUILDNICK)/im ../obj/$(BUILDNICK)/im_process ../obj/$(BUILDNICK)/im_jp2 ../obj/$(BUILDNICK)/im_fftw ../lib/$(BUILDNICK)
+
+ALL_OBJS     = $(OBJS_im) $(OBJS_im_process) $(OBJS_im_jp2) $(OBJS_im_fftw)
+
+STATIC_LIBS  = $(SLIB_im) $(SLIB_im_process) $(SLIB_im_jp2) $(SLIB_im_fftw)
+
+DYNAMIC_LIBS = $(DLIB_im) $(ILIB_im) $(DLIB_im_process) $(ILIB_im_process) $(DLIB_im_jp2) $(ILIB_im_jp2) $(DLIB_im_fftw) $(ILIB_im_fftw)
+
+ALL_LIBS     = $(STATIC_LIBS) $(DYNAMIC_LIBS)
+
+.PHONY: install-all install-static install-dynamic all all-static all-dynamic clean build-dirs
+
+all: all-static all-dynamic
+
+
+### START OF im ###
+CF_im   = -c  -Wall -O2 -I. -I../include -Ilibtiff -Ilibpng -Ilibjpeg -Ilibexif -Iliblzf -I../../zlib/include   -DUSE_EXIF $(CF_im_EXTRA)
+LF_im   = -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_im_EXTRA)
+SLIB_im = ../lib/$(BUILDNICK)/libim.a
+DLIB_im = ../lib/$(BUILDNICK)/libim.dll.a
+ILIB_im = ../lib/$(BUILDNICK)/im_alien_.dll
+OBJS_im = ../obj/$(BUILDNICK)/im/im_oldcolor.o ../obj/$(BUILDNICK)/im/im_oldresize.o ../obj/$(BUILDNICK)/im/tiff_binfile.o ../obj/$(BUILDNICK)/im/im_converttype.o ../obj/$(BUILDNICK)/im/im_attrib.o ../obj/$(BUILDNICK)/im/im_format.o ../obj/$(BUILDNICK)/im/im_format_tga.o ../obj/$(BUILDNICK)/im/im_filebuffer.o ../obj/$(BUILDNICK)/im/im_bin.o ../obj/$(BUILDNICK)/im/im_format_all.o ../obj/$(BUILDNICK)/im/im_format_raw.o ../obj/$(BUILDNICK)/im/im_convertopengl.o ../obj/$(BUILDNICK)/im/im_binfile.o ../obj/$(BUILDNICK)/im/im_format_sgi.o ../obj/$(BUILDNICK)/im/im_datatype.o ../obj/$(BUILDNICK)/im/im_format_pcx.o ../obj/$(BUILDNICK)/im/im_colorhsi.o ../obj/$(BUILDNICK)/im/im_format_bmp.o ../obj/$(BUILDNICK)/im/im_image.o ../obj/$(BUILDNICK)/im/im_rgb2map.o ../obj/$(BUILDNICK)/im/im_colormode.o ../obj/$(BUILDNICK)/im/im_format_gif.o ../obj/$(BUILDNICK)/im/im_lib.o ../obj/$(BUILDNICK)/im/im_format_pnm.o ../obj/$(BUILDNICK)/im/im_colorutil.o ../obj/$(BUILDNICK)/im/im_format_ico.o ../obj/$(BUILDNICK)/im/im_palette.o ../obj/$(BUILDNICK)/im/im_format_ras.o ../obj/$(BUILDNICK)/im/im_convertbitmap.o ../obj/$(BUILDNICK)/im/im_format_led.o ../obj/$(BUILDNICK)/im/im_counter.o ../obj/$(BUILDNICK)/im/im_str.o ../obj/$(BUILDNICK)/im/im_convertcolor.o ../obj/$(BUILDNICK)/im/im_fileraw.o ../obj/$(BUILDNICK)/im/im_format_krn.o ../obj/$(BUILDNICK)/im/im_compress.o ../obj/$(BUILDNICK)/im/im_file.o ../obj/$(BUILDNICK)/im/im_old.o ../obj/$(BUILDNICK)/im/im_format_pfm.o ../obj/$(BUILDNICK)/im/jcapimin.o ../obj/$(BUILDNICK)/im/jcmarker.o ../obj/$(BUILDNICK)/im/jdapimin.o ../obj/$(BUILDNICK)/im/jdinput.o ../obj/$(BUILDNICK)/im/jdtrans.o ../obj/$(BUILDNICK)/im/jcapistd.o ../obj/$(BUILDNICK)/im/jcmaster.o ../obj/$(BUILDNICK)/im/jdapistd.o ../obj/$(BUILDNICK)/im/jdmainct.o ../obj/$(BUILDNICK)/im/jerror.o ../obj/$(BUILDNICK)/im/jmemmgr.o ../obj/$(BUILDNICK)/im/jccoefct.o ../obj/$(BUILDNICK)/im/jcomapi.o ../obj/$(BUILDNICK)/im/jdatadst.o ../obj/$(BUILDNICK)/im/jdmarker.o ../obj/$(BUILDNICK)/im/jfdctflt.o ../obj/$(BUILDNICK)/im/jmemnobs.o ../obj/$(BUILDNICK)/im/jccolor.o ../obj/$(BUILDNICK)/im/jcparam.o ../obj/$(BUILDNICK)/im/jdatasrc.o ../obj/$(BUILDNICK)/im/jdmaster.o ../obj/$(BUILDNICK)/im/jfdctfst.o ../obj/$(BUILDNICK)/im/jquant1.o ../obj/$(BUILDNICK)/im/jcdctmgr.o ../obj/$(BUILDNICK)/im/jdcoefct.o ../obj/$(BUILDNICK)/im/jdmerge.o ../obj/$(BUILDNICK)/im/jfdctint.o ../obj/$(BUILDNICK)/im/jquant2.o ../obj/$(BUILDNICK)/im/jchuff.o ../obj/$(BUILDNICK)/im/jcprepct.o ../obj/$(BUILDNICK)/im/jdcolor.o ../obj/$(BUILDNICK)/im/jidctflt.o ../obj/$(BUILDNICK)/im/jutils.o ../obj/$(BUILDNICK)/im/jdarith.o ../obj/$(BUILDNICK)/im/jcinit.o ../obj/$(BUILDNICK)/im/jcsample.o ../obj/$(BUILDNICK)/im/jddctmgr.o ../obj/$(BUILDNICK)/im/jdpostct.o ../obj/$(BUILDNICK)/im/jidctfst.o ../obj/$(BUILDNICK)/im/jaricom.o ../obj/$(BUILDNICK)/im/jcmainct.o ../obj/$(BUILDNICK)/im/jctrans.o ../obj/$(BUILDNICK)/im/jdhuff.o ../obj/$(BUILDNICK)/im/jdsample.o ../obj/$(BUILDNICK)/im/jidctint.o ../obj/$(BUILDNICK)/im/jcarith.o ../obj/$(BUILDNICK)/im/im_format_jpeg.o ../obj/$(BUILDNICK)/im/tif_aux.o ../obj/$(BUILDNICK)/im/tif_dirwrite.o ../obj/$(BUILDNICK)/im/tif_jpeg.o ../obj/$(BUILDNICK)/im/tif_print.o ../obj/$(BUILDNICK)/im/tif_close.o ../obj/$(BUILDNICK)/im/tif_dumpmode.o ../obj/$(BUILDNICK)/im/tif_luv.o ../obj/$(BUILDNICK)/im/tif_read.o ../obj/$(BUILDNICK)/im/tif_codec.o ../obj/$(BUILDNICK)/im/tif_error.o ../obj/$(BUILDNICK)/im/tif_lzw.o ../obj/$(BUILDNICK)/im/tif_strip.o ../obj/$(BUILDNICK)/im/tif_color.o ../obj/$(BUILDNICK)/im/tif_extension.o ../obj/$(BUILDNICK)/im/tif_next.o ../obj/$(BUILDNICK)/im/tif_swab.o ../obj/$(BUILDNICK)/im/tif_compress.o ../obj/$(BUILDNICK)/im/tif_fax3.o ../obj/$(BUILDNICK)/im/tif_open.o ../obj/$(BUILDNICK)/im/tif_thunder.o ../obj/$(BUILDNICK)/im/tif_dir.o ../obj/$(BUILDNICK)/im/tif_fax3sm.o ../obj/$(BUILDNICK)/im/tif_packbits.o ../obj/$(BUILDNICK)/im/tif_tile.o ../obj/$(BUILDNICK)/im/tif_dirinfo.o ../obj/$(BUILDNICK)/im/tif_flush.o ../obj/$(BUILDNICK)/im/tif_pixarlog.o ../obj/$(BUILDNICK)/im/tif_zip.o ../obj/$(BUILDNICK)/im/tif_dirread.o ../obj/$(BUILDNICK)/im/tif_getimage.o ../obj/$(BUILDNICK)/im/tif_predict.o ../obj/$(BUILDNICK)/im/tif_version.o ../obj/$(BUILDNICK)/im/tif_write.o ../obj/$(BUILDNICK)/im/tif_warning.o ../obj/$(BUILDNICK)/im/tif_ojpeg.o ../obj/$(BUILDNICK)/im/tif_lzma.o ../obj/$(BUILDNICK)/im/tif_jbig.o ../obj/$(BUILDNICK)/im/im_format_tiff.o ../obj/$(BUILDNICK)/im/png.o ../obj/$(BUILDNICK)/im/pngget.o ../obj/$(BUILDNICK)/im/pngread.o ../obj/$(BUILDNICK)/im/pngrutil.o ../obj/$(BUILDNICK)/im/pngwtran.o ../obj/$(BUILDNICK)/im/pngerror.o ../obj/$(BUILDNICK)/im/pngmem.o ../obj/$(BUILDNICK)/im/pngrio.o ../obj/$(BUILDNICK)/im/pngset.o ../obj/$(BUILDNICK)/im/pngwio.o ../obj/$(BUILDNICK)/im/pngpread.o ../obj/$(BUILDNICK)/im/pngrtran.o ../obj/$(BUILDNICK)/im/pngtrans.o ../obj/$(BUILDNICK)/im/pngwrite.o ../obj/$(BUILDNICK)/im/pngwutil.o ../obj/$(BUILDNICK)/im/im_format_png.o ../obj/$(BUILDNICK)/im/lzf_c.o ../obj/$(BUILDNICK)/im/lzf_d.o ../obj/$(BUILDNICK)/im/im_sysfile_win32.o ../obj/$(BUILDNICK)/im/im_dib.o ../obj/$(BUILDNICK)/im/im_dibxbitmap.o ../obj/$(BUILDNICK)/im/exif-mnote-data-fuji.o ../obj/$(BUILDNICK)/im/mnote-fuji-entry.o ../obj/$(BUILDNICK)/im/mnote-fuji-tag.o ../obj/$(BUILDNICK)/im/exif-mnote-data-canon.o ../obj/$(BUILDNICK)/im/mnote-canon-entry.o ../obj/$(BUILDNICK)/im/mnote-canon-tag.o ../obj/$(BUILDNICK)/im/exif-mnote-data-olympus.o ../obj/$(BUILDNICK)/im/mnote-olympus-entry.o ../obj/$(BUILDNICK)/im/mnote-olympus-tag.o ../obj/$(BUILDNICK)/im/exif-mnote-data-pentax.o ../obj/$(BUILDNICK)/im/mnote-pentax-entry.o ../obj/$(BUILDNICK)/im/mnote-pentax-tag.o ../obj/$(BUILDNICK)/im/exif-byte-order.o ../obj/$(BUILDNICK)/im/exif-entry.o ../obj/$(BUILDNICK)/im/exif-utils.o ../obj/$(BUILDNICK)/im/exif-format.o ../obj/$(BUILDNICK)/im/exif-mnote-data.o ../obj/$(BUILDNICK)/im/exif-content.o ../obj/$(BUILDNICK)/im/exif-ifd.o ../obj/$(BUILDNICK)/im/exif-tag.o ../obj/$(BUILDNICK)/im/exif-data.o ../obj/$(BUILDNICK)/im/exif-loader.o ../obj/$(BUILDNICK)/im/exif-log.o ../obj/$(BUILDNICK)/im/exif-mem.o
+
+../obj/$(BUILDNICK)/im/im_oldcolor.o : ./im_oldcolor.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_oldresize.o : ./im_oldresize.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tiff_binfile.o : ./tiff_binfile.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_converttype.o : ./im_converttype.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_attrib.o : ./im_attrib.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format.o : ./im_format.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_tga.o : ./im_format_tga.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_filebuffer.o : ./im_filebuffer.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_bin.o : ./im_bin.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_all.o : ./im_format_all.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_raw.o : ./im_format_raw.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_convertopengl.o : ./im_convertopengl.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_binfile.o : ./im_binfile.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_sgi.o : ./im_format_sgi.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_datatype.o : ./im_datatype.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_pcx.o : ./im_format_pcx.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_colorhsi.o : ./im_colorhsi.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_bmp.o : ./im_format_bmp.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_image.o : ./im_image.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_rgb2map.o : ./im_rgb2map.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_colormode.o : ./im_colormode.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_gif.o : ./im_format_gif.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_lib.o : ./im_lib.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_pnm.o : ./im_format_pnm.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_colorutil.o : ./im_colorutil.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_ico.o : ./im_format_ico.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_palette.o : ./im_palette.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_ras.o : ./im_format_ras.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_convertbitmap.o : ./im_convertbitmap.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_led.o : ./im_format_led.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_counter.o : ./im_counter.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_str.o : ./im_str.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_convertcolor.o : ./im_convertcolor.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_fileraw.o : ./im_fileraw.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_krn.o : ./im_format_krn.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_compress.o : ./im_compress.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_file.o : ./im_file.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_old.o : ./im_old.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_pfm.o : ./im_format_pfm.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcapimin.o : ./libjpeg/jcapimin.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcmarker.o : ./libjpeg/jcmarker.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdapimin.o : ./libjpeg/jdapimin.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdinput.o : ./libjpeg/jdinput.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdtrans.o : ./libjpeg/jdtrans.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcapistd.o : ./libjpeg/jcapistd.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcmaster.o : ./libjpeg/jcmaster.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdapistd.o : ./libjpeg/jdapistd.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdmainct.o : ./libjpeg/jdmainct.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jerror.o : ./libjpeg/jerror.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jmemmgr.o : ./libjpeg/jmemmgr.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jccoefct.o : ./libjpeg/jccoefct.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcomapi.o : ./libjpeg/jcomapi.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdatadst.o : ./libjpeg/jdatadst.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdmarker.o : ./libjpeg/jdmarker.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jfdctflt.o : ./libjpeg/jfdctflt.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jmemnobs.o : ./libjpeg/jmemnobs.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jccolor.o : ./libjpeg/jccolor.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcparam.o : ./libjpeg/jcparam.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdatasrc.o : ./libjpeg/jdatasrc.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdmaster.o : ./libjpeg/jdmaster.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jfdctfst.o : ./libjpeg/jfdctfst.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jquant1.o : ./libjpeg/jquant1.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcdctmgr.o : ./libjpeg/jcdctmgr.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdcoefct.o : ./libjpeg/jdcoefct.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdmerge.o : ./libjpeg/jdmerge.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jfdctint.o : ./libjpeg/jfdctint.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jquant2.o : ./libjpeg/jquant2.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jchuff.o : ./libjpeg/jchuff.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcprepct.o : ./libjpeg/jcprepct.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdcolor.o : ./libjpeg/jdcolor.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jidctflt.o : ./libjpeg/jidctflt.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jutils.o : ./libjpeg/jutils.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdarith.o : ./libjpeg/jdarith.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcinit.o : ./libjpeg/jcinit.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcsample.o : ./libjpeg/jcsample.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jddctmgr.o : ./libjpeg/jddctmgr.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdpostct.o : ./libjpeg/jdpostct.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jidctfst.o : ./libjpeg/jidctfst.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jaricom.o : ./libjpeg/jaricom.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcmainct.o : ./libjpeg/jcmainct.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jctrans.o : ./libjpeg/jctrans.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdhuff.o : ./libjpeg/jdhuff.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jdsample.o : ./libjpeg/jdsample.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jidctint.o : ./libjpeg/jidctint.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/jcarith.o : ./libjpeg/jcarith.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_jpeg.o : ./im_format_jpeg.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_aux.o : ./libtiff/tif_aux.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_dirwrite.o : ./libtiff/tif_dirwrite.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_jpeg.o : ./libtiff/tif_jpeg.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_print.o : ./libtiff/tif_print.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_close.o : ./libtiff/tif_close.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_dumpmode.o : ./libtiff/tif_dumpmode.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_luv.o : ./libtiff/tif_luv.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_read.o : ./libtiff/tif_read.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_codec.o : ./libtiff/tif_codec.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_error.o : ./libtiff/tif_error.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_lzw.o : ./libtiff/tif_lzw.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_strip.o : ./libtiff/tif_strip.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_color.o : ./libtiff/tif_color.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_extension.o : ./libtiff/tif_extension.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_next.o : ./libtiff/tif_next.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_swab.o : ./libtiff/tif_swab.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_compress.o : ./libtiff/tif_compress.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_fax3.o : ./libtiff/tif_fax3.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_open.o : ./libtiff/tif_open.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_thunder.o : ./libtiff/tif_thunder.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_dir.o : ./libtiff/tif_dir.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_fax3sm.o : ./libtiff/tif_fax3sm.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_packbits.o : ./libtiff/tif_packbits.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_tile.o : ./libtiff/tif_tile.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_dirinfo.o : ./libtiff/tif_dirinfo.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_flush.o : ./libtiff/tif_flush.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_pixarlog.o : ./libtiff/tif_pixarlog.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_zip.o : ./libtiff/tif_zip.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_dirread.o : ./libtiff/tif_dirread.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_getimage.o : ./libtiff/tif_getimage.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_predict.o : ./libtiff/tif_predict.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_version.o : ./libtiff/tif_version.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_write.o : ./libtiff/tif_write.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_warning.o : ./libtiff/tif_warning.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_ojpeg.o : ./libtiff/tif_ojpeg.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_lzma.o : ./libtiff/tif_lzma.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/tif_jbig.o : ./libtiff/tif_jbig.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_tiff.o : ./im_format_tiff.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/png.o : ./libpng/png.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngget.o : ./libpng/pngget.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngread.o : ./libpng/pngread.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngrutil.o : ./libpng/pngrutil.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngwtran.o : ./libpng/pngwtran.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngerror.o : ./libpng/pngerror.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngmem.o : ./libpng/pngmem.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngrio.o : ./libpng/pngrio.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngset.o : ./libpng/pngset.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngwio.o : ./libpng/pngwio.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngpread.o : ./libpng/pngpread.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngrtran.o : ./libpng/pngrtran.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngtrans.o : ./libpng/pngtrans.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngwrite.o : ./libpng/pngwrite.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/pngwutil.o : ./libpng/pngwutil.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_format_png.o : ./im_format_png.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/lzf_c.o : ./liblzf/lzf_c.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/lzf_d.o : ./liblzf/lzf_d.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_sysfile_win32.o : ./im_sysfile_win32.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_dib.o : ./im_dib.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/im_dibxbitmap.o : ./im_dibxbitmap.cpp ; g++ $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-mnote-data-fuji.o : ./libexif/fuji/exif-mnote-data-fuji.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-fuji-entry.o : ./libexif/fuji/mnote-fuji-entry.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-fuji-tag.o : ./libexif/fuji/mnote-fuji-tag.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-mnote-data-canon.o : ./libexif/canon/exif-mnote-data-canon.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-canon-entry.o : ./libexif/canon/mnote-canon-entry.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-canon-tag.o : ./libexif/canon/mnote-canon-tag.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-mnote-data-olympus.o : ./libexif/olympus/exif-mnote-data-olympus.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-olympus-entry.o : ./libexif/olympus/mnote-olympus-entry.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-olympus-tag.o : ./libexif/olympus/mnote-olympus-tag.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-mnote-data-pentax.o : ./libexif/pentax/exif-mnote-data-pentax.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-pentax-entry.o : ./libexif/pentax/mnote-pentax-entry.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/mnote-pentax-tag.o : ./libexif/pentax/mnote-pentax-tag.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-byte-order.o : ./libexif/exif-byte-order.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-entry.o : ./libexif/exif-entry.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-utils.o : ./libexif/exif-utils.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-format.o : ./libexif/exif-format.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-mnote-data.o : ./libexif/exif-mnote-data.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-content.o : ./libexif/exif-content.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-ifd.o : ./libexif/exif-ifd.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-tag.o : ./libexif/exif-tag.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-data.o : ./libexif/exif-data.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-loader.o : ./libexif/exif-loader.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-log.o : ./libexif/exif-log.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+../obj/$(BUILDNICK)/im/exif-mem.o : ./libexif/exif-mem.c ; gcc $(CF_ALL) $(CF_im) $^ -o $@
+
+$(SLIB_im): $(OBJS_im)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_im) $(DLIB_im) : $(OBJS_im)
+	g++ -s -shared -o $(ILIB_im) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_im) $(LF_im) $(LF_ALL)
+	-strip $(ILIB_im)
+
+im-static: build-dirs $(SLIB_im)
+im-dynamic: build-dirs $(ILIB_im) $(DLIB_im)
+
+### START OF im_process ###
+CF_im_process   = -c  -Wall -O2 -I../include   -DIM_PROCESS $(CF_im_process_EXTRA)
+LF_im_process   = -lim -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_im_process_EXTRA)
+SLIB_im_process = ../lib/$(BUILDNICK)/libim_process.a
+DLIB_im_process = ../lib/$(BUILDNICK)/libim_process.dll.a
+ILIB_im_process = ../lib/$(BUILDNICK)/im_process_alien_.dll
+OBJS_im_process = ../obj/$(BUILDNICK)/im_process/im_arithmetic_bin.o ../obj/$(BUILDNICK)/im_process/im_morphology_gray.o ../obj/$(BUILDNICK)/im_process/im_quantize.o ../obj/$(BUILDNICK)/im_process/im_arithmetic_un.o ../obj/$(BUILDNICK)/im_process/im_geometric.o ../obj/$(BUILDNICK)/im_process/im_render.o ../obj/$(BUILDNICK)/im_process/im_color.o ../obj/$(BUILDNICK)/im_process/im_histogram.o ../obj/$(BUILDNICK)/im_process/im_resize.o ../obj/$(BUILDNICK)/im_process/im_convolve.o ../obj/$(BUILDNICK)/im_process/im_houghline.o ../obj/$(BUILDNICK)/im_process/im_statistics.o ../obj/$(BUILDNICK)/im_process/im_convolve_rank.o ../obj/$(BUILDNICK)/im_process/im_logic.o ../obj/$(BUILDNICK)/im_process/im_threshold.o ../obj/$(BUILDNICK)/im_process/im_effects.o ../obj/$(BUILDNICK)/im_process/im_morphology_bin.o ../obj/$(BUILDNICK)/im_process/im_tonegamut.o ../obj/$(BUILDNICK)/im_process/im_canny.o ../obj/$(BUILDNICK)/im_process/im_distance.o ../obj/$(BUILDNICK)/im_process/im_analyze.o ../obj/$(BUILDNICK)/im_process/im_kernel.o ../obj/$(BUILDNICK)/im_process/im_remotesens.o ../obj/$(BUILDNICK)/im_process/im_point.o ../obj/$(BUILDNICK)/im_process/im_process_counter.o ../obj/$(BUILDNICK)/im_process/im_convertbitmap.o ../obj/$(BUILDNICK)/im_process/im_convertcolor.o ../obj/$(BUILDNICK)/im_process/im_converttype.o
+
+../obj/$(BUILDNICK)/im_process/im_arithmetic_bin.o : ./process/im_arithmetic_bin.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_morphology_gray.o : ./process/im_morphology_gray.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_quantize.o : ./process/im_quantize.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_arithmetic_un.o : ./process/im_arithmetic_un.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_geometric.o : ./process/im_geometric.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_render.o : ./process/im_render.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_color.o : ./process/im_color.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_histogram.o : ./process/im_histogram.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_resize.o : ./process/im_resize.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_convolve.o : ./process/im_convolve.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_houghline.o : ./process/im_houghline.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_statistics.o : ./process/im_statistics.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_convolve_rank.o : ./process/im_convolve_rank.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_logic.o : ./process/im_logic.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_threshold.o : ./process/im_threshold.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_effects.o : ./process/im_effects.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_morphology_bin.o : ./process/im_morphology_bin.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_tonegamut.o : ./process/im_tonegamut.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_canny.o : ./process/im_canny.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_distance.o : ./process/im_distance.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_analyze.o : ./process/im_analyze.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_kernel.o : ./process/im_kernel.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_remotesens.o : ./process/im_remotesens.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_point.o : ./process/im_point.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_process_counter.o : ./process/im_process_counter.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_convertbitmap.o : ./im_convertbitmap.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_convertcolor.o : ./im_convertcolor.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+../obj/$(BUILDNICK)/im_process/im_converttype.o : ./im_converttype.cpp ; g++ $(CF_ALL) $(CF_im_process) $^ -o $@
+
+$(SLIB_im_process): $(OBJS_im_process)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_im_process) $(DLIB_im_process) : $(OBJS_im_process)
+	g++ -s -shared -o $(ILIB_im_process) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_im_process) $(LF_im_process) $(LF_ALL)
+	-strip $(ILIB_im_process)
+
+im_process-static: build-dirs $(SLIB_im_process)
+im_process-dynamic: build-dirs $(ILIB_im_process) $(DLIB_im_process)
+
+### START OF im_jp2 ###
+CF_im_jp2   = -c  -Wall -O2 -Ilibjasper -I../include   -DEXCLUDE_JPG_SUPPORT -DEXCLUDE_MIF_SUPPORT -DEXCLUDE_PNM_SUPPORT -DEXCLUDE_BMP_SUPPORT -DEXCLUDE_PGX_SUPPORT -DEXCLUDE_RAS_SUPPORT -DEXCLUDE_TIFF_SUPPORT -DJAS_GEO_OMIT_PRINTING_CODE -DJAS_WIN_MSVC_BUILD -DJAS_TYPES $(CF_im_jp2_EXTRA)
+LF_im_jp2   = -lim -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_im_jp2_EXTRA)
+SLIB_im_jp2 = ../lib/$(BUILDNICK)/libim_jp2.a
+DLIB_im_jp2 = ../lib/$(BUILDNICK)/libim_jp2.dll.a
+ILIB_im_jp2 = ../lib/$(BUILDNICK)/im_jp2_alien_.dll
+OBJS_im_jp2 = ../obj/$(BUILDNICK)/im_jp2/jas_binfile.o ../obj/$(BUILDNICK)/im_jp2/im_format_jp2.o ../obj/$(BUILDNICK)/im_jp2/jas_cm.o ../obj/$(BUILDNICK)/im_jp2/jas_icc.o ../obj/$(BUILDNICK)/im_jp2/jas_init.o ../obj/$(BUILDNICK)/im_jp2/jas_stream.o ../obj/$(BUILDNICK)/im_jp2/jas_version.o ../obj/$(BUILDNICK)/im_jp2/jas_debug.o ../obj/$(BUILDNICK)/im_jp2/jas_iccdata.o ../obj/$(BUILDNICK)/im_jp2/jas_malloc.o ../obj/$(BUILDNICK)/im_jp2/jas_string.o ../obj/$(BUILDNICK)/im_jp2/jas_tmr.o ../obj/$(BUILDNICK)/im_jp2/jas_getopt.o ../obj/$(BUILDNICK)/im_jp2/jas_image.o ../obj/$(BUILDNICK)/im_jp2/jas_seq.o ../obj/$(BUILDNICK)/im_jp2/jas_tvp.o ../obj/$(BUILDNICK)/im_jp2/jp2_cod.o ../obj/$(BUILDNICK)/im_jp2/jp2_dec.o ../obj/$(BUILDNICK)/im_jp2/jp2_enc.o ../obj/$(BUILDNICK)/im_jp2/jpc_bs.o ../obj/$(BUILDNICK)/im_jp2/jpc_math.o ../obj/$(BUILDNICK)/im_jp2/jpc_mqenc.o ../obj/$(BUILDNICK)/im_jp2/jpc_t1enc.o ../obj/$(BUILDNICK)/im_jp2/jpc_tagtree.o ../obj/$(BUILDNICK)/im_jp2/jpc_cs.o ../obj/$(BUILDNICK)/im_jp2/jpc_mct.o ../obj/$(BUILDNICK)/im_jp2/jpc_qmfb.o ../obj/$(BUILDNICK)/im_jp2/jpc_t2cod.o ../obj/$(BUILDNICK)/im_jp2/jpc_tsfb.o ../obj/$(BUILDNICK)/im_jp2/jpc_dec.o ../obj/$(BUILDNICK)/im_jp2/jpc_mqcod.o ../obj/$(BUILDNICK)/im_jp2/jpc_t1cod.o ../obj/$(BUILDNICK)/im_jp2/jpc_t2dec.o ../obj/$(BUILDNICK)/im_jp2/jpc_util.o ../obj/$(BUILDNICK)/im_jp2/jpc_enc.o ../obj/$(BUILDNICK)/im_jp2/jpc_mqdec.o ../obj/$(BUILDNICK)/im_jp2/jpc_t1dec.o ../obj/$(BUILDNICK)/im_jp2/jpc_t2enc.o
+
+../obj/$(BUILDNICK)/im_jp2/jas_binfile.o : ./jas_binfile.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/im_format_jp2.o : ./im_format_jp2.cpp ; g++ $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_cm.o : ./libjasper/base/jas_cm.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_icc.o : ./libjasper/base/jas_icc.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_init.o : ./libjasper/base/jas_init.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_stream.o : ./libjasper/base/jas_stream.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_version.o : ./libjasper/base/jas_version.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_debug.o : ./libjasper/base/jas_debug.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_iccdata.o : ./libjasper/base/jas_iccdata.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_malloc.o : ./libjasper/base/jas_malloc.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_string.o : ./libjasper/base/jas_string.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_tmr.o : ./libjasper/base/jas_tmr.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_getopt.o : ./libjasper/base/jas_getopt.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_image.o : ./libjasper/base/jas_image.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_seq.o : ./libjasper/base/jas_seq.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jas_tvp.o : ./libjasper/base/jas_tvp.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jp2_cod.o : ./libjasper/jp2/jp2_cod.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jp2_dec.o : ./libjasper/jp2/jp2_dec.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jp2_enc.o : ./libjasper/jp2/jp2_enc.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_bs.o : ./libjasper/jpc/jpc_bs.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_math.o : ./libjasper/jpc/jpc_math.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_mqenc.o : ./libjasper/jpc/jpc_mqenc.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_t1enc.o : ./libjasper/jpc/jpc_t1enc.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_tagtree.o : ./libjasper/jpc/jpc_tagtree.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_cs.o : ./libjasper/jpc/jpc_cs.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_mct.o : ./libjasper/jpc/jpc_mct.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_qmfb.o : ./libjasper/jpc/jpc_qmfb.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_t2cod.o : ./libjasper/jpc/jpc_t2cod.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_tsfb.o : ./libjasper/jpc/jpc_tsfb.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_dec.o : ./libjasper/jpc/jpc_dec.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_mqcod.o : ./libjasper/jpc/jpc_mqcod.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_t1cod.o : ./libjasper/jpc/jpc_t1cod.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_t2dec.o : ./libjasper/jpc/jpc_t2dec.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_util.o : ./libjasper/jpc/jpc_util.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_enc.o : ./libjasper/jpc/jpc_enc.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_mqdec.o : ./libjasper/jpc/jpc_mqdec.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_t1dec.o : ./libjasper/jpc/jpc_t1dec.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+../obj/$(BUILDNICK)/im_jp2/jpc_t2enc.o : ./libjasper/jpc/jpc_t2enc.c ; gcc $(CF_ALL) $(CF_im_jp2) $^ -o $@
+
+$(SLIB_im_jp2): $(OBJS_im_jp2)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_im_jp2) $(DLIB_im_jp2) : $(OBJS_im_jp2)
+	g++ -s -shared -o $(ILIB_im_jp2) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_im_jp2) $(LF_im_jp2) $(LF_ALL)
+	-strip $(ILIB_im_jp2)
+
+im_jp2-static: build-dirs $(SLIB_im_jp2)
+im_jp2-dynamic: build-dirs $(ILIB_im_jp2) $(DLIB_im_jp2)
+
+### START OF im_fftw ###
+CF_im_fftw   = -c  -Wall -O2 -Ifftw -I../include   -DFFTW_ENABLE_FLOAT $(CF_im_fftw_EXTRA)
+LF_im_fftw   = -lim_process -lim -lzlib1 -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -luuid -loleaut32 -lole32 -lcomctl32 $(LF_im_fftw_EXTRA)
+SLIB_im_fftw = ../lib/$(BUILDNICK)/libim_fftw.a
+DLIB_im_fftw = ../lib/$(BUILDNICK)/libim_fftw.dll.a
+ILIB_im_fftw = ../lib/$(BUILDNICK)/im_fftw_alien_.dll
+OBJS_im_fftw = ../obj/$(BUILDNICK)/im_fftw/im_fft.o ../obj/$(BUILDNICK)/im_fftw/config.o ../obj/$(BUILDNICK)/im_fftw/executor.o ../obj/$(BUILDNICK)/im_fftw/fftwnd.o ../obj/$(BUILDNICK)/im_fftw/fn_1.o ../obj/$(BUILDNICK)/im_fftw/fn_10.o ../obj/$(BUILDNICK)/im_fftw/fn_11.o ../obj/$(BUILDNICK)/im_fftw/fn_12.o ../obj/$(BUILDNICK)/im_fftw/fn_13.o ../obj/$(BUILDNICK)/im_fftw/fn_14.o ../obj/$(BUILDNICK)/im_fftw/fn_15.o ../obj/$(BUILDNICK)/im_fftw/fn_16.o ../obj/$(BUILDNICK)/im_fftw/fn_2.o ../obj/$(BUILDNICK)/im_fftw/fn_3.o ../obj/$(BUILDNICK)/im_fftw/fn_32.o ../obj/$(BUILDNICK)/im_fftw/fn_4.o ../obj/$(BUILDNICK)/im_fftw/fn_5.o ../obj/$(BUILDNICK)/im_fftw/fn_6.o ../obj/$(BUILDNICK)/im_fftw/fn_64.o ../obj/$(BUILDNICK)/im_fftw/fn_7.o ../obj/$(BUILDNICK)/im_fftw/fn_8.o ../obj/$(BUILDNICK)/im_fftw/fn_9.o ../obj/$(BUILDNICK)/im_fftw/fni_1.o ../obj/$(BUILDNICK)/im_fftw/fni_10.o ../obj/$(BUILDNICK)/im_fftw/fni_11.o ../obj/$(BUILDNICK)/im_fftw/fni_12.o ../obj/$(BUILDNICK)/im_fftw/fni_13.o ../obj/$(BUILDNICK)/im_fftw/fni_14.o ../obj/$(BUILDNICK)/im_fftw/fni_15.o ../obj/$(BUILDNICK)/im_fftw/fni_16.o ../obj/$(BUILDNICK)/im_fftw/fni_2.o ../obj/$(BUILDNICK)/im_fftw/fni_3.o ../obj/$(BUILDNICK)/im_fftw/fni_32.o ../obj/$(BUILDNICK)/im_fftw/fni_4.o ../obj/$(BUILDNICK)/im_fftw/fni_5.o ../obj/$(BUILDNICK)/im_fftw/fni_6.o ../obj/$(BUILDNICK)/im_fftw/fni_64.o ../obj/$(BUILDNICK)/im_fftw/fni_7.o ../obj/$(BUILDNICK)/im_fftw/fni_8.o ../obj/$(BUILDNICK)/im_fftw/fni_9.o ../obj/$(BUILDNICK)/im_fftw/ftw_10.o ../obj/$(BUILDNICK)/im_fftw/ftw_16.o ../obj/$(BUILDNICK)/im_fftw/ftw_2.o ../obj/$(BUILDNICK)/im_fftw/ftw_3.o ../obj/$(BUILDNICK)/im_fftw/ftw_32.o ../obj/$(BUILDNICK)/im_fftw/ftw_4.o ../obj/$(BUILDNICK)/im_fftw/ftw_5.o ../obj/$(BUILDNICK)/im_fftw/ftw_6.o ../obj/$(BUILDNICK)/im_fftw/ftw_64.o ../obj/$(BUILDNICK)/im_fftw/ftw_7.o ../obj/$(BUILDNICK)/im_fftw/ftw_8.o ../obj/$(BUILDNICK)/im_fftw/ftw_9.o ../obj/$(BUILDNICK)/im_fftw/ftwi_10.o ../obj/$(BUILDNICK)/im_fftw/ftwi_16.o ../obj/$(BUILDNICK)/im_fftw/ftwi_2.o ../obj/$(BUILDNICK)/im_fftw/ftwi_3.o ../obj/$(BUILDNICK)/im_fftw/ftwi_32.o ../obj/$(BUILDNICK)/im_fftw/ftwi_4.o ../obj/$(BUILDNICK)/im_fftw/ftwi_5.o ../obj/$(BUILDNICK)/im_fftw/ftwi_6.o ../obj/$(BUILDNICK)/im_fftw/ftwi_64.o ../obj/$(BUILDNICK)/im_fftw/ftwi_7.o ../obj/$(BUILDNICK)/im_fftw/ftwi_8.o ../obj/$(BUILDNICK)/im_fftw/ftwi_9.o ../obj/$(BUILDNICK)/im_fftw/generic.o ../obj/$(BUILDNICK)/im_fftw/malloc.o ../obj/$(BUILDNICK)/im_fftw/planner.o ../obj/$(BUILDNICK)/im_fftw/putils.o ../obj/$(BUILDNICK)/im_fftw/rader.o ../obj/$(BUILDNICK)/im_fftw/timer.o ../obj/$(BUILDNICK)/im_fftw/twiddle.o ../obj/$(BUILDNICK)/im_fftw/wisdom.o ../obj/$(BUILDNICK)/im_fftw/wisdomio.o
+
+../obj/$(BUILDNICK)/im_fftw/im_fft.o : ./process/im_fft.cpp ; g++ $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/config.o : ./fftw/config.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/executor.o : ./fftw/executor.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fftwnd.o : ./fftw/fftwnd.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_1.o : ./fftw/fn_1.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_10.o : ./fftw/fn_10.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_11.o : ./fftw/fn_11.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_12.o : ./fftw/fn_12.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_13.o : ./fftw/fn_13.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_14.o : ./fftw/fn_14.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_15.o : ./fftw/fn_15.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_16.o : ./fftw/fn_16.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_2.o : ./fftw/fn_2.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_3.o : ./fftw/fn_3.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_32.o : ./fftw/fn_32.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_4.o : ./fftw/fn_4.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_5.o : ./fftw/fn_5.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_6.o : ./fftw/fn_6.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_64.o : ./fftw/fn_64.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_7.o : ./fftw/fn_7.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_8.o : ./fftw/fn_8.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fn_9.o : ./fftw/fn_9.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_1.o : ./fftw/fni_1.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_10.o : ./fftw/fni_10.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_11.o : ./fftw/fni_11.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_12.o : ./fftw/fni_12.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_13.o : ./fftw/fni_13.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_14.o : ./fftw/fni_14.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_15.o : ./fftw/fni_15.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_16.o : ./fftw/fni_16.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_2.o : ./fftw/fni_2.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_3.o : ./fftw/fni_3.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_32.o : ./fftw/fni_32.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_4.o : ./fftw/fni_4.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_5.o : ./fftw/fni_5.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_6.o : ./fftw/fni_6.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_64.o : ./fftw/fni_64.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_7.o : ./fftw/fni_7.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_8.o : ./fftw/fni_8.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/fni_9.o : ./fftw/fni_9.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_10.o : ./fftw/ftw_10.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_16.o : ./fftw/ftw_16.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_2.o : ./fftw/ftw_2.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_3.o : ./fftw/ftw_3.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_32.o : ./fftw/ftw_32.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_4.o : ./fftw/ftw_4.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_5.o : ./fftw/ftw_5.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_6.o : ./fftw/ftw_6.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_64.o : ./fftw/ftw_64.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_7.o : ./fftw/ftw_7.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_8.o : ./fftw/ftw_8.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftw_9.o : ./fftw/ftw_9.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_10.o : ./fftw/ftwi_10.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_16.o : ./fftw/ftwi_16.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_2.o : ./fftw/ftwi_2.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_3.o : ./fftw/ftwi_3.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_32.o : ./fftw/ftwi_32.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_4.o : ./fftw/ftwi_4.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_5.o : ./fftw/ftwi_5.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_6.o : ./fftw/ftwi_6.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_64.o : ./fftw/ftwi_64.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_7.o : ./fftw/ftwi_7.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_8.o : ./fftw/ftwi_8.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/ftwi_9.o : ./fftw/ftwi_9.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/generic.o : ./fftw/generic.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/malloc.o : ./fftw/malloc.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/planner.o : ./fftw/planner.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/putils.o : ./fftw/putils.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/rader.o : ./fftw/rader.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/timer.o : ./fftw/timer.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/twiddle.o : ./fftw/twiddle.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/wisdom.o : ./fftw/wisdom.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+../obj/$(BUILDNICK)/im_fftw/wisdomio.o : ./fftw/wisdomio.c ; gcc $(CF_ALL) $(CF_im_fftw) $^ -o $@
+
+$(SLIB_im_fftw): $(OBJS_im_fftw)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(ILIB_im_fftw) $(DLIB_im_fftw) : $(OBJS_im_fftw)
+	g++ -s -shared -o $(ILIB_im_fftw) $^ -Wl,--enable-auto-import,--export-all -Wl,--out-implib=$(DLIB_im_fftw) $(LF_im_fftw) $(LF_ALL)
+	-strip $(ILIB_im_fftw)
+
+im_fftw-static: build-dirs $(SLIB_im_fftw)
+im_fftw-dynamic: build-dirs $(ILIB_im_fftw) $(DLIB_im_fftw)
+
+### compile RC
+
+$(VER_OBJ) : $(VER_RC) ; windres --define GCC_WINDRES $^ -o $@
+
+all: build-dirs $(STATIC_LIBS) $(DYNAMIC_LIBS)
+all-static: build-dirs $(STATIC_LIBS)
+all-dynamic: build-dirs $(DYNAMIC_LIBS)
+
+install-all:
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) ../lib/$(BUILDNICK)/* "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-static: all-static
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(STATIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+install-dynamic: all-dynamic
+	$(MKPATH) "$(LIBDIR)"
+	$(MKPATH) "$(INCDIR)"
+	$(CP) $(DYNAMIC_LIBS) "$(LIBDIR)"
+	$(CP) ../include/*.h "$(INCDIR)"
+
+build-dirs:
+	$(MKPATH) $(BUILD_DIRS)
+
+clean:
+	$(RM_F) $(ALL_OBJS) $(ALL_LIBS) $(VER_OBJ)

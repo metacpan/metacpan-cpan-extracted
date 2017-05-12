@@ -1,0 +1,24 @@
+---
+abstract: 'Pretty print integer and hex (rgb) color codes'
+author:
+  - 'Dylan Cali <calid1984@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-256colors
+requires:
+  Color::ANSI::Util: '0'
+  IPC::System::Simple: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/calid/app-256colors/issues
+  repository: git://github.com/calid/app-256colors.git
+version: '0.001'

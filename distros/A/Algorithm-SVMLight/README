@@ -1,0 +1,76 @@
+    Algorithm::SVMLight Perl module
+    =================================
+
+This module provides a Perl interface to the SVMLight code for Support
+Vector Machines written by Thorsten Johachims.  It may be downloaded
+from http://kodiak.cs.cornell.edu/svm_light/v6.01/svm_light.tar.gz .
+
+Please see the documentation of Algorithm::SVMLight for details on how
+to use the perl interface.
+
+
+DOWNLOADING
+
+The two ingredients you must obtain are the core SVMLight code, and
+the Perl interface:
+
+   http://download.joachims.org/svm_light/v6.02/svm_light.tar.gz
+   http://cpan.org/authors/id/K/KW/KWILLIAMS/Algorithm-SVMLight-0.08.tar.gz
+
+UNPACKING
+
+Put the SVMLight.patch file from Algorithm-SVMLight in the top-level
+directory of the core SVMLight code (note that svm_light.tar.gz is a
+"tar bomb"):
+
+   tar -zxvf Algorithm-SVMLight-0.08.tar.gz
+   mkdir svm_light
+   mv svm_light.tar.gz svm_light
+   cd svm_light
+   tar -zxvf svm_light.tar.gz
+   cp ../Algorithm-SVMLight-0.08/SVMLight.patch .
+
+INSTALLATION
+
+Apply the SVMLight.patch file, then build svmlight:
+
+   patch -p1 < SVMLight.patch
+   make
+
+This will provide "libsvmlight.a" and "libsvmlight.so" libraries (or
+whatever the equivalent filenames are on your system), and one of them
+should be able to be used for linking with the perl module.
+
+The Perl wrapper can then be installed as follows:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install  (may need to be done as root)
+
+If the SVMLight headers/library aren't in a location where your
+compiler/linker will find them by itself, in the first step you can
+tell it where they are like so:
+
+  perl Build.PL --extra_compiler_flags "-I/foo/include -Wall" \
+                --extra_linker_flags   "-L/foo/lib -lsvmlight"
+
+DEPENDENCIES
+
+As described above, this module requires a patched version of
+SVMLight.  Installation requires Module::Build version 0.21 and
+Test::More (any version), but they are not used after installation.
+
+
+COPYRIGHT AND LICENCE
+
+The Algorithm-SVMLight perl interface is copyright (C) 2005-2008 Thomson
+Legal & Regulatory, and written by Ken Williams.  It is free software;
+you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+Thorsten Joachims holds the copyright to SVMLight itself - you will
+find full copyright and license information in its distribution.  The
+SVMLight.patch file distributed here is granted under the same license
+terms as the SVMLight code itself.
+

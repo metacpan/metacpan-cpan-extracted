@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+  
+  <title>ARSperl Manual - ars_GetField</title>
+</head>
+
+
+<body bgcolor="#ffffff">
+
+
+
+<h2><code>ars_GetField(ctrl, schema, id)</code></h2>
+
+
+
+Returns the <a href="ds_field_hash.html">Field Properties Structure</a>.
+<p>
+<code>id</code> is the numerical Field Id.
+</p>
+
+<p>
+See also <a href="ars_GetListField.html"><code>ars_GetListField</code></a>,
+<a href="ars_GetFieldByName.html"><code>ars_GetFieldByName</code></a>,
+and <a href="ars_GetFieldTable.html"><code>ars_GetFieldTable</code></a>
+
+</p>
+
+<dl>
+
+                 
+  <dt><b>On success</b></dt>
+
+  <dd>
+ returns a reference to <a href="ds_field_hash.html">HASH</a>
+          
+  </dd>
+
+  <dt><b>On failure</b></dt>
+
+  <dd>
+ returns undef
+  </dd>
+
+</dl>
+
+
+<p>
+Example:
+</p>
+
+<pre>
+         ($field = ars_GetField($c, "User", 8)) || die $ars_errstr;
+         print $field-&gt;{"helpText"};
+</pre>
+
+
+Example of how to retrieve enumerated field labels (e.g. the Status (core field 7) field
+labels):
+<pre>
+        ($field_info = ars_GetField($c, $s, 7})) ||
+            die "GetField: $ars_errstr (no Status field in this schema?)";
+
+        if( exists $field_info-&gt;{limit}{enumLimits}{regularList} ){
+            @enum_vals = @{$field_info-&gt;{limit}{enumLimits}{regularList}};
+        }else{
+            @enum_vals = @{$field_info-&gt;{limit}{enumLimits}{customList}};
+        }
+        
+        print "Status values: ".join(', ', @enum_vals)."\n";
+</pre>
+
+<hr width="30%">
+<p>
+<a href="toc.html"><img alt="&lt;--" src="arrow.gif" align="middle"> Table of Contents </a>
+
+</p>
+
+<p>
+
+</p>
+
+<address>
+Last changes to this page 2 Aug 2007 by Michiel Beijen
+<p>
+&copy; J.C.Murphy, J.W.Murphy 1997 arsperl@arsperl.org 
+</p>
+
+</address>
+
+
+
+</body>
+</html>

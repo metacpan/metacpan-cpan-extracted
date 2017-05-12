@@ -1,0 +1,15 @@
+Apache::Auth::UserDB 0.120
+Manipulation of Apache user authentication databases.
+(C) 2003-2007 Julian Mehnle <julian@mehnle.net>
+<http://search.cpan.org/dist/Apache-Auth-UserDB>
+==============================================================================
+
+Using the Apache::Auth::UserDB::* modules, you can read and write Apache user
+authentication databases.  Both basic and digest authentication databases are
+supported.
+
+The following database types are currently supported:
+  * File: htpasswd/htdigest-style text files.
+
+# $Id: README 31 2007-09-18 01:39:14Z julian $
+# vim:tw=79

@@ -1,0 +1,25 @@
+Revision history for Perl extension Ananke::Template.
+
+1.4  Mon Jan 27 16:59:32 BRST 2003
+	- Add: regex styles [% VAR == /^aa$|^bb$/ %]
+	- Add: no INCLUDE vc pode colocar valor de outra var !VAR
+	- Fix: multihash in IF
+
+1.3  Thu Jul 25 09:29:09 BRT 2002
+	- Add: Return value to variable
+	- You can use multihash (hash.hash.hash)
+
+1.2  Apr  3 14:36:45 BRT 2002
+	- optimezed regex
+	- fix variables with number
+	- fix variables in include
+
+1.1  Tue Mar 26 14:20:25 BRT 2002
+	- remove open(FH,">>/tmp/filex");
+	- type outmsg now is syswrite
+	- fix =! and ==
+	- new: you can change STDOUT to FD
+	- fix last " in new vars string
+
+1.0  Mon Mar  4 19:21:23 2002
+	- First stable version

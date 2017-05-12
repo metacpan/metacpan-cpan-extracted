@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/App-Difio-OpenShift.t
+lib/App/Difio/OpenShift.pm
+lib/App/Difio/OpenShift/Parser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

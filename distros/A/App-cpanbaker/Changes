@@ -1,0 +1,19 @@
+Revision history for Perl extension App::cpanbaker
+
+0.05    三  1/19 15:16:16 2011
+        - support --installed option.
+        - fix syntax bugs.
+
+0.04    三  1/19 13:51:57 2011
+        - bzip2 flag
+
+0.03    二  1/18 14:03:51 2011
+        - update pods
+        - support minicpan
+
+0.02    二  1/18 13:52:10 2011
+        - More options. --dry , --skip-pods, --skip-manpages ..
+        - Filename with OS name , date
+
+0.01    Mon Jan 17 23:26:26 2011
+        - original version

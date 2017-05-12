@@ -1,0 +1,270 @@
+#!/usr/bin/perl -w
+
+###########################################################################
+# TODO
+###########################################################################
+# o tbd
+###########################################################################
+
+use strict;
+
+use App::Options (
+    options => [qw(prefix remote remote_prefix remote_user remote_host op verbose)],
+    option => {
+        prefix => {
+            description => "the directory path to be administered (generally an 'application root' directory)",
+        },
+        remote => {
+            description => "run the command remotely using 'ssh' rather than locally as the logged in user",
+        },
+        remote_host => {
+            description => "(for --remote option) which server(s) to run the prefixadmin on. Comma delimited list. (optionally user\@host:/pr/ef/ix)",
+        },
+        remote_prefix => {
+            description => "directory on remote machine to administer",
+        },
+        remote_user => {
+            description => "the username to run the remote command",
+        },
+        op => {
+            description => "list of operations to perform [fix] (check,fix)",
+        },
+        username => {
+            description => "the user name that a prefix should be shared as",
+        },
+        group => {
+            description => "the group name that a prefix should be shared as",
+        },
+        verbose => {
+            default => 0,
+            description => "level of detail to print",
+        },
+    },
+);
+
+$| = 1;
+
+{
+    my (@op);
+    if ($App::options{op}) {
+        @op = split(/,/,$App::options{op});
+    }
+    elsif ($#ARGV > -1) {
+        @op = @ARGV;
+    }
+    else {
+        @op = ("fix");
+    }
+
+    if ($#op > -1) {
+        my $admin = App::Options::PrefixAdmin->new();
+        
+        foreach my $op (@op) {
+            if ($op eq "fix") {
+                $admin->fix(\%App::options);
+            }
+            else {
+                print "Unknown operation [$op]\n";
+            }
+        }
+    }
+    else {
+        print "No operations specified\n";
+    }
+}
+
+package App::Options::PrefixAdmin;
+
+use File::Find;
+use Date::Format;
+use Fcntl ':mode';
+
+sub new {
+    my ($this) = @_;
+    my $class = ref($this) || $this;
+    my $self = {};
+    bless $self, $class;
+    return($self);
+}
+
+sub fix {
+    my ($self, $options) = @_;
+    my ($path, $file, $cwd);
+    my ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks);
+
+    my $verbose = $options->{verbose} || 0;
+    my $prefix  = $options->{prefix} || die "prefix not specified";
+    die "$prefix is not a directory" if (! -d $prefix);
+    chdir($prefix) || die "Could not change directory to $prefix";
+
+    $path = ".";
+    ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = stat($path);
+    if ($verbose >= 2) {
+        printf("%3d %8d %10s %2d %5d %5d %6d %15d [%17s] %s\n",
+            $dev, $ino, $self->format_mode($mode), $nlink, $uid, $gid, $rdev, $size, time2str("%Y-%m-%d %H:%M:%S", $mtime), $path);
+    }
+
+    my ($u_name, $u_pass, $u_uid, $u_gid, $u_quota, $u_comment, $u_gcos, $u_dir, $u_shell, $u_expire) = getpwuid($uid);
+    print "Uname: $u_name UID: $u_uid\n" if ($verbose >= 2);
+
+    my ($grp_name, $grp_passwd, $grp_gid, $grp_members) = getgrgid($gid);
+    print "Gname: $grp_name GID: $grp_gid Members: $grp_members\n" if ($verbose >= 2);
+
+    my ($shgrp_name,$shgrp_passwd,$shgrp_gid,$shgrp_members);
+    my $shared_group = $options->{group};
+    if ($shared_group) {
+        ($shgrp_name,$shgrp_passwd,$shgrp_gid,$shgrp_members) = getgrnam($shared_group);
+        print "Shared Gname: $shgrp_name GID: $shgrp_gid Members: $shgrp_members\n" if ($verbose >= 2);
+    }
+    else {  # if --group is not given on the command line, use the GID of the top level directory
+        ($shgrp_name,$shgrp_passwd,$shgrp_gid,$shgrp_members) = getgrgid($gid);
+        print "Shared Gname: $shgrp_name GID: $shgrp_gid Members: $shgrp_members\n" if ($verbose >= 2);
+    }
+
+    #print STDERR "   searching $prefix\n" if ($verbose >= 2);
+    find(
+       sub {
+           $file = $_;
+           $path = $File::Find::name;
+           $path =~ s!^\.\/!!;
+           $cwd  = $File::Find::dir;
+           $cwd  =~ s!^\.\/!!;
+           my ($err_msg);
+
+           ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks) = stat($file);
+
+           if (!defined $mode) {
+               print ">>> $file\n" if ($verbose);
+           }
+           else {
+               printf("%3d %8d %07o:%10s %2d %5d %5d %6d %15d [%17s] %s\n",
+                   $dev, $ino, $mode, $self->format_mode($mode), $nlink, $uid, $gid, $rdev, $size, time2str("%Y-%m-%d %H:%M:%S", $mtime), $path) if ($verbose);
+               if ($shgrp_gid) {
+                   $err_msg = $self->_share_file($file, $options, $shgrp_gid, $mode, $uid, $gid);
+               }
+           }
+           return(0);
+       },
+       "."
+    );
+}
+
+# S_IRWXU S_IRUSR S_IWUSR S_IXUSR
+# S_IRWXG S_IRGRP S_IWGRP S_IXGRP
+# S_IRWXO S_IROTH S_IWOTH S_IXOTH
+#
+# # Setuid/Setgid/Stickiness/SaveText.
+# # Note that the exact meaning of these is system dependent.
+#
+# S_ISUID S_ISGID S_ISVTX S_ISTXT
+
+sub format_mode {
+    my ($self, $mode) = @_;
+    my $fmt_mode = ($mode & S_IFREG) ? "-" : (($mode & S_IFDIR) ? "d" : (($mode & S_IFLNK) ? "l" : "?"));
+    $fmt_mode   .= ($mode & S_IRUSR) ? "r" : "-";
+    $fmt_mode   .= ($mode & S_IWUSR) ? "w" : "-";
+    $fmt_mode   .= ($mode & S_IXUSR) ? (($mode & S_ISUID) ? "s" : "x") : (($mode & S_ISUID) ? "S" : "-");
+    $fmt_mode   .= ($mode & S_IRGRP) ? "r" : "-";
+    $fmt_mode   .= ($mode & S_IWGRP) ? "w" : "-";
+    $fmt_mode   .= ($mode & S_IXGRP) ? (($mode & S_ISGID) ? "s" : "x") : (($mode & S_ISGID) ? "S" : "-");
+    $fmt_mode   .= ($mode & S_IROTH) ? "r" : "-";
+    $fmt_mode   .= ($mode & S_IWOTH) ? "w" : "-";
+    $fmt_mode   .= ($mode & S_IXOTH) ? (($mode & S_ISVTX) ? "t" : "x") : (($mode & S_ISVTX) ? "T" : "-");
+    return($fmt_mode);
+}
+
+#  1. $cnt = chmod 0755, 'foo', 'bar';
+#  2. chmod 0755, @executables;
+#  3. $mode = '0644'; chmod $mode, 'foo'; # !!! sets mode to
+#  4. # --w----r-T
+#  5. $mode = '0644'; chmod oct($mode), 'foo'; # this is better
+#  6. $mode = 0644; chmod $mode, 'foo'; # this is best
+
+#  1. $cnt = chown $uid, $gid, 'foo', 'bar';
+#  2. chown $uid, $gid, @filenames;
+
+sub _share_file {
+    my ($self, $file, $options, $shgrp_gid, $mode, $uid, $gid) = @_;
+
+    my $verbose = $options->{verbose};
+    my $err_msg = "";
+    my ($retval);
+    if ($shgrp_gid) {
+
+        if ($gid != $shgrp_gid) {
+            $retval = chown($uid, $shgrp_gid, $file);
+            if ($verbose) {
+                print ">>> chown($uid, $shgrp_gid, $file) = [$retval]\n";
+            }
+        }
+
+        my $share_mode = $mode & 07777;
+        my $mode_needs_fix = 0;
+
+        if ($mode & S_IFDIR) {
+            if ($mode & S_ISGID) {
+                # do nothing
+            }
+            else {
+                $share_mode |= S_ISGID;
+                $mode_needs_fix = 1;
+            }
+        }
+        else {
+            if ($mode & S_ISGID) {
+                $share_mode ^= S_ISGID;
+                $mode_needs_fix = 1;
+            }
+            else {
+                # do nothing
+            }
+        }
+
+        if ($mode & S_ISUID) {
+            $share_mode ^= S_ISUID;
+            $mode_needs_fix = 1;
+        }
+        if ($mode & S_ISVTX) {
+            $share_mode ^= S_ISVTX;
+            $mode_needs_fix = 1;
+        }
+
+        if ($mode & S_IRUSR) {
+            if ($mode & S_IRGRP) {
+                # do nothing
+            }
+            else {
+                $share_mode |= S_IRGRP;
+                $mode_needs_fix = 1;
+            }
+        }
+        if ($mode & S_IWUSR) {
+            if ($mode & S_IWGRP) {
+                # do nothing
+            }
+            else {
+                $share_mode |= S_IWGRP;
+                $mode_needs_fix = 1;
+            }
+        }
+        if ($mode & S_IXUSR) {
+            if ($mode & S_IXGRP) {
+                # do nothing
+            }
+            else {
+                $share_mode |= S_IXGRP;
+                $mode_needs_fix = 1;
+            }
+        }
+
+        if ($mode_needs_fix) {
+            $retval = chmod($share_mode, $file);
+            if ($verbose) {
+                printf(">>> chmod(%06o, $file) = [$retval]\n", $share_mode);
+            }
+        }
+    }
+    return($err_msg);
+}
+
+1;

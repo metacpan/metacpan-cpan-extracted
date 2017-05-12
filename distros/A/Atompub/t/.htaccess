@@ -1,0 +1,4 @@
+AuthType	None
+
+Options         +ExecCGI
+AddType         cgi-script cgi

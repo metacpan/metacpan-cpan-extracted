@@ -1,0 +1,76 @@
+Revision history for Alien-FFI
+
+0.16      2017-03-23 08:00:19 -0400
+  - Production release identical to 0.15_02
+
+0.15_02   2017-03-16 21:01:05 -0400
+  - Fix regression in libffi version downloaded on windows
+  - Fix regressions with Visual C++
+
+0.15_01   2017-03-16 15:42:40 -0400
+  - Migrate to Alien::Build + alienfile
+
+0.14      2016-03-01 12:49:45 -0500
+  - Use Alien::Base::ModuleBuild for configure_requires instead of Alien::Base
+
+0.12      2015-07-15 16:32:45 -0400
+  - Require Alien::Base 0.021 for bug fixes
+
+0.11      2015-04-24 12:41:12 -0400
+  - require Alien::Base 0.017 for bug fixes
+
+0.10      2015-04-22 07:20:59 -0400
+  - use alien_stage_install
+
+0.09      2015-03-18 13:00:16 -0400
+  - Use older version 3.1 when building from source with Microsoft Visual C++
+    newer versions seem to be broken with that compiler
+  - Build with same -arch flags as Perl on Darwin / OS X
+
+0.08      2015-02-24 12:25:47 -0500
+  - Turn off Alien::Base blib detection
+  - Make libs and cflags class methods should work correctly
+    before or after ./Build install
+
+0.07      2015-02-16 18:16:54 -0500
+  - Promote to production
+
+0.06_05   2015-02-16 10:07:27 -0500
+  - Fixed MSWin32 logic, removed MB requirement of 0.4202
+
+0.06_04   2015-02-15 08:17:38 -0500
+  - Bump MB requirement up to 0.4202
+
+0.06_03   2015-02-14 23:25:21 -0500
+  - Only attempt to use Alien::MSYS if it is installed
+
+0.06_02   2015-02-14 08:21:58 -0500
+  - Mark prereqs as "dynamic" as we need Alien::MSYS on Windows
+
+0.06_01   2015-02-13 10:43:04 -0500
+  - Only require Alien::MSYS if we need to do a build from source
+
+0.06      2015-02-03 15:39:48 -0500
+  - Ensure that Alien::Base 0.009 is installed in Build.PL
+
+0.05      2015-01-27 05:03:00 -0500
+  - Require Alien::Base 0.009 which supports multiple argument system
+    This should relax some of the weirdisms in windows
+
+0.04_01   2015-01-25 22:57:40 -0500
+  - work around some weirdisms in windows
+
+0.04      2015-01-23 17:15:50 -0500
+  - bump version requirement for Alien::Base 0.007
+    I am pretty sure this will correct a cpan testers failure that I am seeing
+    in FFI::Platypus.
+
+0.03      2015-01-21 07:30:24 -0500
+  - Work-around for unthreaded OpenBSD.  Basically applied same wonky "fix" as I did to FFI::Raw:
+    https://github.com/plicease/p5-FFI-Raw/commit/e223cf61f599ea7f51e5f5ff088de43028c8f506
+
+0.02      2014-09-11 16:56:51 -0400
+  - make Alien::Base a configure requires
+
+0.01      2014-09-11 14:40:53 -0400
+  - initial version

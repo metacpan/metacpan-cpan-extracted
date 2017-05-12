@@ -1,0 +1,35 @@
+==================================================
+Changes from 1740-12-01 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2014-09-15 19:49:37 +0000
+------------------------------------------
+
+  Change: 679a0edbc00ee4ec419a1cb25be486c7d1dc7ef4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-15 21:49:29 +0000
+
+    Hups, forgot requirements 
+
+  Change: ba854312a674c06588691bd192d99a3fd91f91e2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-15 21:47:35 +0000
+
+    Fixed rights 
+
+  Change: ec1df19baf72b46883444ace9a56c54451bd170b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-15 21:47:14 +0000
+
+    First release 
+
+  Change: 82e35007f59eb0a331548efe2076dec5ba3f0124
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-15 21:22:57 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

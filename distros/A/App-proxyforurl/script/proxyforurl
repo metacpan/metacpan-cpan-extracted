@@ -1,0 +1,209 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+use NetAddr::IP ();
+use Socket 'inet_ntoa';
+
+get '/' => 'index';
+get '/pac' => 'pac';
+
+get '/gethostbyname' => sub {
+  my $c = shift;
+
+  local $! = 0;
+
+  if (my $host = $c->param('host')) {
+    return $c->render(text => $host) unless $host =~ /[a-z]/;
+    my @addr = gethostbyname($c->param('host'));
+    return $c->render(text => "$!", status => 400) if $!;
+    @addr = map { inet_ntoa($_) } @addr[4 .. $#addr];
+    return $c->render(text => $addr[0]) if @addr;
+    return $c->render(text => "No IP found for $host.", status => 400);
+  }
+  else {
+    return $c->render(text => "Host missing.", status => 400);
+  }
+}, 'gethostbyname';
+
+get '/within' => sub {
+  my $c    = shift;
+  my $ip   = $c->param('ip');
+  my $net  = $c->param('net');
+  my $mask = $c->param('mask');
+
+  unless (2 == grep {$_ and $_ =~ /[:\.]/} $ip, $net) {
+    return $c->render(text => "IP or Net is missing.", status => 400);
+  }
+  unless ($mask and $mask =~ /\d/) {
+    return $c->render(text => "Mask is invalid or missing.", status => 400);
+  }
+
+  $ip = NetAddr::IP->new($c->param('ip'));
+  $net = NetAddr::IP->new(join '/', $net, $mask);
+  $c->render(text => $net->contains($ip) ? 1 : 0);
+}, 'within';
+
+app->start;
+
+__DATA__
+@@ index.html.ep
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PAC file tester</title>
+  %= stylesheet "http://yui.yahooapis.com/pure/0.6.0/pure-min.css"
+  %= stylesheet begin
+    form { max-width: 50em; margin: 3em auto; }
+    textarea { height: 18em; }
+    .footer { margin-top: 3em; font-size: 0.9em; }
+    .footer, .footer a { color: #888; }
+  % end
+</head>
+<body>
+%= form_for '', method => 'post', class => 'pure-form pure-form-stacked', begin
+  <h1>Online proxy PAC file tester</h1>
+  <p>
+    <label for="rules">PAC file</label>
+    <textarea id="rules" class="pure-input-1"><%= include 'example_pac' %></textarea>
+  </p>
+  <p>
+    <label for="url">URL</label>
+    %= text_field 'url', 'http://example.com', class => 'pure-input-1', id => 'url', placeholder => 'http://example.com'
+  </p>
+  <p>
+    <label for="host">Host</label>
+    %= text_field 'host', 'example.com', class => 'pure-input-1', id => 'host'
+  </p>
+  <p>
+    <button class="pure-button pure-button-primary">Find rule</button>
+  </p>
+  <label for="rule">Rule</label>
+  <input type="text" id="rule" readonly="readonly" class="pure-input-1">
+  <p class="footer">
+    Powered by <a href="https://metacpan.org/pod/App::proxyforurl#DESCRIPTION">proxyforurl</a>.
+  </p>
+% end
+%= javascript '/pac.js'
+%= javascript begin
+var $=function(id){return document.getElementById(id)};
+var template;
+$('url').addEventListener('change',function(e){var p=document.createElement('a');p.href=e.target.value;$('host').value=p.hostname});
+$('rules').addEventListener('click',function(e) {
+if(!template)template=this.value;
+if(this.value==template)this.value='';
+this.placeholder=template;
+});
+$('rules').addEventListener('blur',function(e){if(!this.value)this.value=template;});
+document.getElementsByTagName('form')[0].addEventListener('submit',function(e) {
+e.preventDefault();
+try{$('rule').value=new Pac().test($('rules').value, $('url').value, $('host').value)}
+catch(e){$('rule').value=e};
+});
+% end
+</body>
+</html>
+
+@@ pac.js.ep
+(function(window) {
+  var pac = function() {};
+  var proto = pac.prototype;
+  var pacFunctions = [
+    'alert',
+    'dateRange',
+    'dnsDomainIs',
+    'dnsDomainLevels',
+    'dnsResolve',
+    'isInNet',
+    'isPlainHostName',
+    'isResolvable',
+    'localHostOrDomainIs',
+    'myIpAddress',
+    'shExpMatch',
+    'timeRange',
+    'weekdayRange'
+  ];
+
+  var TODO = function() { return true; }
+
+  proto.test = function(_code, url, host) {
+    var i, re, code = _code.replace(/\bFindProxyForURL\b/, '');
+
+    for (i = 0; i < pacFunctions.length; i++) {
+      re = new RegExp('\\b' + pacFunctions[i] + '\\s*\\(', 'g');
+      code = code.replace(re, 'this.' + pacFunctions[i] + '(');
+    }
+
+    code = code.replace(/\b(new\s|document\.|window\.|cookie\b)/, 'ILLEGAL');
+    code = eval('(' + code + ');');
+    return code.call(this, url, host);
+  };
+
+  proto.alert = function(str) {
+    alert(str);
+  };
+
+  proto.dateRange = TODO;
+
+  proto.dnsDomainIs = function(host, domain) {
+    return host.length >= domain.length && host.substring(host.length - domain.length) == domain;
+  };
+
+  proto.dnsDomainLevels = function(host) {
+    var m = host.match(/\./g);
+    return m ? m.length - 1 : 0;
+  };
+
+  proto.dnsResolve = function(host) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '<%= url_for 'gethostbyname' %>?host=' + host, false);
+    xhr.send(null);
+    return xhr.status == 200 ? xhr.responseText : false;
+  };
+
+  proto.isInNet = function(ip, net, mask) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '<%= url_for 'within' %>?ip=' + ip + '&net=' + net + '&mask=' + mask, false);
+    xhr.send(null);
+    return xhr.status == 200 && parseInt(xhr.responseText) ? true : false;
+  };
+
+  proto.isResolvable = function(host) {
+    return dnsResolve(host) ? true : false;
+  }
+
+  proto.isPlainHostName = function(str) {
+    return str.match(/\./) ? false : true;
+  };
+
+  proto.localHostOrDomainIs = function(host, str) {
+    return str.match(/^\./) ? dnsDomainIs(host, str) : host == str ? true : host == host.split('.')[0];
+  };
+
+  proto.myIpAddress = function() {
+    return '<%= $c->tx->remote_address %>';
+  };
+
+  proto.shExpMatch = function(str, re) {
+    return str.match(new RegExp(re.replace(/\*/, '.*?'), 'i'));
+  };
+
+  proto.timeRange = TODO;
+  proto.weekdayRange = TODO;
+
+  window.Pac = pac;
+})(window);
+
+@@ example_pac.html.ep
+function FindProxyForURL(url, host) {
+  // our local URLs from the domains below example.com don't need a proxy:
+  if (shExpMatch(host, "*.example.com")) return "DIRECT";
+
+  // URLs within this network are accessed through
+  // port 8080 on fastproxy.example.com:
+  if (isInNet(host, "10.0.0.0", "255.255.248.0")) return "PROXY fastproxy.example.com:8080";
+
+  if (dnsDomainIs(host, "example.com")) return "PROXY proxy2.example.com:8888";
+
+  // All other requests go through port 8080 of proxy.example.com.
+  // should that fail to respond, go directly to the WWW:
+  return "PROXY proxy.example.com:8080; DIRECT";
+}

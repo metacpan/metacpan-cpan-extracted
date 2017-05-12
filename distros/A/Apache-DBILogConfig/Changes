@@ -1,0 +1,29 @@
+Revision history for Perl extension Apache::DBILogConfig.
+
+0.02  Thu Aug 16 22:17:00 2001
+	- Fixed error in parsing of DBILogConfig_log_format that caused things to break when
+    whitespace was used in parameters.
+  - Added support for the following logging formats:
+    
+    b - bytes sent, excluding HTTP headers, in CLF format, i.e. a '-' rather than a 0
+        when no bytes are sent
+    B - Bytes sent, excluding HTTP headers (%b used to be the format for this)
+    H - The request protocol
+    m - The request method
+    q - The query string (prepended with a ? if a query string exists, otherwise an empty string)
+		
+  - Added stubs for future support of:
+
+    A - Local IP-address
+		c - Connection status when response is completed
+        'X' = connection aborted before the response completed
+        '+' = connection may be kept alive after the response is sent
+        '-' = connection will be closed after the response is sent
+		V - The server name according to the UseCanonicalName setting
+
+		Support for these formats will be completed when mod_perl makes this information available via
+    the Apache request, connection and server APIs.
+
+0.01  Mon Jun  8 11:56:27 1998
+	- original version; created by h2xs 1.18
+

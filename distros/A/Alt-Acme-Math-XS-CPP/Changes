@@ -1,0 +1,29 @@
+---
+version: 0.0.5
+date:    Wed Dec 24 22:05:31 PST 2014
+changes:
+- Use makestub and .inline
+---
+version: 0.0.4
+date:    Tue Dec 23 12:22:26 PST 2014
+changes:
+- Fix smoker bug w/ Inline-Module-0.29
+---
+version: 0.0.3
+date:    Sun Dec 21 00:23:47 EST 2014
+changes:
+- Build on Inline::Module 0.27
+- Adds CppGuess support
+- Add dev modules to Makefile.PL
+---
+version: 0.0.2
+date:    Thu Dec 18 18:37:24 PST 2014
+changes:
+- Remove .travis from dist
+- Remove master from dist
+- Update pod
+---
+version: 0.0.1
+date:    Wed Dec 17 23:31:37 PST 2014
+changes:
+- First Release

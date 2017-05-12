@@ -1,0 +1,113 @@
+0.957 2015-11-10
+- fixed misplaced die() in handling request_header
+0.956 2013-07-31
+- fixed bug that children, which got forked because maxconn was reached, did
+  not exit after all requests were done.
+- better output when dumping state (eg kill -USR1..)
+0.955 2013-07-24
+- new option -M|--maxconn to limit number of connections per child
+0.954 2013-07-23
+- new option -C|--childs to fork children and keep them running.
+  might be used to spread load or to just make sure, that child gets
+  restarted if it crashes
+0.953 2013-07-23
+- fixes for endless loop or late close on end of data
+0.952 2013-07-04
+- option -l|--log [rx] to adjust displaying of log messages
+0.951 2013-07-02
+- add support for IMP_FATAL
+- fix support of IMP_PAUSE and IMP_CONTINUE
+- fix closing after everything is done - don't close to early if analyzer
+  takes too long (like with remote analyzer)
+0.950 2013-06-21
+- export eventloop to IMP plugins
+- do get_interface before set_interface to make sure caller supports what we
+  want
+0.949 2013-06-12
+- remove max-in-analyzer option and related code in IMP.pm.
+  Instead the IMP_PAUSE|IMP_CONTINUE interface is supported so that an 
+  analyzer itself can control flow
+0.948 2013-06-12
+- only try to determine CApath if mitm_ca is given
+0.947 2013-06-04
+- fix Bug when full buffer got replaced
+0.946 2013-06-01
+- fix SSL intercept when using upstream proxy
+0.945 2013-05-30
+- add SSL interception feature, see documentation and look for mitm_ca
+- more reliable accounting
+- imporove meta data in Makefile.PL
+0.944 2013-05-03
+- fixed bug where it did not write remaining data after short write and thus
+  caused the connection to hang.
+0.9434 2013-04-26
+- fixed issue when getting a pass until last data, but no eof yet. Occured
+  together with Net::IMP::Cascade when using multiple filters
+0.9433 2013-04-24
+- fixed memory leak
+0.9432 2013-04-09
+- ignore 1xx preliminary responses, e.g. do not send to IMP plugin
+0.9431 2013-03-22
+- fix crash after IMP deny
+0.943 2013-03-04
+- IMP_DENY: give 403 response with reason if response header was not sent yet
+- quote accounting values if necessary
+0.942 2013-02-21
+- better debugging 
+- accept replacements of empty buffers
+- stability improvements
+- make IMP_MAX_IN_ANALYZER configurable
+0.941 2013-02-08
+- restored functionality, that plugin might rewrite URL to 
+  internal://orig_url and than create the response itself
+- fix content decoding (gzip..) if it is upfront known, that
+  the body will not change. In this case the client will get
+  the origiganl encoded content, but the analyzer gets the
+  decoded content
+0.94 2013-02-07
+- major rewrite of Request.pm and IMP.pm:
+  - don't use InspectChain any longer in Request,
+  - decode content only if inspection of content is required
+  - defer sending request header as long as content-length is not known
+0.931 2013-01-23
+- stability improvements on connection errors
+- improvements to FakeResponse for URIs ending with '/'
+0.93 2013-01-22
+- add FakeResponse plugin to hijack requests and send alternate response 
+  w/o contacting server
+- fixed upstream handling for https tunnel (e.g. CONNECT)
+0.92 2013-01-22
+- added support for upstream proxy via listen_ip:port=upstream_host:port syntax
+- fixed stalled handling in Relay.pm
+0.91 2013-01-15
+- extend default search path with Net::IMP::HTTP
+- fixes, especially with replacements
+0.9 2013-01-15
+- moved LogFormData to Net::IMP::HTTP dist
+0.8 2013-01-14
+- add forgotten requirement Net::IMP::HTTP to Makefile.PL
+0.7 2013-01-11
+- convert to use Net::IMP::HTTP
+0.6 2012-12-10
+- make LogFormData accept any data types
+- improve debug message - non-printable as \OOO etc
+- fix handling of responses with no content-length (or with content-length
+  removed due to uncompressing)
+0.5 2012-12-10
+- add special IMP types for HTTP
+  - use typed buffers instead of stream handling internally
+  - adapt CSRFprotect to use these
+- various bug fixes
+0.4 2012-11-28
+- require 5.12.4, 5.10.1 has Socket module w/o inet_ntop etc and because
+  5.10 is end of live there is no motivation to work around it
+- plugin to use can also be given as IMP factory object, not only class name
+0.3 2012-11-22
+- document and fix behavior on SIGUSR1, add debug toggling for SIGUSR2
+0.2 2012-11-22
+- quick fix to bin/http_proxy_imp which still used method run instead of start
+0.1 2012-11-22 
+- initial version, moved from Net::Inspect tools/http_inspection_proxy to 
+  own namespace
+
+    

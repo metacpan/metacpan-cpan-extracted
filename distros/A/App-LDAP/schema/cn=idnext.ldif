@@ -1,0 +1,11 @@
+dn: cn=idnext,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: idnext
+olcObjectClasses: {0}( 1.3.6.1.4.1.7165.1.2.2.3 
+  NAME 'uidNext' SUP top STRUCTURAL
+  DESC 'Next available UNIX uid'
+  MUST ( uidNumber $ cn ) )
+olcObjectClasses: {1}( 1.3.6.1.4.1.7165.1.2.2.4 
+  NAME 'gidNext' SUP top STRUCTURAL
+  DESC 'Next available UNIX gid'
+  MUST ( gidNumber $ cn ) )

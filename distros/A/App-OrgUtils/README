@@ -1,0 +1,14 @@
+DESCRIPTION
+
+    This distribution includes a few modules (scripts) for dealing with Org
+    documents; some originally created as examples/demos for Org::Parser.
+    The following are the included scripts:
+
+    #INSERT_EXECS_LIST
+
+SEE ALSO
+
+    Org::Parser
+
+    orgsel in App::orgsel
+

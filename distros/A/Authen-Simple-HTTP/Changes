@@ -1,0 +1,7 @@
+Revision history for Perl extension Authen::Simple::HTTP
+
+0.2 2006-01-12 00:00
+    - use HEAD method instead of GET.
+
+0.1 2006-01-03 00:00
+    - first release

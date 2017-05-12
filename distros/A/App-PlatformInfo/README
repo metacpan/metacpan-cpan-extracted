@@ -1,0 +1,5 @@
+DESCRIPTION
+
+    This distribution provides a platform-info which is packed with its
+    dependencies so it can run with just perl and core modules.
+

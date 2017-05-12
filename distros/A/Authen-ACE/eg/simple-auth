@@ -1,0 +1,15 @@
+#! /ipl/perl5/bin/perl
+
+# Example of doing simple authentication if at a TTY. This program
+# will handle all parts of the ACE authentication, including setting a
+# new PIN or demanding multiple tokens.
+
+use Authen::ACE;
+
+$ace = new Authen::ACE;
+
+$username = $ARGV[0]? $ARGV[0] : (getpwuid($>))[0];
+
+($result,$shell) = $ace->Auth($username);
+
+print "${username}'s default shell is $shell\n" if $result == ACM_OK;

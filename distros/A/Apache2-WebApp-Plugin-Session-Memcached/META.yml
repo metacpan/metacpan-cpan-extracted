@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name: Apache2::WebApp::Plugin::Session::Memcached
+abstract: Store persistent data using memcached (memory cache daemon)
+version: 0.13
+author:
+  - Marc S. Brooks <mbrooks@cpan.org>
+license: perl
+distribution_type: module
+requires:
+  Apache::Session::Memcached: 0.03
+  Apache::Session::Store::Memcached: 0.03
+  Apache2::WebApp: 0.39
+  Apache2::WebApp::Plugin::Cookie: 0.10
+  Apache2::WebApp::Plugin::Session: 0.16
+  Params::Validate: 0
+build_requires:
+  Apache::Test: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html

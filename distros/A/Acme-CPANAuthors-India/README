@@ -1,0 +1,59 @@
+NAME
+    Acme::CPANAuthors::India - We are the Indian CPAN Authors. Coming from
+    that big peninsula in the center of Asia, the original Indians. The ones
+    columbus was looking for. :)
+
+VERSION
+    version 0.07
+
+SYNOPSIS
+         use Acme::CPANAuthors;
+ 
+         my $authors  = Acme::CPANAuthors->new("India");
+ 
+         my $number   = $authors->count;
+         my @ids      = $authors->id;
+         my @distros  = $authors->distributions("SHANTANU");
+         my $url      = $authors->avatar_url("SHANTANU");
+         my $kwalitee = $authors->kwalitee("SHANTANU");
+         my $name     = $authors->name("SHANTANU");
+         ...
+
+DESCRIPTION
+    This Module provides a List of all Indian CPAN Authors Listed.
+
+NOTES
+      * If you are a Indian CPAN author not listed here, please send your ID/name via email or a pull request on github so I can keep this module up to date. 
+      * If you are not a Indian CPAN author but still on the list here, please send me your ID/name via email or submit a pull request on github and I will remove your name.
+
+SEE ALSO
+      * [Acme::CPANAuthors::Register]
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through github at
+    <https://github.com/shantanubhadoria/acme-cpanauthors-india/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/shantanubhadoria/acme-cpanauthors-india>
+
+      git clone git://github.com/shantanubhadoria/acme-cpanauthors-india.git
+
+AUTHOR
+    Shantanu Bhadoria <shantanu at cpan dott org>
+
+CONTRIBUTORS
+    *   Shantanu <shantanu@cpan.org>
+
+    *   Shantanu Bhadoria <shantanu.bhadoria@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Shantanu Bhadoria.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

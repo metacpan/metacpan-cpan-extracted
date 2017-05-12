@@ -1,0 +1,24 @@
+#!/usr/bin/perl -T
+
+# Shows some information about libjio
+
+use strict;
+use warnings;
+
+use Alien::Libjio;
+
+my $jio = Alien::Libjio->new();
+
+if ($jio->installed) {
+  print  "libjio is installed on your system.\n";
+  printf "  Detection mechanism:  %s\n", $jio->how;
+  printf "  Compiler flags:       %s\n",
+    ref scalar $jio->cflags ? join(' ', $jio->cflags) : '(null)';
+  printf "  Linker flags:         %s\n",
+    ref scalar $jio->ldflags ? join(' ', $jio->ldflags) : '(null)';
+  printf "  Module version:       %s\n", $jio->version
+    if $jio->method eq 'pkg-config';
+}
+else {
+  print {*STDERR} "libjio is not installed on your system\n";
+}

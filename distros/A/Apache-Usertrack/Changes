@@ -1,0 +1,13 @@
+Revision history for Perl extension Apache::Usertrack.
+
+0.03  Fri Jun  4 1999
+    - Use prerequisites to get CPAN to install the Time::HiRes module
+      if it's not already installed
+
+0.02  Fri Aug 14 1998
+    - Set headers_out correctly (guess mod_usertrack have a bug we
+      don't have then ,-), thanks to DougM for the fix
+ 
+0.01  Tue Aug 11 1998
+    - original version; posted on the modperl list
+

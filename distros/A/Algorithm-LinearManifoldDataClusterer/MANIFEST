@@ -1,0 +1,32 @@
+examples/cleanup_directory.pl
+examples/example1.pl
+examples/example2.pl
+examples/example3.pl
+examples/example4.pl
+examples/generate_data_on_a_sphere.pl
+examples/3_clusters_on_a_sphere_3000_samples.csv
+examples/3_clusters_on_a_sphere_498_samples.csv
+examples/4_clusters_on_a_sphere_1000_samples.csv
+examples/data_visualizer.pl
+examples/example1_initial_clustering.png
+examples/example1_clustering_after_3_iterations.png
+examples/example1_clustering_after_graph_partitioning.png
+examples/example1_final_clustering.png
+examples/example2_initial_clustering.png
+examples/example2_clustering_after_3_iterations.png
+examples/example2_clustering_after_8_iterations.png
+examples/example2_clustering_after_graph_partitioning.png
+examples/example2_final_clustering.png
+examples/example3_initial_clustering.png
+examples/example3_clustering_after_3_iterations.png
+examples/example3_clustering_after_7_iterations.png
+examples/example3_clustering_after_graph_partitioning.png
+examples/example3_final_clustering.png
+examples/README
+lib/Algorithm/LinearManifoldDataClusterer.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

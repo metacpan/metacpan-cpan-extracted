@@ -1,0 +1,30 @@
+=head1 NAME
+
+fromfasta
+
+=head1 USAGE
+
+    Usage: recs-fromfasta <args> [<files>]
+       Each sequence from the FASTA input files (or stdin) produces an output record
+       with the keys name and sequence. Each sequence name is also split into id and
+       description on the first whitespace, if any.
+    
+    Arguments:
+       --oneline                    Strip any newlines from the sequence so it is
+                                    one long line
+       --filename-key|fk <keyspec>  Add a key with the source filename (if no
+                                    filename is applicable will put NONE)
+    
+      Help Options:
+          --help  This help screen
+    
+    Examples:
+       Parse a FASTA file into records, stripping newlines in the sequence
+          recs-fromfasta --oneline < example.fasta
+
+=head1 SEE ALSO
+
+L<App::RecordStream::Bio>
+
+=cut
+

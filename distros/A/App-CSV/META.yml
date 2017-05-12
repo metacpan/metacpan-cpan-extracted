@@ -1,0 +1,29 @@
+---
+abstract: 'Manipulate CSV files from the command line'
+author:
+  - 'Gaal\ Yahas\ \<gaal\@forum2\.org\>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CSV
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::String: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  Text::CSV: '0'
+  perl: '5.006000'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSV
+  repository: https://github.com/gaal/app-csv.git
+version: '0.08'

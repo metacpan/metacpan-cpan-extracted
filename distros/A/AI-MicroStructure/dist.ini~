@@ -1,0 +1,69 @@
+name    = AI-MicroStructure
+author  = santex <santex@cpan.org>
+license = Perl_5
+copyright_holder = hagen geissler santex@cpan.org
+copyright_year   = 2014
+version = 0.18
+
+[@Filter]
+bundle           = @Basic
+remove           = Readme
+
+
+[MetaNoIndex]
+dir = misc
+
+[MetaResources]
+homepage    = http://space-man.de/
+
+
+[Prereqs]
+perl=v5.14.1
+AI::Categorizer::Document = 0
+AI::Categorizer::KnowledgeSet = 0
+AI::Categorizer::Learner::NaiveBayes = 0
+AnyDBM_File = 0
+AnyEvent::Subprocess::Easy = 0
+Carp = 0
+Config::Auto = 0
+Cwd = 0
+Data::Dumper = 0
+Data::Printer = 0
+Digest::MD5 = 0
+Digest::SHA1 = 0
+Exporter = 0
+Fcntl = 0
+File::Basename = 0
+File::Glob = 0
+File::Spec = 0
+Getopt::Long = 0
+HTML::SimpleLinkExtor = 0
+HTML::Strip = 0
+HTTP::Request::Common = 0
+IO::Async::Loop = 0
+IO::File = 0
+JSON = 0
+JSON::XS = 0
+LWP::UserAgent = 0
+Lingua::StopWords = 0
+List::Util = 0
+Net::Async::WebSocket::Server = 0
+Parallel::Iterator = 0
+Params::Validate = 0
+Statistics::Basic = 0
+Statistics::Contingency = 0
+Statistics::Descriptive = 0
+Statistics::Distributions::Ancova = 0
+Statistics::MVA::BayesianDiscrimination = 0
+Statistics::MVA::HotellingTwoSample = 0
+Storable = 0
+Storable::CouchDB = 0
+Sysadm::Install=0
+Search::ContextGraph=0
+AI::Categorizer=0
+Algorithm::BaumWelch=0
+Cache::Memcached::Fast=0
+Class::Container=0
+Mojolicious=0
+
+

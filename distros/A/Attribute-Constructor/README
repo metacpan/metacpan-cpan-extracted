@@ -1,0 +1,61 @@
+Attribute/Constructor version 0.03
+==================================
+
+NAME
+
+Attribute::Constructor - implementing constructors with attributes
+
+SYNOPSIS
+
+package SomeObj;
+use Attribute::Constructor;
+
+sub new : Constructor {
+	my $self = shift;
+	$self->{attribute1} = shift;
+	$self->{attribute2} = shift;
+}
+
+--- Calling Code ----
+
+# Will create the object with 'attribute1' and
+# 'attribute2' being set to 'foo' and 'bar' respectively
+my $new_obj = SomeObj->new( 'foo', 'bar' );
+or
+my $new_obj = $old_obj->new( 'foo', 'bar' );
+
+DESCRIPTION
+
+Declaring a method of an object as a constructor will cause the object
+to be created, blessed, and returned to the calling code. This will allow
+the constructor to look more like a "real" constructor from an OO language
+that supports the idea of constructor with syntax.
+
+The object is already returned to the calling code so there is no need to
+return it. The first argument will be a reference to the new class instead
+of a reference to the class so that it behaves more like a normal constructor
+in the fact that it is a instance method not a class method.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Attribute::Handlers
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002 Eric Anderson. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

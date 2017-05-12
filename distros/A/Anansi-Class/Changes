@@ -1,0 +1,23 @@
+Revision history for Perl extension Anansi::Class.
+
+0.01  Sat Apr  6 19:54:31 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Class
+0.02  Wed Apr 10 11:40:57 2013
+	- added module dependencies to makefile.
+	- munged email address.
+0.03  Wed Apr 10 13:14:30 2013
+	- amended makefile to fix dependency issue.
+0.04  Mon May 20 10:59:02 2013
+	- modified the POD to reflect more concise examples and include method parameter.
+0.05  Tue May 28 20:40:05 2013
+	- modified the POD.
+0.06  Tue May 28 22:34:55 2013
+	- modified the POD.
+0.07  Wed May 29 10:53:02 2013
+	- modifield the POD.
+0.08  Wed May 29 11:52:45 2013
+	- modified the POD.
+0.09  Thu Aug 08 12:53:09 2013
+	- added "using" subroutine.
+	- modified the POD.

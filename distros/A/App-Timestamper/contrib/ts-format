@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Time::HiRes qw//;
+use POSIX qw/strftime/;
+
+my $fmt = $ENV{'TIMESTAMPER_FORMAT'};
+
+if (!defined($fmt))
+{
+    die "Format not specified via TIMESTAMPER_FORMAT!";
+}
+
+while (my $l = <ARGV>)
+{
+    $l =~ s#\A([0-9\.]+)(\t)#strftime($fmt,localtime($1)).$2#e;
+    print $l;
+}

@@ -1,0 +1,67 @@
+body { font-family: verdana, arial, sans-serif }
+
+#topbar  {
+    margin: 0;
+    border: 0;
+    position: 0 0;
+    font-size: 10pt;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #aaf;
+}
+#logout-link { float: right }
+#sidebar { float: right; width: 27% }
+#main    { width: 70%; padding: 0 1em }
+
+h1 { font-size: 14pt; color: #00f }
+
+.warning { font-weight: bold }
+.option-buttons { text-align: right }
+.compilation-options { float: right; font-size: 10pt }
+
+.package-name { color: black }
+.source-package-name { text-decoration: underline }
+.builder-name { color: black }
+.builder-info { font-size: 10pt; color: #3a3 }
+.builder-info .builder-name { color: inherit; font-weight: bold }
+
+#incoming-package-list    { margin-left: 1em }
+
+.valid-signature          { color: #0a0 }
+.invalid-signature        { color: #a00 }
+
+.incoming-package         { margin-bottom: 3ex }
+.incoming-package-name    { font-weight: bold; font-size: large }
+.incoming-package-version { font-size: large }
+.incoming-package-info    { }
+.incoming-package-attr    {
+    display:   block;
+    font-size: small;
+}
+
+.incoming-unreadable-package {
+    margin-bottom: 3ex;
+    background-color: #ddd;
+    color: #f00;
+}
+
+.urgency-low    { color: #000; }
+.urgency-medium { color: #f80; }
+.urgency-high   { color: #f00; }
+
+.builder-line:nth-child(odd)  { background-color: #cef }
+.builder-line:nth-child(even) { background-color: #bdf }
+.builder-line { padding: 5px }
+.builder-status { float: right; color: #005; font-size: 10pt }
+.builder-props      { display: block; font-size: 8pt; color: #777 }
+.builder-prop-value { font-weight: bold }
+.compilation-props       { display: block; font-size: 8pt; color: #777; padding-bottom: 1px }
+.compilation-prop-value  { font-weight: bold }
+
+.compilation-queue-line, .failed-compilation-line { padding-bottom: 1ex }
+.failed-compilation-line { color: #777 }
+
+.repo-package-line { padding-bottom: 1ex }
+.repo-package-info { display: block; font-size: 8pt; color: #777 }
+.repo-package-version  { font-weight: bold }
+
+.inactive { color: #777 }

@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/xenial64"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = false
+    vb.memory = "2048"
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get dist-upgrade -y
+
+    sudo apt-get install -y build-essential bison flex
+
+    sudo apt-get install -y libaspell-dev aspell-en figlet filters \
+        fortune-mod fortunes fortunes-bofh-excuses fortunes-min fortunes-off \
+        libevent-openssl-2.0 libpq-dev libxml2-dev
+
+    sudo apt-get install -y perl cpanminus
+
+    sudo apt-get install -y postgresql
+
+    sudo cpanm App::RoboBot
+  SHELL
+end

@@ -1,0 +1,60 @@
+{
+   "abstract" : "App::Term::Jump - utility to navigate your filesystem with heuristic",
+   "author" : [
+      "Khemir Nadim ibn Hamouda. <nadim.khemir@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Term-Jump",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Block" : "0",
+            "Test::Exception" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0",
+            "Text::Diff" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::TreeDumper" : "0",
+            "Data::TreeDumper::Utils" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0.86",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "Readonly" : "0",
+            "Sub::Exporter" : "0",
+            "Text::Pluralize" : "0",
+            "Tree::Trie" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Term::Jump" : {
+         "file" : "lib/App/Term/Jump.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.04.32"
+}

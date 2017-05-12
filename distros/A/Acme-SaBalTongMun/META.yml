@@ -1,0 +1,21 @@
+---
+abstract: 'make a round robin (사발통문, 沙鉢通文)'
+author:
+  - 'Keedi Kim - 김도형 <keedi at cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-SaBalTongMun
+requires:
+  GD: 0
+  List::Util: 0
+  Moose: 0
+  Test::More: 0
+  common::sense: 0
+  namespace::autoclean: 0
+version: 1.100830

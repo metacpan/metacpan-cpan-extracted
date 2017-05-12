@@ -1,0 +1,11 @@
+<ul class="pager">
+  <li class="previous">
+    %= link_to Previous => slide => { slide => prev_slide }
+  </li>
+  <li>
+    %= "Page $slide / " . last_slide
+  </li>
+  <li class="next">
+    %= link_to Next => slide => { slide => next_slide }
+  </li>
+</ul>

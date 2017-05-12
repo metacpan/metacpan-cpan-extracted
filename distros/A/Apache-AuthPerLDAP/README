@@ -1,0 +1,58 @@
+
+NAME
+
+     Apache::AuthPerLDAP - mod_perl PerLDAP Authentication Module
+
+DESCRIPTION
+
+     AuthPerLDAP provides Basic Authentication, with
+     username/password lookups against an LDAP server, using
+     Netscape's PerLDAP kit.
+
+     It is heavily based on Clayton Donley's Apache::AuthLDAP
+     module, but uses the newer Netscape PerLDAP (Mozilla::LDAP),
+     which in turn uses the Netscape Directory SDK for C. Thus
+     Donley's original Net::LDAPapi module and library is no
+     longer required.
+
+     It requires mod_perl and PerLDAP (v1.2 or later). Building
+     mod_perl with:
+
+     perl Makefile.PL PERL_AUTHEN=1 PERL_STACKED_HANDLERS=1
+     PERL_GET_SET_HANDLERS
+
+     works for me. If this module is the only Apache/Perl module
+     you are going to use, you probably don't need anything but
+     the PERL_AUTHEN hook enabled.
+
+     Unlike Donley's Apache::AuthLDAP module, AuthPerLDAP is only
+     used for authentication, and thus only supports the
+     require-user directive.  If a user enters the correct
+     username and password, the authentication is considered to
+     be OK.
+
+CREDITS
+
+     Apache::AuthPerLDAP is greatly inspired by the original
+     Apache::AuthLDAP written by Clayton Donley.
+
+     Adoption to PerLDAP was done by reading the PerLDAP source
+     and documentation provided by Netscape Corp. and Leif
+     Hedstrom, found at www.perldap.org.
+
+     The new book published by O'Reilly & Associates, and
+     authored by Lincoln Stein and Doug MacEachern helped clarify
+     many mod_perl issues I previously had problems with:
+     "Writing Apache Modules with Perl and C" (www.modperl.com).
+
+     Andreas K. Sorensen provided usefull Perl wisdom during
+     debugging.
+
+AUTHOR
+
+     Henrik Strom <henrik@computer.org>
+
+COPYRIGHT
+
+     Copyright (c) 1999 Henrik Strom
+

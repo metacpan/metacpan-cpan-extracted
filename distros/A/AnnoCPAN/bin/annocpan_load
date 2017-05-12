@@ -1,0 +1,32 @@
+#!/home/ivan/bin/perl
+$| = 1;
+
+use strict;
+use warnings;
+
+use AnnoCPAN::Config 'config.pl';
+use AnnoCPAN::Update;
+use Getopt::Long;
+
+my $help;
+my $verbose;
+
+my $ret = GetOptions (
+    help        => \$help,
+    verbose     => \$verbose,
+);
+
+my $cpan = shift;
+usage() if $help or !$ret or !$cpan;
+
+AnnoCPAN::Update->run(cpan_root => $cpan, verbose => $verbose);
+
+sub usage {
+    print <<END;
+annocpan_load [options] <cpan_root>
+Options:
+    --help      -h  This help
+    --verbose   -v  Show progress
+END
+    exit;
+}

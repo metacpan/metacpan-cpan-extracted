@@ -1,0 +1,31 @@
+0.2.3	2004-11-03
+
+	* Corrected bug with one-line conflicts, new test cases.
+	* Thanks to Douglas E. Miles <perlguy-x@eart-y-hlink.net.z> for
+	  reporting this and supplying a patch.
+
+0.2.2	2003-07-08
+
+	* Added support for non-string data items via hashing callbacks.
+	* Documentation updates.
+
+0.2.1	2003-06-26
+
+	* Added simple conflict "optimiser".
+	* Updated docs.
+	* Corrected synopsis, which was still using an old name.
+
+0.1.1	2003-05-21
+
+	* Rename to Algorithm::Diff::Apply for submission at suggestion of
+	  Arthur Bergman <sky-x@nanisky.c-y-om.z>. Maintainer of
+	  Algorithm::Diff is happy with this.
+
+0.0.2	2003-05-07	(not released)
+
+	* Doc fixes.
+
+0.0.1	2003-04-27	(not released)
+
+	* Initial revision 
+

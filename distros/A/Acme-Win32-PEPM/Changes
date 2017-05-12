@@ -1,0 +1,12 @@
+Revision history for Perl extension Acme::Win32::PEPM.
+
+0.02  Fri Oct  9 10:55:32 2015
+    -Fixed, dont make mixed line ending packed .pm files when the original
+     .pm has crlf
+    -Fixed, the makefile errored out if module had more than 1 .pm file
+    -Improved tests
+    -Fixed, unsupported CCs weren't correctly rejected on CPANTesters
+
+0.01  Tue Nov 25 01:09:09 2014
+    - original version
+

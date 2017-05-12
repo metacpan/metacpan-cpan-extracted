@@ -1,0 +1,33 @@
+AnyEvent::HTTPD::ExtDirect
+==========================
+
+    This module provides an RPC::ExtDirect gateway implementation for
+    AnyEvent::HTTPD, a simple lightweight event based web server. Unlike
+    other gateways like Plack::Middleware::ExtDirect or CGI::ExtDirect, this
+    module is in fact more of an application server than just a plugin. You
+    can think of it as Plack framework and Plack::Middleware::ExtDirect
+    combined into one package.
+
+    That said, the asynchronous event based nature of AnyEvent::HTTPD allows
+    using it both as a standalone application server, and as a part of a
+    larger program that may do other things besides serving Ext.Direct or
+    plain HTTP requests. See "Non-blocking server" below.
+
+    If you are not familiar with Ext.Direct, more information can be found
+    in RPC::ExtDirect::Intro.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test
+        make install
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2013-2014 Alex Tokarev <tokarev@cpan.org>.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

@@ -1,0 +1,63 @@
+Audio::OSS - Perl interface for the Open Sound System
+-----------------------------------------------------
+David Huggins-Daines <dhd@cepstral.com>, Cepstral LLC
+http://www.cepstral.com/
+
+About
+-----
+
+This module provides a pure-Perl, no-nonsense, filehandle-based
+interface to the Open Sound System.
+
+Audio::DSP is fine for simple, blocking audio I/O, but it doesn't hold
+up when you want to do something more complicated.  That is, it
+doesn't expose the features of the audio device interface that are
+required to do things like non-blocking audio, real-time control of
+playback, querying the capabilities of the audio device, finding the
+supported sampling rates, etc.  It wants to do buffering for you,
+which is precisely what you'd like to avoid in a more complex
+application.
+
+Also, object-oriented interfaces are less than ideal for audio,
+because they incur greater latency, because you can't select() on an
+object, and because the audio driver already tracks the state of the
+device for you.  In short, a Unix file descriptor is a perfectly good
+abstraction for an audio device.
+
+Finally, this module does not use any XS modules, though it does
+require a C compiler to build.  This is also important for minimizing
+latency and start-up time.  All the ioctl() calls are done in pure
+perl, and there is no need to rely on the mercy of your OS vendor or
+system administrator for .ph files to be created.
+
+Installation
+------------
+
+In general, the following sequence of commands should be fine:
+
+  perl Makefile.PL
+  make test
+  make install
+
+It may be, however, that you are running on a platform other than
+Linux or *BSD, and your OSS header files (or rather, the header file
+"soundcard.h") are located somewhere other than /usr/include/linux or
+/usr/include/sys.  In this case you might try the --kernel-headers or
+--oss-headers options to Makefile.PL:
+
+ perl Makefile.PL --kernel-headers=/home/foobar/src/kernel/include
+ perl Makefile.PL --kernel-headers=/opt/oss/include
+
+Also, as mentioned above, you must have a C compiler installed to run
+Makefile.PL.  If you do not have a C compiler available as 'cc' in
+your PATH, you can set the CC environment variable to the proper
+compiler.  This may also be necessary if your vendor's compiler is
+unable to compile the test program for some reason.  For example:
+
+  # For bourne-like shells
+  $ CC=gcc272 perl Makefile.PL
+  # For C shells
+  % env CC=gcc272 perl Makefile.PL
+
+Please send reports on installation or test failure to the address at
+the top of this file.

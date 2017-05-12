@@ -1,0 +1,7 @@
+Revision history for Perl extension AnyEvent::Plackup
+
+0.02 2013-10-21T04:57:40Z
+        - fixed tests
+
+0.01 2013-10-15T10:01:09Z
+        - original version

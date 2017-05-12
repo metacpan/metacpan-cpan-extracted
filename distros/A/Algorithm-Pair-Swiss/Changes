@@ -1,0 +1,26 @@
+Revision history for Perl extension Algorithm::Pair::Swiss.
+
+0.1   2006-06-10
+	- original version; unable to handle odd number of parties
+	- and sadly I used 0.1 instead of 0.01 as the version number
+
+0.11  2006-06-10
+	- algorithm fixed to also properly handle odd number of parties
+        - some corrections to the documentation
+	- jumped 10 version to make sure we now have double digits 
+
+0.12  2006-06-12
+	- major fixes to the documentation and README
+        - included this Change history file for completeness
+
+0.13  2006-06-19
+	- added ->drop method
+	- explicit stringification to avoid uninitialized value warnings
+	- no more deep recursion warnings
+	- input checks on ->parties method and relevant tests
+
+0.14  2006-07-04
+        - added pod and pod coverage tests
+        - added input tests
+        - fixed some documentation errors
+

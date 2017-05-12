@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 78e50e186b04c8fe1defaa098f1c192181b3d837 COPYING
+SHA1 4b80a90ba6e83c54ed139dd67e9b245e7008dc4d Changes
+SHA1 c5486dba1a66c9760cdd86d9c18601f3281a5e91 MANIFEST
+SHA1 1eeb89e7df2dcce823119df44fc94535539982df META.json
+SHA1 8f1c61c4bd10ffb83d2b2cab13ed14cde581b50e META.yml
+SHA1 75f6d1c8b6a0a3acb94861d3d95c478201f1f259 Makefile.PL
+SHA1 2dc7f13e91e2f14593b11e16f3edea58f536d296 README
+SHA1 3c16d4d0b6c33cd7bc0ab6ea720da2b76f2f2cf9 config.pl
+SHA1 1f3b6b27f64da257b38434c3b76c842af23dd954 fonbotd
+SHA1 2d2aebabe0337cd9e1fbce5e89fa463bb82f3fc9 lib/App/FonBot/Daemon.pm
+SHA1 d8aef8809e6ae6f29abefc783dfa06ad8d33381a lib/App/FonBot/Plugin/BitlBee.pm
+SHA1 86bc063ac768e66eff95d61c1ff8fb7d9a9f732e lib/App/FonBot/Plugin/Common.pm
+SHA1 87557d4cbc2e962fce79912203d0b4e5b5c3e808 lib/App/FonBot/Plugin/Config.pm
+SHA1 f4274546b1fa59413b442c1ad99bf8171486b4fd lib/App/FonBot/Plugin/Email.pm
+SHA1 3b3cb5e00e8e33649611f8fe22e145db30ce4ee8 lib/App/FonBot/Plugin/HTTPD.pm
+SHA1 b44fd8b159a0725df5a63a949991c335ba4bc08a lib/App/FonBot/Plugin/IRC.pm
+SHA1 1dbe4d338a5f89c5813e577f2ce25bfed947c193 lib/App/FonBot/Plugin/OFTC.pm
+SHA1 3315d5450a04a969cda8d3cc46ca30293f5f7f7a log4perl.conf
+SHA1 6ea07eaf23934d6c927152de4441c6c9ad2a22ea t/App-FonBot-Daemon.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJVRS/aAAoJEMoENb5ewbNi+hgP/3xk0CjoSRpQW51dAJEN2gIf
+3qQrjPkT9EuyaSwa5SK5DszO0xIEk9bQ+VLHSQUFTbWPv2pPRHnEiAEnhvfjdi12
+JOAdOlmy+kw1FZ/qYEuDvi4Kgpccb+a/KRWvUmfdv8tL5Jc2/RdgC4pdKvfKnTbQ
+l8HvMO44G5pe4BFq2EIvA7CjGVwYjBK7ZAXSsc4eazTrLOEB/fDN6ywBcn6zTJMo
+zhwrp7zFyy0j9ytm/0fiyqwXXXbMKTsjRUIHFc7t/46dOByqiFKtk57bMqInCOBx
+Xq5J+ky+YEdIs7Jf3cBYq1s/u3d5ZiP3NSeU00W3Q5tMIQdX/8rR3qqWJUFnbCDt
+zBnPCRjiE0WsgF5GYQwu2CzozbMpQF2aoyZLLDe1Ll9mV/1K3XmAWRPM9zeZNw9h
+KkohsRErQtM/NTZeET4qYaTCDlP8kIfFbuQPQNxQ/ca1qQUNLdsRJpDsvdUhaX/N
+BhwOlJtbPKYDQnmmwr+/RjKHmjRO57uTLneGYd3IkL+Sx/ff+h7bbTTgwdOHSwBv
+1yXurm9FKWvqq8Lj8bfboZLz+FpbLwQzHkZFuhYgLvo8BRR7aTjAzxF0lj/LIV0m
+q+33bXUmJsq2cIghtqNZQWmB9R7iDIm6Y4kbvfIvXVhkKyz43rWvYC7pPM85MQPv
+JKbfphJk4/QpV90XKq9W
+=Ee1V
+-----END PGP SIGNATURE-----

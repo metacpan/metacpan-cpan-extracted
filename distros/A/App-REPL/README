@@ -1,0 +1,100 @@
+App-REPL v0.012
+
+0. The install worked, but 'iperl' is complaining that it can't find App::REPL !
+   Why do you hate me?
+
+  Try again -- it'll work this time.  Sorry, I've no idea why this happens.
+  I can't reproduce it after it happens the once.
+
+1. What does the name mean?
+
+  Read-Eval-Print-Loop.  App-REPL offers an application that reads
+  Perl, evaluates it, and tries to print a result.
+
+2. Tries to?
+
+  It doesn't bother with 'CODE' refs, for instance.
+
+3. How does it do that at all?  Can it only handle simple expressions?
+
+  It uses PPI to find a good place within the given Perl to insert an
+  assignment.  It isn't perfect, and probably you can find places
+  where it doesn't print anything useful.
+
+  You can type arbitrarily complex Perl, though -- with 'package'
+  statements, subroutine definitions, &c.
+
+4. ... all on a single line? :-/
+
+  No.  Again, it uses PPI to try and determine if your Perl is
+  complete, and if not it will continue to prompt you for the
+  rest.
+
+5. Tries to?
+
+  Well, Perl isn't Python :-)  Without imposing annoying restrictions,
+  App-REPL can't know that you meant for the second line to continue
+  on from the first, in:
+
+    print $a, $b,
+          $c, $d;
+
+  One error in the current version is that App-Perl doesn't notice
+  that this is incomplete:
+
+    print qw(a b
+
+  It -can- notice, but PPI currently handles quote-like operators
+  strangely, treating qw## and qw() in oddly different ways, and I
+  want to either resolve that or resolve my thinking about that
+  before I add further magic to App-REPL
+
+6. You say 'magic', but I hear 'fragile evil'.  What does App-REPL do
+   that's fragile and evil?
+
+  Well, several things.
+
+  1. The current version monkey-patches a bug out of PPI, so that
+     I don't have to wait for the next PPI to be released before
+     I can get comments on this (alpha, anyway) version of App-REPL.
+
+  2. It relies on the way PPI structures things, and -modifies-
+     that structure without PPI's knowledge, in ways that I figured
+     out through trial and Data::Dumper
+
+  3. It uses PadWalker
+
+7. Yow.  Anything else I should worry about?
+
+  Everything you enter will be eval'd with lengthy prologue and
+  epilogue code, first to set up the environment and finally to
+  remember what you did to the environment.  Although this system
+  -does- try to handle packages well, it currently only recognizes
+  the final package of your eval.  So, if you do:
+
+    package A; my $b = 1; package B;
+  
+  '$b' will not be available for your next eval.
+
+8. You know, your colors are very annoying.  Can I turn them off?
+
+  Sure, just set the ANSI_COLORS_DISABLED environment variable
+  that Term::ANSIColor checks.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Julian Fondren
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

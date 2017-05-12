@@ -1,0 +1,27 @@
+Changes
+examples/eval.pl
+examples/generic.pl
+examples/subs.pl
+examples/unix_socket.pl
+lib/AnyEvent/Redis/RipeRedis.pm
+Makefile.PL
+MANIFEST
+README
+t/00-base.t
+t/01-accessors.t
+t/02-error-codes.t
+t/03-auth.t
+t/04-commands.t
+t/05-db-select.t
+t/06-subs.t
+t/07-lazy-conn.t
+t/08-eval.t
+t/09-conn-errors.t
+t/10-exceptions.t
+t/11-leaks.t
+t/12-pod.t
+t/13-pod-coverage.t
+t/test_helper.pl
+t/tlib/Test/RedisRunner.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

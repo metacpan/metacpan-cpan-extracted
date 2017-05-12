@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="BIG5"?>
+<!-- Copyright 1998 Academia Sinica Computing Center -->
+<!-- Permission to use and distribute granted under MPL -->
+<!-- Email corrections to ricko@gate.sinica.net.tw -->
+<test type="io0">
+	<name>Chinese Test #0: BIG5</name>
+	<data>This is the null nest. It is a Big5 encoded
+	file with no non-ASCII characters (i.e. it is also a
+	UTF-8, ASCII or iso-8859-n file).
+	</data>
+	<data>The XML header of this file is (uppercase encoding)
+	&lt;?xml encoding="BIG5"?&gt;.
+	</data>
+</test>

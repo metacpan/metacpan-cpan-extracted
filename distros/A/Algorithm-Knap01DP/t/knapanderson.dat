@@ -1,0 +1,24 @@
+6
+30
+14
+14
+5
+5
+2
+2
+11
+11
+3
+3
+8
+8
+N=6, M=30 (objects, capacity) 
+weight 0
+profit 0
+...
+Example from Algorithm::Knapsack by Anderson
+sol 30
+vectors:
+0 1 3 (14,5,11)
+0 1 4 5 (14,5,3,8)
+0 2 3 4 (14,2,11,3)

@@ -1,0 +1,30 @@
+---
+abstract: 'Authenticate through Google Authenticator'
+author:
+  - L<mailto:corion@corion.net>
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Auth-GoogleAuthenticator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Authen::OATH: 0
+  Convert::Base32: 0
+  Dancer: 1.3097
+  Dancer::Plugin::FlashMessage: 0
+  Math::Random::MT: 0
+  Template: 2
+  Test::More: 0
+  URI::Escape: 0
+  YAML: 0
+version: 0.03

@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'lib/';
+
+# Unbuffer output to display it as quickly as possible.
+local $| = 1;
+
+# Internal dependencies.
+use App::GitWorkspaceScanner;
+
+# External dependencies.
+use Log::Any::Adapter('Stdout');
+use Data::Dumper;
+use Pod::Usage;
+
+=head1 NAME
+
+scan_git_repositories - Scan git repositories in your workspace for local changes not synced up.
+
+
+=head1 VERSION
+
+Version 1.1.0
+
+=cut
+
+our $VERSION = '1.1.0';
+
+
+=head1 DESCRIPTION
+
+See L<App::GitWorkspaceScanner>.
+
+=cut
+
+# Instantiate app.
+my $app = App::GitWorkspaceScanner->new(
+	arguments => \@ARGV,
+);
+
+# Retrieve the list of repository with uncommitted changes.
+my $unclean_repositories = $app->get_unclean_repositories();
+exit(0)
+	if scalar( keys %$unclean_repositories ) == 0;
+
+# Display any errors.
+if ( defined( $unclean_repositories->{'errors'} ) )
+{
+	foreach my $message ( @{ $unclean_repositories->{'errors'} } )
+	{
+		print "/!\\ $message\n";
+	}
+}
+
+# Display unclean_repositories.
+print "Some repositories are not in sync or on the right branch:\n";
+foreach my $repository ( keys %$unclean_repositories )
+{
+	my $info = $unclean_repositories->{ $repository };
+
+	print "    => $repository: \n";
+
+	print "       -> $info->{'files_total'} files not in sync.\n"
+		if defined( $info->{'files_total'} ) && ( $info->{'files_total'} > 0 );
+
+	print "       -> The checked-out branch is ahead by $info->{'commits_ahead'} commit(s).\n"
+		if defined( $info->{'commits_ahead'} ) && ( $info->{'commits_ahead'} > 0 );
+
+	print "       -> $info->{'local_branch'} is not an authorized branch.\n"
+		if defined( $info->{'is_branch_allowed'} ) && !$info->{'is_branch_allowed'};
+}

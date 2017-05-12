@@ -1,0 +1,32 @@
+1. Set the WCSTOOLS environment variable pointing to the location of
+   your WCSTools distribution:
+
+   Bourne shells
+   $ WCSTOOLS=/path/to/wcstools
+   $ export WCSTOOLS
+
+   C shells
+   % setenv WCSTOOLS /path/to/wcstools
+
+   Alternatively, the environment variables WCSTOOLS_INC and
+   WCSTOOLS_LIB may be used.
+
+2. perl Makefile.PL
+
+3. make
+
+4. make test
+
+5. make install
+
+If compilation fails, please make sure the version of WCSTools you're using
+matches that listed in README as a requirement for this version of the
+module.
+
+If on an AMD64 system, and building the module produces errors of the form
+
+/usr/bin/ld: /path/to/wcstools-3.8.1/libwcs/libwcs.a(imsetwcs.o): relocation R_X86_64_32 against `.data' can not be used when making a shared object; recompile with -fPIC
+
+then this indicates that you should add -fPIC to CFLAGS in the
+wcstools libwcs/Makefile, make clean there and recompile before
+attemping to build the Perl module.

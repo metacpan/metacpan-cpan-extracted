@@ -1,0 +1,6 @@
+0.91  Thu Feb 28 15:47:14 2013 -0500
+	* added login ticket support
+	* added some RESTful login tests
+
+0.90  Tue Apr 24 15:48:21 2012 -0400
+	* Initial public version

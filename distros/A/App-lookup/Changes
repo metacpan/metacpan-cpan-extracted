@@ -1,0 +1,20 @@
+Revision history for perl module App::lookup
+
+0.06 2013-10-01
+	- bump the required version of Module::Build (see
+	  https://rt.cpan.org/Public/Bug/Display.html?id=89091)
+
+0.04 2013-08-07
+	- switch to ExtUtils::MakeMaker
+	- Delete the name of original sites when their aliases are defined.
+
+0.03 2013-07-31
+	- use Dist::Zilla::Plugin::ReadmeFromPod to generate the
+	  README
+	- fix the doc in etc/lookup.el
+
+0.02 2013-07-28
+	- split the elisp part of the documentation into its own file
+
+0.01 2013-07-27
+	- first public release

@@ -1,0 +1,44 @@
+2003-06-19	Christian Gilmore <cag@us.ibm.com>
+
+	o  Altered declaration of an array reference to meet perl-5.8
+	   strict rules.
+	o  Made release 1.01.
+	
+2003-06-18	Christian Gilmore <cag@us.ibm.com>
+
+	o  Added placement of REMOTE_GROUP into request headers to assist
+	   downstream handlers.
+	o  Made release 1.00.
+	
+2003-04-17	Christian Gilmore <cag@us.ibm.com>
+
+	o  Enabled handling of multiple upstream groups.
+	o  Migrated to Text::ParseWords.
+	o  Made release 0.90.
+	
+2001-07-12      Christian Gilmore <cgilmore@tivoli.com>
+
+        o  Removed test for mod_perl-1.26 or higher.
+        o  Cleaned up documentation.
+        o  Made release 0.06.
+
+2001-05-29	Christian Gilmore <cgilmore@tivoli.com>
+        o  Bug fix on strict syntax error.
+	o  Made release 0.05.
+
+2001-02-28	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Added requirement that Apache::Log be imported. Oversight found
+	   by Rod Bloodgood.
+	o  Made release 0.04.
+	
+2001-01-08	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Better handled pre-1.26 set_handlers bugs.
+	o  Made release 0.03.
+	
+2000-09-26	Christian Gilmore <cgilmore@tivoli.com>
+
+	o  Made first public release 0.02.
+
+$Id: ChangeLog,v 1.9 2003/06/19 14:38:08 cgilmore Exp $

@@ -1,0 +1,28 @@
+---
+abstract: 'implements ed(1) error handling'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-EdError
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IPC::Open3: '1.0106'
+  Test::More: '0.86'
+  perl: '5'
+resources:
+  homepage: https://github.com/thrig/Acme-EdError
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/thrig/Acme-EdError
+version: '9.17'

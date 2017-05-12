@@ -1,0 +1,68 @@
+version 0.004; 2011-07-26
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    not exposing [perl #73174] prior to Perl 5.11)
+
+  * document that Perls prior to 5.9.3 don't propagate the right lexical
+    state into string eval
+
+  * test that handlers are scoped correctly across swash loading
+
+version 0.003; 2011-04-27
+
+  * change usage of Params::Classify functions to take advantage of
+    custom ops in Params::Classify 0.012
+
+  * update commentary about universal superclass method resolution
+    kludge, reflecting bug#68654 having been temporarily replaced with
+    bug#81098 for Perl 5.13.8, thus still requiring the workaround but
+    for a slightly different reason
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.002; 2010-04-11
+
+  * bugfix: require bugfixed version of Lexical::SealRequireHints (for
+    passing package through to required code in pure-Perl version of
+    Lexical::SealRequireHints)
+
+  * make all numeric comparisons against $] stringify it first, to avoid
+    architecture-dependent problems with floating point rounding giving
+    it an unexpected numeric value
+
+  * change Attribute::Lexical::UNIVERSAL POD filename from a .pm to the
+    .pod that it should have been
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.001; 2009-10-21
+
+  * use Lexical::SealRequireHints in place of the filename-based
+    workaround for %^H leakage, thus allowing lexical attribute
+    definitions to propagate into string evals, on Perl versions that
+    allow it
+
+  * document Attribute::Lexical::UNIVERSAL in its own POD file
+
+  * declare version of Attribute::Lexical::UNIVERSAL in a way that
+    indexers are more likely to parse successfully
+
+  * check for required Perl version at runtime
+
+  * change perl version declared in build_requires to match that declared
+    in requires, to avoid confusing tools that can only handle a single
+    dependency list
+
+  * remove bogus "exit 0" from Build.PL
+
+version 0.000; 2009-08-24
+
+  * initial released version

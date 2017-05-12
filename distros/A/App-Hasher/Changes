@@ -1,0 +1,12 @@
+Revision history for App::Hasher
+
+1.0.0   2016-05-23
+        * First public release
+
+1.0.1   2016-05-24
+        [Patch]
+        * Mimimal perl version is 5.10
+
+1.0.2   2016-05-24
+        [Patch]
+        * Fixing incorrect distribution name in pod

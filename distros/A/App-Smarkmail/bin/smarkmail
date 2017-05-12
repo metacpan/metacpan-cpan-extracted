@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# PODNAME:  smarkmail
+# ABSTRACT: send email, converting plain text to multipart/alternative + HTML
+
+
+use App::Smarkmail;
+use Email::Sender::Simple;
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+  'smarkmail %o <recipient>',
+  [ 'from|f=s', 'envelope sender' ],
+);
+
+die $usage->text unless @ARGV;
+
+my $text = do { local $/; <STDIN> };
+
+my $email = App::Smarkmail->markdown_email($text);
+
+my $sender = Email::Sender::Transport::Sendmail->new;
+
+Email::Sender::Simple->send(
+  $email,
+  {
+    to   => [ @ARGV ],
+    ($opt->{from} ? (from => $opt->{from}) : ()),
+  },
+);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+smarkmail - send email, converting plain text to multipart/alternative + HTML
+
+=head1 VERSION
+
+version 0.004
+
+=head1 USAGE
+
+ smarkmail [ -f sender ] <recipient ... >
+
+ -f  - envelope recipient; otherwise taken from email From header
+
+=head1 AUTHOR
+
+Ricardo SIGNES <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2008 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

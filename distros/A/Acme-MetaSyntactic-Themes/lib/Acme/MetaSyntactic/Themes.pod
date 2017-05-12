@@ -1,0 +1,211 @@
+=head1 NAME
+
+Acme::MetaSyntactic::Themes - The original Acme::MetaSyntactic themes
+
+=head1 SYNOPSIS
+
+    use Acme::MetaSyntactic qw( batman );
+    print metabatman;    # kapow
+
+=head1 DESCRIPTION
+
+From January 2005 to November 2006, I have published a CPAN distribution
+a week, including new themes for L<Acme::MetaSyntactic> (almost) every week.
+
+In 2012, with the version 1.000 of L<Acme::MetaSyntactic>, I have split
+the core modules (that provide the list behaviour) from the actual themes,
+making the distribution containing the very stable L<Acme::MetaSyntactic>
+modules driving its behaviour a lot thinner.
+
+When Acme-MetaSyntactic 0.99 was published in November 2006, the
+distribution contained 99 themes. The full list of theme and the date
+of their inclusion in the distribution is documented below:
+
+    Date         Release  Theme changes
+    ================================================================
+    2005-01-14    0.01    batman, flintstones, foo, shadok, toto
+    2005-01-14    0.02    [no new theme]
+    2005-01-14    0.03    dilbert, donmartin, pynchon, robin
+    2005-01-15    0.04    crypto, simpsons
+    2005-01-17    0.05    browser
+    2005-01-24    0.06    tld
+    2005-01-31    0.07    jamesbond
+    2005-02-07    0.08    phonetic
+    2005-02-14    0.09    buffy
+    2005-02-21    0.10    viclones
+    2005-02-28    0.11    hhgg
+    2005-03-07    0.12    any, dancers [simpsons removed by mistake]
+    2005-03-14    0.13    loremipsum
+    2005-03-21    0.14    pumpkings
+    2005-03-28    0.15    python
+    2005-04-04    0.16    haddock
+    2005-04-11    0.17    elements
+    2005-04-18    0.18    amber
+    2005-04-25    0.19    magic8ball
+    2005-05-02    0.20    debian
+    2005-05-09    0.21    alphabet
+    2005-05-16    0.22    quantum
+    2005-05-23    0.23    teletubbies
+    2005-05-30    0.24    magicroundabout
+    2005-06-06    0.25    pasta
+    2005-06-13    0.26    simpsons
+    2005-06-20    0.27    groo
+    2005-06-27    0.28    oulipo
+    2005-07-04    0.29    punctuation
+    2005-07-11    0.30    counting_rhyme
+    2005-07-18    0.31    monty_spam
+    2005-07-25    0.32    octothorpe
+    2005-08-01    0.33    services
+    2005-08-08    0.34    peanuts
+    2005-08-15    0.35    garbage
+    2005-08-22    0.36    currency
+    2005-08-29    0.37    jerkcity
+    2005-09-05    0.38    phonetic [made multilingual]
+    2005-09-12    0.39    stars
+    2005-09-19    0.40    yapc
+    2005-09-26    0.41    apollo
+    2005-10-03    0.42    discworld
+    2005-10-10    0.43    roman
+    2005-10-17    0.44    constellations
+    2005-10-24    0.45    booze
+    2005-10-31    0.46    antlers
+    2005-11-07    0.47    facecards
+    2005-11-14    0.48    dwarves
+    2005-11-21    0.49    pm_groups
+    2005-11-28    0.50    unicode
+    2005-12-05    0.51    weekdays
+    2005-12-12    0.52    us_presidents
+    2005-12-19    0.53    opcodes
+    2005-12-26    0.54    barbapapa
+    2006-01-02    0.55    weekdays [made multilingual]
+    2006-01-09    0.56    pokemon
+    2006-01-16    0.57    barbarella
+    2006-01-23    0.58    tmnt
+    2006-01-30    0.59    chess
+    2006-02-06    0.60    gems
+    2006-02-13    0.61    pooh
+    2006-02-20    0.62    garfield
+    2006-02-27    0.63    planets
+    2006-03-06    0.64    trigan
+    2006-03-13    0.65    contrade
+    2006-03-20    0.66    smtp
+    2006-03-27    0.67    pop3
+    2006-04-03    0.68    pop2
+    2006-04-10    0.69    pornstars
+    2006-04-17    0.70    jamesbond [added actors, girls]
+    2006-04-24    0.71    sql
+    2006-05-01    0.72    pantagruel
+    2006-05-08    0.73    planets [made multilingual]
+    2006-05-15    0.74    userfriendly
+    2006-05-22    0.75    norse_mythology
+    2006-05-29    0.76    colours
+    2006-06-05    0.77    colors [alias, multilingual]
+    2006-06-12    0.78    scooby_doo
+    2006-06-19    0.79    lotr
+    2006-06-26    0.80    pgpfone
+    2006-07-03    0.81    swords
+    2006-07-10    0.82    olympics
+    2006-07-17    0.83    metro
+    2006-07-24    0.84    tour_de_france
+    2006-07-31    0.85    foo [merged with toto (removed), made multilingual]
+    2006-08-07    0.86    pie, space_missions [renamed apollo, made multilist]
+    2006-08-14    0.87    sins
+    2006-08-21    0.88    metro [added many other cities subways]
+    2006-08-28    0.89    pause_id
+    2006-09-04    0.90    state_flowers
+    2006-09-11    0.91    vcs
+    2006-09-18    0.92    invasions
+    2006-09-25    0.93    jabberwocky
+    2006-10-02    0.94    nis
+    2006-10-09    0.95    linux
+    2006-10-16    0.96    thunderbirds
+    2006-10-23    0.97    good_omens
+    2006-10-30    0.98    magma
+    2006-11-06    0.99    summerwine [bought by Smylers at the yapc::eu 2006 auction]
+
+This distribution contains all the above themes, except the themes C<any>
+(which picks up I<any> installed theme) and C<foo> (the default theme).
+
+This distribution also contains several themes proposed during the
+years 2005-2006, but that couldn't be included due to self-imposed
+limits (I wanted to have 99 themes in version 0.99).
+
+For version 1.000, these themes are: C<abba>, C<zodiac>.
+Due to a timely coincidence, another new theme has been added:
+C<french_presidents>. Thus bringing it to a total of 100 themes.
+
+    2012-05-07    1.000   abba, french_presidents, zodiac
+
+Future releases will only contain themes proposed in the pre-1.000 era,
+as well as updates to the themes already in the distribution.
+
+    2012-05-14    1.001   muses
+    2012-05-21    1.002   reindeer
+    2012-05-28    1.003   afke
+    2012-06-04    1.004   fabeltjeskrant
+    2012-06-11    1.005   tarot
+    2012-06-18    1.006   alice
+    2012-06-25    1.007   camelidae
+    2012-07-02    1.008   iata
+    2012-07-09    1.009   icao
+    2012-07-16    1.010   calvin
+    2012-07-23    1.011   smurfs
+    2012-07-31    1.012   mars
+    2012-08-06    1.013   lucky_luke
+    2012-08-13    1.014   ben_and_jerry
+    2012-08-20    1.015   tokipona
+    2012-08-27    1.016   wales_towns
+    2012-09-03    1.017   evangelion
+    2012-09-10    1.018   bottles
+    2012-09-17    1.019   screw_drives
+    2012-09-24    1.020   doctor_who
+    2012-10-01    1.021   asterix
+    2012-10-08    1.022   bible
+    2012-10-15    1.023   nobel_prize
+    2012-10-22    1.024   regions
+    2012-10-29    1.025   fawlty_towers
+    2012-11-05    1.026   renault
+    2012-11-12    1.027   care_bears
+    2012-11-19    1.028   counting_to_one
+
+With that last theme, I have reached the end of my I<backlog>,
+having finally published all themes that were sent to me during
+the great hours of L<Acme::MetaSyntactic>.
+Future versions will only contain updates and bug fixes, but no
+new themes.
+
+Do not send me new themes for inclusion in this distribution.
+Your themes should be distributed in their own distribution
+(see for example
+L<Acme::MetaSyntactic::buzzwords>,
+L<Acme::MetaSyntactic::daleks>,
+L<Acme::MetaSyntactic::errno>,
+L<Acme::MetaSyntactic::morning_musume>,
+L<Acme::MetaSyntactic::nethack>,
+L<Acme::MetaSyntactic::soviet>,
+L<Acme::MetaSyntactic::vim>,
+and L<Acme::MetaSyntactic::Themes::Abigail>).
+
+To make your own Acme::MetaSyntactic theme distribution, you can
+take example from this distribution. Have a look at the F<t/>
+directory in particular.
+
+L<Task::MetaSyntactic> is a L<Task> designed to install all available
+L<Acme::MetaSyntactic> themes. Please contact the task maintainer if
+you want it to include your theme.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2005-2014 Philippe Bruhat (BooK), All Rights Reserved.
+
+=head1 LICENSE
+
+This documentation is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

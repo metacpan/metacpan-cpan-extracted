@@ -1,0 +1,60 @@
+=pod
+
+=head1 NAME
+
+ALPM::DB::Local - Machine-local package database.
+
+=head1 SYNOPSIS
+
+  $db = $alpm->localdb;
+  $pkg = $db->find('perl');
+  $db->set_install_reason($pkg, 'implicit') or die $alpm->strerror;
+
+=head1 OBJECT METHODS
+
+This is a subclass of I<ALPM::DB> and inherits all of its methods.
+
+=head2 set_install_reason
+
+  $SUCCESS = $DB->set_install_reason($PKG, $REASON);
+
+The installation reason records whether the package was installed
+explicitly or implicitly. Packages installed as requested on the command
+line are installed explicitly. Packages installed as dependencies are
+installed implicitly. You can override the reason here.
+
+=over 4
+
+=item C<$PKG>
+
+An I<ALPM::Package> object.
+
+=item C<$REASON>
+
+This must be either C<"explicit"> or C<"implicit">.
+
+=item C<$SUCCESS>
+
+Returns truthy on success, false on error.
+
+=back
+
+=head1 SEE ALSO
+
+L<ALPM::DB>
+
+=head1 AUTHOR
+
+Justin Davis, C<< <juster at cpan dot org> >>
+
+Andrew Gregory <apg@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Justin Davis
+
+Copyright (C) 2015 by Andrew Gregory <apg@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

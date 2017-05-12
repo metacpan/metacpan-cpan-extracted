@@ -1,0 +1,13 @@
+Revision history for Perl module Acme::RemoteINC
+
+0.10 Thu Jun 10 22:33:56 2004
+    - original version; created by ExtUtils::ModuleMaker 0.31229
+
+0.11 Makefile.PL revision
+
+0.12  Sun Jun 12 19:12:10 2004
+    - Added ref option to perl_root argument to new
+
+0.13 Makefile.PL revision
+
+0.15 pod revision, tests for pod

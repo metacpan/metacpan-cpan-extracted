@@ -1,0 +1,370 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Astro::UTDF;
+use File::Spec;
+use Pod::Usage;
+use Term::ReadLine;
+
+my $tr = Term::ReadLine->new( 'Query UTDF' );
+
+my @data;	# UTDF data from file
+my $inx = 0;	# Current index into @data
+my $sta;	# Observing station if any.
+my $tle;	# TLE of satellite if any.
+
+{
+    my ( $fh, $fn, $home );
+    my %inifil = (
+	'VMS' => 'query_utdf.ini',
+	'MSWin32' => 'query_utdf.ini',
+	'MacOS' => 'query_utdf.ini',
+    );
+    $home = 'VMS' eq $^O ? $ENV{'SYS$LOGIN'} : (
+	$ENV{HOME} || $ENV{LOGDIR} || $ENV{USERPROFILE} );
+    $fn = File::Spec->catfile( $home,
+	$inifil{$^O} || '.query_utdfrc' );
+    if ( -e $fn ) {
+	open $fh, '<', $fn
+	    or die "Unable to open $fn: $!\n";
+	while( <$fh> ) {
+	    _execute( $_ );
+	}
+	close $fh;
+    }
+}
+
+@ARGV and cmd_load( $ARGV[0] );
+
+while ( defined( my $buffer = $tr->readline( 'Query UTDF> ' ) ) ) {
+    _execute( $buffer );
+}
+
+print "\n";
+
+sub _execute {
+    my ( $buffer ) = @_;
+    $buffer =~ s/ \A \s+ //smx;
+    $buffer =~ s/ \s+ \z //smx;
+    $buffer or next;
+    '#' eq substr $buffer, 0, 1 and next;
+    $buffer =~ s/ \A ! \s* /system /smx;
+    my ( $cmd, @args ) = split qr{ \s+ }smx, $buffer;
+    eval {
+	if ( my $code = __PACKAGE__->can( "cmd_$cmd" ) ) {
+	    $cmd eq 'system'
+		and ( undef, @args ) = split qr{ \s+ }smx, $buffer, 2;
+	    $code->( @args );
+	} elsif ( '_' ne substr( $cmd, 0, 1 ) &&
+	    $data[$inx] &&
+	    $data[$inx]->can( $cmd)
+	) {
+	    my $rslt = $data[$inx]->decode ( $cmd, @args );
+	    defined $rslt and print $rslt, "\n";
+	} else {
+	    die "Unknown command '$cmd'\n";
+	}
+	1;
+    } or warn $@;
+    return;
+}
+
+sub cmd_compare {
+    $tle or die "No TLE loaded\n";
+    $sta or die "No observing station specified\n";
+    my $time = $data[$inx]->measurement_time();
+    my ( $az, $el, $rg, undef, undef, $rg_rt ) = $sta->azel(
+	$tle->universal( $time ) );
+    my $title = join( "\t", '', qw{ Observed Computed Delta } ) . "\n";
+
+    if ( $data[$inx]->is_angle_valid() ) {
+	print $title;
+	$title = undef;
+	_compare_print( 'Azimuth', $data[$inx]->azimuth(), $az );
+	_compare_print( 'Elevatn', $data[$inx]->elevation(), $el );
+    }
+
+    if ( $data[$inx]->is_range_valid() ) {
+	$title and print $title;
+	$title = undef;
+	_compare_print( 'Range', $data[$inx]->range(), $rg );
+    }
+
+    if ( $data[$inx]->is_doppler_valid() ) {
+	$title and print $title;
+	$title = undef;
+	_compare_print( 'Rng rt', $data[$inx]->range_rate, $rg_rt );
+    }
+
+    return;
+}
+
+sub cmd_count {
+    print scalar @data, "\n";
+    return;
+}
+
+sub cmd_exit {
+    print "\n";
+    exit;
+}
+
+sub cmd_help {
+    my ( $what ) = @_;
+    if ( defined $what && 'utdf' eq lc $what ) {
+	pod2usage( {
+		-verbose => 2,
+		-exitval => 'NOEXIT',
+		-input => $INC{'Astro/UTDF.pm'},
+	    } );
+    } else {
+	pod2usage( {
+		-verbose => 2,
+		-exitval => 'NOEXIT',
+	    } );
+    }
+    return;
+}
+
+sub cmd_list {
+    my @args = @_;
+    my @range;
+    my @items;
+    foreach ( @args ) {
+	if ( m/ \A \d+ (?: - \d+ )? \z /smx ) {
+	    push @range, $_;
+	} else {
+	    push @items, $_;
+	}
+    }
+    @items or push @items, 'measurement_time';
+    @range or push @range, $inx;
+    print join( "\t", 'index', @items ), "\n";
+    foreach my $start ( @range ) {
+	my $finish;
+	if ( $start =~ s/ - ( \d+ ) \z //smx ) {
+	    $finish = $1;
+	} else {
+	    $finish = $start;
+	}
+	$finish > $#data and $finish = $#data;
+	foreach my $inx ( $start .. $finish ) {
+	    print join( "\t", $inx, map { $data[$inx]->decode( $_ ) }
+		@items ), "\n";
+	}
+    }
+    return;
+}
+
+sub cmd_load {
+    my ( $fn ) = @_;
+    $fn or die "Must specify file name\n";
+    @data = Astro::UTDF->slurp( $fn );
+    print scalar @data, "\n";
+    @data and cmd_select( 0 );
+    return;
+}
+
+sub cmd_next {
+    my ( $offset ) = @_;
+    defined $offset or $offset = 1;
+    $inx += $offset;
+    cmd_select( $inx );
+    return;
+}
+
+sub cmd_select {
+    my ( $ix ) = @_;
+    defined $ix or $ix = 0;
+    $inx = $ix;
+    $inx < 0 and $inx = @data - $inx;
+    $inx < 0 and $inx = 0;
+    $inx >= @data and $inx = $#data;
+    print $inx, "\t", scalar gmtime $data[$inx]->measurement_time(),
+    "\n";
+    return;
+}
+
+sub cmd_station {
+    my ( $lat, $lon, $ele, @name ) = @_;
+
+    require Astro::Coord::ECI;
+    require Astro::Coord::ECI::Utils;
+
+    defined $lat or do {
+	( $lat, $lon, $ele ) = $sta->geodetic();
+	foreach ( $lat, $lon ) {
+	    $_ = Astro::Coord::ECI::Utils::rad2deg( $_ );
+	}
+	$ele *= 1000;
+	print join( "\t", $lat, $lon, $ele ), "\n";
+	return;
+    };
+
+    defined $lat and defined $lon
+	or die "Latitude and longitude must be specified\n";
+    defined $ele or $ele = 0;
+
+    foreach ( $lat, $lon ) {
+	$_ = Astro::Coord::ECI::Utils::deg2rad( $_ );
+    }
+
+    $ele /= 1000;
+
+    $sta = Astro::Coord::ECI->new()->geodetic(
+	$lat, $lon, $ele );
+
+    if ( @name ) {
+	$sta->set( name => join( ' ', @name ) );
+    }
+
+    return;
+}
+
+sub cmd_system {
+    my ( @args ) = @_;
+    system "@args";
+    return;
+}
+
+sub cmd_tle {
+    my ( $fn ) = @_;
+    if ( defined $fn ) {
+	require Astro::Coord::ECI::TLE;
+	require Astro::Coord::ECI::TLE::Set;
+	my $fh;
+	open $fh, '<', $fn
+	    or die "Unable to open $fn: $!\n";
+	( $tle ) = Astro::Coord::ECI::TLE::Set->aggregate(
+	    Astro::Coord::ECI::TLE->parse ( <$fh> ) );
+	close $fh;
+    }
+    if ( $tle ) {
+	print join( ' ', $tle->get( 'id' ), $tle->get( 'name' ) ), "\n";
+    } else {
+	print "No TLE loaded.\n";
+    }
+    return;
+}
+
+sub _compare_print {
+    my ( $name, $observed, $calculated ) = @_;
+    my $delta = $observed - $calculated;
+    print join( "\t", $name, $observed, $calculated, $delta ), "\n";
+    return;
+}
+
+__END__
+
+=head1 NAME
+
+query_utdf - Ad-hoc query of data in a UTDF file.
+
+=head1 SYNOPSIS
+
+ query_utdf
+ Query UTDF> load foo/utdf.data
+ 653
+ 0     Wed Apr  1 00:00:00 2009
+ Query UTDF> select 100
+ 100   Wed Apr  1 00:01:40 2009
+ Query UTDF> tracking_mode
+ automatic
+ Query UTDF> exit
+
+=head1 DETAILS
+
+This script implements a simple interactive query of a UTDF file. The
+operating philosophy is that there is at (almost) all times a current
+UTDF record. Any L<Astro::UTDF|Astro::UTDF> method can be called on that
+record simply by giving the method name. If the method takes arguments
+they can be specified as well.
+
+Besides the L<Astro::UTDF|Astro::UTDF> methods, a number of additional
+commands have been provided:
+
+=over
+
+=item count
+
+This command prints the number of UTDF records currently loaded.
+
+=item exit
+
+This command terminates the script. End-of-file also works.
+
+=item help
+
+Display this documentation. C<help utdf> displays the documentation for
+L<Astro::UTDF|Astro::UTDF>.
+
+=item list
+
+This command lists data from the file. It takes any number of arguments.
+An argument that is entirely numeric (e.g. C<42>) specifies the number
+of a record to list. An argument that is two numeric strings separated
+by a dash (e.g.  C<86-99>) specifies a range of records to list. Any
+other argument specifies the name of a field to list. For example,
+
+ list 150 100-120 measurement_time azimuth elevation
+
+Lists the measurement_time, azimuth, and elevation from record 150 and
+records 100 through 120, in that order.
+
+Record numbers referring to non-existent records will be ignored.
+Non-existent fields will cause the command (though not the script) to
+die horribly.
+
+The range defaults to the current record, and the list of fields
+defaults to measurement_time.
+
+=item load
+
+This command loads the file named in the command, replacing the
+previously-loaded file if any. If the file contains any records, record
+0 is selected.
+
+=item next
+
+This command selects the next record. Optionally you can specify a
+number, either positive or negative, and the selection will be moved
+that amount. For example, if record 1 is selected, C<next 3> will select
+record 4, and C<next -1> will select record 0.
+
+=item select
+
+This command selects the record at the given index, which defaults to 0.
+Negative indices select from the end.
+
+=item system
+
+This command issues a system command. You can use '!' as a synonym.
+
+=back
+
+=head1 SUPPORT
+
+Support is by the author. Please file bug reports at
+L<http://rt.cpan.org>, or in electronic mail to the author.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010, 2012-2016 Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

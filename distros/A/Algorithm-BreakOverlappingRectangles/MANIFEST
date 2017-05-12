@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Algorithm-BreakOverlappingRectangles.t
+lib/Algorithm/BreakOverlappingRectangles.pm
+BreakOverlappingRectangles.xs
+ppport.h
+samples/s1.pl
+samples/s2.pl
+samples/s3.pl
+samples/s4.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+Revision history for Perl extension Attribute::Unimplemented.
+
+0.02  Mon Sep  3 08:03:42 JST 2001
+	- fixed broken tarball as CPAN module
+
+0.01  Sun Sep  2 01:27:41 2001
+	- original version; created by h2xs 1.21 with options
+		-AXn Attribute::Unimplemented
+

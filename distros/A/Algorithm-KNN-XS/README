@@ -1,0 +1,22 @@
+NAME
+    Algorithm::KNN::XS - k-nearest neighbor algorithm
+
+DESCRIPTION
+    Algorithm::KNN::XS is a module that can perform fast k-nearest neighbor
+    algorithm. It uses the library from http://www.cs.umd.edu/~mount/ANN/
+    to achieve this.
+
+AUTHOR
+    Stephan Conrad <conrad@stephanconrad.de>
+
+COPYRIGHT AND LICENSE
+    Copyright 2011 by Stephan Conrad
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    * Alien::LibANN
+
+ANN - Approximate Nearest Neighbor Library
+    More info can be found here: http://www.cs.umd.edu/~mount/ANN/

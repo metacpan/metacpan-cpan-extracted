@@ -1,0 +1,25 @@
+Changes for App-CSV
+
+* 2014-05-23: Version 0.08
+  Just depend on Text::CSV already (closes #95861).
+
+* 2013-12-14: Version 0.07
+  Better error handling on missing fields (thanks Thomas Sibley).
+
+* 2012-12-04: Version 0.06
+  Support --fields (thanks Prakash Kailasa).
+
+* 2009-05-26: Version 0.05
+  Don't barf on implicit stdio (thanks Dotan Dimet).
+
+* 2009-04-05: Version 0.04
+  Refreshed META.yml file, telling CPAN about MIT license.
+
+* 2009-03-31: Version 0.03
+  Work around a crashing bug in Text::CSV_XS on some systems.
+
+* 2009-03-27: Version 0.02
+  Correct DWIMmy TSV, docfixes.
+
+* 2009-03-26: Version 0.01
+  Initial release.

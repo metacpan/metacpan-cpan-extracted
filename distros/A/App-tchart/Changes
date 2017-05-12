@@ -1,0 +1,48 @@
+Revision history for App-tchart
+
+0.05    2016-03-10 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.04     2015-06-14 (PERLANCAR)
+
+         - No functional changes.
+
+         - Rename module/dist/app from App::chart/chart to App::tchart due to
+           conflict with preexisting CPAN module App::Chart/chart.
+
+
+0.03     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename option --data-field to --data-column, --label-field to
+           --label-column.
+
+         [ENHANCEMENTS]
+
+         - Switch from Text::Graph to Text::Chart to support more chart types
+           and other features.
+
+         - Accept numbers from ARGV.
+
+         - Add input format tsv/tsv+h.
+
+         - Add options: --chart-height (-H) & --chart-width (-W).
+
+         - Add output type: dump (for debugging).
+
+         [BUG FIXES]
+
+         - Other fixes.
+
+
+0.02    2014-04-17 (SHARYANTO)
+
+        - Detect enveloped result (see Rinci::function) and adjust accordingly.
+
+
+0.01    2014-04-10 (SHARYANTO)
+
+        - First release.

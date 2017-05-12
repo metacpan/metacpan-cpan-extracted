@@ -1,0 +1,188 @@
+#------------------------------------------------------------------------------
+# scout.pod
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# This library is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#------------------------------------------------------------------------------
+
+=head1 NAME
+
+B<scout>
+
+=head1 SYNOPSIS
+
+  use AFS::Monitor qw(scout);
+  my $scout;
+
+  $scout = scout(server   => "serverName1");
+
+  $scout = scout(server   => ["serverName1", "serverName2"],
+                 basename => "example.com",
+                 debug    => "debug_out/debug.file"
+                );
+
+=head1 DESCRIPTION
+
+The B<scout> function gathers statistics from the File Server process running
+on each machine specified with the B<server> argument. The B<Output> section
+explains the meaning of the statistics.
+
+=head1 OPTIONS
+
+=over
+
+=item B<server>
+
+String with one name or reference to an array with names of one or
+more machines from which to gather File Server statistics.
+Specifies each file server machine running a File Server process to monitor.
+Provide each machine's fully qualified hostname unless the B<basename>
+argument is used. In that case, specify only the unique initial part of each
+machine name, omitting the domain name suffix (the basename) common to all the
+names. It is also acceptable to use the shortest abbreviated form of a host
+name that distinguishes it from other machines, but successful resolution
+depends on the availability of a name resolution service (such as the Domain
+Name Service or a local host table) at the time the command is issued.
+
+=item B<basename>
+
+String that specifies the basename (domain name) suffix common to all of the
+file server machine names specified with the B<server> argument, and is
+automatically appended to them. This argument is normally the name of the cell
+to which the machines belong. Do not include the period that separates this
+suffix from the distinguishing part of each file server machine name, but do
+include any periods that occur within the suffix itself. For example, in the
+ABC Corporation cell, the proper value is abc.com rather than .abc.com.
+
+=item B<debug>
+
+Specifies the pathname of the file into which to write a debugging trace.
+Partial pathnames are interpreted relative to the current working directory.
+
+=back
+
+=head1 OUTPUT
+
+Returns a reference to an array, with one element per host specified. Each
+element in the array is a reference to a hash containing information about the
+file server, as described below.
+
+=over
+
+=item B<hostName>
+
+This hash entry contains the name of the file server that this array entry
+represents.
+
+=item B<probeOK>
+
+The value of this entry will be 1 if the probe was successful, and 0 if the
+probe failed and was unable to gather any statistics for this File Server
+process.
+
+=item B<stats>
+
+The value of this entry will be a reference to a hash containing all of the
+statistics gathered, unless the probe failed, in which case the b<stats> key
+will not exist. Some of the statistics contained in this hash are described
+below:
+
+=over
+
+=item B<CurrentConnections>
+
+The number of RPC connections open between the File Server process and client
+machines. This number equals or exceeds the number in the B<WorkStations>
+entry (see below), because each user on the machine can have several separate
+connections open at once, and one client machine can handle several users.
+
+=item B<TotalFetchs>
+
+The number of fetch-type RPCs (fetch data, fetch access list, and fetch
+status) that client machines have made to the File Server process since the
+latter started. This number is reset to zero each time the File Server process
+restarts.
+
+=item B<TotalStores>
+
+The number of store-type RPCs (store data, store access list, and store
+status) that client machines have made to the File Server process since the
+latter started. This number is reset to zero each time the File Server process
+restarts.
+
+=item B<WorkStations>
+
+The number of client machines (workstations) that have communicated with the
+File Server process within the last 15 minutes. Such machines are termed
+I<active>. This number is likely to be smaller than the number in the
+B<CurrentConnections> entry because a single client machine can have several
+connections open to one File Server.
+
+=item B<Disk>
+
+A reference to an array containing an entry for each AFS disk partition on the
+file server machine, up to 26 partitions. Each entry is a reference to a hash,
+containing three entries:
+
+=over
+
+=item B<Name>
+
+Indicates the partition name. For example, a value of B<a> specifies the
+B</vicepa> partition.
+
+=item B<BlocksAvailable>
+
+The number of available kilobyte blocks on this partition.
+
+=item B<TotalBlock>
+
+The total number of kilobyte blocks on this partition.
+
+=back
+
+=back
+
+=back
+
+For an example of using the output from this function, refer to the B<scout>
+script in the B<examples> directory.
+
+=head1 AUTHORS
+
+The code and documentation for this class were contributed by Stanford
+Linear Accelerator Center, a department of Stanford University.  This
+documentation was written by
+
+=over
+
+=item Elizabeth Cassell <e_a_c@mailsnare.net> and
+
+=item Alf Wachsmann <alfw@slac.stanford.edu>
+
+=back
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+ Copyright 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+                Elizabeth Cassell <e_a_c@mailsnare.net>
+ All rights reserved.
+
+ Most of the explanations in this document are taken from the original
+ AFS documentation.
+
+ AFS-3 Programmer's Reference:
+ Volume Server/Volume Location Server Interface
+ Edward R. Zayas
+ (c) 1991 Transarc Corporation.
+ All rights reserved.
+
+ IBM AFS Administration Reference
+ (c) IBM Corporation 2000.
+ All rights reserved.
+
+ This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

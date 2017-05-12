@@ -1,0 +1,35 @@
+do{ my $x = {
+       'build_requires' => {
+                             'File::Copy' => 0,
+                             'warnings' => 0,
+                             'File::Spec' => 0,
+                             'Sub::Exporter' => 0,
+                             'vars' => 0,
+                             'Test::More' => 0,
+                             'perl' => '5.005',
+                             'ExtUtils::Liblist' => 0,
+                             'lib' => 0,
+                             'File::Path' => 0,
+                             'Module::Build' => 0,
+                             'ExtUtils::CBuilder' => 0,
+                             'Cwd' => 0
+                           },
+       'conflicts' => {},
+       'requires' => {
+                       'warnings' => 0,
+                       'File::Copy' => 0,
+                       'File::Spec' => 0,
+                       'Sub::Exporter' => 0,
+                       'vars' => 0,
+                       'Test::More' => 0,
+                       'perl' => '5.005',
+                       'ExtUtils::Liblist' => 0,
+                       'File::Path' => 0,
+                       'lib' => 0,
+                       'Module::Build' => 0,
+                       'Cwd' => 0,
+                       'ExtUtils::CBuilder' => 0
+                     },
+       'recommends' => {}
+     };
+$x; }

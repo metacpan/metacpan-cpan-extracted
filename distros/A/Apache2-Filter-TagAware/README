@@ -1,0 +1,81 @@
+NAME
+    Apache2::Filter::TagAware - Tag Awareness for Apache2::Filter
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+      package Your::FancyFilter;
+
+      use strict;
+      use warnings;
+      use Apache2::Filter::TagAware qw();
+      use Apache2::RequestRec qw();
+      use Apache2::Log qw();
+      use APR::Table qw();
+      use Apache2::Const -compile => qw(OK DECLINED);
+
+      sub handler {
+          my $f = Apache2::Filter::TagAware->new(shift);
+          my $r = $f->r;
+
+          my $ctx = $f->ctx;
+
+          if (!$ctx){
+              $ctx = {};
+              $r->headers_out->unset('Content-Length');
+              $ctx->{'fixed_headers'} = 1;
+              $f->ctx($ctx);
+          }
+
+          while ($f->read(my $buffer, 2048)) {
+              # mangle $buffer here
+              $f->print($buffer);
+          }
+
+          return Apache2::Const::OK;
+      }
+
+      1;
+
+DESCRIPTION
+    Apache2::Filter::TagAware is a subclass of "Apache2::Filter" which
+    ensures that the read method will not return a split tag. What
+    constitutes a split tag is definable by the filter.
+
+  new
+      $f = Apache2::Filter::TagAware->new($f,%args);
+
+    tag_regexp
+    a regular expression which defines a split tag. defaults to '(<[^>]*)$'
+
+  read
+      $f->read($buffer, $bytes)
+
+    When read is called, $bytes are read from the underlying stream. The
+    number of bytes returned from the call will vary depending on the size
+    of any tag that might be open. It may return 0 bytes for a few calls
+    then return a chunk of the stream 3 times the size of what you were
+    asking for on the next. There's not really anything that can be done
+    about this other than to use a buffer size that's "big enough", whatever
+    that means in your context. Obviously, returning 0 from read would
+    basically break the page whenever you ran into a tag that was larger
+    than your buffer, so in that situation read will return '0e0', aka zero
+    but true to alleviate the problem.
+
+  ctx
+    See Apache2::Filter docs, behaves identically, at least on the surface.
+
+CAVEATS
+    the $bytes you pass in to read is used as a guideline for the maximum
+    number of bytes that read will return, but it will not always be less
+    than $bytes. If there is a tag in your document larger than $bytes
+    you'll eventually get a chunk of page returned that's larger than
+    $bytes, since that tag will not be split.
+
+AUTHOR AND COPYRIGHT
+    Copyright 2007, Adam Prime (adam.prime@utoronto.ca)
+
+    This software is free. It is licensed under the same terms as Perl
+    itself.
+

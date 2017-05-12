@@ -1,0 +1,98 @@
+NAME
+    Apache::RandomLocation - Perl extension for mod_perl to handle
+    random locations.
+
+SYNOPSIS
+      You can use this in your Apache *.conf files to activate this module.
+
+      <Location /scripts/random-image>
+      SetHandler perl-script
+      PerlSetVar BaseURL /images/
+      PerlSetVar ConfigFile /usr/local/apache/etc/sponsors.txt
+      PerlHandler Apache::RandomLocation
+      </Location>
+
+      <Location /scripts/CPAN>
+      SetHandler perl-script
+      PerlSetVar Type mirror
+      PerlSetVar ConfigFile /usr/local/apache/etc/cpan_mirrors.txt
+      PerlHandler Apache::RandomLocation
+      </Location>
+
+DESCRIPTION
+    Given a list of locations in ConfigFile, this module will
+    instruct the browser to redirect to one of them. The locations
+    in ConfigFile are listed one per line, with lines beginning with
+    # being ignored. How the redirection is handled depends on the
+    variable Type.
+
+    If Type is undefined or set to file, the locations are assumed
+    to be files. BaseUrl, which can be a full or partial URL, gives
+    the location of these files. This can be used to implement, for
+    example, a banner in an HTML page: <IMG SRC="/scripts/random-
+    image">. The file chosen is random. Since after one call this
+    image gets cached by the client, to generate multiple random
+    images on the same page, you could append different bogus paths
+    after the calling URL, as in <IMG SRC="/scripts/random-image/1">
+    and <IMG SRC="/scripts/random-image/2">.
+
+    In this case, if BaseURL indicates the local server is being
+    used, ConfigFile can contain a perl regular expression (enclosed
+    by /, as in /\.gif$/) which will be used to match files in
+    BaseURL. If ConfigFile is not defined, all files in BaseUrl will
+    be read. If BaseUrl is undefined, the top level directory of the
+    local server is assumed.
+
+    If type is set to mirror, the locations in ConfigFile are
+    assumed to be mirror sites of some set of files, giving both the
+    host name and the directory path (eg,
+    ftp.mirror.edu/path/to/dir). In this mode the module acts like
+    the CPAN muliplexer code of http://www.perl.com/CPAN; for
+    example, http://my.host.edu/scripts/CPAN/src/latest.tar.gz will
+    redirect to a nearby CPAN mirror to retrieve the file
+    src/latest.tar.gz. Also like the CPAN multiplexer, a call to the
+    URL http://my.host.edu/scripts/CPAN (without any trailing slash)
+    will bring up a form from which one can manually choose a site
+    to go to.
+
+    In this case, redirection is made to a random mirror site whose
+    country code in the domain name matches that of the client. If
+    no such mirror exists, a random mirror with country code
+    matching *(com|edu|net|org|us)* is selected. For these purposes,
+    clients with country codes *com*, *edu*, *org*, *net*, and *us*
+    are considered equivalent. If a particular mirror site should be
+    considered as having a different country code in this regard,
+    add the desired code (separated by a space) to the end of the
+    line containing the address of the mirror in ConfigFile. If the
+    address of a mirror does not begin with *http://*, the *ftp://*
+    protocol is assumed.
+
+    Information on the locations is stored in a hash, which survives
+    in each child's memory for the life of the child. This hash is
+    uniquely associated with the given Location directive in *.conf,
+    so that multiple uses of Apache::RandomLocation modules on one
+    server with different Location directives is possible.
+
+    Like Apache's configuration files, if any changes are made in
+    ConfigFile, the server must be restarted in order that the
+    changes take immediate effect; otherwise, one must wait for the
+    child processes to die in order that the new configuration file
+    be read in.
+
+AUTHORS
+    Matthew Darwin, matthew@davin.ottawa.on.ca
+
+    Randy Kobes, randy@theory.uwinnipeg.ca
+
+    The mirror redirection code is based on the CPAN multiplexer
+    code of Tom Christiansen and a similar script by Ulrich Pfeifer.
+
+SEE ALSO
+    perl(1), Apache(3), mod_perl(3)
+
+COPYRIGHT
+    Copyright 1998, Matthew Darwin, Randy Kobes
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

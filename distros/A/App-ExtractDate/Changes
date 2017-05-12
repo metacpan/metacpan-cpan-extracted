@@ -1,0 +1,11 @@
+Revision history for App-ExtractDate
+
+0.002   2016-04-06 (PERLANCAR)
+
+	- Allow customizing which Date::Extract module to use (via
+	  --module, -m or PERL_DATE_EXTRACT_MODULE).
+
+
+0.001   2016-04-06 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,37 @@
+CHANGES file for App::Cache:
+
+0.37 Tue Dec  8 20:29:10 GMT 2009
+  - add option to disable the cache (suggested by MSCHWERN)
+
+0.36 Fri Jun 26 16:35:05 BST 2009
+  - allow cache directory to be set by caller (patch by Murray)
+  - delete App::Cache::Test cache dir when done (patch by Murray)
+  - add POD for directory method (patch by Murray)
+  - add "use warnings"
+
+0.35 Wed Sep 10 20:26:08 BST 2008
+  - fixed manifest
+  - added human- and machine-readable license
+
+0.34 Thu Aug 14 11:50:28 CEST 2008
+  - make the tests still pass even if you are offline
+    (patch by Mark Fowler)
+
+0.33 Sat Sep 29 18:00:07 BST 2007
+  - fix the test suite (spotted by Andreas Koenig)
+  - perltidy
+  - use Makefile.PL instead of Build.PL
+
+0.32
+  - minor doc change
+
+0.31 Tue Jul 19 21:40:46 BST 2005
+  - fix one of the tests to now go to www.google.com/ncr
+    (no country redirect)
+
+0.30 Wed Jul  6 01:28:33 BST 2005
+  - fix a silly bug where we wouldn't create the cache directory
+    properly (thanks, dha)
+
+0.29 Tue Jul  5 17:54:10 BST 2005
+  - first release

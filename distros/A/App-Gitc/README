@@ -1,0 +1,27 @@
+NAME
+    App::Gitc - Git Changesets - tools for managing your git changes
+
+VERSION
+    version 0.60
+
+INSTALLATION
+    Read the HOWTO
+    <https://raw.github.com/GrantStreetGroup/gitc/master/HOWTO> for
+    information on setting up Gitc. Example configuration files are
+    available.
+
+SEE ALSO
+    Gitc Wiki <https://github.com/GrantStreetGroup/gitc/wiki>
+
+    App::Gitc::Util
+
+AUTHOR
+    Grant Street Group <developers@grantstreet.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The GNU Affero General Public License, Version 3, November 2007
+

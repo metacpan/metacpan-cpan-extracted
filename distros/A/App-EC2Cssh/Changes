@@ -1,0 +1,49 @@
+==================================================
+Changes from 2016-03-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2017-03-27 15:45:34 +0000
+------------------------------------------
+
+  Change: d30858b5c0c54765329d8575b05d298437dd8565
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-27 16:45:25 +0000
+
+    Fixed bug 
+
+------------------------------------------
+version 0.006 at 2017-03-27 10:24:20 +0000
+------------------------------------------
+
+  Change: 8c0d0489d10e668f14139bfa44f0229b6f5e9251
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-27 11:24:20 +0000
+
+    Use name instead of host when possible 
+
+  Change: 328c84b31fd39f43fcf3fd4435315438cab1290f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-24 18:14:37 +0000
+
+    Nicer output 
+
+------------------------------------------
+version 0.005 at 2017-03-24 17:56:57 +0000
+------------------------------------------
+
+  Change: 87a9faf0d60a9372aa3e17304ce0a528f9c62d49
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-24 17:56:57 +0000
+
+    Travis only from 5.14 
+
+  Change: e4038c413e3a54c2726eb92eb5b079eb3c45206c
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-03-24 17:53:17 +0000
+
+    Added demux feature 
+
+================================================
+Plus 4 releases after 2016-03-27 00:00:00 +0000.
+================================================

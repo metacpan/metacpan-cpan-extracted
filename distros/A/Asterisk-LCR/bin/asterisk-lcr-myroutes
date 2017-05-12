@@ -1,0 +1,165 @@
+#!/usr/bin/perl
+use lib qw (. .. ./lib);
+use warnings;
+use strict;
+
+
+package Routegen;
+
+
+our $Cost   = undef;
+our $Prefix = undef;
+
+
+sub _func_prefix
+{
+    my $self   = shift;
+    my $prefix = shift;
+    return $Routegen::Prefix =~ /^$prefix/;
+}
+
+
+sub _func_margin
+{
+    my $self  = shift;
+    my $coef  = shift || 1.5;
+    my $round = shift || 0.015;
+    
+    my $price = $Routegen::Cost * $coef;
+
+    my $units = int ($price / $round);
+    $units++ if ($price / $round != int ($price / $round));
+
+    my $res = $round * $units;
+    
+    # make it nice why don't you
+    if ($res =~ /\.\d$/) { $res .= 0 }
+    return $res;
+}
+
+
+sub new
+{
+    my $class = shift;
+    my $self  = bless { @_ } => $class;
+    my $file  = $self->{file};
+    
+    open FP, "<$file" or die "Cannot read open $file";
+    $self->{lines} = [ map { chomp(); $_ } <FP> ];
+    close FP;
+    
+    return $self; 
+}
+
+
+sub lines
+{
+    my $self  = shift;
+    my $lines = $self->{lines};
+    return @{$lines};
+}
+
+
+sub process
+{
+    my $self  = shift;
+    my @lines = $self->lines();
+    
+    foreach my $line (@lines)
+    {
+       my $res = 1;
+       my @stuff = split /\s+/, $line;
+       while (@stuff > 0)
+       {
+           $res || last;
+           my $stuff     = shift (@stuff);
+           if    ($stuff =~ s/prefix\://) { $res = $self->_func_prefix (split /\:/, $stuff) }
+           elsif ($stuff =~ s/margin\://) { $res = $self->_func_margin (split /\:/, $stuff) }
+           else                           { $res = $stuff                  }
+       }
+       
+       return $res if ($res);
+    }
+    
+    return;
+}
+
+
+package main;
+use Asterisk::LCR::Locale;
+use Asterisk::LCR::Route;
+use Config::Mini;
+use warnings;
+use strict;
+
+$SIG{__WARN__} = sub { $_[0] !~ /Can't locate AGI\/Fake\.pm/ and $_[0] !~ /Useless use of bitwise/ and warn @_ };
+
+@ARGV || die "Usage: $0 <config_file> <country_prefixes> <rules_file>";
+Config::Mini::parse_file (shift @ARGV);
+
+@ARGV || die "Usage: $0 <config_file> <country_prefixes> <rules_file>";
+my $country_pfx = shift (@ARGV);
+
+@ARGV || die "Usage: $0 <config_file> <country_prefixes> <rules_file>";
+my $rategen = Routegen->new (file => shift @ARGV);
+
+our $STORE    = Config::Mini::instantiate ("storage")  || die "no storage configured"; 
+our $DIAL     = Config::Mini::instantiate ("dialer")   || die "no dialer configured"; 
+our $LOCALE   = $DIAL->locale();
+
+my %pfx2label = ();
+my %pfx2rate  = ();
+
+print STDERR "Importing supported prefixes\n";
+open FP, "<$country_pfx" or die "Cannot read-open $country_pfx!";
+while (<FP>)
+{
+    chomp();
+    my ($key, $val) = split /\s*,\s*/, $_, 2;
+    $key = $LOCALE->normalize ($key);
+    $pfx2label{$key} = $val;
+}
+
+
+print STDERR "Establishing rates list\n";
+foreach my $pfx (sort keys %pfx2label)
+{
+    my @rates = $STORE->search_rates ($pfx, $DIAL->limit());
+    @rates or do { delete $pfx2label{$pfx};  next};
+
+    $Routegen::Prefix = $pfx;
+    $Routegen::Cost   = pop (@rates)->rate();
+    $pfx2rate{$pfx}  = $rategen->process();
+}
+
+print STDERR "Removing redundant rates\n";
+my $dirty = 1;
+while ($dirty)
+{
+    $dirty = 0;
+    foreach my $pfx1 (keys %pfx2rate)
+    {
+        my $rate1 = $pfx2rate{$pfx1} || next;
+        foreach my $pfx2 (grep /^$pfx1\d/, keys %pfx2rate)
+        {
+            my $rate2 = $pfx2rate{$pfx2} || next;
+            $rate1 == $rate2 and do {
+#                print STDERR "$pfx1($rate1) - $pfx2($rate2)\n";
+                delete $pfx2rate{$pfx2};
+                delete $pfx2label{$pfx2};
+                $dirty = 1;
+            };
+        }
+    }
+}
+
+foreach my $pfx ( sort { $pfx2rate{$a} <=> $pfx2rate{$b} || $a cmp $b } keys %pfx2label )
+{
+    print "$pfx,$pfx2label{$pfx},$pfx2rate{$pfx}\n";
+}
+
+
+1;
+
+
+__END__

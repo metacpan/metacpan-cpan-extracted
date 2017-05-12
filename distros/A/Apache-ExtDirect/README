@@ -1,0 +1,36 @@
+Apache-ExtDirect version 0.90
+=============================
+
+This module implements RPC::ExtDirect gateway for Apache2/mod_perl2
+environment.
+
+RPC::ExtDirect is an implementation of Ext.Direct remoting protocol
+used in Ext JS framework for JavaScript.
+
+For more information, see RPC::ExtDirect documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL -apxs /path/to/your/apxs
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    mod_perl2
+    RPC::ExtDirect
+    Attribute::Handlers
+    JSON
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Alexander Tokarev, <tokarev@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. See perlartistic.
+

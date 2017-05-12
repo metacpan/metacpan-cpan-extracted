@@ -1,0 +1,14 @@
+Revision history for App-SimpleScan-Plugin-Retry
+1.02  Wed Aug  2 13:22:23 PDT 2006
+	- remove @accent from tests
+
+1.01  Mon Apr 10 09:59:21 PDT 2006
+	- failed upload; trying again
+
+0.02  Tue Feb 28 13:02:42 PST 2006
+       Update to match quoting in App::SimpleScan.
+       Update to match automatic stacking of user agent code.
+
+0.01  Tue Nov 22 15:15:54 2005
+       Initial release.
+

@@ -1,0 +1,10 @@
+--- SDL_Pango-0.1.2/src/SDL_Pango.h	2014-04-23 13:10:40.000000000 +0200
++++ SDL_Pango-0.1.2/src/SDL_Pango.h	2014-04-24 10:22:58.000000000 +0200
+@@ -34,6 +34,7 @@
+ #include "SDL.h"
+ 
+ #include "begin_code.h"
++#include <ft2build.h>
+ 
+ #ifdef __cplusplus
+ extern "C" {

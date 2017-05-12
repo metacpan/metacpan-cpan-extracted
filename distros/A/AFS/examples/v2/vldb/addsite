@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl
+
+use v5.10.0;
+use blib;
+use strict;
+use warnings;
+
+use AFS::VLDB;
+
+my ($vldb, $server, $part, $volume, $roid, $valid, $ok);
+
+die "Usage: $0 server partition volume [roid [valid]] \n" if $#ARGV < 2;
+
+$server = shift;
+$part   = shift;
+$volume = shift;
+$roid   = shift // '';
+$valid  = shift // 0;
+
+$vldb = AFS::VLDB->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+$ok = $vldb->addsite($server, $part, $volume, $roid, $valid);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "Added replication site $server /vicep$part for volume $volume \n"; }

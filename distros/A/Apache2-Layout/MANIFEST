@@ -1,0 +1,22 @@
+Changes
+Changes.yml
+lib/Apache2/Layout.pm
+Layout.xs
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+t/00-signature.t
+t/01compile.t
+t/02simple.t
+t/03pod-cover.t
+t/03pod.t
+t/conf/extra.conf.in
+t/htdocs/cgi/test.pl
+t/htdocs/footer.html
+t/htdocs/head.html
+t/htdocs/header.html
+t/htdocs/large.html
+t/htdocs/simple.html
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

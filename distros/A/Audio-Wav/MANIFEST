@@ -1,0 +1,20 @@
+COPYRIGHT
+Changes
+MANIFEST
+README
+LICENSE
+META.yml
+Makefile.PL
+TODO
+Wav.pm
+test.pl
+test_tone.wav
+Wav/Read.pm
+Wav/Write.pm
+Wav/Tools.pm
+Wav/Write/Header.pm
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+
+META.json                                Module JSON meta-data (added by MakeMaker)

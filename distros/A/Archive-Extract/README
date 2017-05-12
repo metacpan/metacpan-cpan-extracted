@@ -1,0 +1,40 @@
+This is the README file for Archive::Extract, a perl module for 
+generic archive extraction
+
+Please refer to 'perldoc Archive::Extract' after installation for details.
+
+#####################################################################
+
+* Description
+
+Archive::Extract
+
+    Archive::Extract is a generic archive extraction mechanism.
+
+    It allows you to extract .tgz, .tar, .gz and .zip files, using
+    either perl modules or commandline tools
+
+#####################################################################
+
+* Installation
+
+Archive::Extract follows the standard perl module install process
+
+perl Makefile.PL
+make
+make test
+make install
+
+The module uses no C or XS parts, so no c-compiler is required.
+
+######################################################################
+
+AUTHOR
+    This module by Jos Boumans <kane@cpan.org>.
+
+COPYRIGHT
+    This module is copyright (c) 2002 Jos Boumans <kane@cpan.org>. All
+    rights reserved.
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.

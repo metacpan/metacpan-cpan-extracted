@@ -1,0 +1,10 @@
+Build.PL
+Changes
+ElectronModuleBuild.pm
+lib/Alien/Electron.pm
+MANIFEST			This list of files
+t/runs.t
+t/static/main.js
+t/static/package.json
+META.yml
+META.json

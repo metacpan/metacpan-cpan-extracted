@@ -1,0 +1,13 @@
+---
+dirs-recursive:
+  .: ext/DB_File
+exclude-regexes:
+  - '^(?:\.?/)?META.yml$'
+  - '^(?:\.?/)?MANIFEST$'
+  - '^(?:\.?/)?README$'
+  - '^(?:\.?/)?ppport\.h$'
+  - '^(?:\.?/)?t/\d*pod.*\.t$'
+  - '^(?:\.?/)?patches/'
+  - '^(?:\.?/)?fallback\.xs$'
+  - '^(?:\.?/)?fallback\.h$'
+

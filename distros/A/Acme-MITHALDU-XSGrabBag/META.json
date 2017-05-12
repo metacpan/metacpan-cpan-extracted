@@ -1,0 +1,92 @@
+{
+   "abstract" : "a bunch of XS math functions i'm not sure where to shove yet",
+   "author" : [
+      "Christian Walde <walde.christian@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-MITHALDU-XSGrabBag",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Inline::C" : "0.74",
+            "Inline::Module" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "strictures" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::InDistDir" : "0",
+            "Test::More" : "0",
+            "Test::Number::Delta" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::MITHALDU::XSGrabBag" : {
+         "file" : "lib/Acme/MITHALDU/XSGrabBag.pm",
+         "version" : "1.161310"
+      },
+      "Acme::MITHALDU::XSGrabBag::Inline" : {
+         "file" : "lib/Acme/MITHALDU/XSGrabBag/Inline.pm",
+         "version" : "1.161310"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-acme-mithaldu-xsgrabbag at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Acme-MITHALDU-XSGrabBag"
+      },
+      "homepage" : "https://github.com/wchristian/Acme-MITHALDU-XSGrabBag",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wchristian/Acme-MITHALDU-XSGrabBag.git",
+         "web" : "https://github.com/wchristian/Acme-MITHALDU-XSGrabBag"
+      }
+   },
+   "version" : "1.161310"
+}
+

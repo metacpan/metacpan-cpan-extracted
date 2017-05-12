@@ -1,0 +1,232 @@
+PerlLoadModule Apache2::ClickPath
+PerlLoadModule Apache2::ClickPath::Store
+<ClickPathUAExceptions>
+Google     Googlebot
+MSN        msnbot
+Mirago     HeinrichderMiragoRobot blub
+Yahoo      Yahoo-MMCrawler
+Seekbot    Seekbot
+Picsearch  psbot
+Globalspec Ocelli
+Naver      NaverBot
+Turnitin   TurnitinBot
+dir.com    Pompos
+search.ch  search\.ch
+IBM        http://www\.almaden\.ibm\.com/cs/crawler/
+</ClickPathUAExceptions>
+PerlTransHandler Apache2::ClickPath
+ClickPathSessionPrefix "-S:"
+ClickPathMaxSessionAge 5
+PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+<Directory "@ServerRoot@">
+Options Indexes Includes
+</Directory>
+<Directory "@DocumentRoot@/bin">
+Options Indexes Includes ExecCGI
+SetHandler cgi-script
+</Directory>
+LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+
+<VirtualHost Machine>
+<ClickPathUAExceptions>
+Google     Googlebot
+MSN        msnbot
+Mirago     HeinrichderMiragoRobot blub
+Yahoo      Yahoo-MMCrawler
+Seekbot    Seekbot
+Picsearch  psbot
+Globalspec Ocelli
+Naver      NaverBot
+Turnitin   TurnitinBot
+dir.com    Pompos
+search.ch  search\.ch
+IBM        http://www\.almaden\.ibm\.com/cs/crawler/
+</ClickPathUAExceptions>
+PerlTransHandler Apache2::ClickPath
+ClickPathSessionPrefix "-S:"
+ClickPathMaxSessionAge 5
+PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+<Directory "@ServerRoot@">
+Options Indexes Includes
+</Directory>
+<Directory "@DocumentRoot@/bin">
+Options Indexes Includes ExecCGI
+SetHandler cgi-script
+</Directory>
+LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+
+ClickPathMachine test
+</VirtualHost>
+
+<VirtualHost NullMachine>
+<ClickPathUAExceptions>
+Google     Googlebot
+MSN        msnbot
+Mirago     HeinrichderMiragoRobot blub
+Yahoo      Yahoo-MMCrawler
+Seekbot    Seekbot
+Picsearch  psbot
+Globalspec Ocelli
+Naver      NaverBot
+Turnitin   TurnitinBot
+dir.com    Pompos
+search.ch  search\.ch
+IBM        http://www\.almaden\.ibm\.com/cs/crawler/
+</ClickPathUAExceptions>
+PerlTransHandler Apache2::ClickPath
+ClickPathSessionPrefix "-S:"
+ClickPathMaxSessionAge 5
+PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+<Directory "@ServerRoot@">
+Options Indexes Includes
+</Directory>
+<Directory "@DocumentRoot@/bin">
+Options Indexes Includes ExecCGI
+SetHandler cgi-script
+</Directory>
+LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+
+ClickPathMachine
+</VirtualHost>
+
+<VirtualHost UAExceptionsFile>
+<ClickPathUAExceptions>
+Google     Googlebot
+MSN        msnbot
+Mirago     HeinrichderMiragoRobot blub
+Yahoo      Yahoo-MMCrawler
+Seekbot    Seekbot
+Picsearch  psbot
+Globalspec Ocelli
+Naver      NaverBot
+Turnitin   TurnitinBot
+dir.com    Pompos
+search.ch  search\.ch
+IBM        http://www\.almaden\.ibm\.com/cs/crawler/
+</ClickPathUAExceptions>
+PerlTransHandler Apache2::ClickPath
+ClickPathSessionPrefix "-S:"
+ClickPathMaxSessionAge 5
+PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+<Directory "@ServerRoot@">
+Options Indexes Includes
+</Directory>
+<Directory "@DocumentRoot@/bin">
+Options Indexes Includes ExecCGI
+SetHandler cgi-script
+</Directory>
+LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+LogLevel debug
+
+ClickPathUAExceptionsFile "@ServerRoot@/UAExceptions"
+
+ClickPathStoreDirectory "store"
+ClickPathStorePath "/store"
+ClickPathStoreTimeout 2
+ClickPathStoreCleanupInterval 1
+
+KeepAlive On
+KeepAliveTimeout 30
+
+<ClickPathMachineTable>
+localhost A /store
+127.0.0.13 B http://klaus:32810/store
+</ClickPathMachineTable>
+</VirtualHost>
+
+<VirtualHost FriendlySession>
+<ClickPathUAExceptions>
+Google     Googlebot
+MSN        msnbot
+Mirago     HeinrichderMiragoRobot blub
+Yahoo      Yahoo-MMCrawler
+Seekbot    Seekbot
+Picsearch  psbot
+Globalspec Ocelli
+Naver      NaverBot
+Turnitin   TurnitinBot
+dir.com    Pompos
+search.ch  search\.ch
+IBM        http://www\.almaden\.ibm\.com/cs/crawler/
+</ClickPathUAExceptions>
+PerlTransHandler Apache2::ClickPath
+ClickPathSessionPrefix "-S:"
+ClickPathMaxSessionAge 2
+PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+<Directory "@ServerRoot@">
+Options Indexes Includes
+</Directory>
+<Directory "@DocumentRoot@/bin">
+Options Indexes Includes ExecCGI
+SetHandler cgi-script
+</Directory>
+LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+
+<ClickPathFriendlySessions>
+  param.friendly.org   param(ld) param ( id )   f
+  uri.friendly.org     uri(1) uri ( 3 )         u
+  mixed.friendly.org    param(ld) uri ( 3 )     m
+</ClickPathFriendlySessions>
+ClickPathFriendlySessionsFile "@ServerRoot@/FriendlySessions"
+
+<ClickPathMachineTable>
+localhost A
+127.0.0.13 B
+</ClickPathMachineTable>
+</VirtualHost>
+
+<VirtualHost Without_UAExc>
+PerlTransHandler Apache2::ClickPath
+ClickPathSessionPrefix "-S:"
+ClickPathMaxSessionAge 2
+PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+<Directory "@ServerRoot@">
+Options Indexes Includes
+</Directory>
+<Directory "@DocumentRoot@/bin">
+Options Indexes Includes ExecCGI
+SetHandler cgi-script
+</Directory>
+LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+
+<ClickPathMachineTable>
+localhost
+127.0.0.13
+</ClickPathMachineTable>
+</VirtualHost>
+
+<VirtualHost Secret>
+PerlTransHandler Apache2::ClickPath
+ClickPathSessionPrefix "-S:"
+ClickPathMaxSessionAge 5
+ClickPathSecret data:,So%20long%20and%20thanks%20for%20all%20the%20fish
+PerlOutputFilterHandler Apache2::ClickPath::OutputFilter
+<Directory "@ServerRoot@">
+Options Indexes Includes
+</Directory>
+<Directory "@DocumentRoot@/bin">
+Options Indexes Includes ExecCGI
+SetHandler cgi-script
+</Directory>
+LogFormat "%h %l %u %t \"%m %U%q %H\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{SESSION}e\""
+
+<ClickPathMachineTable>
+localhost A /store
+127.0.0.13 B http://klaus:32810/store
+</ClickPathMachineTable>
+
+ClickPathStoreDirectory "store"
+ClickPathStorePath "/store"
+ClickPathStoreTimeout 2
+ClickPathStoreCleanupInterval 1
+
+KeepAlive On
+KeepAliveTimeout 30
+
+<ClickPathFriendlySessions>
+  param.friendly.org   param(ld) param ( id )   f
+  uri.friendly.org     uri(1) uri ( 3 )         u
+  mixed.friendly.org   param(ld) uri ( 3 )      m
+</ClickPathFriendlySessions>
+</VirtualHost>
+

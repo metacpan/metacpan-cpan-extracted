@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+
+# This script creates a Categorizer and runs several of its methods on
+# a corpus, reporting the results.
+#
+# Copyright 2002 Ken Williams, under the same license as the
+# AI::Categorizer distribution.
+
+
+use strict;
+use AI::Categorizer;
+use Benchmark;
+my $HAVE_YAML = eval "use YAML; 1";
+
+my ($opt, $do_stage, $outfile) = parse_command_line(@ARGV);
+@ARGV = grep !/^-\d$/, @ARGV;
+
+my $c = eval {new AI::Categorizer(%$opt)};
+if ($@ and $@ =~ /^The following parameter/) {
+  die "$@\nPlease see the AI::Categorizer documentation for a description of parameters accepted.\n";
+}
+die $@ if $@;
+
+%$do_stage = map {$_, 1} 1..5 unless keys %$do_stage;
+
+my $out_fh;
+if ($outfile) {
+  open $out_fh, ">> $outfile" or die "Can't create $outfile: $!";
+  select((select($out_fh), $|=1)[0]);
+  if (keys(%$do_stage) > 1) {
+    print $out_fh "~~~~~~~~~~~~~~~~", scalar(localtime), "~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    if ($HAVE_YAML) {
+      print {$out_fh} YAML::Dump($c->dump_parameters);
+    } else {
+      warn "More detailed parameter dumping is available if you install the YAML module from CPAN.\n";
+    }
+  }
+}
+  
+
+run_section('scan_features',     1, $do_stage);
+run_section('read_training_set', 2, $do_stage);
+run_section('train',             3, $do_stage);
+run_section('evaluate_test_set', 4, $do_stage);
+if ($do_stage->{5}) {
+  my $result = $c->stats_table;
+  print $result if $c->verbose;
+  print $out_fh $result if $out_fh;
+}
+
+sub run_section {
+  my ($section, $stage, $do_stage) = @_;
+  return unless $do_stage->{$stage};
+  if (keys %$do_stage > 1) {
+    print " % $0 @ARGV -$stage\n" if $c->verbose;
+    die "$0 is not executable, please change its execution permissions"
+      unless -x $0;
+    system($0, @ARGV, "-$stage") == 0
+      or die "$0 returned nonzero status, \$?=$?";
+    return;
+  }
+  my $start = new Benchmark;
+  $c->$section();
+  my $end = new Benchmark;
+  my $summary = timestr(timediff($end, $start));
+  my ($rss, $vsz) = memory_usage();
+  print "$summary (memory: rss=$rss, vsz=$vsz)\n" if $c->verbose;
+  print $out_fh "Stage $stage: $summary (memory: rss=$rss, vsz=$vsz)\n" if $out_fh;
+}
+
+sub parse_command_line {
+  my (%opt, %do_stage);
+
+  while (@_) {
+    if ($_[0] =~ /^-(\d+)$/) {
+      shift;
+      $do_stage{$1} = 1;
+      
+    } elsif ( $_[0] eq '--config_file' ) {
+      die "--config_file requires the YAML module from CPAN to be installed.\n" unless $HAVE_YAML;
+      shift;
+      my $file = shift;
+      my $href = YAML::LoadFile($file);
+      @opt{keys %$href} = values %$href;
+      
+    } elsif ( $_[0] =~ /^--/ ) {
+      my ($k, $v) = (shift, shift);
+      $k =~ s/^--//;
+      $opt{$k} = $v;
+      
+    } else {
+      die usage();
+    }
+  }
+
+  while (my ($k, $v) = each %opt) {
+    # Allow abbreviations
+    if ($k =~ /^(\w+)_class$/) {
+      my $name = $1;
+      $v =~ s/^::/AI::Categorizer::\u${name}::/;
+      $opt{$k} = $v;
+    }
+  }
+
+  my $outfile;
+  unless ($outfile = delete $opt{outfile}) {
+    $outfile = $opt{progress_file} ? "$opt{progress_file}-results.txt" : "results.txt";
+  }
+
+  return (\%opt, \%do_stage, $outfile);
+}
+
+sub usage {
+  return <<EOF;
+ Usage:
+
+  $0 --parameter_1 <value_1> --parameter_2 <value_2>
+      # You may specify a YAML config file as follows:
+  $0 --config_file <path> --parameter_3 <value_3>
+      # Or, to run only step 3 (of 5)
+  $0 --config_file <path> -3
+
+ --parameter_1, --parameter_2, etc. are parameters accepted by
+ AI::Categorizer objects' new() methods.
+
+EOF
+}
+
+sub memory_usage {
+  my ($rss, $vsz);
+  if ($^O eq 'darwin' or $^O eq 'linux') {
+    ($rss, $vsz) = `ps -eo rss,vsz -p $$` =~ /(\d+)\s+(\d+)/;
+  } elsif ($^O eq 'solaris') {
+    ($rss, $vsz) = `ps -o rss,vsz -p $$` =~ /(\d+)\s+(\d+)/;
+  } else {
+    warn "Unknown system, can't get memory usage";
+  }
+  return ($rss, $vsz);
+}

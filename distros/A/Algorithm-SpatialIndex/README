@@ -1,0 +1,91 @@
+NAME
+    Algorithm::SpatialIndex - Flexible 2D spacial indexing
+
+SYNOPSIS
+      use Algorithm::SpatialIndex;
+      my $idx = Algorithm::SpatialIndex->new(
+        strategy    => 'QuadTree', # or others
+        storage     => 'Memory', # or others
+        limit_x_low => -100,
+        limit_x_up  => 100,
+        limit_y_low => -100,
+        limit_y_up  => 100,
+        bucket_size => 100,
+      );
+  
+      # fill (many times with different values):
+      $idx->insert($id, $x, $y);
+  
+      # query
+      my @items = $idx->get_items_in_rect($xlow, $ylow, $xup, $yup);
+      # @items now contains 0 or more array refs [$id, $x, $y]
+
+DESCRIPTION
+    A generic implementation of spatial (2D) indexes with support for
+    pluggable algorithms (henceforth: *strategies*) and storage backends.
+
+    Right now, this package ships with a quad tree implementation
+    (Algorithm::SpatialIndex::Strategy::QuadTree) and an in-memory storage
+    backend (Algorithm::SpatialIndex::Storage::Memory).
+
+    NOTE: This is an experimental release. There must be bugs.
+
+  new
+    Creates a new spatial index. Requires the following parameters:
+
+    strategy
+      The strategy to use. This is the part of the strategy class name after
+      a leading "Algorithm::SpatialIndex::Strategy::".
+
+    storage
+      The storage backend to use. This is the part of the storage class name
+      after a leading "Algorithm::SpatialIndex::Storage::".
+
+    The following parameters are optional:
+
+    limit_x_low limit_x_up limit_y_low limit_y_up
+      The upper/lower limits of the x/y dimensions of the index. Defaults to
+      "[-100, 100]" for both dimensions.
+
+    bucket_size
+      The number of items to store in a single leaf node (bucket). If this
+      number is exceeded by an insertion, the node is split up according to
+      the chosen strategy.
+
+      "bucket_size" defaults to 100.
+
+  insert
+    Insert a new item into the index. Takes the unique item id, an x-, and a
+    y coordinate as arguments.
+
+  get_items_in_rect
+    Given the coordinates of two points that define a rectangle, this method
+    finds all items within that rectangle.
+
+    Returns a list of array references each of which contains the id and
+    coordinates of a single item.
+
+SEE ALSO
+    Algorithm::SpatialIndex::Strategy::MedianQuadTree
+
+    Algorithm::QuadTree
+
+    Tree::M
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 183:
+        You forgot a '=back' before '=head2'
+

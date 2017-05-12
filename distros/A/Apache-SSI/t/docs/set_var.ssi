@@ -1,0 +1,3 @@
+Set one: <!--#set var=one value=hi -->
+Set two: <!--#set var=two value=$one -->
+Echo two: <!--#echo var=two -->

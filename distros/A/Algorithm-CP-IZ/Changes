@@ -1,0 +1,8 @@
+Revision history for Perl extension Algorithm::CP::IZ.
+
+0.02  Mon Nov 07 2015
+	- Change default directories for header and include in Makefile.PL
+	- Avoid error "during global destruction."
+
+0.01  Mon Oct 12 14:31:13 2015
+	- first release;

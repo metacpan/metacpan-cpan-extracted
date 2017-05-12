@@ -1,0 +1,7 @@
+
+ . Adding Documents in CSV format
+ . prepare_commit,  Solr 4.0
+ . whole groups of fields still need to be listed in 'deprecate'
+   or 'ignored' tables.
+ . many pluggable extensions, like spellchecker
+

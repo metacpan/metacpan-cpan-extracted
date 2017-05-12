@@ -1,0 +1,55 @@
+{
+   "abstract" : "CLI to Net::OpenSSH that runs the same command via SSH on many remote servers at the same time",
+   "author" : [
+      "Hunter McMillen <mcmillhj@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-SSH-Cluster",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "MooseX::App::Simple" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Net::OpenSSH::Parallel" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mcmillhj/App-SSH-Cluster/issues"
+      },
+      "homepage" : "https://metacpan.org/release/App-SSH-Cluster",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mcmillhj/App-SSH-Cluster.git",
+         "web" : "http://github.com/mcmillhj/App-SSH-Cluster"
+      }
+   },
+   "version" : "0.004"
+}
+

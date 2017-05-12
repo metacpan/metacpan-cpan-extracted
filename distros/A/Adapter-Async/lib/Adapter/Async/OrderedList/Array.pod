@@ -1,0 +1,63 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Adapter::Async::OrderedList::Array
+at lib/Adapter/Async/OrderedList/Array.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Adapter::Async::OrderedList::Array - arrayref adapter
+
+=head1 VERSION
+
+version 0.018
+
+=head1 DESCRIPTION
+
+See L<Adapter::Async::OrderedList> for the API.
+
+=head1 count
+
+=head1 get
+
+=head2 range
+
+Retrieves all items in a range.
+
+=over 4
+
+=item * start
+
+=item * end
+
+=item * count
+
+=item * on_item
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Adapter::Async::OrderedList>
+
+L<all|Adapter::Async::OrderedList/all>, L<append|Adapter::Async::OrderedList/append>, L<insert|Adapter::Async::OrderedList/insert>, L<pop|Adapter::Async::OrderedList/pop>, L<push|Adapter::Async::OrderedList/push>, L<shift|Adapter::Async::OrderedList/shift>, L<unshift|Adapter::Async::OrderedList/unshift>
+
+=item L<Adapter::Async>
+
+L<bus|Adapter::Async/bus>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2013-2015. Licensed under the same terms as Perl itself.

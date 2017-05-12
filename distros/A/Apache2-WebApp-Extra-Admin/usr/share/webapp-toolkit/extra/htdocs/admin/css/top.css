@@ -1,0 +1,29 @@
+/*
+ *  Apache2::WebApp::Toolkit - Admin Control Panel (top.css)
+ *  Copyright (C) 2010 Marc S. Brooks <mbrooks@cpan.org>
+ *
+ *  Licensed under the terms of the BSD License
+ *  http://www.opensource.org/licenses/bsd-license.php
+ */
+
+/*--------------------------------------------------------------------------*/
+/* defaults - override                                                      */
+
+body {
+	background-color: #CCCCCC;
+	border-bottom: 1px solid #999999;
+	height: 49px;
+	margin: 0px;
+}
+
+#logged {
+	float: right;
+	font-size: 12px;
+	position: relative;
+	right: 20px;
+	top: 16px;
+}
+
+#logged strong {
+	color: #FFFFFF;
+}

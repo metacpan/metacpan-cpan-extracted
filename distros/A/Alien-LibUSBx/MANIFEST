@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+lib/Alien/LibUSBx.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/99-postinstall.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

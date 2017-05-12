@@ -1,0 +1,19 @@
+---
+abstract: 'a awsome module,suck greate fire wall!'
+author:
+  - '舌尖上的牛氓 <yiming.jin@live.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Caoliu
+requires:
+  Mojo: 0
+  Time::HiRes: 0
+  YAML: 0
+version: 1.0

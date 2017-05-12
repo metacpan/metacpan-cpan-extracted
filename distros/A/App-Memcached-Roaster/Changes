@@ -1,0 +1,20 @@
+Revision history for Perl extension App-Memcached-Roaster
+
+v0.2.2 2016-03-22T13:16:59Z
+
+    - Remove FindBin in script for CPAN
+
+2016-03-22 v0.2.1  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Release to CPAN
+
+2016-03-22 v0.2.0  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Provide as a simple random data generator.
+        - Slim up codes and integrate into one module.
+        - Lessen dependency.
+
+2016-03-22 v0.1.0  YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>
+
+    - Initial release
+

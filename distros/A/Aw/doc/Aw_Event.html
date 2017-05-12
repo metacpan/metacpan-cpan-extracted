@@ -1,0 +1,119 @@
+<html>
+<head>
+  <title>Aw::Event</title>
+</head>
+<body bgcolor="#f0f0f0" link="#cc0000" vlink="brown">
+
+<h1><u>Aw::Event</u></h1>
+
+<table width="90%" border=1 bgcolor="#cccc99">
+<tr bgcolor="#bfbfbf"><th>Method</th><th>Arguments</th><th>Return</th><th>Throws<br>Exception</th></tr>
+<tr align="center"><th align="left"><a name="new"></a>new</th><td>( client, event_type_name [ <b>,</b> %data ] )<br><div align="left">Instantiates a new Aw::Event object and sets event fields if a %data of structured data is provided.</div></td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="DESTROY"></a>DESTROY</th><td>( )</td><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="clear"></a>clear</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="clearField"></a>clearField</th><td>( field_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="fromBinData"></a>fromBinData</th><td>( client, data, size )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getBaseName"></a>getBaseName</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getBooleanField"></a>getBooleanField</th><td>( field_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getBooleanSeqField"></a>getBooleanSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getByteField"></a>getByteField</th><td>( field_name )</td><td>Byte</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getByteSeqField"></a>getByteSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Byte</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getCharField"></a>getCharField</th><td>( field_name )</td><td>Char</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getCharSeqField"></a>getCharSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Char</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getClient"></a>getClient</th><td>( )</td><td>Aw::Client</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getDateField"></a>getDateField</th><td>( field_name )</td><td>Aw::Date</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getDateSeqField"></a>getDateSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Aw::Date</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getDoubleField"></a>getDoubleField</th><td>( field_name )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getDoubleSeqField"></a>getDoubleSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Double</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getEventId"></a>getEventId</th><td>( )</td><td>CORBA::LongLong</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getFamilyName"></a>getFamilyName</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getField"></a>getField</th><td>( field_name )</td><td>[$ | @ | %]</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getFieldNames"></a>getFieldNames</th><td>( [ field_name ] )</td><td>@&lt;field_name&gt;</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getFieldType"></a>getFieldType</th><td>( field_name )</td><td>Type Id</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getFloatField"></a>getFloatField</th><td>( field_name )</td><td>Number.Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getFloatSeqField"></a>getFloatSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Float</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getIntegerField"></a>getIntegerField</th><td>( field_name )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getIntegerSeqField"></a>getIntegerSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Integer</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getLongField"></a>getLongField</th><td>( field_name )</td><td>CORBA::LongLong</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getLongSeqField"></a>getLongSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Corba::LongLong</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getPublishSequenceNumber"></a>getPublishSequenceNumber</th><td>( )</td><td>CORBA::LongLong</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getReceiptSequenceNumber"></a>getReceiptSequenceNumber</th><td>( )</td><td>CORBA::LongLong</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getScopeName"></a>getScopeName</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getSequenceField"></a>getSequenceField</th><td>( field_name [, offset [, max_n] ] )</td><td>@&lt;field_name&gt;</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSequenceFieldSize"></a>getSequenceFieldSize</th><td>( field_name )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getShortField"></a>getShortField</th><td>( field_name )</td><td>Type Id</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getShortSeqField"></a>getShortSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Short</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getStringField"></a>getStringField</th><td>( field_name )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getStringSeqField"></a>getStringSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getStructFieldAsEvent"></a>getStructFieldAsEvent</th><td>( field_name )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getStructFieldAsHash"></a>getStructFieldAsHash</th><td>( field_name )</td><td>Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getStructSeqFieldAsEvents"></a>getStructSeqFieldAsEvents</th><td>( field_name [, [offset [, max_n] ])</td><td>@Aw::Event</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getSubscriptionIds"></a>getSubscriptionIds</th><td>( )</td><td>@Aw::Subscription</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTag"></a>getTag</th><td>( )</td><td>Number</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTypeDef"></a>getTypeDef</th><td>( )</td><td>Aw::TypeDef</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTypeDefFieldNames"></a>getTypeDefFieldNames</th><td>( [ field_name ] )</td><td>@&lt;field_name&gt;</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getTypeName"></a>getTypeName</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getUCCharField"></a>getUCCharField</th><td>( field_name )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getUCCharSeqField"></a>getUCCharSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@Char::UTF8</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getUCStringField"></a>getUCStringField</th><td>( field_name )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="getUCStringSeqField"></a>getUCStringSeqField</th><td>( field_name [, offset [, max_n] ] )</td><td>@String::UTF8</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="init"></a>init</th><td>( %data  )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="isAckReply"></a>isAckReply</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="isErrorReply"></a>isErrorReply</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="isFieldSet"></a>isFieldSet</th><td>( field_name )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="isLastReply"></a>isLastReply</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="isNullReply"></a>isNullReply</th><td>( )</td><td>Boolean</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setBooleanField"></a>setBooleanField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setBooleanSeqField"></a>setBooleanSeqField</th><td>( field_name, @Boolean )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setByteField"></a>setByteField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setByteSeqField"></a>setByteSeqField</th><td>( field_name, @Byte )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setCharField"></a>setCharField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setCharSeqField"></a>setCharSeqField</th><td>( field_name, @Boolean )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setDateField"></a>setDateField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setDateSeqField"></a>setDateSeqField</th><td>( field_name, @Aw::Date )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setDoubleField"></a>setDoubleField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setDoubleSeqField"></a>setDoubleSeqField</th><td>( field_name, @Double )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setField"></a>setField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setFloatField"></a>setFloatField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setFloatSeqField"></a>setFloatSeqField</th><td>( field_name, @Float )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setIntegerField"></a>setIntegerField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setIntegerSeqField"></a>setIntegerSeqField</th><td>( field_name, @Integer )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setLongField"></a>setLongField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setLongSeqField"></a>setLongSeqField</th><td>( field_name, @Corba::LongLong )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setPublishSequenceNumber"></a>setPublishSequenceNumber</th><td>( seqn )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setSequenceField"></a>setSequenceField</th><td>( field_name, [ src_offset [, dest_offset,] ] @&lt;field_type&gt; )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setSequenceFieldSize"></a>setSequenceFieldSize</th><td>( field_name, size )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setShortField"></a>setShortField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setShortSeqField"></a>setShortSeqField</th><td>( field_name, @Short )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setStringField"></a>setStringField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setStringFieldToSubstring"></a>setStringFieldToSubstring</th><td>( field_name, char_offset, nc, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setStringSeqField"></a>setStringSeqField</th><td>( field_name, @String )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setStructFieldFromEvent"></a>setStructFieldFromEvent</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setStructSeqFieldFromEvents"></a>setStructSeqFieldFromEvents</th><td>( field_name, src_offset, dest_offset, @Aw::Event )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setTag"></a>setTag</th><td>( tag )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setUCCharField"></a>setUCCharField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setUCCharSeqField"></a>setUCCharSeqField</th><td>( field_name, @Char::UTF8 )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setUCStringField"></a>setUCStringField</th><td>( field_name, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setUCStringFieldToSubstring"></a>setUCStringFieldToSubstring</th><td>( field_name, char_offset, nc, value )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="setUCStringSeqField"></a>setUCStringSeqField</th><td>( field_name, @String::UTF8 )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="stringFromANSI"></a>stringFromANSI</th><td>( string )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="stringToANSI"></a>stringToANSI</th><td>( utf8String)</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="toBinData"></a>toBinData</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="toFormattedString"></a>toFormattedString</th><td>( format_string )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="toHash"></a>toHash</th><td>( )</td><td>%Hash</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="toString"></a>toString</th><td>( )</td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="validate"></a>validate</th><td>( client )</td><td>Boolean</td><td>YES</td></tr>
+<tr bgcolor="#bfbfbf" align="left"><th colspan=4>Inherited Methods</th></tr>
+<tr align="center"><th align="left"><a name="err"></a>err</th><td>( )</td><td>Boolean</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="errmsg"></a>errmsg</th><td>( )</td><td>String</td><td>YES</td></tr>
+<tr align="center"><th align="left"><a name="error"></a>error</th><td>( )</td><td>Aw::Error</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="hello"></a>hello</th><td>( )<br><div align="left">Returns the string "hello".  Useful for debugging.</div></td><td>String</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="getWarn"></a>getWarn</th><td>( )<br><div align="left">Returns current warn <b><code>level</code></b>.</div></th><td>Number</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="setWarn"></a>setWarn</th><td>( level )<br><div align="left">Sets new warn <b><code>level</code></b>.<dir>0 : No warnings (quiet mode)<br>1 : Terse (uses awErrorToString)<br>2 : Verbose (uses awErrorToCompleteString)</dir>The Aw extensions must be compiled with AWXS_WARNS defined.</div></th><td>void</td><td>NO</td></tr>
+<tr align="center"><th align="left"><a name="warn"></a>warn</th><td>( [string] )<br><div align="left">Warn message is <b><code>string</code></b> if passed, otherwise current err is converted to string.</div></th><td>void</td><td>YES</td></tr>
+</table>
+
+<p><hr size=3 noshade>
+
+</body>
+</html>

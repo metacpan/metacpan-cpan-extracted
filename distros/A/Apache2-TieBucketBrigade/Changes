@@ -1,0 +1,19 @@
+Revision history for Perl extension Apache2::TieBucketBrigade.
+0.07  Wed Aug  3 15:11:00 2005
+        - changed to Apache2 namespace
+        - fixed READ support
+        - fixed many bugs
+
+0.05  Fri Sep 10 17:12:21 2004
+        - support for polling and select proxying
+
+0.03  Wed Feb 18 02:59:18 2004
+        - changed autoflush and blocking implementation to not spit warnings
+
+0.02  Mon Feb 16 01:53:07 2004
+        - minor doc fixes
+
+0.01  Sun Feb  8 21:19:28 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.1 -n Apache::TieBucketBrigade
+

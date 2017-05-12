@@ -1,0 +1,67 @@
+NAME
+    Authen::Simple - Simple Authentication
+
+SYNOPSIS
+        use Authen::Simple;
+        use Authen::Simple::Kerberos;
+        use Authen::Simple::SMB;
+
+        my $simple = Authen::Simple->new(
+            Authen::Simple::Kerberos->new( realm => 'REALM.COMPANY.COM' ),
+            Authen::Simple::SMB->new( domain => 'DOMAIN', pdc => 'PDC' )
+        );
+    
+        if ( $simple->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+
+DESCRIPTION
+    Simple and consistent framework for authentication.
+
+METHODS
+    *   new
+
+        This method takes an array of "Authen::Simple" adapters. Required.
+
+    *   authenticate( $username, $password )
+
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple::ActiveDirectory.
+
+    Authen::Simple::CDBI.
+
+    Authen::Simple::DBI.
+
+    Authen::Simple::FTP.
+
+    Authen::Simple::HTTP.
+
+    Authen::Simple::Kerberos.
+
+    Authen::Simple::LDAP.
+
+    Authen::Simple::NIS.
+
+    Authen::Simple::PAM.
+
+    Authen::Simple::Passwd.
+
+    Authen::Simple::POP3.
+
+    Authen::Simple::RADIUS.
+
+    Authen::Simple::SMB.
+
+    Authen::Simple::SMTP.
+
+    Authen::Simple::SSH.
+
+AUTHOR
+    Christian Hansen "chansen@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

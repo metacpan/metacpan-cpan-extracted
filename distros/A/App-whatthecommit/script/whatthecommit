@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use App::whatthecommit qw(goodie);
+
+&help if ( $ARGV[0] eq "help" or $ARGV[0] eq "--help" or !$ARGV[0] );
+
+goodie($_) for @ARGV;
+
+sub help {
+    print
+        "Syntax: $0 [git-repo] [another-git-repo] [another-one-git-repo]\n\tAttention: it will overwrite your existing pre-commit-msg hook\n\n";
+    print
+        "App::whatthecommit is just another lazy-to-lazy line command utility. \n\twhatthecommit.com generates commit messages for the lazy,\n\tthis tool will increment your lazyness to another level,\n\tjust give your git repo(s) as args and he will create prepare-commit-msg hook to fetch a random commit.\n";
+    exit 1;
+}

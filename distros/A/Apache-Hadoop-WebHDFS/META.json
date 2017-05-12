@@ -1,0 +1,52 @@
+{
+   "abstract" : "interface to Hadoop's WebHDS API that supports GSSAPI/SPNEGO (secure) access.",
+   "author" : [
+      "Adam Faris <apache-hadoop-webhdfs@mekanix.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Apache-Hadoop-WebHDFS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Map" : "0",
+            "LWP::Authen::Negotiate" : "0",
+            "LWP::Debug" : "0",
+            "WWW::Mechanize" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Apache::Hadoop::WebHDFS" : {
+         "file" : "lib/Apache/Hadoop/WebHDFS.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ]
+   },
+   "version" : "0.04"
+}

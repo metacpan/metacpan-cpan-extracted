@@ -1,0 +1,26 @@
+NAME
+    Archive::Any::Plugin::Rar - Archive::Any wrapper around Archive::Rar
+
+SYNOPSIS
+    Do not use this module directly. Instead, use Archive::Any.
+
+SEE ALSO
+    Archive::Any, Archive::Rar
+
+AUTHOR
+    Dmitriy V. Simonov, "<dsimonov at gmail.com>"
+
+ACKNOWLEDGEMENTS
+    Thanks to Clint Moore for Archive::Any
+
+    Thanks to "<d_ion at mail.ru>" for minor fix
+
+    Thanks to "<ksuri at cpan.org>" for major fix
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Dmitriy V. Simonov.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+

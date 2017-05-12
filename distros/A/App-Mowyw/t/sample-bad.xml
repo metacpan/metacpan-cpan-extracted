@@ -1,0 +1,10 @@
+<root>
+  <item>
+    <foo>bar1</foo>
+    <baz>quox1</baz>
+  </item>
+  <blerk>
+    <foo>bar1</foo>
+    <baz>quox1</baz>
+  </blerk>
+</root>

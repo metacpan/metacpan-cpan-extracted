@@ -1,0 +1,199 @@
+---
+abstract: 'KeePass2 commandline tools'
+author:
+  - 'celogeek <me@celogeek.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::More: 0.94
+  perl: 5.004
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-KeePass2
+requires:
+  Carp: 0
+  Data::Printer: 0
+  File::KeePass: 0
+  IO::Prompt: 0
+  Moo: 0
+  Moo::Role: 0
+  MooX::Options: 0
+  feature: 0
+  perl: 5.010
+  strict: 0
+  utf8::all: 0
+  warnings: 0
+resources:
+  bugtracker: https://tasks.celogeek.com/projects/app-keepass2/issues
+  homepage: https://tasks.celogeek.com/projects/app-keepass2
+  repository: git://github.com/celogeek/App-KeePass2.git
+version: 0.04
+x_Dist_Zilla:
+  perl:
+    version: 5.016003
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@GRS/@Filter/GatherDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@GRS/@Filter/PruneCruft'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@GRS/@Filter/ManifestSkip'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@GRS/@Filter/MetaYAML'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@GRS/@Filter/License'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@GRS/@Filter/Readme'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@GRS/@Filter/ExtraTests'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@GRS/@Filter/ExecDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@GRS/@Filter/ShareDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@GRS/@Filter/Manifest'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@GRS/@Filter/TestRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@GRS/@Filter/ConfirmRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@GRS/ModuleBuild'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ReportVersions
+      name: '@GRS/ReportVersions'
+      version: 1.110730
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@GRS/OurPkgVersion'
+      version: 0.004000
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: '@GRS/Prepender'
+      version: 1.112280
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@GRS/AutoPrereqs'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: '@GRS/Prereqs'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@GRS/MinimumPerl'
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: '@GRS/Test::Compile'
+      version: 2.002
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@GRS/Test::UnusedVars'
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@GRS/PodCoverageTests'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@GRS/PruneFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+      name: '@GRS/ReadmeMarkdownFromPod'
+      version: 0.120120
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@GRS/MetaJSON'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaResourcesFromGit
+      name: '@GRS/MetaResourcesFromGit'
+      version: 1.103620
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@GRS/MetaConfig'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@GRS/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::PerlTidy
+      name: '@GRS/PerlTidy'
+      version: 0.13
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@GRS/Test::Perl::Critic'
+      version: 2.112410
+    -
+      class: Dist::Zilla::Plugin::MetaResourcesFromGit
+      name: MetaResourcesFromGit
+      version: 1.103620
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300034
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300034

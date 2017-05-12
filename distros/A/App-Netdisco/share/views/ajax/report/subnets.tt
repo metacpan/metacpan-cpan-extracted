@@ -1,0 +1,32 @@
+[% USE Number.Format %]
+<table id="data-table" class="table table-bordered table-condensed table-hover" width="100%" cellspacing="0">
+  <thead>
+    <tr>
+      <th class="nd_center-cell">Subnet</th>
+      <th class="nd_center-cell">Size</th>
+      <th class="nd_center-cell">Number of Active Nodes</th>
+      <th class="nd_center-cell">Percent Utilization</th>
+    </tr>
+  </thead>
+  </tbody>
+    [% FOREACH row IN results %]
+    <tr>
+      <td class="nd_center-cell"><a href="[% uri_for('/report/ipinventory') %]?subnet=[% row.subnet | uri %]&daterange=[% params.daterange | uri %]&age_invert=[% params.age_invert | uri %]&limit=[% row.subnet_size | uri %]">
+               [% row.subnet | html_entity %]</a></td>
+      <td class="nd_center-cell">[% row.subnet_size | format_number %]</td>
+      <td class="nd_center-cell">[% row.active | format_number %]</td>
+      <td class="nd_center-cell">[% row.percent | html_entity %]</td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+
+<script>
+$(document).ready(function() {
+  $('#data-table').dataTable({
+    "order": [[ 3, 'desc' ]],
+[% INCLUDE 'ajax/datatabledefaults.tt' -%]
+  } );
+} );
+</script>
+

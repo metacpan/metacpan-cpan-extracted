@@ -1,0 +1,223 @@
+Please remember to BACK UP YOUR FILES before attempting to run migration
+scripts.
+=============================================================
+Migration from 1.11 to 1.12
+
+1. It is important to note that if PageKit runs in a perl 5.6.x environment
+	all internal pages are in default_output_charset. For perl 5.8.x
+	all these pages are in perl's own unicode format. This change should
+	be transparent to the user but many libraries do not support perl's
+	new character handling.
+
+=============================================================
+Migration from 1.10 to 1.11
+
+=============================================================
+Migration from 1.09 to 1.10
+
+=============================================================
+Migration from 1.08 to 1.09
+
+1. Static pages can be protected with the reqire_login attribute in the
+	Config.xml page and section tags. This is enabled by default.
+        If you want backward compatible or you do not want to protect
+        static pages, set the global option protect_static="no".
+
+=============================================================
+Migration from 1.07 to 1.08
+
+1. Remember that you need libxml2 >= 2.4.10, libxslt >= 1.0.9,
+	XML::LibXML >= 1.31 and XML::LibXSLT >= 1.31
+
+2. Apache::SessionX replaces Apache::PageKit::Session.
+	For now you can also choose your Session-Toolkit with
+        the global config options:
+
+        session_class = 'Apache::PageKit::Session' and
+        page_session_class = 'Apache::PageKit::Session'
+
+	this settings choose the old Session class, but the old class
+	might go away in the future.
+
+3. inside the hook pkit_cleanup_code it is impossible to use $model->session
+	and $model->page_session. They are already deleted. If you have to use
+        one of the session objects that late, use pkit_post_common_code. 
+
+=============================================================
+Migration from 1.06 to 1.07
+
+1. The returncode from your pagecode is now ignored. If you have to set such
+	a code, see $model->pkit_status_code;.
+
+=============================================================
+Migration from 1.05 to 1.06
+
+1. __PACKAGE__ is not interpolated run
+2. The PKIT_COMPONENT tag did NOT support a single unnamed parameter anymore.
+
+	<PKIT_COMPONENT filexx>
+
+        changed to
+
+        <PKIT_COMPONENT NAME="filexx"/>
+
+3. Digest::MD5->md5_hex changed to Digest::MD5::md5_hex in Common.pm
+4. MD5->hexhash changed to Digest::MD5::md5_hex in MyModel.pm
+5. Remove some possible "use undefined" warnings
+6. Write "use Digest::MD5 ();" before "use DBI;"
+
+run
+migration/migrate_pagekit_1.05_to_1.06.pl /path/to/pagekit_root
+
+=============================================================
+Migration from 1.04 to 1.05
+
+1. pkit_done parameter is no longer automatically filled in HTML
+	Forms.  So if you have HTML code that looks like this:
+
+	<input type="hidden" name="pkit_done">
+
+	Change to
+
+	<input type="hidden" name="pkit_done"
+		value="<MODEL_VAR NAME="pkit_done">">
+
+=============================================================
+Migration from 1.02 to 1.03
+
+1. XSL files are now located in View/pkit_view directory instead of
+	View/pkit_view/XSL.  Simply move all files out of the XSL
+	directories into their parent directiories.  If you don't have
+	any XSL files, skip this step.
+
+=============================================================
+Migration from 0.99 to 1.00
+
+1. Several of the <PKIT_*> tags have changed.  To update the templates
+run
+migration/migrate_pagekit_0.99_to_1.00.pl /path/to/pagekit_root
+
+=============================================================
+Migration from 0.98 to 0.99
+
+1. The View/Component and View/Page directories have merged into one
+directory under View.  To merge the templates, run
+migration/migrate_pagekit_0.98_to_0.99.pl
+
+2. <PKIT_VAR NAME="SELFURL"> has been changed to <PKIT_SELFURL>
+You can apply this change easily by running from the View directory:
+
+cd /path/to/pagekitroot/View
+perl -pi -e 's!<PKIT_VAR +NAME *= *"?SELFURL"? *>!<PKIT_SELFURL>!gi' \
+	`find . -name "*.tmpl"`
+
+3. $model->input_param has been changed to $model->input for getting
+	request parameters and $model->fillinform for filling in HTML forms
+	and $model->pnotes for passing around data between different handlers
+
+	$model->output_param has been changed to $model->output
+
+4. $model->input_param('pkit_user') and $model->output_param('pkit_user')
+	is no longer set by authentication code.  Instead, set
+	$model->pnotes(pkit_user => $pkit_user) in your
+	pkit_auth_session_key in your model code and use
+	$model->pnotes('pkit_user') to access the set value
+
+=============================================================
+Migration from 0.97 to 0.98
+
+1. Apache::PageKit::Error has been renamed to Apache::ErrorReport
+If you use PerlSetVar PKIT_ERROR_HANDLER anywhere in your httpd.conf
+file, you should change it to PerlSetVar ErrorReportHandler
+
+You can do this easily by running:
+
+perl -pi -e 's/PerlSetVar PKIT_ERROR_HANDLER/PerlSetVar ErrorReportHandler/g' httpd.conf
+
+Also if you include Apache::PageKit::Error in your httpd.conf run:
+
+perl -pi -e 's/PerlModule Apache::PageKit::Error/PerlModule Apache::ErrorReport/g' httpd.conf
+
+=============================================================
+Migration from 0.96 to 0.97
+
+1. The DTD for the Config file is now PageKit_Config-0.97.dtd.  You
+should update Config/Config.xml to reflect this and copy
+PageKit_Config-0.97.dtd into the Config directory.
+
+2. Support for navigation bars has been removed.  If you had been using
+them, please contact me and I will help you work around this.  If there
+is sufficient demand, I will try to implement navigation bars again in a more
+clean and robust manner (XPointers in Content XML files, with hooks in
+Model code??).  Note that these template variable will no longer work:
+<PKIT_LOOP NAME="BREAD_CRUMB"> and <PKIT_VAR NAME="LAST_CRUMB">.  However,
+it is recommended that you keep the parent_id in your Config.xml file, as
+this might be used in the future.
+
+3. $model->content_param no longer works, since content is now compiled into
+the template and it is not possible to get or set the tags run time.
+Instead you can simply place <MODEL_VAR> tags into the content and set
+them from the model.
+
+4. <PKIT_VAR NAME="LOGINOUT_LINK"> has been removed since
+it isn't really elegant and can easily be replaced.  To replace, use
+something like:
+
+<MODEL_IF NAME="PKIT_USER">
+	<a href="/login_page?pkit_done=http://yoursite/page_to_view_after_login">Log In</a>
+<MODEL_ELSE>
+	<a href="<PKIT_VAR NAME="SELFURL">pkit_logout=1">Log Out</a>
+</MODEL_IF>
+
+5. The content part of pagekit has been rewritten from the
+ground up.  You should use the included migrate_pagekit_0.96_to_0.97.pl
+file to update your content file.
+
+*********NOTE that this doesn't seem to work with CDATA sections - I'm not
+sure why - if you figure why, let me know.  Otherwise, just do what I did,
+convert this CDATA sections to PCDATA, escaping any <, >, and & characters
+along the way.
+
+6. The html_clean_level option has been moved
+from the Global section to the Server section of the
+configuration file.  If you have specifed the 'html_clean_level'
+option in your Config.xml file, you
+have to move the attribute(s) from the <GLOBAL> tag to
+<SERVER> tag.
+
+7. Login code has been rewriten.  To login, you must set the 'pkit_login'
+to a true value.  In addition, the 'new_credential' option is no longer
+supported.  Instead, you should make sure that 'require_login' is set to
+'no' and perform a pkit_redirect in the model code to a URL that logs
+the user in.  See newacct2 in eg/Model/MyPageKit/MyModel.pm for an
+example of how this should work.  In addition, you must rewrite
+pkit_auth_credential to take the credentials from the input_param method.
+
+8. <PKIT_COMPONENT> can no longer be set dynamically.  If you were using
+this feature, please contact me and I'll see what I can do.  If there is
+sufficient demand, I will put support for this back in.
+
+=============================================================
+Migration from 0.94 to 0.95
+
+1. A couple of new configuration options have been added to
+Config/Config.xml.
+
+You should replace the Config/Config.dtd file in your Pagekit directory
+with the Config.dtd contained in the eg/ directory of your distribution
+to reflect this change.
+
+==============================================================
+Migration from 0.93 to 0.94
+
+1. MyPageKit has been replaced with MyPageKit::Model.
+
+To update rename MyPageKit to MyPageKit::Model and rename
+auth_credential and auth_session_key to pkit_auth_credential and
+pkit_session_credential.  Modify methods to take $model as
+first argument instead of $pk.
+
+Also, replace handler with pkit_dbi_connect, pkit_session_setup,
+and pkit_common_code.  See the code in eg/Model/MyPageKit/Common.pm
+for an example of how to do this.
+

@@ -1,0 +1,42 @@
+<h3 align="center">Edit content for site <: $site_name :>, design <: $design_name :></h3>
+<form name="<: $context :>_content_form" id="<: $context :>_content_form" action="" method="post" onSubmit="return <: $context :>_content_onsubmit()">
+<table align="center">
+<tr>
+<td align="center" colspan="3"><div id="<: $context :>_content_message_div"></div></td>
+</tr>
+<tr>
+<td>Page name:</td>
+<td align="left" colspan="2"><: $page_name :></td>
+</tr>
+<tr>
+<td>Homepage?</td>
+<td align="left" colspan="2"><div id="<: $context :>_content_homepage_div"></div></td>
+</tr>
+<tr>
+<td valign="top">Head content:</td>
+<td colspan="2"><textarea name="head_text" id="head_text" rows="4" cols="100"><: $head_text :></textarea></td>
+</tr>
+<tr>
+<td valign="top">Body content:</td>
+<td colspan="2"><textarea name="body_text" id="body_text" rows="12" cols="100"><: $body_text :></textarea></td>
+</tr>
+<tr>
+<td></td>
+<td><input type="reset" value="Reset" /></td>
+<td align="center"><input type="submit" name="submit_<: $context :>_content" id="submit_<: $context :>_content" value="<: $submit_text :>" onClick="document.<: $context :>_content_form.action.value=1" /></td>
+</tr>
+<tr><td colspan="3"><hr /></td></tr>
+<tr>
+<td></td>
+: if $backup {
+<td><input type="submit" name="submit_backup_content" id="submit_backup_content" value="Backup" onClick="document.<: $context :>_content_form.action.value=2" /></td>
+: }
+: else {
+: }
+<td align="center" colspan="$colspan"><input type="submit" name="submit_generate_content" id="submit_generate_content" value="Generate" onClick="document.<: $context :>_content_form.action.value=3" /></td>
+</tr>
+</table>
+
+<input type="hidden" name="action" id="action" value="0" />
+<input type="hidden" name="sid" id="sid" value="<: $sid :>" />
+</form>

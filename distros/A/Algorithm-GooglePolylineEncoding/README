@@ -1,0 +1,18 @@
+Algorithm::GooglePolylineEncoding
+=================================
+
+Implementation of Google's encoded polyline algorithm format. This
+format is for example used in the Google Static Maps API.
+
+INSTALLATION
+
+With a modern CPAN.pm ($CPAN::VERSION >= 1.88_55) just do:
+
+   cpan .
+
+Or build and install manually by using the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+use App::LedgerSMB::Admin;
+use App::LedgerSMB::Admin::Database;
+
+use Getopt::Long;
+
+my $helpmsg = qq|
+lsmb_reload: Reload a LedgerSMB Database
+
+   lsmb_reload [options]
+
+The following options are supported:
+
+   --help                   Print this message and exit
+   --host hostname          Database Host
+   --path /example/path     Path to LedgerSMB installation (required)
+   --chart us/chart/General Chart of Accounts path (relative to sql)
+   --gifi  ca/gifi/General  Path to GIFI
+   --port 5432              Database Poart
+   --dbname database        Create db with the following name (required)
+   --username postgres      Database Superuser to Log In As
+   --prompt-password        Prompt for Password (can use PGPASSWORD instead)
+|;
+
+my ($all, $help, $host, $port, $path, $dbname, $username, $promptpasswd,
+  $chart, $gifi);
+
+GetOptions('all'               => \$all,
+           'help'              => \$help,
+           'chart=s'           => \$chart,
+           'gifi=s'            => \$gifi,
+           'host=s'            => \$host,
+           'port=s'            => \$port,
+           'username=s'        => \$username, 
+           'prompt-password'   => \$promptpasswd,
+           'path=s'            => \$path,
+           'dbname=s'          => \$dbname
+);
+
+if ($help or !$dbname){
+   print $helpmsg;
+   exit 0;
+}
+
+my $passwd;
+if ($promptpasswd){
+   print "Password: ";
+   $passwd = <>;
+}
+
+$username ||= 'postgres';
+
+open(LSMB, '<', "$path/LedgerSMB.pm") or 
+open(LSMB, '<', "$path/lib/LedgerSMB.pm") or die 'Bad LedgerSMB path';
+($line) = grep {$_ =~ /^\s*our\s+\$VERSION/} <LSMB>;
+$line =~ /(\d+\.\d+)/;
+my $major = $1;
+$lsmbversion->{$major} = $major;
+App::LedgerSMB::Admin->add_paths($major => $path);
+close LSMB;
+
+
+## set up db connection
+
+my $db = App::LedgerSMB::Admin::Database->new(
+   host     => $host,
+   port     => $port,
+   username => $username,
+   password => $password,
+   dbname   => $dbname,
+);
+
+## do the actual work
+
+$db->create;
+$db->load($major);
+$chart =~ s/\.sql$// if $chart;
+$gifi =~ s/\.sql$// if $gifi ;
+$db->run_file("$path/sql/$chart.sql") if $chart;
+$db->run_file("$path/sql/$gifi.sql") if $gifi;
+
+exit 0;
+1;

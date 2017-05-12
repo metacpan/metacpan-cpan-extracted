@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               App-Prove-RunScripts
+version:            0.05
+abstract:           Run scripts around a TAP harness.
+author:
+    - Yoshihiro Sasaki <ysasaki at cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Method::Modifiers:  1.08
+    parent:               0
+resources:
+    bugtracker:  https://github.com/ysasaki/p5-app-prove-runscripts/issues
+    license:     http://dev.perl.org/licenses/
+    repository:  git://github.com/ysasaki/p5-app-prove-runscripts.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

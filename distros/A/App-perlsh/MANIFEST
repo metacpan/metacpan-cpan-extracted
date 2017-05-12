@@ -1,0 +1,13 @@
+bin/perlsh
+Build.PL
+Changes
+lib/App/perlsh.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01repl.t
+t/99pod.t

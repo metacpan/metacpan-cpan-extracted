@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/App/Install.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/app-install.t
+examples/install.pl
+examples/MyAppInstall.pm
+examples/templates/foo.tmpl
+examples/templates/bar.tmpl

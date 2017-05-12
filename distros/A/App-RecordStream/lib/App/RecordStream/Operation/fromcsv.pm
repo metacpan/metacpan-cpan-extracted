@@ -1,0 +1,157 @@
+package App::RecordStream::Operation::fromcsv;
+
+our $VERSION = "4.0.22";
+
+use strict;
+
+use base qw(App::RecordStream::Operation);
+
+use Text::CSV;
+
+sub init {
+  my $this = shift;
+  my $args = shift;
+
+  my @fields;
+  my $header_line = undef;
+  my $strict = 0;
+  my $delim  = ',';
+  my $escape = '"';
+  my $quote  = '"';
+
+  my $spec = {
+    "keys|k|field|f=s" => sub { push @fields, split(/,/, $_[1]); },
+    "header"           => \$header_line,
+    "strict"           => \$strict,
+    "delim|d=s"        => \$delim,
+    "escape=s"         => \$escape,
+    "quote=s"          => \$quote,
+  };
+
+  $this->parse_options($args, $spec);
+
+  die "Delimiter must be a single character\n\n"
+    unless length $delim == 1;
+
+  my $csv_args = {
+    binary      => 1,
+    eol         => $/,
+    sep_char    => $delim,
+    escape_char => $escape,
+
+    # Text::CSV wants undef, but it's easier to pass the empty string at the shell.
+    quote_char  => ($quote eq '' ? undef : $quote),
+  };
+
+  if ( !$strict ) {
+    $csv_args->{'allow_whitespace'}    = 1;
+    $csv_args->{'allow_loose_quotes'}  = 1;
+    $csv_args->{'allow_loose_escapes'} = 1;
+  }
+
+  $this->{'FIELDS'}      = \@fields;
+  $this->{'HEADER_LINE'} = $header_line;
+  $this->{'PARSER'}      = new Text::CSV($csv_args);
+  $this->{'EXTRA_ARGS'}  = $args;
+}
+
+sub wants_input {
+  return 0;
+}
+
+sub stream_done {
+  my $this = shift;
+
+  my $files = $this->{'EXTRA_ARGS'};
+
+  if ( scalar @$files > 0 ) {
+    foreach my $file ( @$files ) {
+      $this->update_current_filename($file);
+
+      open(my $fh, '<', $file) or die "Could not open file: $!\n";
+      $this->get_records_from_handle($fh);
+      close $fh;
+    }
+  }
+  else {
+    $this->get_records_from_handle(\*STDIN);
+  }
+}
+
+sub get_records_from_handle {
+  my ($this, $handle) = @_;
+
+  my $parser     = $this->{'PARSER'};
+  my $do_headers = $this->{'HEADER_LINE'};
+  my @fields     = @{ $this->{'FIELDS'} };
+
+  while(my $row = $parser->getline($handle)) {
+    if ( $do_headers ) {
+      push @fields, @$row;
+      $do_headers = 0;
+      next;
+    }
+
+    my @values = @$row;
+
+    my $record = App::RecordStream::Record->new();
+    for(my $i = 0; $i < @values; ++$i) {
+      my $key = $fields[$i] || $i;
+      ${$record->guess_key_from_spec($key)} = $values[$i];
+    }
+    $this->push_record($record);
+  }
+
+  # Parsing was a success only if we reached EOF and we got no error.  Code
+  # 2012 is used by Text::CSV_XS for normal EOF condition.
+  my ($code, $msg, $pos) = $parser->error_diag;
+  unless ($parser->eof and ($code == 0 or $code == 2012)) {
+      my ($line, $file) = ($., $this->get_current_filename);
+      die "fromcsv: parse error: $msg ($code)",
+          ", roughly at position $pos, line $line, file $file\n";
+  }
+}
+
+sub add_help_types {
+  my $this = shift;
+  $this->use_help_type('keyspecs');
+}
+
+sub usage
+{
+  my $this = shift;
+
+  my $options = [
+    [ 'key|k <keys>', 'Comma separated list of field names.  May be specified multiple times, may be key specs' ],
+    [ 'header', 'Take field names from the first line of input' ],
+    [ 'strict', 'Do not trim whitespaces, allow loose quoting (quotes inside quotes), or allow the use of escape characters when not strictly needed.  (not recommended, for most cases, though may help with parsing quoted fields containing newlines)' ],
+    [ 'delim|-d <character>', "Field delimiter to use when reading input lines (default ',')."],
+    [ 'escape <character>', "Escape character used in quoted fields (default '\x22')."],
+    [ 'quote <character>', "Quote character used in quoted fields (default '\x22').  Use the empty string to indicate no quoted fields."],
+  ];
+
+  my $args_string = $this->options_string($options);
+
+  return <<USAGE;
+Usage: recs-fromcsv <args> [<files>]
+   __FORMAT_TEXT__
+   Each line of input (or lines of <files>) is split on commas to
+   produce an output record.  Fields are named numerically (0, 1, etc.), or as
+   given by --field, or as read by --header.  Lines may be split on delimiters
+   other than commas by providing --delim.
+   __FORMAT_TEXT__
+
+Arguments:
+$args_string
+
+Examples:
+   Parse csv separated fields x and y.
+      recs-fromcsv --field x,y
+   Parse data with a header line specifying fields
+      recs-fromcsv --header
+   Parse tsv data (using bash syntax for a literal tab)
+      recs-fromcsv --delim \$'\\t'
+USAGE
+}
+
+1;

@@ -1,0 +1,31 @@
+---
+abstract: 'A simple, reliable finite state machine'
+author:
+  - 'Jeff Ober <jeffober@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Bundle::Extended: '0'
+  Test::More: '0'
+  Type::Tiny: '1.000006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Auto-Mata
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Type::Tiny: '1.000006'
+resources:
+  bugtracker: https://github.com/jsober/Auto-Mata/issues
+  homepage: https://github.com/jsober/Auto-Mata
+  repository: https://github.com/jsober/Auto-Mata.git
+version: '0.08'
+x_serialization_backend: 'YAML::Tiny version 1.70'

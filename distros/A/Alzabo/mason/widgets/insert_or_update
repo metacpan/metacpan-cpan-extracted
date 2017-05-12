@@ -1,0 +1,50 @@
+<%doc>
+=pod
+
+=head1 NAME
+
+insert_or_update
+
+=head1 SYNOPSIS
+
+  <& insert_or_update, table => $table, %ARGS &>
+
+=head1 DESCRIPTION
+
+A simple component to perform an insert or update based on the values
+of %ARGS.  An insert is done if the primary key columns for the table
+are not defined in C<%ARGS>.  Otherwise an update is done.
+
+=head1 PARAMETERS
+
+=over 4
+
+=item * table
+
+An <Alzabo::Table> object into which a new row is inserted or an
+existing row is updated.
+
+=back
+
+The rest of the arguments should simply be the C<%ARGS> hash as passed
+to the calling component.  This component will extract the relevant
+column values from that hash.
+
+=head1 RETURNS
+
+The row that was inserted or updated.
+
+=cut
+</%doc>
+<%args>
+$table
+</%args>
+<%init>
+my $insert = 1;
+foreach my $c ( $table->primary_key )
+{
+    $insert = 0 unless defined $ARGS{ $c->name };
+}
+
+return $insert ? $m->comp( 'insert', %ARGS ) : $m->comp( 'update', %ARGS );
+</%init>

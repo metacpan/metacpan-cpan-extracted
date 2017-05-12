@@ -1,0 +1,25 @@
+---
+abstract: 'unbundled set of stupid types for Type::Tiny'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  Test::More: 0.88
+  Test::TypeTiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Types-NonStandard
+requires:
+  Devel::Cycle: 0
+  Scalar::Util: 1.26
+  Type::Tiny: 1
+resources:
+  repository: git://github.com/avenj/acme-types-nonstandard.git
+version: 0.002002

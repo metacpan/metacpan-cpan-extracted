@@ -1,0 +1,17 @@
+0.005     2016-09-10 16:33:08 EDT
+  - Lower perl version requirement to 5.8.1
+  - Move Unicode::UTF8 to recommends
+
+0.004     2015-10-30 12:38:37 EDT
+  - Use Class::Tiny::Chained
+
+0.003     2015-10-11 03:18:15 EDT
+  - Fix loose version check so that version tuples with underscores are
+    correctly disallowed
+
+0.002     2015-09-12 20:10:22 EDT
+  - Use Getopt::Long::Modern
+  - Add warning when version is rewritten to a lower version
+
+0.001     2015-09-02 18:38:57 EDT
+  - First release

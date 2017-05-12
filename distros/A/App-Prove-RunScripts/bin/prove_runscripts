@@ -1,0 +1,48 @@
+#!perl
+use strict;
+use warnings;
+use App::Prove::RunScripts;
+
+my $app = App::Prove::RunScripts->new;
+$app->process_args(@ARGV);
+exit( $app->run ? 0 : 1 );
+
+__END__
+
+=head1 NAME
+
+prove_runscripts - Run scripts around a TAP harness.
+
+=head1 USAGE
+
+prove_runscripts [options] [files or directories]
+
+=head1 OPTIONS
+
+Options that take arguments:
+      --before          Run script before a TAP harness.
+      --after           Run script after a TAP harness.
+
+Other options are same as C<prove>. See C<prove -h> for more details.
+
+=head1 EXAMPLE
+
+=head2 Run Test::mysqld before a running test scripts
+
+    $ prove_runscripts --before setup_test_mysqld.pl -lr t/
+
+=head2 Run multiple scripts
+
+    $ prove_runscripts -lr t/ \
+    > --before b1.pl --before b2.pl \
+    > --after  a1.pl --after  a2.pl
+
+This command run scripts like below.
+
+    b1.pl -> b2.pl -> t/ -> a1.pl -> a2.pl
+
+=head1 SEE ALSO
+
+L<App::Prove::RunScripts>, L<prove>
+
+=cut

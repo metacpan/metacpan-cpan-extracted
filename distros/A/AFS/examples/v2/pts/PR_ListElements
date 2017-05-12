@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::PTS;
+
+die "Usage: $0 id\n" if $#ARGV !=0;
+
+my $id = shift;
+
+my $pts = AFS::PTS->new;
+$AFS::CODE and print "AFS::CODE = $AFS::CODE\n";
+
+my $over = 0;
+my @members = $pts->PR_ListElements($id,$over);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else {
+    print "over = $over\n";
+    print "members for $id\n";
+
+    foreach my $mem (sort @members) {
+        printf("  $mem\n");
+    }
+}

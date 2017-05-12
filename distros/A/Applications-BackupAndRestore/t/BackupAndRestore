@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+use Test::More no_plan;
+use strict;
+use warnings;
+
+BEGIN {
+	$| = 1;
+	chdir 't' if -d 't';
+	unshift @INC, '../bin';
+	unshift @INC, '../lib';
+	use_ok 'Applications::BackupAndRestore';
+}
+
+use Applications::BackupAndRestore -run;
+
+1;
+__END__

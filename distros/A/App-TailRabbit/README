@@ -1,0 +1,27 @@
+NAME
+    App::TailRabbit - Listen to a RabbitMQ exchange and emit the messages to
+    console.
+
+SYNOPSIS
+        tail_reabbit --exchange_name firehose --routing_key # --rabbitmq_user guest --rabbitmq_user guest --rabbitmq_host localhost
+
+DESCRIPTION
+    Simple module to consume messages from a RabitMQ message queue.
+
+BUGS
+    Virtually no docs
+    Creates all exchanges as durable.
+    Always creates exchange if it doesn't exist
+    Probably several more
+
+SEE ALSO
+    Net::RabbitFoot
+
+AUTHOR
+    Tomas (t0m) Doran "<bobtfish@bobtfish.net>".
+
+COPYRIGHT & LICENSE
+    Copyright the above author(s).
+
+    Licensed under the same terms as perl itself.
+

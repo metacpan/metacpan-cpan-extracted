@@ -1,0 +1,162 @@
+# vim: ts=4:sw=4:et:ai:sts=4
+#
+# KGB - an IRC bot helping collaboration
+# Copyright © 2012 Damyan Ivanov
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+=head1 NAME
+
+KGB_protocol - specification of the client-server communication protocol
+
+=head1 DESCRIPTION
+
+The protocol used by the KGB collaboration service is based on JSON-RPC
+(L<http://json-rpc.org/>).
+
+KGB service helps collaboration by relaying notifications about commits in a
+version control system to IRC. It consists of client, hooked to the version
+control system which sends information about changes to the server, and a
+server, listening for client's notifications and relaying them on configured
+IRC channels.
+
+=head1 AUTHENTICATION
+
+Message content is authenticated by using two HTTP headers. The
+B<X-KGB-Project> header must contain the project ID, as defined in server's
+configuration. The B<X-KGB-Auth> header must contain a SHA1 hash (in
+hexadecimal notation) calculated over the shared secret, the project ID and the
+JSON-encoded message.
+
+Upon receiving the HTTP request the server calculates the hash using the
+supplied project ID, the server copy of the shared secret for that project and
+the content of the HTTP request. If the hash matches the one provided in the
+B<X-KGB-Auth> header, the authentication succeeds and the request is processed.
+Otherwise an error is returned.
+
+=head1 METHODS
+
+=head2 commit_v4 I<arguments>
+
+This method takes information about a single commit and relays it to IRC.
+I<arguments> is a map with the members described below. Any additional members
+are ignored.
+
+=over
+
+=item B<commit_id> I<string>
+
+A string identifying the commit in the version control system. Git (short)
+hash, Subversion revision number, this kind of thing.
+
+=item B<rev_prefix> I<string>
+
+A string to prepend to the commit ID when displaying on IRC. C<r> is
+particularly useful for Subversion repositories.
+
+=item B<author> I<string>
+
+A string representing the commit author.
+
+=item B<branch> I<string>
+
+A string representing the commit branch.
+
+=item B<module> I<string>
+
+A string representing the commit module or sub-project.
+
+=item B<commit_log> I<string>
+
+The commit message.
+
+=item B<changes> I<list of strings>
+
+List of changes files/directories in the commit. Each string is a path,
+optionaly prepended with C<(A)> for added paths, C<(M)> for modified paths and
+C<(D)> for deleted paths. If no prefix is given modification is assumed. An
+additional plus sign flags property changes (Specific to Subversion term), e.g.
+C<(M+)>.
+
+=item B<extra> I<map>
+
+A map with additional parameters. Currently supported members are:
+
+=over
+
+=item B<web_link>
+
+A URL with commit details (e.g. gitweb or viewvc).
+
+=item B<use_irc_notices>
+
+A flag whether to use IRC notices instead of regular messages.
+
+=item B<use_color>
+
+A flag whether to use colors when sending commit notifications. Defaults to 1.
+
+=back
+
+=back
+
+=head2 relay_message I<message>
+
+This method takes only one string argument which is the message to relay to
+IRC. There are no restrictions or requirements to the message content, which is
+relayed verbatim to project's IRC channels.
+
+=head2 ERRORS
+
+=head3 Errors reported on HTTP level
+
+Authentication errors use HTTP code C<401>, while other errors -- bad or
+missing headers and problems with the JSON data use HTTP code C<400>.
+
+The error text is in the reason phrase of the HTTP status line (see RFC 2616,
+section 6.1).
+
+=head3 Errors reported on JSON-RPC level
+
+After successful authentication and decoding of the JSON request, all the
+errors are reported as mandated by the JSON-RPC specification.
+
+=head1 AUTHOR
+
+=over
+
+=item Damyan Ivanov L<dmn@debian.org>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2012 Damyan Ivanov
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 51
+Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+=cut

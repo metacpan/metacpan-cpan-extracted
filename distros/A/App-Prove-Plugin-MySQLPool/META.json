@@ -1,0 +1,95 @@
+{
+   "abstract" : "pool of Test::mysqld-s reused while testing",
+   "author" : [
+      "Masakazu Ohtsuka <o.masakazu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Prove-Plugin-MySQLPool",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::mysql" : "0",
+            "DBI" : "0",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Prove" : "0",
+            "Cache::FastMmap" : "0",
+            "File::Temp" : "0",
+            "Mouse" : "0",
+            "POSIX::AtFork" : "0",
+            "Test::mysqld" : "0.20",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Prove::Plugin::MySQLPool" : {
+         "file" : "lib/App/Prove/Plugin/MySQLPool.pm",
+         "version" : "0.06"
+      },
+      "TAP::Formatter::MySQLPool" : {
+         "file" : "lib/App/Prove/Plugin/MySQLPool.pm"
+      },
+      "TAP::Formatter::MySQLPool::Session" : {
+         "file" : "lib/App/Prove/Plugin/MySQLPool.pm"
+      },
+      "Test::mysqld::Pool" : {
+         "file" : "lib/Test/mysqld/Pool.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mash/App-Prove-Plugin-MySQLPool/issues"
+      },
+      "homepage" : "https://github.com/mash/App-Prove-Plugin-MySQLPool",
+      "repository" : {
+         "url" : "git://github.com/mash/App-Prove-Plugin-MySQLPool.git",
+         "web" : "https://github.com/mash/App-Prove-Plugin-MySQLPool"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Ichinose Shogo <shogo82148@gmail.com>",
+      "mackee <macopy123@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

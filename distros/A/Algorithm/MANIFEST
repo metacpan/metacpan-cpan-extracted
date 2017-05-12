@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Algorithm.t
+lib/Algorithm.pm
+lib/Algorithm/Searching.pm
+lib/Algorithm/Sorting.pm

@@ -1,0 +1,121 @@
+# $Author: mil $ $Rev: 297 $
+# $Date: 2005-06-07 09:50:49 +0200 (Tue, 07 Jun 2005) $
+
+For users upgrading to 1.0
+
+If you are using mod_perl2 version mod_perl-2.0 is now required.
+
+Also, CGI 3.08 is required if using mod_perl2.
+
+To enable access keys for navigation update the navpicture.tpl and
+showpicture.tpl templates.
+
+For users upgrading from 0.7 to 0.8
+
+You need to create new directory called gallery in Apaches
+icons directory. Copy the png files from the htdocs dictory
+to this new directory.
+
+For those of you with pre-existing templates, a simple
+
+   cd templates; perl -pi -e 's/(?<!\\)(\$[\w\_\d]+)/\{ $1 \}/g' *.tpl
+
+should get your templates but directory.tpl and file.tpl
+working correctly. The last two needs to be updated from
+the distribution.
+
+For users upgrading from 0.6 to 0.7
+
+Apache::Gallery now uses the module Image::Imlib2 instead
+of Inline::C. This enables us to ship binary distributions.
+
+Copy htdocs/agfolder.png to your Apache
+icons directory.
+
+If you enable the GalleryMaxThumbnailsPerPage option you
+need to update your index.tpl template file or use the
+new templates. You also need to copy templates/default/gallery.css
+to your DocumentRoot.
+
+To update to the new layout, copy templates/new/gallery.css 
+to your DocumentRoot and copy templates/new/*.tpl to your
+GalleryTemplateDir and set the following option in your virtual
+host:
+
+PerlSetVar GalleryEXIFMode 'values'
+
+For users upgrading from 0.5.1 to 0.6
+
+templates/movie.tpl has been removed and replaced by
+templates/file.tpl
+
+Remember to update templates/picture.tpl
+
+htdocs/video-wmv.png
+htdocs/application-doc.png
+htdocs/application-mp3.png
+htdocs/application-ogg.png
+htdocs/application-pdf.png
+htdocs/application-rtf.png
+htdocs/application-wav.png
+
+have been added and should be copied to our Apache icons
+directory.
+
+For users upgrading from 0.5 to 0.5.1
+
+InlineDir is no longer honored, File::Spec is used to find a temporary
+directory (usually /tmp)
+Since 0.5, your .cache subdirectories are no longer used and can be
+safely deleted. All cached images are now kept in
+/var/tmp/Apache-Gallery/ unless you set GalleryCacheDir.
+
+For users upgrading from 0.4 to 0.5
+
+Remember to update the following templates:
+templates/interval.tpl
+templates/intervalactive.tpl
+templates/layout.tpl
+templates/refresh.tpl
+templates/scaleactive.tpl
+templates/showpicture.tpl
+templates/slideshowisoff.tpl
+templates/slideshowoff.tpl
+templates/pictureinfo.tpl
+templates/nopictureinfo.tpl
+
+A new option has been added:
+
+PerlSetVar	GalleryCacheDir '/var/tmp/Apache-Gallery/'
+
+GalleryCacheDir is optional but you can use it to decide
+where Apache::Gallery should place the scaled pictures.
+
+For users upgrading from 0.3 to 0.4:
+
+Two new options have been added, they are both optional:
+
+PerlSetVar   GalleryThumbnailSize '100x75'
+PerlSetVar   GalleryCopyrightImage 'htdocs/c.png'
+
+The templates and the htdocs/gallery.css file has been updated
+so remember to copy them to your template dir and documentroot!
+
+To use the new movie feature make sure you add the movie.tpl file
+to your templates dir and copy the video-* files from htdocs to
+your apache icons directory.
+
+For users upgrading from 0.2 to 0.3:
+
+There has been som changes to the templates. info.tpl and scale.tpl
+were added and showpicture.tpl was changed a little.
+
+InlineDir, imageinfo and imagesizes have been made configurable,
+so please add
+
+PerlSetVar   InlineDir '/usr/local/apache/Inline'
+PerlSetVar   GalleryInfo 'Picture Taken => DateTimeOriginal, Flash => Flash' 
+PerlSetVar   GallerySizes '640 1024 1600 2272'
+
+to your virtualhost.
+

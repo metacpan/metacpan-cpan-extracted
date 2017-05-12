@@ -1,0 +1,37 @@
+---
+abstract: 'Alien::Build installer class for Module::Build'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  File::chdir: '0'
+  Test2::Suite: '0.000060'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Build-MB
+no_index:
+  directory:
+    - corpus
+    - example
+    - maint
+requires:
+  Alien::Build: '0.05'
+  Module::Build: '0'
+  Path::Tiny: '0'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/Alien-Build-MB/issues
+  homepage: https://metacpan.org/pod/Alien::Build::MB
+  repository: git://github.com/plicease/Alien-Build-MB.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

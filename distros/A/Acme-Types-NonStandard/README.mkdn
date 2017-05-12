@@ -1,0 +1,46 @@
+# NAME
+
+Acme::Types::NonStandard - unbundled set of stupid types for Type::Tiny
+
+# SYNOPSIS
+
+    use Acme::Types::NonStandard -types;
+
+# DESCRIPTION
+
+An attempt to provide totally useless types that [Types::Standard](https://metacpan.org/pod/Types::Standard) does not.
+
+### ConfusingDualVar
+
+A dualvar (see ["dualvar" in Scalar::Util](https://metacpan.org/pod/Scalar::Util#dualvar)) whose stringy value must be a floating
+point number or integer distinct from the numeric value (to maximize debugging
+confusion).
+
+### FortyTwo
+
+The number 42. Always.
+
+Can be coerced from Any (to the number 42).
+
+### ProbableMemoryLeak
+
+An object that contains cyclic references (per [Devel::Cycle](https://metacpan.org/pod/Devel::Cycle)).
+
+### ReallySparseArray
+
+An array that only contains `undef` (but as many of them as you'd like!)
+
+### RefRefRef
+
+A reference to a reference to a reference (to ensure adequate levels of
+indirection; see also: Cargill's quandry).
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>, but I'm going to loudly deny while pointing
+fingers at `popl` and `hobbs` on `irc.perl.org#moose`.
+
+Licensed under the same terms as Perl.
+
+Patches or suggestions regarding other completely stupid types welcome, as
+long as they're not in any way useful.

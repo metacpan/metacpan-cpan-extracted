@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+examples/and.pl
+lib/AI/Perceptron.pm
+t/01_basic.t
+t/02_api.t

@@ -1,0 +1,44 @@
+Revision history for Perl module App::Pastebin::Create
+
+1.0102
+	* Dependencies minor fix
+
+1.0101
+	* Added commands to build ready-to-compile source code.
+
+1.0100
+	* Added Test::Pod to prequisite.
+	* Fixed no depends error
+
+1.0011
+	* Added links
+
+1.0010 2016-10-09
+	* include precompile test
+
+1.0009 2016-10-07
+	* Fix missing $VERSION that cause cpanm version check error (undef/null)
+
+1.0008 2016-10-07
+	* Minor fixes
+
+1.0007 2016-10-07
+	* Fixed POD (#)
+
+1.0006 2016-10-07
+	* Fixed POD (finally, people in #perl must be like :O)
+
+1.0005 2016-10-07
+	* Fixed POD
+
+1.0004 2016-10-07
+	* Fixed POD (need to see POD first after this)
+
+1.0003 2016-10-07
+	* Fixed POD (again)
+
+1.0002 2016-10-07
+	* Added this file
+	* Fixed POD in Create.pm
+
+	

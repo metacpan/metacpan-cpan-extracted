@@ -1,0 +1,35 @@
+0.07    06 October 2011
+        -- updated the build tools to stop failing on CPANPLUS
+
+0.06    12 September 2011
+        -- make sure we don't index Maker
+
+0.05    09 September 2011
+        -- switch to use Maker.pm for buildsystem.
+        -- add a version of the code that provides relative targets for the
+           location of the Perl binary and the local::lib targets.
+        -- added docs for new feature and some other doc tweaks.
+        -- took a bit more care to make sure more of my paths are relative
+           and cross OS friendly.
+        
+0.04    30 December 2010
+        -- Updated to my modern Makefile.PL layout
+        -- More docs (thanks jgoulah for suggestions)
+        -- reduce required Perl version to 5.8.5
+
+0.03    22 September 2010
+        -- Changes to the Makefile.PL for more automation and for clarity. This
+           should not effect installation or usage, but should clarify things
+           for authors.
+        -- Fixed various typos in the pod documentation
+        
+0.02    23 August 2010
+        -- Document and include the commandline helper script builder so that
+           people who need to scrit custom deployments can do so.
+        -- Create bash and c-shell source scripts for people that only have a
+           single local-lib and want to make this easier
+        -- various documentation improvements.
+
+0.01    05 August 2010
+        -- First Release
+

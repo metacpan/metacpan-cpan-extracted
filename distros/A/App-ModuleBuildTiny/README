@@ -1,0 +1,64 @@
+NAME
+
+    App::ModuleBuildTiny - A standalone authoring tool for
+    Module::Build::Tiny
+
+VERSION
+
+    version 0.019
+
+DESCRIPTION
+
+    App::ModuleBuildTiny contains the implementation of the mbtiny tool.
+
+FUNCTIONS
+
+      * modulebuildtiny($action, @arguments)
+
+      This function runs a modulebuildtiny command. It expects at least one
+      argument: the action. It may receive additional ARGV style options
+      dependent on the command.
+
+      The actions are documented in the mbtiny documentation.
+
+SEE ALSO
+
+ Helpers
+
+      * scan-prereqs-cpanfile
+
+      A tool to automatically generate a cpanfile for you.
+
+      * cpan-upload
+
+      A program that facilitates upload the tarball as produced by mbtiny.
+
+      * perl-reversion
+
+      A tool to bump the version in your modules.
+
+      * perl-bump-version
+
+      An alternative tool to bump the version in your modules
+
+ Similar programs
+
+      * Dist::Zilla
+
+      An extremely powerful but somewhat heavy authoring tool.
+
+      * Minilla
+
+      A more minimalistic but still somewhat customizable authoring tool.
+
+AUTHOR
+
+    Leon Timmermans <leont@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2011 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

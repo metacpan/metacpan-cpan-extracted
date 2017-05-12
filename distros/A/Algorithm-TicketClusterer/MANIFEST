@@ -1,0 +1,17 @@
+examples/ExampleExcelFile.xls
+examples/SampleTest.xlsx
+examples/misspelled_words.txt
+examples/README
+examples/retrieve_similar_tickets.pl
+examples/stop_words.txt
+examples/ticket_preprocessor_and_doc_modeler.pl
+examples/README
+lib/Algorithm/TicketClusterer.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t
+t/__SampleTest.xlsx
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

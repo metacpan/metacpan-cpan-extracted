@@ -1,0 +1,18 @@
+[% USE YAML %]
+<article>
+<header>
+  <h1>
+    Oops!
+  </h1>
+</header>
+<section>
+  <p>Something went wrong...</p>
+  <p>
+    [% error.http_code | html %]
+  </p>
+  <pre>[% error.simple_message | html %]</pre>
+  <pre>[% error.stack_trace.as_string | html %]</pre>
+</section>
+<footer>
+</footer>
+</article>

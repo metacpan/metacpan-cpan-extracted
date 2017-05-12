@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+
+use Config;
+use Data::Dumper;
+
+sub copy {
+   eval Dumper $_[0];
+}
+
+while(<DATA>) {
+   /^(\S+\s+\*?)(\S+)\s*\((.*)\)$/ or die "unparseable decl: $_\n";
+   my($res,$func,@args)=($1,$2,split /,\s+/,$3);
+   my(@paths);
+   for(@args) {
+      my ($type,$name)=/^#?(.*?\s\*?)(\S+)$/;
+      push @{$f{$func}{paths}},$name if /^#/;
+      push @{$f{$func}{args}},[$type,$name];
+   }
+   $f{$func}{restype}=$res;
+}
+
+$gen="gen000";
+
+$ENV{POSIXLY_CORRECT}=1;
+open NM,"$Config{nm} $Config{nm_opt} $Config{libc} |"
+   or die "Unable to run nm to parse library symbols: $!\n";
+$funcs = "(".join("|",keys %f).")";
+while(<NM>) {
+   if (/^[0-9a-fA-F]+\s+\S\s+$funcs(?:(@+)(\S+))?$/o) {
+      my($func,$vtype,$vers)=($1,$2,$3);
+      if ($vers) {
+         my $f2=$func.($gen++);
+         $g{$f2}=copy $f{$func};
+         $g{$f2}{real}="$func, \"$vers\"";
+         push(@{$v{$vers}{local}},$f2);
+         push(@{$v{$vers}{global}},$func);
+         if ($vtype eq "@@") {
+            $versmap.="default_symbol_version ($f2, $func, $vers);\n";
+         } else {
+            $versmap.="symbol_version ($f2, $func, $vers);\n";
+         }
+      } else {
+         $g{$func}=copy $f{$func};
+         $g{$func}{real}="$func, 0";
+      }
+   }
+}
+close NM;
+
+open C,">replace.c" or die "Unable to create replace.c: $!\n";
+while (($func,$f)=each %g) {
+   print C $f->{restype},$func,"(",join(", ",map "$_->[0]$_->[1]",@{$f->{args}}),")\n";
+   print C "{\n  $f->{restype}_retval;\n  REAL_FUNC($f->{restype}, $f->{real}, (",join(", ",map $_->[0],@{$f->{args}}),"));\n";
+
+   for (@{$f->{paths}}) {
+      print C "  gen_change ($_);\n";
+   };
+   print C "  _retval = real_func (",join(", ",map $_->[1],@{$f->{args}}),");\n";
+
+   print C "  return _retval;\n";
+   print C "}\n\n";
+}
+print C $versmap;
+close C;
+
+if ($versmap) {
+   open V,">Versions.def" or die "Unable to create Versions.def: $!\n";
+   while(my($vers,$v)=each %v) {
+      print V "$vers {\n";
+      print V "   global:\n";
+      for (@{$v->{global}}) {
+         print V "      $_;\n";
+      }
+      print V "   local:\n";
+      for (@{$v->{local}}) {
+         print V "      $_;\n";
+      }
+      print V "};\n";
+   }
+   close V;
+} elsif (-e "Versions.def") {
+   unlink "Versions.def" or die "Unable to remove Versions.def: $!\n";
+}
+
+__END__
+int creat (#const char *file, mode_t mode)
+int creat64 (#const char *file, mode_t mode)
+int mkdir (#const char *path, mode_t mode)
+int rmdir (#const char *path)
+int unlink (#const char *path)
+int remove (#const char *path)
+int rename (#const char *oldpath, #const char *newpath)
+int link (#const char *oldpath, #const char *newpath)
+int symlink (const char *oldpath, #const char *newpath)
+FILE *fopen (#const char *path, const char *mode)
+FILE *fopen64 (#const char *path, const char *mode)
+FILE *freopen (#const char *path, const char *mode, FILE *stream)
+FILE *freopen64 (#const char *path, const char *mode, FILE *stream)

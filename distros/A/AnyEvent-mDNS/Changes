@@ -1,0 +1,21 @@
+Revision history for Perl extension AnyEvent::mDNS
+
+0.06  Fri Dec 28 19:50:14 PST 2012
+        - Use AnyEvent::Handle::UDP to make it actually work again (Leon Timmermans)
+        - Fixed the parsing of DNS unpack result
+
+0.05  Mon Jul 20 17:00:51 PDT 2009
+        - Revert the changes made in 0.04 -- it's buggy
+
+0.04  Mon Jul 20 16:47:50 PDT 2009
+        - Do not use AnyEvent::Handle to favor AnyEvent->io
+        - Runs its own timer to emulate UDP timeout (unless timeout is set to 0)
+
+0.03  Fri Jul 17 17:17:40 PDT 2009
+        - Changed discover() API parameters to work more like AnyEvent standards
+
+0.02  Wed Jul 15 17:34:44 PDT 2009
+        - Deduplicate found services
+
+0.01  Wed Jul 15 13:06:28 2009
+        - original version

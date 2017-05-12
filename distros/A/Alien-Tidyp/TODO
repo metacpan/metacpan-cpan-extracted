@@ -1,0 +1,4 @@
+- better tests (compile something more complex)
+- failure http://www.cpantesters.org/cpan/report/eb7e8f74-4bb9-11e0-92d8-2cbe282221a5
+  Invalid version format (fractional part required) at /home/graham/perltest/perl5123th/perl/lib/5.12.3/i686-linux-thread-multi/File/Spec/Unix.pm line 66.
+- on MacOSX 10.6.6 - we need fat libraries (-arch i386 -arch ppc -arch x86_64)

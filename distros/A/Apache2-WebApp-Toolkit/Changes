@@ -1,0 +1,10 @@
+Revision history for Perl module Apache2::WebApp::Toolkit
+
+0.39
+    - Updated optional $class (in WebApp.pm) to return a blessed OBJECT by default.
+    - Added missing packages to 001_load.t test script.
+    - Minor POD updates and additions.
+    - Spring cleaning.
+
+0.391
+	- End of Life

@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Acme-RightSideOutObject
+version:            0.01
+abstract:           Turn Class::InsideOut objects back right side out
+author:
+    - Scott Walters <knoppix@lightandslowass.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::InsideOut:  0.1
+    Data::Alias:       0.1
+    PadWalker:         0.1
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

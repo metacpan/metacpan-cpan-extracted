@@ -1,0 +1,72 @@
+{
+   "abstract" : "A modular Telegram Bot",
+   "author" : [
+      "Justin Hawkins <justin@eatmorecode.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-TeleGramma",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::INI::Reader" : "0.025",
+            "Config::INI::Writer" : "0.025",
+            "DateTime" : "0",
+            "Exporter" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "Module::Pluggable" : "5.2",
+            "Mojo::Base" : "0",
+            "Mojo::File" : "0",
+            "Mojolicious" : "7.31",
+            "Proc::Daemon" : "0",
+            "Storable" : "0",
+            "Telegram::Bot" : "0.010",
+            "Time::Duration::Parse" : "0.13",
+            "constant" : "0",
+            "feature" : "0",
+            "lib" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Temp" : "0",
+            "Telegram::Bot::Message" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/EatMoreCode/app-telegramma/issues"
+      },
+      "homepage" : "https://github.com/EatMoreCode/app-telegramma",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EatMoreCode/app-telegramma.git",
+         "web" : "https://github.com/EatMoreCode/app-telegramma"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,76 @@
+Revision history for App-DzilUtils
+
+0.11    2016-03-10 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+	- Make all CLI use dzilutils.ini.
+
+
+0.10    2016-01-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix POD section ordering.
+
+
+0.09    2015-11-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump version of IPC::System::Options to fixed 0.22
+	  version.
+
+
+0.08    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07    2015-04-25 (PERLANCAR)
+
+	- Add utility: list-dist-deps.
+
+
+0.06    2015-03-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Documentation] Mention list of utilities in main module, add FAQ
+	  & See Also.
+
+
+0.05    2014-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Extract completion routine to separate dist Complete-Dist-Zilla.
+
+
+0.04    2014-12-27 (PERLANCAR)
+
+	- Adjust to Complete::Module 0.06+.
+
+
+0.03    2014-12-15 (PERLANCAR)
+
+	- Add utility: list-dzil-roles.
+
+
+0.02    2014-11-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to Complete::Bash 0.12.
+
+	- Remove doc about tab completion (now added automatically during
+	  build via Pod::Weaver::Section::BashCompletion::PerinciCmdLine).
+
+
+0.01    2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+        - First release.

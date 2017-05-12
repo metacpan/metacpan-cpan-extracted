@@ -1,0 +1,25 @@
+                           AFS::PAG To-Do List
+
+API:
+
+ * Expose pioctl and find a good way to let callers use it.  This will
+   require some way of constructing the pioctl call number and arguments
+   from inside Perl, or at least some documented guidance as to how to use
+   pack.
+
+Build:
+
+ * Add config.guess and support the libkafs replacement for the other
+   operating systems on which it works.  (Mac OS X, Solaris, and other
+   system-call-only platforms.)
+
+ * Add the necessary probes to link with OpenAFS libraries on AIX and
+   IRIX.
+
+ * Contribute back support for check_func to Config::AutoConf to clean up
+   the code in Build.PL.
+
+ * Honor all of the build settings passed to Module::Build when doing
+   probes with Config::AutoConf.  This will probably require pulling the
+   ExtUtils::CBuilder object from Module::Build and modifying
+   Config::AutoConf to use the same builder.

@@ -1,0 +1,45 @@
+Revision history for App-mymeta_requires
+
+0.006     2016-08-18 15:06:05-04:00 America/New_York
+
+  [ADDED]
+
+  - Added a '--report' option
+
+  [PREREQS]
+
+  - Dropped Perl prerequisite to v5.8.1
+
+  - Removed Log::Dispatchouli, Object::Tiny and autodie
+
+  - Added Class::Tiny and List::Util
+
+0.005     2013-03-29 22:24:25 America/New_York
+
+  [FIXED]
+
+  - Skip 'perl' is list of prerequisites
+
+0.004     2013-03-26 14:50:46 America/New_York
+
+  [FIXED]
+
+  - Correctly check version of installed modules against the requirement
+
+0.003     2012-05-18 12:41:41 America/New_York
+
+  [CHANGED]
+
+  - Replaced use of Version::Requirements (deprecated) with
+    CPAN::Meta::Requirements
+
+0.002     2011-08-14 07:40:56 America/New_York
+
+  [ADDED]
+
+  - Added support for configuration requirements
+  - Added fallback to META.json|yml
+
+0.001     2011-08-13 22:40:55 America/New_York
+    - First release
+

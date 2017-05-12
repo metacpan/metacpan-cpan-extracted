@@ -1,0 +1,11 @@
+Makefile.PL
+MANIFEST
+README
+MiniWiki.pm
+example/template,v
+example/index,v
+example/edit,v
+example/list,v
+example/listchanges,v
+test.pl
+wiki.cgi

@@ -1,0 +1,22 @@
+Revision history for Perl extension AnyEvent::ReadLine::Gnu
+
+1.0  Fri May 11 17:37:36 CEST 2012
+        - make sure any readline adornment is off even on first redisplay.
+	- added caveat section.
+        - fix "support" url.
+
+0.2  Thu May 10 23:52:21 CEST 2012
+	- the SYNOPSIS used cb instead of the correct
+          on_line parameter name.
+        - postpone the invocation of the on_line callback as readline
+          is not yet in a "new line" state when calling the callback.
+        - pass point position to callback.
+        - accept both cb and on_line for callback, croak if
+          both are missing.
+        - clarify encoding.
+
+0.1  Thu May 10 04:21:08 CEST 2012
+	- first release.
+
+0.0  Thu May 10 02:38:09 CEST 2012
+	- creation.

@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+
+# PODNAME: get_pauseid_favorites
+
+use strict;
+use warnings FATAL => 'all';
+use feature 'say';
+use utf8;
+use open qw(:std :utf8);
+
+use MetaCPAN::Client;
+use HTTP::Tiny;
+use JSON::PP;
+
+sub get_user_id_from_pause_id {
+    my ($pause_id) = @_;
+
+    my $mc = MetaCPAN::Client->new();
+    my $data = $mc->author({
+        all => [
+            { pauseid => $pause_id },
+        ]
+    })->next();
+
+    my $user_id = $data->{data}->{user};
+
+    return $user_id;
+}
+
+sub get_distribution_repository {
+    my ($d) = @_;
+
+    my $response = HTTP::Tiny->new->get("http://api.metacpan.org/v0/release/$d");
+    my $json = $response->{content};
+    my $data = decode_json($json);
+
+    my $repository_url = $data->{resources}->{repository}->{url};
+
+    return $repository_url;
+}
+
+sub main {
+
+    my $pause_id = $ARGV[0];
+
+    if (not defined $pause_id) {
+        say "You should run it as `$0 PAUSEID`";
+        exit 1;
+    }
+
+    my $user_id = get_user_id_from_pause_id($pause_id);
+
+    my $mc = MetaCPAN::Client->new();
+    my $data = $mc->favorite({
+        all => [
+            { user => $user_id },
+        ]
+    });
+
+    say 'namespace,name,source';
+
+    while (my $element = $data->next) {
+
+        my $module = $element->{data}->{distribution};
+        my $url = get_distribution_repository($module);
+        $module =~ s/-/::/g;
+
+        if (defined $url) {
+            say 'perl,'
+                . $module . ','
+                . $url
+                ;
+        } else {
+            warn "WARNING: no info about repostitory url for $module\n";
+        }
+    }
+
+}
+main();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+get_pauseid_favorites
+
+=head1 VERSION
+
+version 1.0.5
+
+=head1 AUTHOR
+
+Ivan Bessarabov <ivan@bessarabov.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Ivan Bessarabov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

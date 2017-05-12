@@ -1,0 +1,241 @@
+#!/usr/bin/perl
+
+# Created on: 2013-11-08 11:49:31
+# Create by:  dev
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Getopt::Long;
+use Pod::Usage;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Module::CoreList;
+use File::chdir;
+use YAML::Syck qw/LoadFile/;
+
+require CHI;
+require WWW::Mechanize::Cached;
+require HTTP::Tiny::Mech;
+require MetaCPAN::API;
+
+our $VERSION = version->new('0.0.3');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    out     => undef,
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'test|t!',
+        'verbose|v+',
+        'man',
+        'help',
+        'version',
+    ) or pod2usage(2);
+
+    if ( $option{'version'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    my @install = @ARGV;
+    my %packages;
+
+    MODULE:
+    while ( my $module = shift @install ) {
+
+        # check for git repositories/local folders
+        if ( -d $module ) {
+            local $CWD = $module;
+            my $yaml = LoadFile(-e 'MYMETA.yml' ? 'MYMETA.yml' : 'META.yml');
+
+            next MODULE if !ref $yaml || !$yaml->{requires};
+
+            push @install, grep {$_ ne 'perl'} keys %{ $yaml->{requires} };
+            next MODULE;
+        }
+        elsif ( $module =~ /git/ ) {
+        }
+
+        # normalize to standard Perl module names.
+        if ( $module =~ /[.]pm$/ ) {
+            $module =~ s/[.]pm$//;
+            $module =~ s{/}{::}g;
+        }
+
+        next if exists $packages{$module};
+
+        $packages{$module} = apt_package($module);
+
+        # in no apt package check if any dependencies can be installed via apt
+        if ( !$packages{$module} ) {
+            push @install, dependencies($module);
+        }
+    }
+
+    my @packages = grep { $packages{$_} } keys %packages;
+    my @cpan     = grep {!$packages{$_} } keys %packages;
+
+    print "sudo apt-get install " . join ' ', map {my $a = lc "lib${_}-perl"; $a =~ s/(?:_|::)/-/g; $a} @packages;
+    print "\n\n";
+
+    print "sudo cpanm " . join ' ', @cpan;
+    print "\n\n";
+
+    sleep 1;
+
+    if ( !$option{test} ) {
+        system qw/sudo apt-get install/, @packages if @packages;
+        system qw/sudo cpanm/,           @cpan     if @cpan;
+    }
+
+    return;
+}
+
+sub apt_package {
+    my ($module) = @_;
+    my $package = lc "lib$module-perl";
+    $package =~ s/::/-/g;
+    $package =~ s/_/-/g;
+
+    my $cache = `apt-cache search $package`;
+
+    return $cache =~ /^$package\s+-\s+/ ? $package : undef;
+}
+
+sub dependencies {
+    my ($module) = @_;
+
+    my $dependencies = eval { required_modules($module) } || [];
+    my %depends;
+    my %seen = ( perl => 1 );
+
+    while ( my $dependency = shift @$dependencies) {
+        my $module = $dependency->{module};
+        next if $seen{$module}++;
+
+        # Check if the module is a CORE module and skip if it is
+        my $core_version = eval { Module::CoreList->first_release($module) };
+        next if $core_version && $core_version <= $PERL_VERSION;
+
+        my ($dist, $depends) = eval { required_modules($module) };
+
+        next if $@ || !$dist || $depends{$dist}++;
+
+        push @$dependencies, @{ $depends };
+    }
+
+    return keys %depends;
+}
+
+my $mcpan;
+my %required;
+sub required_modules {
+    my ($module) = @_;
+    return if exists $required{$module};
+    $required{$module}++;
+
+    $mcpan ||= MetaCPAN::API->new(
+        ua => HTTP::Tiny::Mech->new(
+            mechua => WWW::Mechanize::Cached->new(
+                cache => CHI->new(
+                    driver => 'File',
+                    root_dir => '/tmp/metacpan-cache',
+                ),
+            ),
+        ),
+    );
+
+    warn "$module\n" if $option{verbose} > 1;
+    my $module_details = $mcpan->module($module);
+    my $dist_details   = $mcpan->release( distribution => $module_details->{distribution} );
+
+    return wantarray ? ( $module_details->{distribution}, $dist_details->{dependency} ) : $dist_details->{dependency};
+}
+
+__DATA__
+
+=head1 NAME
+
+apt-perl - Installs perl dependencies from apt (if possible) otherwise uses cpanm.
+
+=head1 VERSION
+
+This documentation refers to apt-perl version 0.0.3
+
+=head1 SYNOPSIS
+
+   apt-perl [option] (module|dist|file) ...
+
+ OPTIONS:
+  -t --test         Just show what would be installed don't actually install
+
+  -v --verbose      Show more detailed option
+     --version      Prints the version information
+     --help         Prints this help information
+     --man          Prints the full documentation for apt-perl
+
+
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2013 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW, Australia 2077)
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

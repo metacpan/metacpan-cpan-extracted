@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e448c7b142b6fd516f3448dabffdd2b5cc109bf3 Changes
+SHA1 ef50cab217bcf1669eeb5f1da46a0c5ac3422d2d INSTALL
+SHA1 776b35de0d79370b17f9b26a61565d97aaee5acd LICENSE
+SHA1 e206d1d1aba831355bab81f85f074aaf0c7936c0 MANIFEST
+SHA1 50f2f785fcfbc9c70dc0d4d018b7b0aa1f780db0 META.yml
+SHA1 0488fd9e300f454926afa1b0ab2e9d984c784862 Makefile.PL
+SHA1 fa5a3717ec555cb822449eda90513629f2bf57e3 README
+SHA1 972a00ca22595652796605fc41d84b10b9b31500 lib/AnyEvent/Capture.pm
+SHA1 099e7ce993ff620aaf4f97a984550a1f4a8bc8c5 t/basic.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 8d931d5c7b6fc03e39a744d59522e4b7077562a1 t/release-portability.t
+SHA1 612226d447015079c046d65932f774304a4b9f20 t/release-synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQGhzuAAoJEF6ojHedHIiFwE0QAIuCAlVo6maEb2lRYZtaUMG+
+t/D/1Xo+Qw+IikPdyy7RsJ1MfTlNUvprF6YuTT5ED3mRYtTJkErRSGDIly5SwxN4
+/FvFJxLk+TT9tTumJ9rocAAwJJMiX2S3JuODwtfS52m6IG9x1uylV78dEe9jropV
+V2RHTQWGohWv0pv0c9hD+RuAjKUcdZBFxk2CkhnIsSzWArxevNemByt6VKj4m2si
+J+e+IPPiGpUgLNnOpJ8Coh/M0Ki8A56ausQVgWr0+J8seg6HPkKjNk6711LFenSM
+4zg/U38npWNLtGSww9TL/EeeLB6ORAoIGNh59aI28SAuMouPjt1LIUUsq5bQTTL7
+wa4kaw0dHY7Bzl+TRYLrx9+45GBkTPvF0P6xcs1huCYP7xYBAmdmgNJO3hysBAjN
+bKawJ7fq+QpN9q2pyRsZH6SbEA/h5se4Dvd7pJN6y8fplUBTz/E/obcSzo8N2yPR
+MM2K5UOd+cs/pDgkaA0tpZEXSq7a1ibsLUyQ2RvX+yXyxvR6Dy+WCyDEYVWK/pJW
+ZnAr3kLkcBZ0mJ0+ZkqyyJQ1xL3b/CaF/DhHHGvdMHgTIKcPWgG0h/gon2+wi43w
+MTegDW2Ul0KBUq+hxM6OcPnkbzq8X8O+4gU4xnee1jEYvhh/QYGKLoL3MqKCg8Pe
+RZCoVonsoXLskMx9Eb3k
+=mdVi
+-----END PGP SIGNATURE-----

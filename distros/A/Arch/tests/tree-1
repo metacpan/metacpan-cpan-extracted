@@ -1,0 +1,48 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Tree methods.
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 11;
+
+use_ok("Arch::Tree");
+
+my $arch_dir = "$FindBin::Bin/../{arch}";
+
+my $upstream = 'migo@homemail.com--Perl-GPL/arch-perl--devel--0';
+
+SKIP: {
+skip("not in arch tree", 10) unless -d "$arch_dir";
+
+my $tree_version = `cat $arch_dir/++default-version`;
+chomp($tree_version);
+
+my $tree = Arch::Tree->new("$FindBin::Bin/..");
+
+my $version1 = $tree->get_version;
+ok(defined $version1,        "tree version exists");
+is($version1, $tree_version, "tree version is correct");
+
+my @versions = $tree->get_log_versions;
+ok(@versions, "log versions");
+ok((grep { $_ eq $upstream } @versions),     "log versions has upstream");
+ok((grep { $_ eq $tree_version } @versions), "log versions has tree version");
+
+my @revisions = $tree->get_log_revisions($upstream);
+ok(@revisions, "upstream version log revisions");
+
+my @logs = $tree->get_logs($upstream);
+ok(@logs, "upstream version logs");
+
+my $log = $logs[0];
+is($log->revision, 'arch-perl--devel--0--base-0',  "import log revision");
+is($log->summary, "initial import",                "import log summary");
+is($log->standard_date, "2004-07-11 00:05:40 GMT", "import log date");
+
+}

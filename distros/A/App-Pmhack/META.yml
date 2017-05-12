@@ -1,0 +1,32 @@
+---
+abstract: 'Hack on installed Perl modules'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  File::Slurp: 0
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+  Test::Differences: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Pmhack
+requires:
+  Carp: 0
+  English: 0
+  File::Copy: 0
+  File::Path: 2.07
+  Module::Load: 0
+  Module::Locate: 0
+  Params::Util: 0
+  Perl6::Export::Attrs: 0
+  Pod::Usage::CommandLine: 0
+  Try::Tiny: 0
+version: 0.002

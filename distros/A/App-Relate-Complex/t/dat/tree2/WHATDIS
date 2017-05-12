@@ -1,0 +1,18 @@
+Sun May 27 01:15:44 2007
+~/End/Cave/Relate/Wall/List-Filter/lib/List/Filter/App/t/dat/tree2/WHATDIS
+
+This is another tree of files to be indexed locally by slocate 
+over here: 
+
+~/End/Cave/Relate/Wall/List-Filter/lib/List/Filter/App/t/dat/slocate2
+
+My intention is to make tree2 indefinitely extensible, by making some 
+informal notes about what the existing tests expect to see there, 
+so that later extensions won't impact already existing tests. 
+
+For test #7 (all numbers approximate):
+
+    my $test_name = "Testing relate method using the :skipdull filter";
+
+*.txt files with "doom" or "shadow" in the title, plus backups and autosaves, 
+and RCS version control.

@@ -1,0 +1,70 @@
+NAME
+    Alien::Win32::LZMA - Install and make available lzma.exe
+
+DESCRIPTION
+    On Windows (unlike on Unix systems) the primary mechanism for accessing
+    LZMA functionality is via the 7-Zip desktop application.
+
+    Alien::Win32::LZMA is a simple Alien module which embeds a copy of the
+    lzma.exe command line utility for use in situations where the
+    memory-only compression and decompression provided by the current
+    generation of modules is not sufficient.
+
+    The version of lzma.exe provided by this module is taken from the LZMA
+    SDK 4.65 at <http://downloads.sourceforge.net/sevenzip/lzma465.tar.bz2>.
+
+FUNCTIONS
+  lzma_exe
+    The "lzma_exe" function returns the location of the installed lzma.exe
+    command line application as a string.
+
+  lzma_version
+    The "lzma_version" function runs lzma.exe and finds the version of the
+    application. It should match the version of this module.
+
+  lzma_compress
+      lzma_compress('file', 'file.lz') or die('Failed to compress');
+
+    The "lzma_compress" function invokes lzma.exe to compress one file into
+    another file.
+
+    Any additional params to "lzma_compress" will be passed through to the
+    underlying command line call as options.
+
+    Returns true if the invocation returns without error.
+
+  lzma_decompress
+      lzma_decompress('file','file.lz') or die('Failed to decompress');
+
+    The "lzma_decompress" function invokes lzma.exe to decompress an LZMA
+    file into another file.
+
+    Any additional params to "lzma_compress" will be passed through to the
+    underlying command line call as options.
+
+    Returns true if the invocation returns without error.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Alien-Win32-LZMA>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Compress::umLZMA
+
+COPYRIGHT
+    Copyright 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+    The LZMA SDK is written and placed in the public domain by Igor Pavlov.
+

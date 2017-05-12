@@ -1,0 +1,64 @@
+---
+abstract: 'Ark plugins for authentications'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Digest::SHA1: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.9.0, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Ark-Plugin-Authentication
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Ark::Plugin::Authentication:
+    file: lib/Ark/Plugin/Authentication.pm
+    version: 0.01
+  Ark::Plugin::Authentication::Backend:
+    file: lib/Ark/Plugin/Authentication/Backend.pm
+  Ark::Plugin::Authentication::Credential::OpenID:
+    file: lib/Ark/Plugin/Authentication/Credential/OpenID.pm
+  Ark::Plugin::Authentication::Credential::Password:
+    file: lib/Ark/Plugin/Authentication/Credential/Password.pm
+  Ark::Plugin::Authentication::Credential::Twitter:
+    file: lib/Ark/Plugin/Authentication/Credential/Twitter.pm
+  Ark::Plugin::Authentication::Store::DBIx::Class:
+    file: lib/Ark/Plugin/Authentication/Store/DBIx/Class.pm
+  Ark::Plugin::Authentication::Store::Minimal:
+    file: lib/Ark/Plugin/Authentication/Store/Minimal.pm
+  Ark::Plugin::Authentication::Store::Model:
+    file: lib/Ark/Plugin/Authentication/Store/Model.pm
+  Ark::Plugin::Authentication::Store::Null:
+    file: lib/Ark/Plugin/Authentication/Store/Null.pm
+  Ark::Plugin::Authentication::User:
+    file: lib/Ark/Plugin/Authentication/User.pm
+requires:
+  Ark: 0
+  LWPx::ParanoidAgent: 0
+  Net::OpenID::Consumer: 0
+  OAuth::Lite: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/ark-framework/Ark-Plugin-Authentication/issues
+  homepage: https://github.com/ark-framework/Ark-Plugin-Authentication
+  repository: git://github.com/ark-framework/Ark-Plugin-Authentication.git
+version: 0.01
+x_contributors:
+  - 'Songmu <y.songmu@gmail.com>'

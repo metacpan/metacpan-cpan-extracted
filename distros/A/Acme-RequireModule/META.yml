@@ -1,0 +1,24 @@
+---
+abstract: 'Extends require() to accept module names'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>.'
+build_requires:
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.44
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-RequireModule
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

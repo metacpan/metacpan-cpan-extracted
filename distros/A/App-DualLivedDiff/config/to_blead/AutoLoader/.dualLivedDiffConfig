@@ -1,0 +1,7 @@
+---
+files:
+  lib/AutoLoader.pm: lib/AutoLoader.pm
+  lib/AutoSplit.pm: lib/AutoSplit.pm
+  t/01AutoLoader.t: lib/AutoLoader/t/01AutoLoader.t
+  t/02AutoSplit.t: lib/AutoLoader/t/02AutoSplit.t
+

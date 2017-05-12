@@ -1,0 +1,13 @@
+AuthCookiePAM.pm
+Changes
+MANIFEST
+README
+LICENSE
+Makefile.PL
+test.pl
+generic_reg_auth_scheme.txt
+techspec.txt
+schema.sql
+eg/html/login.html
+eg/html/login-failed.html
+eg/public-pl/login.pl

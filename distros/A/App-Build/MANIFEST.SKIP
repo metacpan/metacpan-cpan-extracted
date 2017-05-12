@@ -1,0 +1,25 @@
+# Avoid version control files.
+\B\.svn\b
+\b_darcs\b
+^\.gitignore$
+^\.git\b
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bblib/
+\bMYMETA.yml$
+^App-Build-.*\.tar\.gz$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+# Project-specific files
+^t/test_install

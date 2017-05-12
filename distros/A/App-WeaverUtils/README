@@ -1,0 +1,15 @@
+DESCRIPTION
+
+    This distribution provides the following command-line utilities related
+    to Pod::Weaver:
+
+    #INSERT_EXECS_LIST
+
+FAQ
+
+    #INSERT_BLOCK: App::PMUtils faq
+
+SEE ALSO
+
+    #INSERT_BLOCK: App::PMUtils see_also
+

@@ -1,0 +1,51 @@
+Revision history for AlignDB-ToXLSX
+
+1.2.1 2017-01-25T20:21:39Z
+    - Remove single quotes from attribute names
+
+1.2.0 2017-01-11T15:44:53Z
+    - Release to CPAN
+    - Improve test coverage
+    - Travis CI
+
+1.1.7 2016-12-16T00:31:19Z
+    - Switch to Minilla
+
+1.1.6  2016-01-28 01:32:44 CST
+    - trendline in draw_xy()
+
+1.1.5  2016-01-23 21:18:35 CST
+    - Add write_column()
+    - Add draw_dd()
+
+1.1.4  2016-01-23 02:41:44 CST
+    - Fix _find_scale()
+
+1.1.3  2016-01-22 21:34:04 CST
+    - y_last_column in draw_y()
+    - better _find_scale()
+
+1.1.2  2016-01-22 03:48:56 CST
+    - major_tick_mark => 'inside'
+    - $opt->{cross} for draw_y()
+
+1.1.1  2016-01-22 02:52:14 CST
+    - Record worksheet cursor in object, row() and column()
+    - s/option/opt/g
+    - Remove write_content_*(). May add later.
+
+1.1.0  2016-01-22 01:12:21 CST
+    - Remove hard dependency on DBD::mysql
+    - write_header_direct() ==> write_header()
+    - Remove write_header_sql(), use sql2names()
+    - write_row_direct() ==> write_row()
+    - write_content_direct() ==> write_sql()
+
+1.0.4  2016-01-19 06:58:30 CST
+    - add draw_xy()
+
+1.0.3  2016-01-15 16:50:30 CST
+    - Switch to Dist::Milla
+    - Remove alignDB specific methods
+    - draw_y() and draw_2y()
+    - add_index_sheet()

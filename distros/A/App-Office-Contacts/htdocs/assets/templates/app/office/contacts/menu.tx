@@ -1,0 +1,5 @@
+<select id="<: $name :>">
+: for $list -> $item {
+<option value="<: $item.key :>" <: $item.selected :>><: $item.value :></option>
+: }
+</select>

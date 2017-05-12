@@ -1,0 +1,7 @@
+Revision history for Perl module Algorithm::Loops:
+
+1.031_00 - 2003-09-27
+ - Grouped routines into one module.
+
+1.02
+ - Last version number posted to http://perlmonks.org/

@@ -1,0 +1,12 @@
+Revision history for Perl extension Array::Lock.
+
+0.02  Sun Jan  5 21:22:29 2003
+	- Changed word 'keys' to 'indexes':
+           - Updated documentation.
+           - Functions, lock_keys and unlock_keys
+             are now lock_indexes and unlock_indexes
+        - Fixed some copy/paste misdocumentation.
+
+0.01  Sun Nov 30 13:55:27 2003
+	- original version; created by h2xs 1.22.
+

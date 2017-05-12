@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Acme/CPANPLUS/Module/With/Failing/Configure/Requires.pm
+lib/Acme/CPANPLUS/Module/With/Failing/Configure/Requires.pm.bak
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

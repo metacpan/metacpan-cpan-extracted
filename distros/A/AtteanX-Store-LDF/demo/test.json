@@ -1,0 +1,19 @@
+{
+    "base_uri"  : "http://localhost/",
+    "store" : {
+        "storetype"     : "Memory",
+        "sources" : [ { 
+            "file" : "/tmp/test.ttl",
+            "syntax" : "turtle"
+        } ]
+    },
+ 
+    "fragments" : { 
+      "fragments_path" : "/fragments" ,
+      "allow_dump_dataset" : "1"
+    } ,
+
+    "void": {
+        "urispace" : "http://localhost"
+    }
+}

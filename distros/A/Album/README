@@ -1,0 +1,48 @@
+'album' is a tool to create and maintain a browser based photo album.
+
+The photo albums are intended to be the digital equivalents of paper
+albums, but easier to create and maintain. Although you can publish a
+photo album on the Web, this tool is not specifically targeted at
+creating Web shows.
+
+Details
+=======
+
+A photo album consists of a number of (large) pictures, small thumbnail
+images, and index pages. Optionally, medium sized images can be
+generated as well. The album will be organised as follows:
+
+  index.html       first or only index page
+  indexN.html      subsequent index pages (N = 1, 2, ...)
+  css/		   direcotry with style sheets
+  icons/           directory with navigation icons
+  large/           original (large) images, with HTML pages
+  medium/          optional medium sized images, with HTML pages
+  thumbnail/       thumbnail images
+
+Each image can be labeled with a description, a tag (applies to a
+group of images, e.g. a date), the image name, and some
+characteristics (size and dimensions).
+
+Images can be handled 'in situ', or imported from e.g. a CD-ROM or
+digital camera. Optionally, EXIF information from digital camera files
+can be taken into account.
+
+Web site: http://www.squirrel.nl/people/jvromans/Album/index.html
+
+Helper programs
+===============
+
+This program requires some helper programs for certain tasks.
+
+  jpegtran    will be used to rotate JPEG files loslessly.
+	      If missing, JPEG files will be rotated by ImageMagick,
+	      with possible loss of information.
+  mencoder    is needed to manipulate MPEG files.
+	      If missing, MPEG files will be copied without
+	      processing. They cannot be rotated, and may not be
+	      playable on your mpeg player.
+  mplayer     is needed to extract a still from MPEG movies, and to 
+	      extract audio from VOICE files.
+	      If missing, no stills will be produced, and VOICE files
+	      will remain silent.

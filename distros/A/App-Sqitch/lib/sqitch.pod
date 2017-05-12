@@ -1,0 +1,567 @@
+=encoding UTF-8
+
+=head1 Name
+
+sqitch - Sane database change management
+
+=head1 Synopsis
+
+  sqitch [<options>] <command> [<command-options>] [<args>]
+
+=head1 Description
+
+Sqitch is a database change management application. What makes it different
+from your typical L<migration|Module::Build::DB>-L<style|DBIx::Migration>
+approaches? A few things:
+
+=over
+
+=item No opinions
+
+Sqitch is not integrated with any framework, ORM, or platform. Rather, it is a
+standalone change management system with no opinions about your database
+engine, application framework, or your development environment.
+
+=item Native scripting
+
+Changes are implemented as scripts native to your selected database engine.
+Writing a L<PostgreSQL|http://postgresql.org/> application? Write SQL scripts
+for L<C<psql>|http://www.postgresql.org/docs/current/static/app-psql.html>.
+Writing an L<Oracle|http://www.oracle.com/us/products/database/>-backed app?
+Write SQL scripts for L<SQL*Plus|http://www.orafaq.com/wiki/SQL*Plus>.
+
+=begin comment
+
+=item VCS integration
+
+Sqitch likes to use your VCS history to determine in what order to execute
+changes. No need to keep track of execution order; your VCS already tracks
+information sufficient for Sqitch to figure it out for you.
+
+=end comment
+
+=item Dependency resolution
+
+Database changes may declare dependencies on other changes -- even on changes
+from other Sqitch projects. This ensures proper order of execution, even when
+you've committed changes to your VCS out-of-order.
+
+=item No numbering
+
+Change deployment is managed by maintaining a plan file. As such, there is no
+need to number your changes, although you can if you want. Sqitch doesn't much
+care how you name your changes.
+
+=item Iterative Development
+
+Up until you tag and release your project, you can modify your change
+deployment scripts as often as you like. They're not locked in just because
+they've been committed to your VCS. This allows you to take an iterative
+approach to developing your database schema. Or, better, you can do
+test-driven database development.
+
+=begin comment
+
+=item Bundling
+
+Rely on your VCS history for deployment but have Sqitch bundle up changes for
+distribution. Sqitch can read your VCS history and write out a plan file along
+with the appropriate deployment and reversion scripts. Once the bundle is
+installed on a new system, Sqitch can use the plan file to deploy or the
+changes in the proper order.
+
+=item Reduced Duplication
+
+If you're using a VCS to track your changes, you don't have to duplicate
+entire change scripts for simple changes. As long as the changes are
+L<idempotent|http://en.wikipedia.org/wiki/Idempotence>, you can change
+your code directly, and Sqitch will know it needs to be updated.
+
+=end comment
+
+=back
+
+Ready to get started? Here's where:
+
+=over
+
+=item Sqitch Tutorials
+
+Detailed tutorials demonstrating the creation, development, and maintenance
+of a database with Sqitch.
+
+=over
+
+=item * L<PostgreSQL Tutorial|sqitchtutorial>
+
+=item * L<SQLite Tutorial|sqitchtutorial-sqlite>
+
+=item * L<MySQL Tutorial|sqitchtutorial-mysql>
+
+=item * L<Oracle Tutorial|sqitchtutorial-oracle>
+
+=item * L<Firebird Tutorial|sqitchtutorial-firebird>
+
+=item * L<Vertica Tutorial|sqitchtutorial-vertica>
+
+=back
+
+=item L<PDX.pm Presentation|https://speakerdeck.com/theory/sane-database-change-management-with-sqitch>
+
+Slides from "Sane Database Management with Sqitch", presented to the Portland
+Perl Mongers in January, 2013.
+
+=item L<PDXPUG Presentation|https://vimeo.com/50104469>
+
+Movie of "Sane Database Management with Sqitch", presented to the Portland
+PostgreSQL Users Group in September, 2012.
+
+=item L<Agile Database Development|https://speakerdeck.com/theory/agile-database-development-2ed>
+
+Three-hour tutorial session on using L<Git|http://git-scm.org/>, test-driven
+development with L<pgTAP|http://pgtap.org>, and change management with Sqitch.
+
+=back
+
+=begin comment
+
+Eventually move to L<sqitchtutorial> or L<sqitchintro> or some such.
+
+=end comment
+
+=head2 Terminology
+
+=over
+
+=item C<change>
+
+A named unit of change. A change name must be used in the file names of its
+deploy and a revert scripts. It may also be used in a verify script file
+name.
+
+=item C<tag>
+
+A known deployment state, pointing to a single change, typically corresponding
+to a release. Think of it is a version number or VCS revision. A given point
+in the plan may have any number of tags.
+
+=item C<state>
+
+The current state of the database. This is represented by the most
+recently-deployed change. If the state of the database is the same as the most
+recent change, then it is considered "up-to-date".
+
+=item C<plan>
+
+A list of one or more changes and their dependencies that define the order of
+deployment execution. The plan is stored in a "plan file," usually named
+F<sqitch.plan>. Sqitch reads the plan file to determine what changes to
+execute to change the database from one state to another.
+
+=item C<target>
+
+A named database to which to deploy changes. Always has an associated
+connection URI, and may also have an associated command-line client and
+registry name.
+
+=item C<registry>
+
+The name of the database object where Sqitch's state and history data is
+stored. Typically a schema name (as in PostgreSQL and Oracle) or a database
+name (as in SQLite and MySQL).
+
+=item C<add>
+
+The act of adding a change to the plan. Sqitch will generate scripts for the
+change, which you then may modify with the necessary code (typically DDLs) to
+actually deploy, revert, and verify the change.
+
+=item C<deploy>
+
+The act of deploying changes to a database. Sqitch reads the plan, checks the
+current state of the database, and applies all the changes necessary to either
+bring the database up-to-date or to a requested state (a change name or tag).
+
+=item C<revert>
+
+The act of reverting database changes to reach an earlier deployment state.
+Sqitch reads the list of deployed changes from the database and reverts
+them in the reverse of the order in which they were applied. All changes
+may be reverted, or changes may be reverted to a requested state (a change
+name or tag).
+
+=item C<committer>
+
+User who commits or reverts changes to a database.
+
+=item C<planner>
+
+User who adds a change to the plan.
+
+=back
+
+=head1 Options
+
+  -f --plan-file  FILE      Path to a deployment plan file.
+     --engine     ENGINE    Database engine.
+     --registry   REGISTRY  Registry schema or database.
+     --db-client  PATH      Path to engine command-line client.
+  -d --db-name    NAME      Database name.
+  -u --db-user    USER      Database user name.
+  -h --db-host    HOST      Database server host name.
+  -p --db-port    PORT      Database server port number.
+     --top-dir    DIR       Path to directory with plan and scripts.
+     --etc-path             Print path to etc directory and exit.
+     --quiet                Quiet mode with non-error output suppressed.
+  -v --verbose              Increment verbosity.
+     --version              Print version number and exit.
+     --help                 Show a list of commands and exit.
+     --man                  Print introductory documentation and exit.
+
+=head1 Options Details
+
+=over
+
+=item C<-f>
+
+=item C<--plan-file>
+
+  sqitch --plan-file plan.txt
+  sqitch -f main.plan
+
+Path to the deployment plan file. Defaults to F<$top_dir/sqitch.plan>. See
+L</Plan File> for a description of its structure.
+
+=item C<--engine>
+
+  sqitch --engine pg
+
+The database engine to use. Supported engines include:
+
+=over
+
+=item * C<pg> - L<PostgreSQL|http://postgresql.org/> and L<Postgres-XC|http://sourceforge.net/>
+
+=item * C<sqlite> - L<SQLite|http://sqlite.org/>
+
+=item * C<oracle> - L<Oracle|http://www.oracle.com/us/products/database/>
+
+=item * C<mysql> - L<MySQL|http://dev.mysql.com/> and L<MariaDB|https://mariadb.com/>
+
+=item * C<firebird> - L<Firebird|http://www.firebirdsql.org/>
+
+=item * C<vertica> - L<Vertica|https://my.vertica.com/>
+
+=back
+
+=item C<--registry>
+
+  sqitch --registry registry
+
+The name of the Sqitch registry schema or database. Sqitch will store its own
+data here.
+
+=item C<--db-client>
+
+=item C<--client>
+
+  sqitch --client /usr/local/pgsql/bin/psql
+
+Path to the command-line client for the database engine. Defaults to a client
+in the current path named appropriately for the specified engine.
+
+=item C<-d>
+
+=item C<--db-name>
+
+  sqitch --db-name widgets
+  sqitch -d bricolage
+
+Name of the database. In general, L<targets|sqitch-target> and URIs are
+preferred, but this option can be used to override the database name in a
+target.
+
+=item C<-u>
+
+=item C<--db-user>
+
+=item C<--db-username>
+
+  sqitch --db-username root
+  sqitch --db-user postgres
+  sqitch -u Mom
+
+User name to use when connecting to the database. Does not apply to all
+engines. In general, L<targets|sqitch-target> and URIs are preferred, but this
+option can be used to override the user name in a target.
+
+=item C<-h>
+
+=item C<--db-host>
+
+  sqitch --db-host db.example.com
+  sqitch -h appdb.example.net
+
+Host name to use when connecting to the database. Does not apply to all
+engines. In general, L<targets|sqitch-target> and URIs are preferred, but this
+option can be used to override the host name in a target.
+
+=item C<-p>
+
+=item C<--db-port>
+
+  sqitch --db-port 7654
+  sqitch -p 5431
+
+Port number to connect to. Does not apply to all engines.In general,
+L<targets|sqitch-target> and URIs are preferred, but this option can be used
+to override the port in a target.
+
+=item C<--top-dir>
+
+  sqitch --top-dir migrations/
+
+Path to directory containing deploy, revert, and verify scripts. It should
+contain subdirectories named C<deploy>, C<revert>, and (optionally) C<verify>.
+Defaults to C<.>.
+
+=item C<--etc-path>
+
+  sqitch --etc-path
+
+Print out the path to the Sqitch F<etc> directory and exit. This is the
+directory where the system-wide configuration file lives, as well as change
+script templates.
+
+=item C<--quiet>
+
+Suppress normal output messages. Error messages will still be emitted to
+C<STDERR>. Overrides any value specified by C<--verbose>.
+
+=item C<-v>
+
+=item C<--verbose>
+
+  sqitch --verbose
+  sqitch -vvv
+
+Pass multiple times to specify a value between 0 and 3 to determine how
+verbose Sqitch should be. Unless C<--quiet> is specified, the default is 1,
+meaning that Sqitch will output basic status messages as it does its thing.
+Values of 2 and 3 each cause greater verbosity. Ignored if C<--quiet> is
+specified.
+
+=item C<--help>
+
+  sqitch --help
+
+Outputs a brief description all known Sqitch commands and exits.
+
+=item C<--man>
+
+  sqitch --man
+
+Outputs this documentation and exits.
+
+=item C<-V>
+
+=item C<--version>
+
+  sqitch --version
+
+Outputs the program name and version and exits.
+
+=back
+
+=head1 Sqitch Commands
+
+=over
+
+=item L<C<init>|sqitch-init>
+
+Create the plan file and directories for deploy, revert, and verify scripts if
+they do not already exist. This command is useful for starting a new Sqitch
+project.
+
+=item L<C<status>|sqitch-status>
+
+Output information about the current deployment state of a database, including
+the name of the last deployed change, as well as any tags applied to it. If
+any changes in the plan have not been deployed, they will be listed
+separately.
+
+=item L<C<log>|sqitch-log>
+
+Search and Output the complete change history of a database. Provides
+information about when changes were deployed, reverted, or failed, as well as
+who planned and committed the changes, and when.
+
+=item L<C<add>|sqitch-add>
+
+Add a new change.
+
+=item L<C<tag>|sqitch-tag>
+
+List tags or tag the latest change.
+
+=item L<C<rework>|sqitch-rework>
+
+Rework an existing change.
+
+=item L<C<target>|sqitch-target>
+
+Manage target databases.
+
+=item L<C<deploy>|sqitch-deploy>
+
+Deploy changes to a database
+
+=item L<C<revert>|sqitch-revert>
+
+Revert changes from a database.
+
+=item L<C<verify>|sqitch-verify>
+
+Verify changes deployed to a database.
+
+=item L<C<config>|sqitch-config>
+
+Get and set project, user, or system Sqitch options.
+
+=item L<C<bundle>|sqitch-bundle>
+
+Bundle a Sqitch project for distribution. This command copies the Sqitch
+configuration, plan, and deploy, revert, and verify scripts to a directory, so
+that it can be packaged up for distribution, such as in an RPM or tarball.
+
+=item L<C<help>|sqitch-help>
+
+Show help for a specific command or, if no command is specified, show the same
+documentation as C<--help>.
+
+=back
+
+=head1 Configuration
+
+Sqitch configuration can be set up on a project, user, or system-wide basis.
+The format of the configuration file, named F<sqitch.conf>, is the same as for
+L<git>.
+
+Here's an example of a configuration file that might be useful checked into a
+VCS for a project that deploys to PostgreSQL and stores its deployment scripts
+with the extension F<ddl> under the C<migrations> directory. It also wants
+bundle to be created in the F<_build/sql> directory, and to deploy starting
+with the "gamma" tag:
+
+  [core]
+      engine    = pg
+      top_dir   = migrations
+      extension = ddl
+
+  [engine "pg"]
+      target    = widgetopolis
+
+  [revert]
+      to        = gamma
+
+  [bundle]
+      from      = gamma
+      tags_only = yes
+      dest_dir  = _build/sql
+
+  [target "widgetopolis"]
+      uri       = db:pg:widgetopolis
+
+And here's an example of useful configuration in F<~/.sqitch/sqitch.conf>, to
+point to system-specific engine information:
+
+  [user]
+      name      = Marge N. O’Vera
+      email     = marge@example.com
+
+  [engine "pg"]
+      client    = /usr/local/pgsql/bin/psql
+
+  [engine "mysql"]
+      client    = /usr/local/mysql/bin/mysql
+
+  [engine "oracle"]
+      client    = /usr/local/instantclient_11_2/sqlplus
+
+  [engine "sqlite"]
+      client    = /usr/local/bin/sqlite3
+
+Various commands read from the configuration file and adjust their operation
+accordingly. See L<sqitch-config> for a list.
+
+=head1 See Also
+
+The original design for Sqitch was sketched out in a number of blog posts:
+
+=over
+
+=item *
+
+L<Simple SQL Change Management|http://justatheory.com/computers/databases/simple-sql-change-management.html>
+
+=item *
+
+L<VCS-Enabled SQL Change Management|http://justatheory.com/computers/databases/vcs-sql-change-management.html>
+
+=item *
+
+L<SQL Change Management Sans Duplication|http://justatheory.com/computers/databases/sql-change-management-sans-redundancy.html>
+
+=back
+
+Other tools that do database change management include:
+
+=over
+
+=item L<Rails migrations|http://guides.rubyonrails.org/migrations.html>
+
+Numbered migrations for L<Ruby on Rails|http://rubyonrails.org/>.
+
+=item L<Module::Build::DB>
+
+Numbered changes in pure SQL, integrated with Perl's L<Module::Build> build
+system. Does not support reversion.
+
+=item L<DBIx::Migration>
+
+Numbered migrations in pure SQL.
+
+=item L<Versioning|http://www.depesz.com/2010/08/22/versioning/>
+
+PostgreSQL-specific dependency-tracking solution by
+L<depesz|http://www.depesz.com/>.
+
+=back
+
+=head1 Author
+
+David E. Wheeler <david@justatheory.com>
+
+=head1 License
+
+Copyright (c) 2012-2015 iovation Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

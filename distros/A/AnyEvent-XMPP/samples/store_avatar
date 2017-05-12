@@ -1,0 +1,50 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use EV;
+use AnyEvent;
+use AnyEvent::XMPP::Client;
+use AnyEvent::XMPP::Ext::VCard;
+
+my $j = AnyEvent->condvar;
+my $cl = AnyEvent::XMPP::Client->new (debug => 1);
+$cl->add_account ($ARGV[0], $ARGV[1], undef, undef, {
+   initial_presence => -1, dont_retrieve_roster => 1
+});
+my $ex = AnyEvent::XMPP::Ext::VCard->new;
+
+my $av = do {
+   open my $av, $ARGV[2] or die "Couldn't open avatar '$ARGV[2]': $!";
+   local $/;
+   binmode $av;
+   <$av>
+};
+
+
+$cl->reg_cb (
+   session_ready => sub {
+      my ($cl, $acc) = @_;
+      print "session ready\n";
+      $ex->store ($acc->connection, { _avatar => $av }, sub {
+         my ($e) = @_;
+         if ($e) {
+            warn "error in storing avatar: " .$e->string ."\n";
+         }
+         $j->broadcast;
+      });
+   },
+   disconnect => sub {
+      my ($cl, $acc, $h, $p, $reas) = @_;
+      print "disconnect ($h:$p): $reas\n";
+   },
+   error => sub {
+      my ($cl, $acc, $err) = @_;
+      print "ERROR: " . $err->string . "\n";
+   },
+   message => sub {
+      my ($cl, $acc, $msg) = @_;
+      print "message from: " . $msg->from . ": " . $msg->any_body . "\n";
+   }
+);
+$cl->start;
+$j->wait;

@@ -1,0 +1,17 @@
+Revision history for App-SimpleScan-Plugin-Forget
+1.02  Wed Aug  2 13:20:41 PDT 2006
+	- remove references to @accent
+
+1.01  Mon Apr 10 09:54:26 PDT 2006
+	- Failed upload; trying again
+
+1.00  Fri Mar 17 16:55:35 PST 2006
+	- verified that plugin meets App::SimpleScan
+	  1.0 interface.
+
+0.02  Tue Feb 28 13:18:16 PST 2006
+       Update tests for consistency with new App::SimpleScan.
+
+0.01  Wed Oct 26 10:04:46 2005
+       Initial release.
+

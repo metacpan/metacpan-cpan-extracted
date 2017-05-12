@@ -1,0 +1,5 @@
+git.push_to = git@github.com:hkoba/app-perlminlint.git
+
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
+
+CheckChangeLog.files = Changes

@@ -1,0 +1,11 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+App-scrape-*
+App-scrape-*/
+.releaserc
+cover_db
+MYMETA.*

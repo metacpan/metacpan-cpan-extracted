@@ -1,0 +1,79 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Tree methods.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+plan skip_all => "No functional arch backend" unless is_tla_functional;
+plan tests => 15;
+
+use_ok("Arch::Tree");
+use_ok("Arch::Util", "run_tla", "save_file");
+use_ok("Arch::Backend", "has_archive_setup_cmd");
+use_ok("Arch::TempFiles");
+use_ok("Arch::Session");
+
+# setup testing environment
+my $TEMP     = Arch::TempFiles->new;
+my $TEMP_DIR = $TEMP->dir;
+die "Internal: Arch::TempFiles::dir didn't create dir\n"
+	unless $TEMP_DIR && -d $TEMP_DIR;
+
+$ENV{HOME} = $TEMP_DIR;
+
+sub run_tla0 (@) {
+	run_tla(@_);
+	fail(), die "'tla " . join(" ", @_) . "' failed: $?\n" if $?;
+	pass();
+}
+
+my $arch_id      = 'Arch Perl <arch-perl@example.com>';
+my $arch_archive = 'arch-perl@example.com--test';
+my $arch_version = 'ex--ample--0';
+my $arch_fqv     = "$arch_archive/$arch_version";
+my $arch_archdir = "$TEMP_DIR/archive";
+my $arch_projdir = "$TEMP_DIR/project";
+
+# create archive
+run_tla0("my-id",         $arch_id);
+run_tla0("make-archive",  $arch_archive, $arch_archdir);
+SKIP: {
+skip("this arch backend has no archive-setup", 1) if !has_archive_setup_cmd();
+run_tla0("archive-setup", $arch_fqv);
+}
+
+# setup project
+mkdir($arch_projdir, 0777);
+run_tla0("init-tree", "-d", $arch_projdir);
+
+# initial import
+my $tree = Arch::Tree->new($arch_projdir);
+ok($tree->add_log_version($arch_fqv) == 0, "add log version");
+ok($tree->set_version($arch_fqv) == 0,     "set tree version");
+ok($tree->import($arch_fqv) == 0,          "import");
+
+# change something
+save_file("$arch_projdir/somefile", 'some content');
+ok($tree->add('somefile') == 0, "add file");
+
+# check changes
+my @changes = $tree->get_changes();
+ok(@changes, "changes");
+eq_hash(
+	$changes[0],
+	{
+		type => 'A',
+		old_path => undef,
+		new_path => 'somefile'
+	},
+	"change entry"
+);
+
+# commit
+ok($tree->commit({ summary => 'nothing much'}) == 0, "commit");

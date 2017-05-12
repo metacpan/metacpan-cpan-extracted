@@ -1,0 +1,12 @@
+Revision history for Alien-MSYS2
+
+0.02      2017-01-13 12:50:41 -0500
+  - MSYS2 is properly setup on a share install
+  - GNU make is installed as part of a share install
+  - share install will only happen if it is requested
+    (set ALIEN_INSTALL_TYPE to share) since MSYS2 is
+    a large package
+  - Alien::MSYS2->bin_dir works for system install
+
+0.01      2017-01-12 16:36:34 -0500
+  - initial version

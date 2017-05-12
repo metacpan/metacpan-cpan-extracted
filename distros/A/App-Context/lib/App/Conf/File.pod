@@ -1,0 +1,211 @@
+
+######################################################################
+## $Id: File.pod 3208 2002-09-09 01:34:11Z spadkins $
+######################################################################
+
+=head1 NAME
+
+App::Conf::File - Load and access configuration data
+
+=head1 SYNOPSIS
+
+   use App::Conf;
+
+   $config = App::Conf->new();
+   $config = App::Conf->new(configFile => $file);
+   print $config->dump(), "\n";       # use Data::Dumper to spit out the Perl representation
+
+   # accessors
+   $property_value = $config->get($property_name);
+   $branch = $config->get_branch($branch_name);  # get hashref of properties
+
+   # on-demand loading helper methods (private methods)
+   $config->overlay($config2);        # merge the two config structures using overlay rules
+   $config->overlay($config1, $config2);  # merge $config2 onto $config1
+   $config->graft($branch_name, $config2);  # graft new config structure onto branch
+
+   # By convention, the configurations for each App-Context service will be located
+   # two levels under the hash ref as shown.
+
+   $config->{Conf}              # config settings for all Conf services
+   $config->{Conf}{default}     # config settings for the default Conf service
+   $config->{Security}          # config settings for all Security services
+   $config->{Security}{default} # config settings for the default Security service
+   $config->{Template}{tt}      # config settings for the Template service named "tt"
+
+   # The default driver (if "configClass" not supplied) reads in a Perl
+   # data structure from the file.  Alternate drivers can read a Storable,
+   # unvalidated XML, DTD-validated XML, RDF-validated XML, or any other
+   # file format or data source anyone cares to write a driver for.
+
+   $conf = {
+     'Standard' => {
+       'Log-Dispatch' => {
+         'logdir' => '/var/p5ee',
+       }
+     },
+     'Authen' => {
+       'passwd' => '/etc/passwd',
+       'seed' => '303292',
+     },
+   };
+
+   # A comparable unvalidating XML file would look like this.
+
+   <conf>
+     <Standard>
+       <Log-Dispatch logdir="/var/p5ee"/>
+     </Standard>
+     <Authen passwd="/etc/passwd" seed="303292"/>
+   </conf>
+
+   # A comparable ini file (.ini) would look like this.
+
+   [Standard.Log-Dispatch]
+   logdir = /var/p5ee
+   [Authen]
+   passwd = /etc/passwd
+   seed = 303292
+
+   # A comparable Java properties-like file would look like this.
+
+   Standard.Log-Dispatch.logdir = /var/p5ee
+   Authen.passwd = /etc/passwd
+   Authen.seed = 303292
+
+=head1 DESCRIPTION
+
+App::Conf::File is the class which represents configuration
+data in a file.  The type of Serializer used to deserialize the
+data is determined by the extension on the file name and contents
+of the beginning of the file.
+
+=cut
+
+#############################################################################
+# CLASS
+#############################################################################
+
+=head1 Class: App::Conf::File
+
+ * Throws: App::Exception::Conf
+ * Since:  0.01
+
+=head2 Design
+
+The App::Conf::File class extends the App::Conf class,
+overriding the create() method.
+
+=cut
+
+#############################################################################
+# CONSTRUCTOR METHODS
+#############################################################################
+
+=head1 Constructor Methods:
+
+=cut
+
+#############################################################################
+# new()
+#############################################################################
+
+=head2 new()
+
+The constructor is inherited from
+L<C<App::Conf>|App::Conf/"new()">.
+
+=cut
+
+#############################################################################
+# PUBLIC METHODS
+#############################################################################
+
+=head1 Public Methods:
+
+=cut
+
+#############################################################################
+# get()
+#############################################################################
+
+=head2 get()
+
+The constructor is inherited from
+L<C<App::Reference>|App::Reference/"get()">.
+
+=cut
+
+#############################################################################
+# get_branch()
+#############################################################################
+
+=head2 get_branch()
+
+The constructor is inherited from
+L<C<App::Reference>|App::Reference/"get_branch()">.
+
+=cut
+
+#############################################################################
+# dump()
+#############################################################################
+
+=head2 dump()
+
+The constructor is inherited from
+L<C<App::Reference>|App::Reference/"dump()">.
+
+=cut
+
+#############################################################################
+# PROTECTED METHODS
+#############################################################################
+
+=head1 Protected Methods:
+
+The following methods are intended to be called by subclasses of the
+current class.
+
+=cut
+
+#############################################################################
+# create()
+#############################################################################
+
+=head2 create()
+
+    * Signature: $config_data = $config->create($named);
+    * Param:     void
+    * Param:     configFile     string
+    * Return:    $config_data   {}
+    * Throws:    App::Exception::Conf
+    * Since:     0.01
+
+    Sample Usage: 
+
+    $config_data = $config->create();
+    $config_data = $config->create(
+        configFile => "config.xml",
+    );
+
+This method overrides the default create() method for a Reference.
+
+=cut
+
+=head1 ACKNOWLEDGEMENTS
+
+ * Author:  Stephen Adkins <stephen.adkins@officevision.com>
+ * License: This is free software. It is licensed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<C<App>|App>,
+L<C<App::Context>|App::Context>,
+L<C<App::Reference>|App::Reference>,
+L<C<App::Conf>|App::Conf>
+
+=cut
+
+1;
+

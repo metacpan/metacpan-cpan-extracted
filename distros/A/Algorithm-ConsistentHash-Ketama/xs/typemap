@@ -1,0 +1,44 @@
+TYPEMAP
+
+PerlKetama*    T_PERLKETAMA
+
+INPUT
+T_PERLKETAMA
+    {
+        MAGIC *mg;
+
+        mg = PerlKetama_mg_find(aTHX_ SvRV($arg), &PerlKetama_vtbl);
+        if (mg) {
+            $var = (PerlKetama *) mg->mg_ptr;
+        } else {
+            croak(\"not a ketama object\");
+        }
+    }
+
+OUTPUT
+T_PERLKETAMA
+        if (!$var)          /* if null */
+            SvOK_off($arg); /* then return as undef instead of reaf to undef */
+        else {
+            /* setup $arg as a ref to a blessed hash hv */
+            MAGIC *mg;
+            HV *hv = newHV();
+            const char *classname = \"Algorithm::ConsistentHash::Ketama\";
+            /* take (sub)class name to use from class_sv if appropriate */
+            if (SvMAGICAL(class_sv))
+                mg_get(class_sv);
+
+            if (SvOK( class_sv ) && sv_derived_from(class_sv, classname ) ) {
+                if(SvROK(class_sv) && SvOBJECT(SvRV(class_sv))) {
+                    classname = sv_reftype(SvRV(class_sv), TRUE);
+                } else {
+                    classname = SvPV_nolen(class_sv);
+                }
+            }
+
+            sv_setsv($arg, sv_2mortal(newRV_noinc((SV*)hv)));
+            (void)sv_bless($arg, gv_stashpv(classname, TRUE));
+            mg = sv_magicext((SV*)hv, NULL, PERL_MAGIC_ext, &PerlKetama_vtbl, (char*) $var, 0); 
+            mg->mg_flags |= MGf_DUP;
+        }
+

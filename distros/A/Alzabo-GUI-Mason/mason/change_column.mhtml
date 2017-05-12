@@ -1,0 +1,116 @@
+<%args>
+$schema
+$table
+$column
+$type
+$extended_type => undef
+$nullable => 0
+$default => undef
+$length => undef
+$precision => undef
+$primary_key => 0
+$sequenced => 0
+@attributes => ()
+$comment => ''
+</%args>
+
+<%init>
+use Alzabo::GUI::Mason;
+
+my ($s, $t, $c);
+eval
+{
+    $s = Alzabo::Create::Schema->load_from_file( name => $schema );
+
+    $t = $s->table($table);
+
+    $c = $t->column($column);
+
+    $length = undef if $length eq '';
+    $precision = undef if $precision eq '';
+    $default = Alzabo::GUI::Mason::default_from_web( $default );
+
+    foreach ( qw( nullable sequenced ) )
+    {
+	my $m = "set_$_";
+	if ($ARGS{$_})
+	{
+	    unless ($c->$_())
+	    {
+		$c->$m(1);
+	    }
+	}
+	elsif ($c->$_())
+	{
+	    $c->$m(0);
+	}
+    }
+
+    if (defined $default)
+    {
+	$c->set_default($default);
+    }
+    elsif (defined $c->default)
+    {
+	$c->set_default(undef);
+    }
+
+    if ( $extended_type && $c->type ne $extended_type &&
+	 $s->rules->feature('extended_column_types') )
+    {
+	$c->alter( type => $extended_type,
+		   length => $length,
+		   precision => $precision,
+		 );
+    }
+    elsif ($type && $c->type ne $type)
+    {
+	$c->alter( type => $type,
+		   length => $length,
+		   precision => $precision,
+		 );
+    }
+    elsif ($length ne $c->length || $precision ne $c->precision)
+    {
+	$c->set_length( length => $length,
+			precision => $precision );
+    }
+
+    if ($primary_key)
+    {
+	unless ($c->is_primary_key)
+	{
+	    $t->add_primary_key($c);
+	}
+    }
+    elsif ($c->is_primary_key)
+    {
+	$t->delete_primary_key($c);
+    }
+
+    $c->set_attributes( grep { length } @attributes );
+
+    $c->set_comment($comment);
+
+    $s->save_to_file;
+};
+
+my $e = $@;
+
+$m->comp( 'handle_rules_exception', e => $e, comp => 'view_column', %ARGS );
+
+$m->comp( 'exception', $e ) if $e;
+
+$m->redirect( uri( path => 'view_column' . Alzabo::GUI::Mason::Config::mason_extension(),
+                   query => { schema => $s->name,
+                              table  => $t->name,
+                              column => $c->name,
+                            },
+                 ),
+            );
+
+</%init>
+
+<%flags>
+inherit => 'syshandler'
+</%flags>

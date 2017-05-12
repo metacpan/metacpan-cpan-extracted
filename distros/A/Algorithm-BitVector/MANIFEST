@@ -1,0 +1,10 @@
+examples/BitVectorDemo.pl
+examples/README
+examples/testinput.txt
+lib/Algorithm/BitVector.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

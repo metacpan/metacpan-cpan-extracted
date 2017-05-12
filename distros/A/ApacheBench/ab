@@ -1,0 +1,141 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Std;
+use HTTPD::Bench::ApacheBench;
+
+my %options;
+getopt('nctpCHT', \%options);
+getopts('Vki', \%options);
+
+if ($options{'V'}) {
+    &show_version;
+    exit;
+}
+if (!@ARGV) {
+    &show_usage;
+    exit;
+}
+
+my $postdata;
+if ($options{'p'}) {
+    open(FILE, $options{'p'});
+    $postdata = join('', <FILE>);
+    close FILE;
+}
+
+my $c = $options{'c'} || 1;
+my $n = $options{'n'} || 1;
+
+
+my $b = HTTPD::Bench::ApacheBench->new;
+$b->concurrency($c);
+$b->keepalive( $options{'k'} );
+$b->timelimit( $options{'t'} );
+my $run = HTTPD::Bench::ApacheBench::Run->new
+  ({
+    urls      => [ $ARGV[0] ],
+    repeat    => $n,
+    memory    => 3,
+   });
+$run->cookies([ $options{'C'} ]);
+$run->postdata([ $postdata ]);
+$run->head_requests([ $options{'i'} ]);
+$run->content_types([ $options{'T'} ]);
+# need to kludge H option because of weaknesses in Getopt::Std
+#  (can't handle multiple identical options)
+$options{'H'} =~ s/\\r\\n/\r\n/g;
+$run->request_headers([ $options{'H'} ]);
+$b->add_run($run);
+
+$b->execute;
+
+&show_results();
+print "Response headers:\n";
+print $run->response_headers(0)."\n";
+
+sub min { my $min = shift; foreach (@_) {$min = $_ if $_ < $min} $min; }
+sub max { my $max = shift; foreach (@_) {$max = $_ if $_ > $max} $max; }
+sub avg { my $tot = 0; foreach (@_) {$tot += $_} $tot / ($#_+1); }
+
+sub show_results {
+    my $time_in_sec = $b->total_time / 1000;
+
+    my $sent_requests = $b->total_requests_sent;
+    my $completed_requests = $b->total_responses_received;
+    my $failed_requests = $b->total_responses_failed;
+
+    my $hps = $completed_requests / $time_in_sec;
+    my $kps = $b->bytes_received / 1024 / $time_in_sec;
+
+    my $doc_length = $run->response_body_lengths()->[0];
+    my $html_size = $n * $doc_length;
+    my $total_bytes_read = $n * $run->sum_bytes_read();
+
+    my ($software) = ( $run->response_headers()->[0] =~ m/Server: (.*)/ );
+    my ($hostname) = ( $run->urls()->[0] =~ m,(?:http://)?([^/:]+), );
+    my ($port) = ( $run->urls()->[0] =~ m,(?:http://)?[^/:]+:(\d+), );
+    $port = 80 unless $port;
+    my ($path) = ( $run->urls()->[0] =~ m,(?:http://)?[^/]+(.*), );
+
+    &show_version;
+    print qq`Server Software:        $software
+Server Hostname:        $hostname
+Server Port:            $port
+
+Document Path:          $path
+Document Length:        $doc_length bytes
+
+Concurrency Level:      $c
+Time taken for tests:   $time_in_sec seconds
+Sent requests:          $sent_requests
+Completed requests:     $completed_requests
+Failed requests:        $failed_requests
+Total transferred:      $total_bytes_read bytes
+HTML transferred:       $html_size bytes
+Requests per second:    $hps
+Transfer rate:          $kps kb/s received
+
+Connnection Times (ms)
+              min     avg   max
+Connect:   `.sprintf("%6d%8.2f%6d",
+		     &min(map {$run->iteration($_)->min_connect_time} 0..($n-1)),
+		     &avg(map {$run->iteration($_)->connect_times(0)} 0..($n-1)),
+		     &max(map {$run->iteration($_)->max_connect_time} 0..($n-1))).qq`
+Response:  `.sprintf("%6d%8.2f%6d",
+		     &min(map {$run->iteration($_)->min_response_time} 0..($n-1)),
+		     &avg(map {$run->iteration($_)->response_times(0)} 0..($n-1)),
+		     &max(map {$run->iteration($_)->max_response_time} 0..($n-1))
+		    )."\n\n" . $b->warnings . "\nHTTP request:\n" . $run->request_body(0);
+}
+
+
+sub show_usage {
+    print qq`Usage: $0 [options] [http://]hostname[:port]/path
+Options are:
+    -n requests     Number of requests to perform
+    -c concurrency  Number of multiple requests to make
+    -t timelimit    Seconds to max. wait for responses (may be fractional)
+    -p postfile     File containg data to POST
+    -T content-type Content-type header for POSTing
+    -i              Use HEAD instead of GET
+    -C attribute    Add cookie, eg. 'Apache=1234'
+    -H attribute    Add Arbitrary header line, eg. 'Accept-Encoding: zop'
+                    Inserted after all normal header lines.
+                    (separate multiple headers with "\\r\\n")
+    -V              Print version number and exit
+    -k              Use HTTP KeepAlive feature
+    -h              Display usage information (this message)
+`;
+}
+
+
+sub show_version {
+    print qq`This is ab implemented using the ApacheBench Perl API, version $HTTPD::Bench::ApacheBench::VERSION
+Copyright (c) 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Copyright (c) 1998-1999 The Apache Group, http://www.apache.org/
+Copyright (c) 2000-2002 Ling Wu, Adi Fairbank, http://www.certsite.com/
+Copyright (c) 2003-2011 Adi Fairbank, http://adiraj.org/
+
+`;
+}

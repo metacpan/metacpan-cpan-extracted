@@ -1,0 +1,24 @@
+Apache2-JemplateFilter
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Apache2::JemplateFilter
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Fujiwara Shunichiro
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

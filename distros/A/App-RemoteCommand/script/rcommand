@@ -1,0 +1,63 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+use App::RemoteCommand;
+
+exit App::RemoteCommand->new->parse_options(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+rcommand - simple remote command launcher
+
+=head1 SYNOPSIS
+
+  > rcommand [OPTIONS] HOSTS COMMANDS
+  > rcommand [OPTIONS] --host-file FILE COMMANDS
+  > rcommand [OPTIONS] HOSTS --script SCRIPT [SCRIPT_ARGS]
+
+=head1 OPTIONS
+
+  -s, --script=SCRIPT       execute local script file instead of COMMANDS argument
+  -H, --host-file=FILE      set target hosts by host listed file
+  -a, --ask-sudo-password   raise prompt for sudo password first
+      --sudo-password=PASS  set sudo password
+  -c, --concurrency=NUM     parallel concurrency, default 5
+      --append-hostname     append hostname to each output line, default on
+      --append-time         append time to each output line, default off
+      --sudo=USER           execute COMMAND or SCRIPT with sudo -u USER
+  -q, --quiet               do not show SUCCESS/FAIL results
+  -h, --help                show this help
+  -v, --version             show version
+
+=head1 EXAMPLES
+
+  > rcommand example.jp 'uname -a'
+  > rcommand example.jp --script foo.pl
+  > rcommand example.jp --script script.pl arg1 arg2 arg3
+  > rcommand --host-file host.txt 'uptime; top -b -n 1'
+  > rcommand --ask-sudo-password '{www1,www2}.example.com' -- sudo rm -rf /tmp/trash
+  > rcommand --ask-sudo-password --sudo root example.com 'service restart httpd'
+  > rcommand --ask-sudo-password --sudo app example.com --script script.sh
+
+  HOST SYNTAX:
+  HOSTS will be expand by String::Glob::Permute::string_glob_permute function.
+  For example,
+
+   'example.{com,jp}'     => example.com, example.jp
+   'example[001-003].com' => example001.com, example002.com, example003.com
+   '{prod,qa}[01-02].com' => prod01.com, prod02.com, qa01.com, qa02.com
+
+=head1 LICENSE
+
+Copyright (C) Shoichi Kaji.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Shoichi Kaji E<lt>skaji@cpan.orgE<gt>
+
+=cut

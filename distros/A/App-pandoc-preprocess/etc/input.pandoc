@@ -1,0 +1,500 @@
+% `ppp` Documentation
+% Daniel Bruder
+% Version 0.6.0
+
+<!-- <#ifdef HANDOUT>
+Explanation of the gpp feature ...
+<#endif>
+ -->
+
+\newpage
+
+# Abstract
+_`ppp` allows you to use pandoc in new ways by rendering ASCII-markup to beautiful pictures right from within pandoc's verbatim environments._
+
+_See below for illustrative examples and detailed usage instructions._
+
+_Bonus on top: Leaving out `ppp` form the typesetting pipeline will still render your document and the verbatims with the ASCII-markup will still stay readable!_
+
+------------------------------------------------------------------------------
+
+
+
+# General usage
+
+In each case, you will use pandoc's verbatim environment, set the rendering engine and additional options:
+
+~~~~~~~~~~~
+~~~~~ {.renderer .option1 .option2=value2}
+ --- RENDERER-SPECIFIC MARKUP GOES HERE ---
+~~~~~
+~~~~~~~~~~~
+
+## General Renderers
+The renderers available to `ppp` are:
+
+* ditaa
+* yuml diagrams:
+    * class diagramas (cf. Figure \ref{fig:yuml-class-diagram})
+    * usecase diagramas (cf. Figure \ref{fig:yuml-usecase-diagram})
+    * activity diagramas (cf. Figure \ref{fig:yuml-activity-diagram})
+* dot
+* neato
+* rdfdot
+
+## General Options
+This is a list of the general options, compatible with any type of renderer:
+
+* `.scale=90%`
+* `.label=fig:my-figure`
+* `.title="Some label for the figure"`
+
+
+------------------------------------------------------------------------------
+
+\newpage
+
+# ditaa Diagrams
+
+In order to generate `ditaa`-diagrams, ditaa needs to be installed.
+
+For an exhaustive list of options and possibilities, please check the [ditaa homepage](http://ditaa.sourceforge.net/).
+
+## ditaa Options
+
+Apart from the [General Options][], the possible options specific to ditaa are:
+
+* `.rounded-corners`
+* `.no-shadows`
+* `.no-antialias`
+* `.no-separation`
+
+## ditaa Examples
+
+Using ditaa, the following markup will produce Figure \ref{fig:pipeline-overview}.
+
+\scriptsize
+
+    ~~~~~ {.ditaa .rounded-corners .no-shadows
+           .scale=90% .title="The ppp and pandoc pipeline"
+           .label=fig:pipeline-overview  .no-antialias .no-separation
+          } # Caution! These lines actually would have to be on *one* line only!
+    +-----------------+       +--------+           +--------------------+
+    | markdown source |------>| ppp    |------*--->| pröcessed markdown |
+    +-----------------+       +--------+      |    +--------------------+
+                                  |           \--->| image files        |
+                        +------------------+       +--------------------+
+                        | diagram creation |
+                        +------------------+
+                        | ditaa/dot/rdfdot |
+                        +------------------+
+    ~~~~~
+
+\normalsize
+
+
+~~~~~ {.ditaa .rounded-corners .no-shadows .scale=90% .title="The ppp and pandoc pipeline" .label=fig:pipeline-overview  .no-antialias .no-separation}
++-----------------+       +--------+           +--------------------+
+| markdown source |------>| ppp    |------*--->| pröcessed markdown |
++-----------------+       +--------+      |    +--------------------+
+                              |           \--->| image files        |
+                    +------------------+       +--------------------+
+                    | diagram creation |
+                    +------------------+
+                    | ditaa/dot/rdfdot |
+                    +------------------+
+~~~~~
+
+As a contrast, turning off several options, ditaa will produce an output as in Figure \ref{fig:pipeline-overview-2}:
+
+
+\scriptsize
+
+    ~~~~~ {.ditaa .scale=90% .title="The ppp and pandoc pipeline #2" .label=fig:pipeline-overview-2}
+    +-----------------+       +--------+           +--------------------+
+    | markdown source |------>| ppp    |------*--->| pröcessed markdown |
+    +-----------------+       +--------+      |    +--------------------+
+                                  |           \--->| image files        |
+                        +------------------+       +--------------------+
+                        | diagram creation |
+                        +------------------+
+                        | ditaa/dot/rdfdot |
+                        +------------------+
+    ~~~~~
+
+\normalsize
+
+
+~~~~~ {.ditaa .scale=90% .title="The ppp and pandoc pipeline #2" .label=fig:pipeline-overview-2}
++-----------------+       +--------+           +--------------------+
+| markdown source |------>| ppp    |------*--->| pröcessed markdown |
++-----------------+       +--------+      |    +--------------------+
+                              |           \--->| image files        |
+                    +------------------+       +--------------------+
+                    | diagram creation |
+                    +------------------+
+                    | ditaa/dot/rdfdot |
+                    +------------------+
+~~~~~
+
+
+
+------------------------------------------------------------------------------
+
+\newpage
+
+# dot Diagrams
+
+`dot` rendering is done through [GraphViz](http://www.graphviz.org/)'s engine. Please cf. [Graphviz's Documentation](http://www.graphviz.org/Documentation.php) for exact usage specifics on the usage of `dot`.
+
+## dot Options
+
+* currently none apart from the [General Options][]
+
+## dot Examples
+
+With `dot` as the *renderer*, the following markup produces the figure as seen in Figure \ref{fig:dot-fsa}.
+
+\scriptsize
+
+    ~~~~~ {.dot .scale=50% .title=dot Finite State Automaton .label=fig:dot-fsa}
+    digraph finite_state_machine {
+      rankdir=LR;
+      size="8,5"
+      node [shape = doublecircle]; LR_0 LR_3 LR_4 LR_8;
+      node [shape = circle];
+      LR_0 -> LR_2 [ label = "SS(B)" ];
+      LR_0 -> LR_1 [ label = "SS(S)" ];
+      LR_1 -> LR_3 [ label = "S($end)" ];
+      LR_2 -> LR_6 [ label = "SS(b)" ];
+      LR_2 -> LR_5 [ label = "SS(a)" ];
+      LR_2 -> LR_4 [ label = "S(A)" ];
+      LR_5 -> LR_7 [ label = "S(b)" ];
+      LR_5 -> LR_5 [ label = "S(a)" ];
+      LR_6 -> LR_6 [ label = "S(b)" ];
+      LR_6 -> LR_5 [ label = "S(a)" ];
+      LR_7 -> LR_8 [ label = "S(b)" ];
+      LR_7 -> LR_5 [ label = "S(a)" ];
+      LR_8 -> LR_6 [ label = "S(b)" ];
+      LR_8 -> LR_5 [ label = "S(a)" ];
+    }
+    ~~~~~
+
+\normalsize
+
+~~~~~ {.dot .scale=50% .title=dot Finite State Automaton .label=fig:dot-fsa}
+digraph finite_state_machine {
+  rankdir=LR;
+  size="8,5"
+  node [shape = doublecircle]; LR_0 LR_3 LR_4 LR_8;
+  node [shape = circle];
+  LR_0 -> LR_2 [ label = "SS(B)" ];
+  LR_0 -> LR_1 [ label = "SS(S)" ];
+  LR_1 -> LR_3 [ label = "S($end)" ];
+  LR_2 -> LR_6 [ label = "SS(b)" ];
+  LR_2 -> LR_5 [ label = "SS(a)" ];
+  LR_2 -> LR_4 [ label = "S(A)" ];
+  LR_5 -> LR_7 [ label = "S(b)" ];
+  LR_5 -> LR_5 [ label = "S(a)" ];
+  LR_6 -> LR_6 [ label = "S(b)" ];
+  LR_6 -> LR_5 [ label = "S(a)" ];
+  LR_7 -> LR_8 [ label = "S(b)" ];
+  LR_7 -> LR_5 [ label = "S(a)" ];
+  LR_8 -> LR_6 [ label = "S(b)" ];
+  LR_8 -> LR_5 [ label = "S(a)" ];
+}
+~~~~~
+
+
+
+------------------------------------------------------------------------------
+
+
+\newpage
+
+# neato Diagrams
+
+`neato` diagrams behave very similarly to [dot Diagrams][]. Please cf [dot Diagrams] for more information
+
+## neato Options
+
+* same as [dot Options][]
+
+## neato Examples
+
+The following example produces Figure \ref{fig:neato-diagram}.
+
+\scriptsize
+
+    ~~~~~ {.neato .scale=50% .title=neato diagram .label=fig:neato-diagram}
+    graph G {
+      n0 -- n1 -- n2 -- n3 -- n0;
+    }
+    ~~~~~
+
+\normalsize
+
+~~~~~ {.neato .scale=50% .title=neato diagram .label=fig:neato-diagram}
+graph G {
+  n0 -- n1 -- n2 -- n3 -- n0;
+}
+~~~~~
+
+
+
+------------------------------------------------------------------------------
+
+
+\newpage
+
+
+# yUML
+
+yUML needs a network connection and uses <http://yuml.me> as the rendering service.
+
+## yUML Options
+Options specific to yUML can be:
+
+* `.type=`: any of `[` `class`, `activity`, `usecase` `]`
+* `.style=`: any of `[` `scruffy`, `boring`, `plain` `]`
+* `.direction=`: any of `[` `LR`, `RL`, `TD`, `]`
+
+<!-- * `.format=`: `png`, `pdf`, `jpg`, `svg` -->
+<!-- * `.scale=`: `10%`-`200%` -->
+
+## yUML Examples
+
+### yUML Class diagrams
+
+With *yUML* as the renderer, setting `.type=class` and using the style `.style=boring`, the following markup produces Figure \ref{fig:yuml-class-diagram}.
+
+\scriptsize
+
+    ~~~~ {.yuml .style=boring .type=class .direction=TD .title=yUML class diagram .label=fig:yuml-class-diagram}
+
+    [Customer] +1 ->        *[Order]
+    [Order]   ++1 -items>   *[LineItem]
+    [Order]       -0..1>     [PaymentMethod]
+    ~~~~
+
+\normalsize
+
+~~~~ {.yuml .style=boring .type=class .direction=TD .title=yUML class diagram .label=fig:yuml-class-diagram}
+[Customer] +1 ->        *[Order]
+[Order]   ++1 -items>   *[LineItem]
+[Order]  -0..1>     [PaymentMethod]
+~~~~
+
+\newpage
+
+### yuml Usecase diagrams
+
+With `scruffy` style and `.type=usecase`, the following example produces Figure \ref{fig:yuml-usecase-diagram}.
+
+\scriptsize
+
+    ~~~~ {.yuml .style=scruffy .type=usecase .title=yUML usecase diagram .label=fig:yuml-usecase-diagram}
+    // Cool Use Case Diagram
+    [Customer]-(Make Cup of Tea)
+    (Make Cup of Tea)<(Add Milk)
+    (Make Cup of Tea)>(Add Tea Bag)
+    ~~~~
+
+\normalsize
+
+~~~~ {.yuml .style=scruffy .type=usecase .title=yUML usecase diagram .label=fig:yuml-usecase-diagram}
+// Cool Use Case Diagram
+[Customer]-(Make Cup of Tea)
+(Make Cup of Tea)<(Add Milk)
+(Make Cup of Tea)>(Add Tea Bag)
+~~~~
+
+\newpage
+
+
+### yuml Activity diagrams
+
+Lastly, using `.type=activity` and `.style=plain` the following example produces Figure \ref{fig:yuml-activity-diagram}.
+
+\scriptsize
+
+    ~~~~ {.yuml .style=plain .type=activity .title=yUML activity Diagram .label=fig:yuml-activity-diagram}
+    (start)->|a|,|a|->(Make Coffee)->|b|,|a|->(Make Breakfast)->|b|,|b|-><c>[want more coffee]->(Make Coffee),<c>[satisfied]->(end)
+    ~~~~
+
+\normalsize
+
+~~~~ {.yuml .style=plain .type=activity .title=yUML activity Diagram .label=fig:yuml-activity-diagram}
+(start)->|a|,|a|->(Make Coffee)->|b|,|a|->(Make Breakfast)->|b|,|b|-><c>[want more coffee]->(Make Coffee),<c>[satisfied]->(end)
+~~~~
+
+
+
+<!-- ~~~~ {.yuml .style=boring .type=class }
+[               Company
+             <<singleton>>
+ ===================================
+ +give_me_a_rise (employee : Person)
+ +please_hire_me (prospect : Person) ]
+
+[        Person
+ -----------------------
+ -name : String
+ -----------------------
+ +you_re_fired () : void ]
+
+[Company] 1 employer <@>--- "< works for" employee 1..n [Person] 1 boss --- flunkies 1..* [Person]
+~~~~ -->
+
+
+
+------------------------------------------------------------------------------
+
+
+
+\newpage
+
+# rdfdot Diagrams
+
+## rdfdot Options
+
+* currently none apart from the [General Options][]
+
+## rdfdot Examples
+
+The following example produces Figure \ref{"fig:rdfdot-diagram"} on page \pageref{"fig:rdfdot-diagram"}.
+
+\scriptsize
+
+    ~~~~~ {.rdfdot .scale=65% .title=rdfdot Diagram .label="fig:rdfdot-diagram"}
+
+    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    @base <http://example.com/> .
+    <alice> foaf:name "Alice" ;
+            foaf:knows [ foaf:name "Bob" ] .
+    ~~~~~
+
+\normalsize
+
+~~~~~ {.rdfdot .scale=65% .title=rdfdot Diagram .label="fig:rdfdot-diagram"}
+
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@base <http://example.com/> .
+<alice> foaf:name "Alice" ;
+        foaf:knows [ foaf:name "Bob" ] .
+~~~~~
+
+\newpage
+
+# List of options
+
+
+------------------------------------------------------------------------
+ Renderer               Option                    possible values
+----------            ------------              --------------------
+*General*               `.scale`                  `1%`--`99%`
+
+                        `.label`                  `fig:my-figure`
+
+                        `.title`                  `"Some label for the figure"`
+
+
+ditaa                   `.rounded-corners`
+
+                        `.no-shadows`
+
+                        `.no-antialias`
+
+                        `.no-separation`
+
+dot                     N/A
+
+neato                   N/A
+
+yUML                    `.type=`                   any of `[` `class`, `activity`, `usecase` `]`
+
+                        `.style=`                  any of `[` `scruffy`, `boring`, `plain` `]`
+
+                        `.direction=`              any of `[` `LR`, `RL`, `TD`, `]`
+
+rdfdot                  N/A
+
+------------------------------------------------------------------------
+
+Table: List of options
+
+
+\newpage
+
+# List of homepages and documentation to renderers
+
+
+-----------------------------------------------------------------------------
+Renderer    Links
+----------  -----------------------------------------------------------------
+ppp         (this document)
+            
+            <https://metacpan.org/release/App-pandoc-preprocess>
+            
+            <https://github.com/xdbr/p5-App-pandoc-preprocess>
+            
+ditaa       <http://ditaa.sourceforge.net/>
+            
+dot         <http://www.graphviz.org/>
+            
+neato       <http://www.graphviz.org/>
+            
+yUML        <http://yuml.me/>
+            
+            <https://github.com/wandernauta/yuml>
+            
+rdfdot      <https://metacpan.org/pod/RDF::Trine::Exporter::GraphViz>
+
+-----------------------------------------------------------------------------
+
+Table: List of options
+
+
+
+# Credits and further references
+
+* <http://www.asciiflow.com/#Draw>: an excellent helper for all things diagram
+* <http://randomdeterminism.wordpress.com/2012/06/01/how-i-stopped-worring-and-started-using-markdown-like-tex/>: general introduction to another approach to typesetting and using `gpp`
+* <https://github.com/nichtich/ditaa-markdown>: This is where the original idea came from
+* gpp: <http://files.nothingisreal.com/software/gpp/gpp.html>
+
+\listoffigures
+
+
+------------------------------------------------------------------------------
+
+
+<!--
+ # Test 1
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+* Code
+
+* in lists should not be set:
+    ~~~~~ {.dot .Grankdir:LR}
+
+    digraph {
+      A -> B -> C;
+      A -> C;
+    }
+
+    ~~~~~
+-->
+
+<!--
+op = OptionParser(usage="%prog [-i FILE] -o FILE", version="%prog 0.1")
+op.add_option("-i", "--in", dest="infile", help="read yuml from FILE instead of stdin", metavar="FILE", default="-")
+op.add_option("-o", "--out", dest="outfile", help="store output in FILE", metavar="FILE")
+op.add_option("-f", "--format", dest="fmt", help="use format FMT", metavar="FMT", default="png", choices=['png', 'pdf', 'jpg', 'svg'])
+op.add_option("-t", "--type", dest="type", help="draw a TYPE diagram", metavar="TYPE", default="class", choices=['class', 'activity', 'usecase'])
+op.add_option("-s", "--style", dest="style", help="use style STY", metavar="STY", default="scruffy", choices=['scruffy', 'boring', 'plain'])
+op.add_option("--scale", dest="scale", help="scale output to percentage", metavar="PERCENT", type="int")
+op.add_option("--dir", dest="dir", help="direction of the diagram LR RL TD", metavar="DIRECTION")
+op.add_option("-v", "--verbose", dest="v", help="print some debug info", action="store_true", default=False)
+ -->

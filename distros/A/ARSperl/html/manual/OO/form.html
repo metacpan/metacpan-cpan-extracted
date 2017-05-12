@@ -1,0 +1,241 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - OO Layer Overview</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<CENTER>
+<H1>ARSperl Programmer's Manual - OO Layer Form Object</H1>
+</CENTER>
+
+<H2> Methods </H2>
+
+<DL>
+<DT><A NAME="new"><B>constructor</B></A>
+<PRE>
+  $f = new ARS::form(-form =&gt; scalar string,
+                     -vui  =&gt; scalar string,
+                     -connection =&gt; ARS object);
+</PRE>
+
+    This is the default constructor. To make life easier, you should use
+    the openForm() method available in the 
+    <a href="connection.html">Connection Object</A>.
+
+<P>
+<DT><A NAME="DESTROY"><B>destructor</B></A>
+	Currently, the form destructor does nothing.
+<P>
+<DT><A NAME="query"><B>query()</B></A>
+<PRE>
+  @matches =  $f->query(-query         =&gt; scalar string,
+                        -maxhits       =&gt; scalar string,
+                        -firstretrieve =&gt; scalar string);
+</PRE>
+
+    This function allows you to run a query against a Form. Both parameters 
+    are optional. If you specify neither, you will get a list of all
+    available records upto the limit imposed on the server. If you specify
+    a qualifier and a maxhits number, you will get matching records upto
+    the maximum number of hits you specified. <P> 
+    This method returns a list of matching Record IDs. It does not
+    currently return a "query list". 
+
+<P>
+<DT><A NAME="getFieldID"><B>getFieldID()</B></A>
+<PRE>
+  $id = $f->getFieldID(-field =&gt; scalar string);
+</PRE>
+
+    This an "internal" function that is used to translate a field name to a 
+    field ID. Eventually, it will obey the VUI you specified. 
+<P>
+
+<DT><A NAME="getFieldName"><B>getFieldName()</B></A>
+<PRE>
+  $name = $f->getFieldName(-id =&gt; scalar string);
+</PRE>
+
+    This an "internal" function that is used to translate a field ID to a 
+    field nameD. Eventually, it will obey the VUI you specified. 
+<P>
+
+<DT><A NAME="getEnumValues"><B>getEnumValues()</B></A>
+<PRE>
+  @vals = $f->getEnumValues(-field =&gt; scalar string);
+</PRE>
+
+   This function returns a list of enumeration values (labels)
+   for a given field. If the field is not an enumeration field,
+   an exception is thrown (type=ERROR, num=81006).
+<P>
+
+<DT><A NAME="getFieldType"><B>getFieldType()</B></A>
+<PRE>
+  $type = $f->getFieldType(-name =&gt; scalar string,
+                           -id =&gt; scalar string);
+</PRE>
+
+    This an "internal" function that is used to retrieve the datatype of a
+    particular field. You must specify one of the parameters. If you
+    specify both, the -id parameter is ignore in favor of the -name
+    parameer. Eventually, it will obey the VUI you specified. 
+<P>
+<DT><A NAME="create"><B>create()</B></A>
+<PRE>
+  $id = $f->create(-values =&gt; { field1 =&gt; value1, ... });
+</PRE>
+    This function allows you to create a new entry in this form. You can
+    specify field name to field value mappings with out regard for the
+    field ID or enumeration types. Behind the scenes magic occurs to hide
+    this from you. <P>
+    Eventually, it will obey the VUI you specified. 
+    <P>
+
+      In order to create an entry with an attachment, you should use the 
+      following format:
+
+<PRE>
+  $id = $f->create(-values =&gt; { 
+               "Attachment Field Name" =&gt; { file =&gt; scalar filename, 
+                                            OR
+                                            buffer =&gt; scalar,
+                                            AND
+                                            size =&gt; scalar
+                                          }
+                              });
+</PRE>
+
+    Note that the size field must correspond to either the length of the
+    in-core buffer or the size of the file you wish to attach. Specifying
+    and incorrect length will result in a truncated attachment. See the
+    <code>t/entry.t</code> file in the source distribution for an example
+    of adding attachments to records.
+
+<P>
+<DT><A NAME="delete"><B>delete()</B></A>
+<PRE>
+   $f->delete(-entry =&gt; scalar string);
+</PRE>
+
+    This method will delete a given entry from the form. It does not "pad
+    out" the entry id for you currently. So if there are leading zeros, you 
+    must add them.
+
+<P>
+<DT><A NAME="set"><B>set()</B></A>
+<PRE>
+   $f->set(-entry =&gt; scalar string,
+           -gettime =&gt; scalar timestamp,
+           -value =&gt; { field1 =&gt; value1, ...});
+</PRE>
+
+    This method allows you to set the field values of an existing entry. It 
+    currently does not obey the VUI setting. You may specify the
+    enumeration field text instead of the enumeration value. In the future, 
+    you will have the option of specifying either.
+
+<P>
+<DT><A NAME="merge"><B>merge()</B></A>
+<PRE>
+   $f->merge(-type   =&gt; numeric value,
+             -values =&gt; { field1 =&gt; value1, ...});
+</PRE>
+
+    This method allows you to "merge" the given fields/values into 
+    a form. The merge operation is fairly powerful, allowing you
+    to bypass the usual pattern, "not-null", etc, checks that are 
+    enforced on set() and create() operations. In addition,
+    the merge() operation allows you to over-write existing entries
+    (including their diary fields). This call  
+    currently does not obey the VUI setting. You may specify the
+    enumeration field text instead of the enumeration value. In the future, 
+    you will have the option of specifying either. In the future, 
+    this call will also do the right thing for diary fields. Currently, 
+    you need to pass the <I>encoded</I> diary to this
+	routine. See <A HREF="ars_EncodeDiary.html">ars_EncodeDiary</A>.
+
+<P>
+<DT><A NAME="get"><B>get()</B></A>
+<PRE>
+   ($value1, ...) = $f->get(-entry =&gt; scalar string,
+                            -fields =&gt; [ field1, ... ]);
+</PRE>
+
+    This method allows you to retrieve some (or all, if you don't specify
+    the -fields parameter) fields for a given record ID from the form. It
+    does not currently obey the VUI setting. In addition, you can not
+    specify field ID's currently, but will be able to in the
+    future. Finally, the entry ID will not be padded out for you currently.
+    In addition, enumeration values will be converted on the fly for you.
+<P>
+<DT><A NAME="getAsHash"><B>getAsHash()</B></A>
+<PRE>
+   %h = $f->getAsHash(-entry =&gt; scalar string,
+                      -fields =&gt; [ field1, ... ]);
+</PRE>
+
+    This method is identical to get() in every way except for the return
+    value. This method returns a list of key/value pairs where the key is
+    the field name (currently doesn't obey vui setting) and the field value 
+    (enumeration values are converted to text automatically). <P>
+
+      The current implementation does allow for the specification of sort
+      order, but in the future it will and then you should, as usual, put
+      the return value into an array instead of a hash.
+
+<P>
+<DT><A NAME="getAttachment"><B>getAttachment()</B></A>
+<PRE>
+   $v = $f->getAttachment(-entry =&gt; scalar string,
+                          -field =&gt; [ field1 ],
+                          -file  =&gt; scalar string);
+</PRE>
+
+    This method allows you to retrieve an attachment from the given
+    record. You must specify both the record's entry ID and the attachment
+    field name. The <code>file</code> parameter is optional. If specified,
+    the attachment will be written to the given filename. If not specified, 
+    the attachment is returned as a scalar value.
+<P>
+<DT><A NAME="value2internal"><B>value2internal()</B></A>
+<PRE>
+  $v = value2internal(-field =&gt; scalar, -value =&gt; value);
+</PRE>
+
+    This is an internal routine used to translate enumeration values into
+    text for a given field.
+
+<P>
+<DT><A NAME="internal2value"><B>internal2value()</B></A>
+<PRE>
+  $v = internal2value(-field =&gt; scalar, -id =&gt; scalar, -value =&gt; value);
+</PRE>
+
+    This is an internal routine used to translate enumeration text into
+    enumeration values for a given field. You must specify either the field 
+    or id parameter as well as the value parameter.
+
+<P>
+<DT><A NAME="setSort"><B>setSort()</B></A>
+<PRE>
+  $f->setSort("Field Name1", [<I>ARS::AR_SORT_ASCENDING</I> or <I>ARS::AR_SORT_DESCENDING</I>], 
+              "Field Name2", [<I>ARS::AR_SORT_ASCENDING</I> or <I>ARS::AR_SORT_DESCENDING</I>], 
+              ...);
+</PRE>
+
+    This method allows you to set the sort option (ascending or
+    descending) for field names. Each field name must be followed
+    by a sort option. The fields will be sorted in the order 
+    they are listed in the parameter list.
+
+<P>
+
+</DL>
+
+
+<HR>
+<A HREF="../toc.html">Back to Table of Contents</A><BR>
+Last updated 9 Jun 1999 by jcmurphy@buffalo.edu.
+</BODY>
+</HTML>
+

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY AUTHOR  "Alex Peeters">
+<!ENTITY PURPOSE "2005/12/21, DTD schema v1.0 for Monitoring by XML">
+
+<!ELEMENT MonitoringXML (Monitoring)>
+<!ELEMENT Monitoring (Schema, Results)>
+<!ELEMENT Schema EMPTY>
+<!ATTLIST Schema
+	Value CDATA #FIXED "1.0"
+>
+<!ELEMENT Results (Details, ErrorDetail?, ErrorStack?, Extension?)>
+<!ELEMENT Details (#PCDATA)>
+<!ELEMENT ErrorDetail (#PCDATA)>
+<!ELEMENT ErrorStack (#PCDATA)>
+<!ATTLIST Details
+	Host CDATA #REQUIRED
+	Service CDATA #REQUIRED
+	Environment (PROD | TEST | ACC | DEV | SIM | LOCAL) #REQUIRED
+	Date CDATA #REQUIRED
+	Time CDATA #REQUIRED
+	Epochtime CDATA #REQUIRED
+	Status (0 | 1 | 2 | 3 | 4) #REQUIRED
+	StatusMessage CDATA #REQUIRED
+	PerfData CDATA #IMPLIED
+>
+<!ELEMENT Extension (Element+)>
+<!ELEMENT Element (#PCDATA)>
+<!ELEMENT eName (#PCDATA)>
+<!ELEMENT eDescription (#PCDATA)>
+<!ELEMENT eType (#PCDATA)>
+<!ELEMENT eValue (#PCDATA)>
+<!ELEMENT ePerfData (#PCDATA)>
+<!ATTLIST Element
+	eName CDATA #REQUIRED
+	eDescription CDATA #REQUIRED
+	eType (INTEGER | FLOAT | STRING | ARRAY | HASH | XML | BLOB) #REQUIRED
+	eFormat CDATA #IMPLIED
+	eValue CDATA #REQUIRED
+	ePerfData CDATA #IMPLIED
+>

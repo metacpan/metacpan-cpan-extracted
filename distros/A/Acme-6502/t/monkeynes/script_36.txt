@@ -1,0 +1,5 @@
+clear
+power on
+regs
+
+save verify_XX.txt

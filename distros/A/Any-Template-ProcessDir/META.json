@@ -1,0 +1,61 @@
+{
+   "abstract" : "Process a directory of templates",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Any-Template-ProcessDir",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find::Wanted" : "0",
+            "File::Path" : "2.07",
+            "File::Slurp" : "0",
+            "File::Spec" : "3.0",
+            "Moose" : "0.66",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-any-template-processdir@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Any-Template-ProcessDir"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-any-template-processdir.git",
+         "web" : "https://github.com/jonswar/perl-any-template-processdir"
+      }
+   },
+   "version" : "0.08"
+}
+

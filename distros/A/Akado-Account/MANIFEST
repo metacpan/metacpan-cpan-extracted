@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Akado/Account.pm
+t/00-load.t
+t/_parse_xml.t
+t/author-whitespaces.t
+t/release-cpan-changes.t

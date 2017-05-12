@@ -1,0 +1,210 @@
+{
+   "abstract" : "The ORM as our great brother.",
+   "author" : [
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Aniki",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Teng" : "0",
+            "Teng::Schema::Declare" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Time::Moment" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::WeightedRoundRobin" : "0",
+            "SQL::Maker::Plugin::JoinSelect" : "0"
+         },
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0",
+            "Class::Inspector" : "0",
+            "DBI" : "0",
+            "DBIx::Handler" : "0.12",
+            "DBIx::Schema::DSL" : "0",
+            "Data::Page::NoTotalEntries" : "0",
+            "Data::Section::Simple" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "Hash::Util::FieldHash" : "0",
+            "Lingua::EN::Inflect" : "0",
+            "List::MoreUtils" : "0",
+            "List::UtilsBy" : "0",
+            "Module::Load" : "0",
+            "Mouse" : "v2.4.5",
+            "Mouse::Role" : "0",
+            "Mouse::Util::TypeConstraints" : "0",
+            "SQL::Maker" : "1.19",
+            "SQL::Maker::SQLType" : "0",
+            "SQL::NamedPlaceholder" : "0",
+            "SQL::QueryMaker" : "0",
+            "SQL::Translator::Schema::Constants" : "0",
+            "Scalar::Util" : "0",
+            "String::CamelCase" : "0",
+            "Try::Tiny" : "0",
+            "namespace::sweep" : "0",
+            "parent" : "0",
+            "perl" : "5.014002"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "DBD::Pg" : "0",
+            "DBD::mysql" : "0",
+            "Test::mysqld" : "0",
+            "Test::postgresql" : "0"
+         },
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "List::Util" : "0",
+            "Mouse::Util" : "0",
+            "Test::Builder" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "feature" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Aniki" : {
+         "file" : "lib/Aniki.pm",
+         "version" : "1.03"
+      },
+      "Aniki::Filter" : {
+         "file" : "lib/Aniki/Filter.pm"
+      },
+      "Aniki::Filter::Declare" : {
+         "file" : "lib/Aniki/Filter/Declare.pm"
+      },
+      "Aniki::Handler" : {
+         "file" : "lib/Aniki/Handler.pm"
+      },
+      "Aniki::Handler::WeightedRoundRobin" : {
+         "file" : "lib/Aniki/Handler/WeightedRoundRobin.pm"
+      },
+      "Aniki::Plugin::Count" : {
+         "file" : "lib/Aniki/Plugin/Count.pm"
+      },
+      "Aniki::Plugin::Pager" : {
+         "file" : "lib/Aniki/Plugin/Pager.pm"
+      },
+      "Aniki::Plugin::PagerInjector" : {
+         "file" : "lib/Aniki/Plugin/PagerInjector.pm"
+      },
+      "Aniki::Plugin::RangeConditionMaker" : {
+         "file" : "lib/Aniki/Plugin/RangeConditionMaker.pm"
+      },
+      "Aniki::Plugin::SQLPager" : {
+         "file" : "lib/Aniki/Plugin/SQLPager.pm"
+      },
+      "Aniki::Plugin::SelectJoined" : {
+         "file" : "lib/Aniki/Plugin/SelectJoined.pm"
+      },
+      "Aniki::Plugin::WeightedRoundRobin" : {
+         "file" : "lib/Aniki/Plugin/WeightedRoundRobin.pm"
+      },
+      "Aniki::QueryBuilder" : {
+         "file" : "lib/Aniki/QueryBuilder.pm"
+      },
+      "Aniki::QueryBuilder::Canonical" : {
+         "file" : "lib/Aniki/QueryBuilder/Canonical.pm"
+      },
+      "Aniki::Result" : {
+         "file" : "lib/Aniki/Result.pm"
+      },
+      "Aniki::Result::Collection" : {
+         "file" : "lib/Aniki/Result/Collection.pm"
+      },
+      "Aniki::Result::Collection::Joined" : {
+         "file" : "lib/Aniki/Result/Collection/Joined.pm"
+      },
+      "Aniki::Result::Role::Pager" : {
+         "file" : "lib/Aniki/Result/Role/Pager.pm"
+      },
+      "Aniki::Row" : {
+         "file" : "lib/Aniki/Row.pm"
+      },
+      "Aniki::Row::Joined" : {
+         "file" : "lib/Aniki/Row/Joined.pm"
+      },
+      "Aniki::Schema" : {
+         "file" : "lib/Aniki/Schema.pm"
+      },
+      "Aniki::Schema::Relationship" : {
+         "file" : "lib/Aniki/Schema/Relationship.pm"
+      },
+      "Aniki::Schema::Relationship::Declare" : {
+         "file" : "lib/Aniki/Schema/Relationship/Declare.pm"
+      },
+      "Aniki::Schema::Relationship::Fetcher" : {
+         "file" : "lib/Aniki/Schema/Relationship/Fetcher.pm"
+      },
+      "Aniki::Schema::Relationships" : {
+         "file" : "lib/Aniki/Schema/Relationships.pm"
+      },
+      "Aniki::Schema::Table" : {
+         "file" : "lib/Aniki/Schema/Table.pm"
+      },
+      "Aniki::Schema::Table::Field" : {
+         "file" : "lib/Aniki/Schema/Table/Field.pm"
+      },
+      "Aniki::Schema::Table::PrimaryKey" : {
+         "file" : "lib/Aniki/Schema/Table/PrimaryKey.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/Aniki/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/Aniki",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/Aniki.git",
+         "web" : "https://github.com/karupanerura/Aniki"
+      }
+   },
+   "version" : "1.03",
+   "x_authority" : "cpan:KARUPA",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Pine Mizune <pinemz@gmail.com>",
+      "watanabe-yocihi <watanabe-yoichi@kayac.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400",
+   "x_static_install" : 1
+}

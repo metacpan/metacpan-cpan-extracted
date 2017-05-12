@@ -1,0 +1,22 @@
+Acme/Bushisms version 0.02
+==========================
+
+NAME
+  Acme::Bushisms - Dubya Does Perl
+
+DESCRIPTION
+  The first time you run a program under `use Acme::Bushisms', the
+  module removes all the unsightly printable, democrat, and liberal 
+  characters from your source file. The code continues to work
+  exactly as it did before, but now contains Bush speak.
+ 
+INSTALLATION
+  It's all pure Perl, so just put the .pm file in its appropriate              
+  local Perl subdirectory
+
+COPYRIGHT AND LICENCE
+  Copyright (C) 2003 Mike Accardo <mikeaccardo@yahoo.com>
+
+  This library is free software; you can redistribute it and/or           
+  modify it under the same terms as Perl itself. 
+

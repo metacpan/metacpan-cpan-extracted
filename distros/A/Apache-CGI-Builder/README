@@ -1,0 +1,36 @@
+Apache-CGI-Builder README File
+==============================
+
+
+Description
+-----------
+
+This module is a CGI::Builder extension that supply a perl handler to integrate your application modules with the Apache/mod_perl server.
+    
+Installation
+------------
+
+0.  Prerequisites:
+    - Apache/mod_perl 1 or 2
+    - CGI::Builder >= 1.2
+
+1. CPAN installation
+
+    perl -MCPAN -e 'install Apache::CGI::Builder'
+
+If you want to install all the extensions and prerequisites of the CBF, all in one easy step:
+
+    perl -MCPAN -e 'install Bundle::CGI::Builder::Complete'
+
+2. Standard installation
+- from the directory where this file is located, type:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+--
+Domizio Demichelis perl.4pro.net
+2004-03-27

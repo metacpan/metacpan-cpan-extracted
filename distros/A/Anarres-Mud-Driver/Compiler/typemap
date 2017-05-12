@@ -1,0 +1,15 @@
+Anarres::Mud::Driver::Compiler	T_PTROBJ
+Anarres::Mud::Driver::Compiler::Type	T_BLESS_SVREF
+
+############################
+INPUT
+T_BLESS_SVREF
+	if (sv_isa($arg, \"${ntype}\"))
+		$var = SvPV_nolen(SvRV($arg));
+	else
+		croak(\"$var is not of type ${ntype}\");
+############################
+OUTPUT
+T_BLESS_SVREF
+	sv_setsv($arg, sv_bless(newRV_noinc(newSVpv($var, 0)),
+					gv_stashpv("$Package", TRUE)));

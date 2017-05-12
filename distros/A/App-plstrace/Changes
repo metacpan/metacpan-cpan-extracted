@@ -1,0 +1,44 @@
+Revision history for App-plstrace
+
+0.06    2014-12-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed/split module SHARYANTO::String::Util ->
+	  String::PerlQuote.
+
+
+0.05    2014-06-24 (SHARYANTO)
+
+        - Remove --reltime, replace it with -tttt.
+
+        - Fix showing exit time.
+
+        - Introduce -ttttt (show relative time to previous trace message).
+
+
+0.04    2014-06-24 (SHARYANTO)
+
+        - More accurate relative timing (takes into account the plstrace's
+          overhead).
+
+
+0.03    2014-06-24 (SHARYANTO)
+
+        - No functional changes.
+
+        [BUG FIXES]
+
+        - Fix handling of --reltime.
+
+        - Short option -h (for --help) and -v (for --version) didn't work.
+
+
+0.02    2014-06-23 (SHARYANTO)
+
+        - Add options: --(no)show-entry, --(no)show-exit.
+
+
+0.01    2014-06-23 (SHARYANTO)
+
+        - First release.

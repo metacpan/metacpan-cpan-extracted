@@ -1,0 +1,25 @@
+---
+abstract: 'HTTP::Server::Simple based server for CPANIDX'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-CPANIDX-HTTP-Server
+requires:
+  App::CPANIDX: 0.28
+  Config::Tiny: 2.12
+  HTTP::Server::Simple: 0.43
+  HTTP::Server::Simple::CGI: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/bingos/app-cpanidx-http-server
+  repository: https://github.com/bingos/app-cpanidx-http-server.git
+version: 0.08

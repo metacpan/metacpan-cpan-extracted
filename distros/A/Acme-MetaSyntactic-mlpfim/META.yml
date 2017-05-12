@@ -1,0 +1,32 @@
+---
+abstract: 'a meta syntactic variable for everypony!'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::MetaSyntactic: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-MetaSyntactic-mlpfim
+requires:
+  Acme::MetaSyntactic::List: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic-mlpfim
+  repository: https://github.com/shlomif/perl-Acme-MetaSyntactic-mlpfim.git
+version: 0.0.1

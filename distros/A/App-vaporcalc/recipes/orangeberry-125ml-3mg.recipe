@@ -1,0 +1,23 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Orange Cream",
+            "percentage" : "4"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Strawberry Ripe",
+            "percentage" : "4"
+         }
+      ],
+      "target_pg" : "30",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "125",
+      "target_nic_per_ml" : "3",
+      "target_vg" : 70,
+      "notes" : []
+   }
+}

@@ -1,0 +1,142 @@
+#!/usr/bin/env perl
+
+use v5.14;
+use warnings;
+no warnings 'once';
+use autodie;
+use File::Slurp;
+use Scalar::Util qw(blessed);
+use Attean;
+use Attean::RDF;
+use Data::Dumper;
+use Getopt::Long;
+use Try::Tiny;
+use open ':std', ':encoding(utf8)';
+
+BEGIN { $Error::TypeTiny::StackTrace	= 1; }
+
+if (scalar(@ARGV) < 1) {
+	print STDERR <<"END";
+Usage: $0 query.rq [data.ttl ...]
+
+Parses the supplied SPARQL query to an Attean::Algebra object,
+and executes it against a model containing the RDF data parsed
+from the data file(s) using Attean::SimpleQueryEvaluator.
+
+END
+	exit(0);
+}
+
+my $dryrun			= 0;
+my $check_syntax	= 0;
+my $verbose			= 0;
+my $debug			= 0;
+my $benchmark		= 0;
+my $print_sparql	= 0;
+my $print_plan		= 0;
+my $print_algebra	= 0;
+my $update			= 0;
+my $out_format		= '';
+my $short			= 0;
+my $result			= GetOptions(
+	"verbose"	=> \$verbose,
+	"debug"		=> \$debug,
+	"update"	=> \$update,
+	"benchmark"	=> \$benchmark,
+	'algebra'	=> \$print_algebra,
+	'plan'		=> \$print_plan,
+	"q"			=> \$print_sparql,
+	'n'			=> \$dryrun,
+	'c'			=> \$check_syntax,
+	'short'		=> \$short,
+	'output=s'	=> \$out_format,
+);
+
+my $qfile	= shift;
+
+try {
+	warn "Constructing model...\n" if ($verbose);
+	my $store	= Attean->get_store('Memory')->new();
+	my $model	= Attean::MutableQuadModel->new( store => $store );
+	my $graph	= Attean::IRI->new('http://default-graph/');
+
+	my $map		= URI::NamespaceMap->new();
+	while (my $data = shift(@ARGV)) {
+		my $base	= Attean::IRI->new('file://' . File::Spec->rel2abs($data));
+		open(my $fh, '<:encoding(UTF-8)', $data);
+		warn "Parsing data from $data...\n" if ($verbose);
+		my $pclass	= Attean->get_parser( filename => $data ) // 'AtteanX::Parser::Turtle';
+		my $parser	= $pclass->new(base => $base, namespaces => $map);
+		my $iter	= $parser->parse_iter_from_io($fh);
+		my $quads	= $iter->as_quads($graph);
+		$model->add_iter($quads);
+	}
+	
+	if ($debug) {
+		my $iter	= $model->get_quads();
+		while (my $q = $iter->next) {
+			say $q->as_string;
+		}
+	}
+
+	warn "Parsing query...\n" if ($verbose);
+	my $base	= Attean::IRI->new('file://' . File::Spec->rel2abs($qfile));
+	my $s 		= Attean->get_parser('SPARQL')->new(base => $base, namespaces => $map);
+	if ($update) {
+		$s->update(1);
+	}
+	open(my $fh, '<:utf8', $qfile) or die $!;
+	my $algebra;
+	eval {
+		($algebra)	= $s->parse_list_from_io($fh);
+	};
+	if ($@) {
+		die "Failed to parse query $qfile: $@";
+	}
+
+	if ($print_algebra) {
+		print "# Algebra:\n" . $algebra->as_string . "\n";
+	}
+	
+	if ($check_syntax) {
+		print "Syntax OK: $qfile\n";
+		exit(0);
+	}
+	
+	if ($print_sparql) {
+		print "# SPARQL:\n";
+		print $algebra->as_sparql;
+		print "\n";
+	}
+	
+	if (not($dryrun) or $print_plan) {
+		my $default_graphs	= [$graph];
+		my $planner	= Attean::IDPQueryPlanner->new();
+		my $plan	= $planner->plan_for_algebra($algebra, $model, $default_graphs);
+		if ($print_plan) {
+			print "# Plan:\n" . $plan->as_string . "\n";
+		}
+		unless ($dryrun) {
+			my $mapper	= $short ? Attean::TermMap->short_blank_map : undef;
+			my $bmapper	= $short ? $mapper->binding_mapper : undef;
+			my $iter	= $plan->evaluate($model);
+			if ($bmapper) {
+				$iter	= $iter->map($bmapper);
+			}
+			my $count	= 1;
+			my $class	= Attean->get_serializer($out_format);
+			if ($out_format and $class) {
+				my $s	= $class->new(namespaces => $map);
+				$s->serialize_iter_to_io(\*STDOUT, $iter);
+			} else {
+				while (my $r = $iter->next) {
+					printf("%3d %s\n", $count++, $r->as_string);
+				}
+			}
+		}
+	}
+} catch {
+	my $exception	= $_;
+	warn "Caught error: $exception";
+	exit(1);
+};

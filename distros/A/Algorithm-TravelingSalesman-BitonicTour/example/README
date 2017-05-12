@@ -1,0 +1,9 @@
+# for uploading to the NEOS Concorde server at Argonne
+# (http://www-neos.mcs.anl.gov/neos/solvers/co:concorde/TSP.html)
+0 6
+1 0
+2 3
+5 4
+6 1
+7 5
+8 2

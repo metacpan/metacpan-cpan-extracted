@@ -1,0 +1,74 @@
+Revision history for Perl extension App::Wax.
+
+1.1.0 Fri 16 Dec 23:15:52 2016
+
+    - add -D option equivalent to -d "${XDG_CACHE_HOME:-$HOME/.cache}/wax"
+    - automatically create the -d/-D directories if their parent directories exist
+      (otherwise raise an error)
+
+1.0.5 Mon Feb 16 20:52:30 2015
+
+    - fix logging of unresolved URLs
+
+1.0.4 Thu Feb 12 19:04:07 2015
+
+    - make sure temp files are removed on error
+    - changelog: fix --cache/--mirror descriptions
+
+1.0.3 Wed Feb 4 22:26:26 2015
+
+    - remove duplicate POD from CPAN
+
+1.0.2 Wed Feb 4 22:04:09 2015
+
+    - fix release date
+
+1.0.1 Wed Feb 4 21:41:59 2015
+
+    - fix usage/help display
+    - doc/code nitfixen
+
+1.0.0 Tue Feb 3 23:21:47 2015
+
+    - breaking changes:
+        - the separator is now opt-in i.e. `--` is no longer the default separator
+            - as a result the -S/--no-separator option has been removed
+        - -d/--debug is now -v/--verbose
+        - -d is now short for --dir/--directory
+    - new --cache option: remote resources are only fetched once
+    - new --mirror option: remote resources are only fetched if they've been updated
+    - parallelize downloads
+    - improve tests
+
+0.3.1 Fri Jun 17 21:16:43 2011
+
+    - docfixen
+    - rm README.md from CPAN
+
+0.3.0 Fri Jun 17 19:29:40 2011
+
+    - add -S/--no-separator option, allowing detection of the "stop waxing" token to be disabled
+
+0.2.0 Fri Jun 17 18:23:13 2011
+
+    - fix user-agent and timeout accessors
+    - increase default timeout to 60 seconds
+    - add -s/--separator option to allow the "stop waxing" token to be customized
+    - save temp files with a wax_ prefix
+    - more tests
+    - better repo link
+    - add README.md
+
+0.1.0 Fri Jun 17 14:28:28 2011
+
+    - fix extension handling
+    - better error handling
+    - s/URI/URL/g
+
+0.0.2 Fri Jun 17 05:11:59 2011
+
+    - docfixen
+
+0.0.1 Thu Jun 16 23:59:31 2011
+
+    - initial release

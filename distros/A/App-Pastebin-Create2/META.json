@@ -1,0 +1,44 @@
+{
+   "abstract" : "Simple CLI App to create and upload to Pastebin.com",
+   "author" : [
+      "faraco <skelic3@gmail.com>, mfzz <mfzz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Pastebin-Create2",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "WWW::Pastebin::PastebinCom::Create" : "1.003",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/faraco/App-Pastebin-Create2/issues"
+      },
+      "homepage" : "https://github.com/faraco/App-Pastebin-Create2",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/faraco/App-Pastebin-Create2.git",
+         "web" : "https://github.com/faraco/App-Pastebin-Create2"
+      }
+   },
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

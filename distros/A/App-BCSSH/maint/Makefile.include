@@ -1,0 +1,6 @@
+pack: bcssh
+bcssh: bin/bcssh $(TO_INST_PM) maint/pack
+	$(PERL) maint/pack bin/bcssh > bcssh
+	chmod +x bcssh
+release-pack: bcssh
+	maint/update-build-branch $(VERSION) build bcssh

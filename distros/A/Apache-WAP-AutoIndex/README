@@ -1,0 +1,17 @@
+This is a simple module to demonstrate the use of CGI::WML to create a WML 
+(wireless) file browser using mod_perl. It was written to accompany an article 
+in the Perl Journal #20.
+
+It requires mod_perl and CGI::WML to be installed.
+
+Add the following to 'httpd.conf':
+
+  PerlModule Apache::WAP::AutoIndex
+  <Location ~ "filelist\.wml$">
+    SetHandler perl-script
+    PerlHandler Apache::WAP::AutoIndex
+  </Location>
+
+After installing, access a directory with a WML browser, appending 
+"filelist.wml" to view the results.
+

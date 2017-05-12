@@ -1,0 +1,54 @@
+---
+abstract: 'Apply iTunes-like metadata to an mp4 file.'
+author:
+  - 'Andrew Jones <andrew@arjones.co.uk>'
+build_requires:
+  App::Cmd::Tester: 0
+  File::Copy: 0
+  File::Spec: 0
+  FindBin: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Net::Ping: 0
+  Test::Class: 0
+  Test::Exception: 0
+  Test::MockObject: 0
+  Test::More: 0.88
+  WebService::TVDB::Series: 0
+  base: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-MP4Meta
+requires:
+  App::Cmd::Setup: 0
+  AtomicParsley::Command: 0
+  AtomicParsley::Command::Tags: 0
+  File::Spec: 0
+  File::Temp: 0
+  LWP::Simple: 0
+  Module::Load: 0
+  Object::Tiny: 0
+  Try::Tiny: 0
+  WebService::OMDB: 0
+  WebService::TVDB: 1.122800
+  constant: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrewrjones/perl5-App-MP4Meta/issues
+  homepage: https://github.com/andrewrjones/perl5-App-MP4Meta
+  repository: https://github.com/andrewrjones/perl5-App-MP4Meta.git
+version: 1.153340
+x_contributors:
+  - 'Andrew Jones <andrew@andrew-jones.com>'
+  - 'Andrew Jones <andrewjones86@googlemail.com>'
+  - 'Jim Graham <jim@jim-graham.net>'
+  - 'andrewrjones <andrewjones86@googlemail.com>'

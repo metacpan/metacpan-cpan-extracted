@@ -1,0 +1,76 @@
+NAME
+    Authen::Simple::SSH - Simple SSH authentication
+
+SYNOPSIS
+        use Authen::Simple::SSH;
+    
+        my $ssh = Authen::Simple::SSH->new(
+            host => 'host.company.com'
+        );
+    
+        if ( $ssh->authenticate( $username, $password ) ) {
+            # successfull authentication
+        }
+    
+        # or as a mod_perl Authen handler
+    
+        PerlModule Authen::Simple::Apache
+        PerlModule Authen::Simple::SSH
+
+        PerlSetVar AuthenSimpleSSH_host "host.company.com"
+
+        <Location /protected>
+          PerlAuthenHandler Authen::Simple::SSH
+          AuthType          Basic
+          AuthName          "Protected Area"
+          Require           valid-user
+        </Location>    
+
+DESCRIPTION
+    SSH authentication.
+
+METHODS
+    * new
+        This method takes a hash of parameters. The following options are
+        valid:
+
+        * host  Connection host, can be a hostname or IP address. Defaults
+                to "localhost".
+
+                    host => 'ldap.company.com'
+                    host => '10.0.0.1'
+
+        * port  Connection port, default to 22.
+
+                    port => 22
+
+        * protocol
+                Connection protocol, defaults to 2.
+
+                    protocol => 1
+
+        * cipher
+                Connection cipher.
+
+                    cipher => 'Blowfish'
+
+        * log   Any object that supports "debug", "info", "error" and
+                "warn".
+
+                    log => Log::Log4perl->get_logger('Authen::Simple::SSH')
+
+    * authenticate( $username, $password )
+        Returns true on success and false on failure.
+
+SEE ALSO
+    Authen::Simple.
+
+    Net::SSH::Perl.
+
+AUTHOR
+    Christian Hansen "ch@ngmedia.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

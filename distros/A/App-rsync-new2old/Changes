@@ -1,0 +1,32 @@
+0.006   2017-02-07 (PERLANCAR)
+
+        - Add utility: newest-mtime.
+
+
+0.005   2016-12-15 (PERLANCAR)
+
+	- Handle 'source' vs 'source/' a la rsync.
+
+
+0.004   2016-12-15 (PERLANCAR)
+
+	- No functional changes.
+
+        - Document the --create-target-if-not-exists option (and the others).
+
+
+0.003   2016-12-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Forgot to specify $VERSION for main module.
+
+
+0.002   2016-12-15 (PERLANCAR)
+
+	- Add option: --create-target-if-not-exists.
+
+
+0.001   2016-12-15 (PERLANCAR)
+
+        - First release.

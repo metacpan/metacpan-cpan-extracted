@@ -1,0 +1,13 @@
+^ASNMTAP-3.002.003.tar.gz$
+^Makefile$
+^MANIFEST.bak$
+^MANIFEST-3.002.003$
+^TODO$
+\bautoconf/\b
+\bapplications/etc/\b
+\bapplications/htmlroot/nav/\b
+\bapplications/master/\b
+\bapplications/slave/\b
+\bresults/\b
+^t/APPLICATIONS_
+^t/PLUGINS_

@@ -1,0 +1,146 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use App::War;
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = $App::War::VERSION;
+
+=pod
+
+=head1 NAME
+
+war - break one big decision into lots of little decisions
+
+=head1 SYNOPSIS
+
+    war [--help] [--man] [--version]
+    war [--graph] --file sourcefile
+    war [--graph] alt1 alt2 alt3 ...
+
+=head1 DESCRIPTION
+
+Imagine you're at a department store, trying to choose one china pattern
+out of a dozen or more alternatives.  How do you do it?  If none stands out
+as the clear winner, you might apply a process of elimination to your
+choices, until a winner emerges.
+
+This application applies a process similar to that described above: first,
+the set of alternatives is defined.  Then pairs of alternatives are
+presented to the user, who chooses one "winner" from each pair.  The
+process continues until an unambiguous ordering of the alternatives is
+known.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--file> filename, B<-f> filename
+
+Reads the list of alternatives from file C<filename>, a text file
+containing the items to be ranked.  Blank lines are ignored, as well as
+lines starting with the pound (C<#>) character.
+
+=item B<--graph>, B<-g>
+
+When the results are shown to the user, also display a textual
+representation of the preference graph.
+
+=item B<--help>, B<-h>, B<-?>
+
+Display simple command-line options.
+
+=item B<--man>
+
+Display detailed script information.
+
+=item B<--version>, B<-v>
+
+Shows the current script version.
+
+=back
+
+=head1 EXAMPLE
+
+To choose our favorite bug, we could do the following:
+
+    % war aphid bee cricket
+    Choose one of the following:
+    <1> aphid
+    <2> bee
+    2
+    Choose one of the following:
+    <1> cricket
+    <2> bee
+    1
+    ===== final preference order =====
+    cricket
+    bee
+    aphid
+    %
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<App::War>
+
+Information on access to the source code, bug tracking, and smoke testing
+can be found in the L<App::War> documentation.
+
+=item L<http://en.wikipedia.org/wiki/Paired_comparison>
+
+=item L<http://en.wikipedia.org/wiki/Law_of_comparative_judgment>
+
+=item L<http://en.wikipedia.org/wiki/Analytic_Hierarchy_Process>
+
+=item L<http://www.kittenwar.com>
+
+=back
+
+=head1 AUTHOR
+
+John Trammell, C<< <johntrammell@gmail.com> >>
+
+=cut
+
+our %OPT = ();
+my @OPTIONS = qw/ file|f=s graph|g help|h|? man version|v /;
+GetOptions(\%OPT,@OPTIONS) || pod2usage;
+if ($OPT{version}) { die "Using App::War v$VERSION\n" }
+if ($OPT{man})     { pod2usage(-verbose => 2); }
+if ($OPT{help})    { pod2usage(-exitval => 0); }
+
+# get items
+my @items = _items();
+unless (@items) {
+    pod2usage(-msg => 'No items specified.', -verbose => 0, -exitval => 0);
+}
+
+# fight the war
+my $war = App::War->new(items => \@items)->run;
+
+# print the results
+report($war);
+
+# read the items from the file specified on the command line
+sub _items {
+    return @ARGV if @ARGV;
+    open(my $h,q(<),$OPT{file}) or die $!;
+    return grep { /\S/ && !/^#/ } map { chomp; $_ } <$h>;
+}
+
+sub report {
+    my $war = shift;
+    if ($OPT{graph}) {
+        print "graph: @{[ $war->graph ]}\n";
+    }
+    my @items = $war->items;
+    print "===== final preference order =====\n";
+    for (map { $items[$_] } $war->graph->topological_sort) {
+        print $_, "\n";
+    }
+}
+

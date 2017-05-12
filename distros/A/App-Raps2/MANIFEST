@@ -1,0 +1,17 @@
+bin/raps2
+Build.PL
+Changelog
+COPYING
+lib/App/Raps2.pm
+lib/App/Raps2/Password.pm
+lib/App/Raps2/UI.pm
+MANIFEST			This list of files
+README
+t/00-compile.t
+t/05-pod-compile.t
+t/20-app-raps2-password.t
+t/29-app-raps2.t
+t/in/hash
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

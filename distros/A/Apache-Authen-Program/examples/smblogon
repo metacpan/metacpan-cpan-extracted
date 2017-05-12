@@ -1,0 +1,46 @@
+#!/www/perl-5.6.1/bin/perl -Tw
+# SMB logon tester (uses Samba's smbclient).
+#
+# NOTE: Runs in taint mode because it is usually
+#       invoked by other programs (mainly CGIs).
+
+
+# ------ pragmas
+use strict;
+
+
+# ------ define variables
+my @output   = ();	# smbclient output lines
+my $password = "";	# $username's password
+my $server   = "";	# server NetBIOS name
+my $share    = "";	# share on $server (cannot be hidden share)
+my $smbclient		# Samba smbclient pathname
+ = "/www/bin/smbclient";
+my $username = "";	# user ID for access
+
+
+# ------ verify and untaint arguments
+$ENV{"PATH"} = "/bin:/usr/bin";
+if (scalar(@ARGV) < 4) {
+    die "usage: smblogon username password server share\n";
+}
+$ARGV[0] =~ m#([^`']+)#;
+$username = $1;
+$ARGV[1] =~ m#([^`']+)#;
+$password = $1;
+$ARGV[2] =~ m#(([a-zA-Z0-9]|-|\+|_|\.)+)#;
+$server   = $1;
+$ARGV[3] =~ m#(([a-zA-Z0-9]|-|\+|_|\.)+)#;
+$share    = $1;
+
+
+# ------ test ability to logon to local domain
+@output = `$smbclient //$server/$share '$password' -U '$username' -c ''`;
+if (!grep(/session setup failed/, @output)
+ && grep(/Domain=.* OS=.* Server=/, @output)) {
+    print "OK: SMB login succeeded.\n";
+    exit 0;
+} else {
+    print "FAILURE:\n@output";
+    exit 1;
+}

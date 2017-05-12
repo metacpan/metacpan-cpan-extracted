@@ -1,0 +1,59 @@
+NAME
+    Acme::POE::Acronym::Generator - Generate random POE acronyms.
+
+VERSION
+    version 1.20
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use Acme::POE::Acronym::Generator;
+
+      my $poegen = Acme::POE::Acronym::Generator->new();
+
+      for ( 1 .. 10 ) {
+        my $acronym = $poegen->generate();
+        print $acronym, "\n";
+      }
+
+DESCRIPTION
+    What does POE stand for?" is a common question, and people have expanded
+    the acronym in several ways.
+
+    Acme::POE::Acronym::Generator produces randomly generated expansions of
+    the POE acronym ( or at your option any other arbitary word ).
+
+CONSTRUCTOR
+    "new"
+        Takes three optional parameters:
+
+          'dict', the path to the words file to use, default is /usr/share/dict/words;
+          'wordlist', an arrayref consisting of words to use, this overrides the use of dict file;
+          'key', provide a word to make an acronym for instead of POE;
+
+        If the dict file doesn't exist it will use a very small subset of
+        words to generate responses.
+
+        Returns a shiny Acme::POE::Acronym::Generator object.
+
+METHODS
+    "generate"
+        Takes no parameters.
+
+        In a scalar context, returns a string containing the acronym.
+
+        In a list context, returns the individual words of the acronym as a
+        list.
+
+SEE ALSO
+    <http://poe.perl.org/?What_POE_Is>
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,22 @@
+This module does nothing (except for screw around with AUTOLOAD, which might
+well break anything that depends on that), unless a typo is made with a
+function name, in which case some random other thingy from the symbol table is
+instead called. As such, it probably should not be used.
+
+Install from CPAN via:
+
+  cpan Acme::NamespaceRoulette
+
+Or build and install from source via:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013,2015 by Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

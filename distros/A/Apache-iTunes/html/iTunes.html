@@ -1,0 +1,98 @@
+<html>
+	<head><title>iTunes Apache Interface</title></head>
+	
+<body>
+
+<div align="center">
+
+<h1>iTunes Apache Interface { $version }</h1>
+
+player state is { $state }.<br>
+{ $current ? "current track is $current." : '' }<br>
+{ $playlist ? "current playlist is $playlist." : '' }<br>
+<b>
+||
+<a href="{$base}/play">Play</a> ||
+<a href="{$base}/stop">Stop</a> ||
+<a href="{$base}/pause">Pause</a> ||
+<a href="{$base}/back_track">Restart</a> ||
+<hr noshade width="85%">
+<a href="{$base}/previous">&lt;&lt; Previous</a> ||
+<a href="{$base}/next">Next &gt;&gt;</a></b>
+<hr noshade width="85%">
+{
+my $str = 'Volume: ';
+
+$str .= join "<b>.</b>", map {
+	my $value = $_ * 10;
+	qq|<a href="$base/volume/$value">$_</a>|
+	} 0 .. 11;
+
+$str;
+}
+<br>
+
+<table>
+	<tr>
+	<td bgcolor="#FFFF00"><b>Playlists</b></td>
+	<td bgcolor="#FFFF00"><b>Tracks</b></td>
+	</tr>
+
+	</tr>
+	<tr><td valign="top">
+		<table>
+			{
+			require URI::Escape;
+			my $str;
+			foreach my $this ( @playlists )
+				{
+				if( $this eq $playlist )
+					{
+					$str .= qq|<tr><td bgcolor="#00ccff"><b>$this</b></td></tr>\n|;
+					}
+				else
+					{
+					my $encoded = URI::Escape::uri_escape( $this );
+					
+					$str .= "<tr><td>";
+					$str .= qq|<a href="$base/playlist/$encoded">$this</a>|;
+					$str .= "</td></tr>\n";
+					}
+				}
+				
+			$str;
+			}
+		</table>
+	</td>
+	<td valign="top">
+		<table>
+			{
+			no warnings 'uninitialized';
+			my $str;
+			my $count = 0;
+			my $list = URI::Escape::uri_escape( $playlist );
+			
+			foreach my $track ( @tracks )
+				{
+				$count++;
+				if( $track eq $current )
+					{
+					$str .= qq|<tr><td bgcolor="#00ccff"><b>$track</b></td></tr>\n|;
+					}
+				else
+					{
+					$str .= "<tr><td>";
+					$str .= qq|<a href="$base/track/$count/$list">$track</a>|;
+					$str .= "</td></tr>\n";
+					}
+				}
+
+			$str;
+			}
+		</table>
+	</td></tr>
+</table>
+</div>
+
+</body>
+</html>

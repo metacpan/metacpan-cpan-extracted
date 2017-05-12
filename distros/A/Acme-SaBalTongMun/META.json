@@ -1,0 +1,27 @@
+{
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100830",
+   "name" : "Acme-SaBalTongMun",
+   "author" : [
+      "Keedi Kim - \u00ea\u00b9\u0080\u00eb\u008f\u0084\u00ed\u0098\u0095 <keedi at cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {
+      "List::Util" : "0",
+      "Test::More" : "0",
+      "namespace::autoclean" : "0",
+      "GD" : "0",
+      "common::sense" : "0",
+      "Moose" : "0"
+   },
+   "abstract" : "make a round robin (\u00ec\u0082\u00ac\u00eb\u00b0\u009c\u00ed\u0086\u00b5\u00eb\u00ac\u00b8, \u00e6\u00b2\u0099\u00e9\u0089\u00a2\u00e9\u0080\u009a\u00e6\u0096\u0087)",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

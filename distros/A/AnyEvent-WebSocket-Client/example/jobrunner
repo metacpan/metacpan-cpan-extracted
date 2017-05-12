@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use JSON qw( to_json );
+use AnyEvent::Open3::Simple;
+use AnyEvent::WebSocket::Client 0.12;
+
+unless(@ARGV > 0)
+{
+  print "usage: $0 command [arg1 [ arg2 [ ... ] ]\n";
+  exit 1;
+}
+
+my $client = AnyEvent::WebSocket::Client->new;
+my $connection = $client->connect("ws://localhost:3000/run")->recv;
+
+# error stdout stderr signal exit
+
+my $done = AnyEvent->condvar;
+
+my $ipc = AnyEvent::Open3::Simple->new(
+  on_stdout => sub {
+    my($proc, $line) = @_;
+    print $line, "\n";
+    $connection->send(to_json({ type => 'out', data => $line }));
+  },
+  on_stderr => sub {
+    my($proc, $line) = @_;
+    print STDERR $line, "\n";
+    $connection->send(to_json({ type => 'err', data => $line }));
+  },
+  on_exit => sub {
+    my($proc, $exit, $signal) = @_;
+    $connection->send(to_json({ type => 'exit', exit => $exit, signal => $signal }));
+    $done->send([$exit,$signal]);
+  },
+  on_error => sub {
+    my($error) = @_;
+    $connection->send(to_json({ type => 'error', data => $error }));
+    $done->croak($error);
+  },
+);
+
+$connection->send(to_json(\@ARGV));
+$ipc->run(@ARGV);
+
+my($exit,$signal) = @{ $done->recv };
+if($signal)
+{
+  print STDERR "died with signal $signal\n";
+  exit 1;
+}
+else
+{
+  exit $exit;
+}

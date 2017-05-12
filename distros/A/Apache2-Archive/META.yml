@@ -1,0 +1,28 @@
+---
+abstract: 'Expose archive files through the Apache web server.'
+author:
+  - 'J. Peterson, jon@snowdrift.org, made the original Apache::Archive module. David Moreno, david@axiombox.com, made the port to mod_perl 2.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Apache2-Archive
+no_index:
+  directory:
+    - inc
+requires:
+  Apache2::Const: 0
+  Apache2::Log: 0
+  Apache2::Status: 0
+  Apache2::SubRequest: 0
+  Apache2::Util: 0
+  Archive::Tar: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.1

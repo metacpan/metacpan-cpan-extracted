@@ -1,0 +1,45 @@
+ dpkg-buildpackage -rfakeroot -D -us -uc
+dpkg-buildpackage: set CFLAGS to default value: -g -O2
+dpkg-buildpackage: set CPPFLAGS to default value: 
+dpkg-buildpackage: set LDFLAGS to default value: -Wl,-Bsymbolic-functions
+dpkg-buildpackage: set FFLAGS to default value: -g -O2
+dpkg-buildpackage: set CXXFLAGS to default value: -g -O2
+dpkg-buildpackage: source package qux
+dpkg-buildpackage: source version 1.0-1
+dpkg-buildpackage: source changed by Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+dpkg-buildpackage: host architecture i386
+ fakeroot debian/rules clean
+dh_testdir
+dh_testroot
+dh_clean
+ dpkg-source -b equivs.plpgSw
+dpkg-source: warning: source directory 'equivs.plpgSw' is not <sourcepackage>-<upstreamversion> 'qux-1.0'
+dpkg-source: info: using source format `1.0'
+dpkg-source: info: building qux in qux_1.0-1.tar.gz
+dpkg-source: info: building qux in qux_1.0-1.dsc
+ debian/rules build
+make: Nothing to be done for `build'.
+ fakeroot debian/rules binary
+dh_testdir
+dh_testroot
+dh_clean -k
+dh_testdir
+dh_testroot
+dh_install
+dh_installdocs
+dh_installchangelogs
+dh_compress
+dh_fixperms
+dh_installdeb
+dh_gencontrol
+dh_md5sums
+dh_builddeb
+dpkg-deb: building package `qux' in `../qux_1.0-1_i386.deb'.
+ dpkg-genchanges  >../qux_1.0-1_i386.changes
+dpkg-genchanges: including full source code in upload
+dpkg-buildpackage: full upload; Debian-native package (full source is included)
+Now signing changes and any dsc files...
+ signfile qux_1.0-1.dsc Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+gpg: skipped "Esteban Manchado Velázquez <estebanm@estebanm-desktop>": secret key not available
+gpg: /tmp/debsign.MlxdxnoC/qux_1.0-1.dsc: clearsign failed: secret key not available
+debsign: gpg error occurred!  Aborting....

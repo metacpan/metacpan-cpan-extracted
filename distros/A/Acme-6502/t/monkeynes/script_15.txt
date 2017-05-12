@@ -1,0 +1,44 @@
+clear
+power on
+regs
+
+# Base test --------------------
+memset 00c9 72
+
+op a9 55
+op a2 0b
+op 15 be
+
+# Should be:  ACC=77, IX=0B
+test acc = 77
+test ix = 0b
+
+# Negative test --------------------
+power on
+
+memset 00c9 aa
+
+op a9 55
+op a2 0b
+op 15 be
+
+# Should be:  ACC=FF, IX=0B, S=1
+test acc = ff
+test ix = 0b
+test s = 1
+
+# Zero test ----------------
+power on
+
+memset 00c9 00
+
+op a9 00
+op a2 0b
+op 15 be
+
+# Should be:  ACC=0, IX=0B, Z=1
+test acc = 0
+test ix = 0b
+test z = 1
+
+save verify_15.txt

@@ -1,0 +1,52 @@
+NAME
+    Alt::Base - Base class for alternate module
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+     # in your Alt/Foo/Bar/phrase.pm:
+     package Alt::Foo::Bar::phrase;
+     use base qw(Alt::Base);
+     1;
+
+     # customize options:
+     package Alt::Foo::Bar::phrase;
+     use base qw(Alt::Base);
+     our %ALT = (check => 0, ...);
+     1;
+
+DESCRIPTION
+    The Alt::Base class provides common functionalities for an alternate
+    module. For more information about the Alt concept, please refer to Alt.
+
+    Alt::Base defines an "import()" routine which checks for options in
+    %ALT. These options are:
+
+    *   check => BOOL (default: 1)
+
+        If set to true (the default), will perform several things. First,
+        check that the alternate module is indeed named
+        "Alt::<<Original::Module>::<phrase>". Then, load "Alternate::Module"
+        and check that the package variable $ALT is defined with the value
+        of "phrase". This is to ensure that we are loading the correct
+        module, and sometimes we do want to make sure about this. The wrong
+        module can be loaded, for example if user reinstalls the original
+        distribution or another alternate distribution.
+
+        Will die upon failure.
+
+    *
+
+SEE ALSO
+    Alt
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,93 @@
+{
+   "abstract" : "Command line tool for Perl code refactoring",
+   "author" : [
+      "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-EditorTools",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0.87",
+            "Text::Diff" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0.301",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0.80",
+            "File::Path" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Slurp" : "0",
+            "IPC::Cmd" : "0",
+            "PPIx::EditorTools" : "0",
+            "Path::Class" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "App::EditorTools" : {
+         "file" : "lib/App/EditorTools.pm",
+         "version" : "1.00"
+      },
+      "App::EditorTools::Command::InstallEmacs" : {
+         "file" : "lib/App/EditorTools/Command/InstallEmacs.pm",
+         "version" : "1.00"
+      },
+      "App::EditorTools::Command::InstallVim" : {
+         "file" : "lib/App/EditorTools/Command/InstallVim.pm",
+         "version" : "1.00"
+      },
+      "App::EditorTools::Command::IntroduceTemporaryVariable" : {
+         "file" : "lib/App/EditorTools/Command/IntroduceTemporaryVariable.pm",
+         "version" : "1.00"
+      },
+      "App::EditorTools::Command::RenamePackage" : {
+         "file" : "lib/App/EditorTools/Command/RenamePackage.pm",
+         "version" : "1.00"
+      },
+      "App::EditorTools::Command::RenamePackageFromPath" : {
+         "file" : "lib/App/EditorTools/Command/RenamePackageFromPath.pm",
+         "version" : "1.00"
+      },
+      "App::EditorTools::Command::RenameVariable" : {
+         "file" : "lib/App/EditorTools/Command/RenameVariable.pm",
+         "version" : "1.00"
+      },
+      "App::EditorTools::CommandBase::Install" : {
+         "file" : "lib/App/EditorTools/CommandBase/Install.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-EditorTools"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mvgrimes/app-editortools"
+      }
+   },
+   "version" : "1.00"
+}

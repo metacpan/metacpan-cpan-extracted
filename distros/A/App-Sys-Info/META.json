@@ -1,0 +1,60 @@
+{
+   "abstract" : "Application of Sys::Info to gather information from the system",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Sys-Info",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.40"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Format::Human::Bytes" : "0",
+            "Sys::Info" : "0.73",
+            "Text::Table" : "0",
+            "Time::Elapsed" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Sys::Info" : {
+         "file" : "lib/App/Sys/Info.pm",
+         "version" : "0.24"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/burak/cpan-app-sys-info/"
+      }
+   },
+   "version" : "0.24"
+}

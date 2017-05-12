@@ -1,0 +1,14 @@
+drop table <<<TABLENAME>>>
+
+~
+create table <<<TABLENAME>>> (
+ID bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+LOOKUP varchar(14) default NULL,
+IMGNAME varchar(28) NOT NULL default '',
+IMGURL varchar(78) NOT NULL default '',
+IMGTYPE varchar(8) NOT NULL default '',
+IMG_B blob,
+CHANGEDATE_T TIMESTAMP NOT NULL,
+RECORDDATE_T TIMESTAMP NOT NULL,
+PRIMARY KEY (ID), UNIQUE KEY ID (ID) ) ENGINE=MyISAM
+

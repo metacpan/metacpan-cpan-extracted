@@ -1,0 +1,214 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+our $DATE = '2014-12-10'; # DATE
+our $VERSION = '0.06'; # VERSION
+
+use Getopt::Long qw(:config bundling no_permute);
+use Time::HiRes qw(time);
+
+my %Opts;
+my $subs;
+my $res = GetOptions(
+    'help|h'      => sub {
+        require Pod::Usage;
+        Pod::Usage::pod2usage(-verbose=>0, -exitval=>0);
+    },
+    'version|v'   => sub {
+        say "plstrace version ", ($main::VERSION // '?');
+        exit 0;
+    },
+    't'           => sub { $Opts{show_time}++ },
+    's=i'         => sub { $Opts{strsize} = $_[1] },
+    'T'           => sub { $Opts{show_spent_time} = 1 },
+    'show-entry!' => sub { $Opts{show_entry} = $_[1] ? 1:0 },
+    'show-exit!'  => sub { $Opts{show_exit}  = $_[1] ? 1:0 },
+    'e=s'      => sub {
+        my $arg = $_[1];
+        my ($qual, $vals) = $arg =~ /^(\w+)=(.*)/
+            or die "plstrace: Invalid value for -e, please see documentation\n";
+        #$vals = [split /,/, $vals];
+        if ($qual eq 'trace') {
+            $subs = $vals;
+        } else {
+            die "plstrace: Unknown qualifier for -e '$qual', please see documentation\n";
+        }
+    },
+);
+exit 99 unless $res;
+
+@ARGV or die "plstrace: Please specify Perl program to trace\n";
+defined $subs or die "plstrace: Please specify -e trace=... option\n";
+my $prog = shift @ARGV;
+
+my $dlp_import = $subs;
+$dlp_import .= "," . join(",", map {"-$_=$Opts{$_}"} keys %Opts) if keys %Opts;
+my $time0 = time(); # t0 = before we exec perl and compile Debug::LTrace::plstrace and wrap
+$dlp_import .= ",-time0=$time0";
+
+my @cmd = ($^X, "-MDebug::LTrace::plstrace=$dlp_import", $prog, @ARGV);
+say join " ", @cmd if $ENV{DEBUG};
+exec @cmd;
+
+# ABSTRACT: Trace Perl function calls
+# PODNAME: plstrace
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+plstrace - Trace Perl function calls
+
+=head1 VERSION
+
+This document describes version 0.06 of plstrace (from Perl distribution App-plstrace), released on 2014-12-10.
+
+=head1 SYNOPSIS
+
+ % plstrace --help (or -h)
+ % plstrace --version (or -v)
+ % plstrace [PLSTRACE OPTIONS] <PROG> [PROG OPTIONS]
+
+Basic example (the only required option is C<-e trace=...> to specify which
+subroutines should be traced, the below example means all subroutines in the
+main package (C<*>) and all subroutines in the C<Foo> package (C<Foo::*>)):
+
+ % plstrace -e trace=*,Foo::* your_program.pl --your --prog --options
+
+Show time spent inside each subroutine:
+
+ % plstrace -e trace=... -T your_program.pl ...
+
+Sample output (using C<-tttt> options):
+
+ 000.009660 > main::foo("some arg", "1")
+ 000.020905 > main::bar()
+ 000.020905 < main::bar()
+ 000.009660 < main::foo("some arg", "1")
+ 000.034183 > main::foo("some arg", "2")
+ 000.041502 > main::bar()
+ 000.041502 < main::bar()
+ 000.034183 < main::foo("some arg", "2")
+ 000.071704 > main::foo("some arg", "3")
+ 000.088051 > main::bar()
+ 000.088051 < main::bar()
+ 000.071704 < main::foo("some arg", "3")
+
+The main difference with strace output is that each sub is displayed twice,
+during entry and exit.
+
+=head1 DESCRIPTION
+
+B<plstrace> is "strace for your Perl functions". Its interface and output is
+similar to Unix utility B<strace>. But only a few strace options are currently
+supported.
+
+Some notes (caveats, limitations):
+
+=over
+
+=item * Currently implemented by wrapping Perl subroutines with Perl subroutines during INIT phase
+
+caller() has been adjusted so the wrapped subroutines does not see the trace
+wrappers (see L<Hook::LexWrap>).
+
+There are other low-level approaches for tracing (that might be used), see
+L</"SEE ALSO">.
+
+=item * Perl builtin functions are not traced, only user-defined subroutines
+
+=item * O/S system calls or external programs are not traced
+
+=item * Time spent in each subroutine (-T) is inclusive
+
+This means if A calls B and B calls C, A's time will include B and C.
+
+=item * Timing overhead currently has not been adjusted
+
+So for small time amounts (microseconds or smaller) you should understand that
+the times are not very accurate.
+
+=back
+
+=head1 OPTIONS
+
+Unless specified otherwise, these options follow its strace counterpart. The
+long options are the ones that are added and different from strace.
+
+=head2 -s SIZE(int)
+
+=head2 -T
+
+=head2 -t
+
+Like in strace, if specified once (C<-t>) will show time of day down to the
+second, if specified twice (C<-tt>) will show time of day with microseconds, if
+specified three times (C<-ttt>) will print epoch with microseconds.
+
+plstrace adds two more styles: four times (C<-tttt>) will show relative time to
+pogram start with microseconds, five times (C<-ttttt>) will show relative time
+to I<previous message> with microseconds.
+
+=head2 -e trace=SUB_SPECS(str)
+
+C<< <SUB SPECS> >> is a comma-separated sub spec. Each sub spec is either
+C</\w+/> (e.g. C<foo>) to mean a named subroutine in the C<main> package, C<*>
+to mean all subroutines in the C<main> package, C</\w+(::\w+)+/> (e.g.
+C<Foo::func>, C<Foo::Bar::blah>) to mean a fully-qualified named subroutine, or
+C</\w+(::\w+)*::\*/> (e.g. C<Foo::*>) to mean all subroutines in a package.
+
+=head2 --(no)hshow-entry
+
+Whether to show subroutine entry. Default is true. Use C<--noshow-entry> to hide
+showing entry traces.
+
+=head2 --(no)show-exit
+
+Whether to show subroutine exit. Default is true. Use C<--noshow-exit> to hide
+showing exit traces.
+
+=head1 SEE ALSO
+
+B<strace>, the inspiration for this program.
+
+L<Debug::LTrace::plstrace> which currently actually implements the tracing, and
+which in turn is based on L<Debug::LTrace>.
+
+Other subroutine tracing modules: L<Devel::TraceCalls>, L<Runops::Trace>,
+L<Devel::TraceSubs>, L<Devel::STrace> (and others).
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-plstrace>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-plstrace>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-plstrace>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

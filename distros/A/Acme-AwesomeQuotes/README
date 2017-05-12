@@ -1,0 +1,84 @@
+NAME
+    Acme::AwesomeQuotes - Make your text awesome!
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+      use Acme::AwesomeQuotes;
+      my $awesome_text = GetAwesome('Wyld Stallyns');
+      say q(I'm Bill S. Preston, Esquire!);
+      say q(And I'm Ted "Theodore" Logan!);
+      say ('And we are ', $awesome_text, '!');
+
+DESCRIPTION
+    Tired of ordinary quotation marks that lack punch?
+
+    Looking for something that can better convey just how *awesome* your
+    words are?
+
+    You need `àwesome quoteś´!
+
+FUNCTIONS
+  GetAwesome
+    "GetAwesome()" is the module’s only function, and is exported by
+    default. It takes a single scalar string argument, and returns that
+    string with the following changes applied:
+
+    *   a grave accent (or backtick, U+0060) is prepended;
+
+    *   a combining grave accent is added to the first letter;
+
+    *   a combining acute accent is added to the final letter;
+
+    *   an acute accent (U+00B4) is appended;
+
+    In addition, leading/trailing whitespace and punctuation is stripped,
+    and the returned string is in NFC.
+
+    Combining characters already present in the string are respected, and
+    existing initial/terminal grave/acute accents will not be doubled.
+    However, in cases where both a grave and acute accent may be applied –
+    such as if the initial letter has an acute accent, or if the string
+    consists of only a single letter – a caron is used instead, because
+    combining grave and acute accents on the same character doesn’t look so
+    hot. :)
+
+LIMITATIONS
+    *   N.B. that the first and last characters of the supplied string must
+        be *letters*; leading/trailing whitespace and punctuation will be
+        stripped, and if the resulting first/last character is not a letter
+        an exception will be raised. Letters may be from any script covered
+        by Unicode. Because leading/trailing punctuation is stripped, if
+        your text is to go e.g. at the end of a sentence, you should apply
+        the full-stop *after* calling "GetAwesome()".
+
+    *   The returned string is in NFC; combining accents will therefore
+        occur as separate characters only if there is no code point for the
+        corresponding character+accent.
+
+    *   A string that is already in `àwesome quoteś´ cannot be made *more*
+        awesome by calling the function on it repeatedly. :)
+
+BUGS
+    None known, doubtless many undiscovered.
+
+SEE ALSO
+    Acme::LeetSpeak
+    <http://search.cpan.org/~jmadler/Acme-LeetSpeak-0.01/lib/Acme/LeetSpeak.
+    pm>
+
+ACKNOWLEDGEMENTS
+    Thanks to the regulars on <irc://irc.perl.org/perl> for the idea. Thanks
+    to Ævar Arnfjörð Bjarmason (avar, <http://search.cpan.org/~avar/>) for
+    helpful suggestions on packaging.
+
+AUTHOR
+    Marcus Smith <carwash@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcus Smith.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

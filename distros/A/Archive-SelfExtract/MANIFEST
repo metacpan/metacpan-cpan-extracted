@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST			This list of files
+Makefile.PL
+README
+bin/mkselfextract
+lib/Archive/SelfExtract.pm
+sample/test-script.pl
+sample/test.zip
+t/1.t

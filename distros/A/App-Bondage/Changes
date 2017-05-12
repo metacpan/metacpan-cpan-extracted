@@ -1,0 +1,103 @@
+0.4.11 Thu Oct 7 01:06:47 GMT 2010
+    - Support the new CAP instead of CAPAB on FreeNode
+
+0.4.10 Sun Oct 3 15:31:37 GMT 2010
+    - After daemonizing, notify the POE kernel that we have forked
+
+0.4.9 Thu Sep 30 20:52:50 GMT 2010
+    - Fix decreasing version numbers in some packages
+
+0.4.8 Thu Sep 30 19:40:52 GMT 2010
+    - Set default values for realname/server/hops in WHO replies
+
+0.4.7 Wed Sep 29 21:02:41 GMT 2010
+    - Use Proc::Daemon instead of POE::Component::Daemon
+
+0.4.6 Tue Aug 17 22:48:52 GMT 2010
+    - Set process name with Sys::Prctl if it's available. Unless we're
+      running on a perl which calls prctl() for us.
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.4.4 Fri Mar 12 02:26:44 GMT 2010
+    - Allow disabling POE::Component::IRC's flood protection
+
+0.4.3 Wed Jan 20 03:00:24 GMT 2010
+    - Add log_notices and log_dcc options
+
+0.4.2 Wed Jan 13 09:29:09 GMT 2010
+    - Spurious NAMES replies will not get into the recall buffer now
+    - Migrated Makefile.PL over to Module::Install
+    - Use YAML::XS for configs instead of Config::Any
+    - Set $0 to "bondage: $USER" (or "bondage") so bondage is visible in ps
+      and netstat as such
+
+0.4.1 Tue Sep 30 19:23:43 GMT 2008
+    - Fixed a serious typo
+    - Some pod updates
+
+0.4.0 Tue Sep 30 17:00:29 GMT 2008
+    - Don't forward PING/PONG server messages
+    - Generate various server replies without contacting the server.
+      As a consequence, it should use less traffic and be snappier,
+      especially when many/large/busy channels are involved.
+    - Added away_poll config option
+
+0.3.3 Sun Sep 28 04:21:50 GMT 2008
+    - Fixed crash on client disconnect
+
+0.3.2 Wed Sep 24 20:10:19 GMT 2008
+    - Fix race condition related to CAPAB IDENTIFY-MSG
+    - Use less CPU while attaching when recall mode is 'all'
+
+0.3.1 Wed Sep 24 19:06:09 GMT 2008
+    - Fix bug in recall due to wrong string interpolation
+    - More pod improvements
+    - More sanity checks on the config file
+
+0.3.0 Wed Sep 24 00:17:00 GMT 2008
+    - Handle the CAPAB IDENTIFY-MSG feature smoothly
+    - Make recall keep track of channel topic changes
+    - Remove a debugging print statement, doh
+    - Should detach from the terminal now when not using --debug
+    - Moved 'bondage' from bin/ to script/ since it's not a binary
+    - Prettified some of the pod
+    - Exit cleanly upon getting SIGINT when clients are attached
+    - Fix bug in 99-test-pod.t
+    - Create the logs/ dir on demand
+
+0.2.5 Tue Mar 11 01:42:08 GMT 2008
+    - Fix PM recalling
+    - Enable plugin_debug in PoCo::IRC when debugging
+    - A few pod fixes
+    - Fix MANIFEST
+
+0.2.4 Mon Feb 11 04:33:05 GMT 2008
+    - Fix topic recalling
+    - Add log_rotate/log_sortbydate
+    - Move channel cycling to POE::Component::IRC
+    - Use Config::Any instead of YAML::Syck
+    - Exit (almost) cleanly when sent TERM/INT signals
+    - Rename auto_cycle option to cycle_empty
+
+0.2.3 Wed Jan 30 05:01:30 GMT 2008
+    - Fix silly versioning blunder
+
+0.2.2 Wed Jan 30 04:18:26 GMT 2008
+    - Reorganized pod
+    - Fixed Cycle.pm
+
+0.2.1 Mon Jan 28 10:14:17 GMT 2008
+    - Pod fixes
+
+0.2.0 Mon Jan 28 06:24:13 GMT 2008
+    - Uploaded to CPAN as App::Bondage
+    - Moved most features into separate PoCo-IRC plugins
+    - Rewrote a lot of stuff
+
+0.1.1 Mon Jan 14 08:33:22 GMT 2008
+    - A change log!
+    - Fix ignoring WHO replies requested by PoCo::IRC::State
+    - Fix auto away not working properly when reconnecting
+    - Require POE-Component-IRC 5.52, so that CTCP commands
+      (/me and the like) will be forwarded

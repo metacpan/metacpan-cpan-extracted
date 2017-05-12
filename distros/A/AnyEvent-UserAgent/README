@@ -1,0 +1,43 @@
+NAME
+
+AnyEvent::UserAgent - AnyEvent::HTTP OO-wrapper.
+
+DESCRIPTION
+
+AnyEvent::UserAgent is a OO-wrapper around AnyEvent::HTTP with cookies
+support by HTTP::Cookies. Also request callback receives response as
+HTTP::Response object.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc AnyEvent::UserAgent
+
+You can also look for information at:
+
+    Repository
+        http://github.com/AdCampRu/anyevent-useragent
+    Bug tracker
+        http://github.com/AdCampRu/anyevent-useragent/issues
+
+AUTHOR
+
+Denis Ibaev, dionys@cpan.org for AdCamp.ru.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.

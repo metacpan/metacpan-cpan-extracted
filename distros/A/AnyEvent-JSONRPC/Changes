@@ -1,0 +1,68 @@
+Revision history for Perl extension AnyEvent::JSONRPC
+
+0.15   2010-10-28
+      - Fix error in AnyEvent::JSONRPC::HTTP::Server making this module unusable
+      - Silence warning about AnyEvent::JSONRPC::Client being a non-Mouse class
+
+0.14   2010-07-20
+      - Added base classes AnyEvent::JSONRPC::Server and
+        AnyEvent::JSONRPC::Client
+      - Made the json object in the Server classes configurable and allow and
+        convert blessed by default.
+      - Added some utility functions for registering methods
+      - Improved dependencies
+
+0.13_3 2010-07-08
+      - Added simple HTTP server based on AnyEvent::HTTPD
+      - Moved TCP code to AnyEvent::JSONRPC::TCP::*
+
+0.13_2 2010-07-07
+      - Added simple HTTP client based on AnyEvent::HTTP
+
+0.13_1 2010-07-02
+      - Forked AnyEvent::JSONRPC::Lite for a more full-spec implementation
+        All previous versions is from AnyEvent::JSONRPC::Lite
+        Thanks to Daisuke Murase for authoring the ::Lite module
+      - BACKWARD INCOMPATIBLE: The API is mostly the same, but with some
+                               subtle differences. 
+      - Based on JSON::RPC::Common to do most handling of JSON-RPC messages
+
+0.12  2010-05-28T11:35:58+09:00
+      - fix a documentation bug (tokuhirom++)
+
+0.11001 2009-09-03T17:57:54+09:00
+      - fix pod spell and its test (tokuhirom++)
+      - depends latest AnyEvent
+      - add recommends line for JSON::XS
+
+0.11  2009-09-03T15:23:56+09:00
+      - fix broken pod syntax
+      - some refactoring around result condvar (tokuhirom++)
+
+0.10  2009-08-28T20:25:51+09:00
+      - BACKWARD INCOMPATIBLE: client's $cv->recv now just get ->{result} directly.
+                               and just croak when server returns an error by using $cv->croak
+      - added on_error, on_eof callback options to constructor
+      - upgrade documents
+
+0.03002 2009-08-27T16:28:48+09:00
+      - remove Guard object isa check, it's not used when Guard module isn't available.
+
+0.03001 2009-08-27T11:41:18+09:00
+      - fix disconnect test, checking disconnection in on_error
+
+0.03  2009-08-26T02:04:07+09:00
+      - fixed some bugs that destroying objects (== disconnection, close server) does not work
+
+0.02  2009-08-04T21:28:38+09:00
+      - added default on_eof handler to Server for ignoring clean disconnection from client
+
+0.01002 2009-08-02T13:57:19+09:00
+      - some document fixes
+      - added missing prereq: JSON
+
+0.01001 2009-07-31T17:03:44+09:00
+      - added missing prereq: Any::Moose
+
+0.01  2009-07-31T16:43:46+09:00
+      - original version

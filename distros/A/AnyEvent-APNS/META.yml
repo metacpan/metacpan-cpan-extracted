@@ -1,0 +1,31 @@
+---
+abstract: 'Simple wrapper for Apple Push Notifications Service (APNS) provider'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-APNS
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0
+  AnyEvent: 4.80
+  Filter::Util::Call: 0
+  JSON::Any: 0
+  Net::SSLeay: 1.33
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/typester/anyevent-apns-perl.git
+version: 0.10

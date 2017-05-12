@@ -1,0 +1,408 @@
+#!/usr/bin/perl
+# -*- Mode: perl -*-
+# file: pic
+
+# NOTE:  This is a very confusing looking script.  It is basically a client-side image map, but it 
+# uses a variety of workarounds so that when the user clicks in an area that isn't part of the map,
+# the coordinates of the click are passed back to the script as a server-side image map.  It uses
+# javascript tricks to do this, but unfortunately the tricks are different for Netscape and Internet
+# explorer.
+
+use strict;
+
+use Ace 1.51;
+use File::Path;
+use CGI 2.42 qw/:standard escape Map Area Layer *p *TR *td *table/;
+use CGI::Carp;
+use Ace::Browser::AceSubs qw(:DEFAULT Style Url);
+use Ace::Browser::GeneSubs 'NCBI';
+
+# these constants should be moved into configuration file
+use constant DISABLED => 0;
+use constant WIDTH    => 1024;
+use constant HEIGHT   =>  768;
+use constant ICONS        => Configuration()->Icons;
+use constant UP_ICON      => ICONS .'/a_up.gif';
+use constant DOWN_ICON    => ICONS .'/a_down.gif';
+use constant ZOOMIN_ICON  => ICONS .'/a_zoomin.gif';
+use constant ZOOMOUT_ICON => ICONS .'/a_zoomout.gif';
+
+use constant JSCRIPT => <<END;
+function send_click(e,url) {
+   if (e.offsetX)
+      send_click_ie(e,url);
+   else
+      send_click_ns(e,url);
+}
+function send_click_ns(e,url) {
+   window.location = url + (e.x-document.theMapImg.x) + '-' + (e.y-document.theMapImg.y);
+}
+function send_click_ie(e,url) {
+   window.location = url + e.offsetX + '-' + e.offsetY;
+}
+function s(obj,comment) {
+   if (obj != null) obj.title=comment;
+   window.status=comment;
+   return true;
+}
+function c() {
+   if (window.event) window.event.cancelBubble=true;
+}
+END
+;
+
+# uuencoded GIF for error messages
+use constant ERROR_GIF=><<'END';
+M1TE&.#=A8`$W`/```+\``/___RP`````8`$W```"_H2/<<'M#Q^(+BF%;%YR
+M3PJ&XDB6YCERE8&V[@O'((LQ-"VKW?KAM?W!!!LXG>R(3+I\Q*'R"8U2@D4@
+MTFC=_8A-;?<K#8MSSJRI/(:BT\QM;()N7]Q>LUV>SNLA<OQTO?<&*-9VXV0Q
+M`W<X2+?"-^3C5P/)L;`!1%7)PJ398\@)]^BIZ,E#*00F%(>H&I+1]&G7BOJ9
+MV0G(BE)(FBDK(2OI=EI7-%B:93C9BURZ:Y8\9^.[E:S1PX-*?5SWT[<-O:D"
+MKMCMR!QQ`[-[')F(:9[XFGKGX3[7GDV=.OK'I?U\[=$73><`%I0F<%^9*L+>
+M=8/D\.%`B`F#V8-7"XL__GHB\/F*1&F-CGITTF&RYHI<(W%^BAG$]C*C-W@K
+MJ9PDR$R>MV4D_S"Z"`9:BDOS$J);.*PH+*6@_AD]2NL42)$\ERD+RNXG2)H%
+M9Q[D&FXBB;!+D(H="G.:4F"+N'78QO5"TKAOY9H#M>JL1*=[+6YERA+J5X4Q
+MM<(]X6SPE*>).<UK2O?>X8]_W=8=^6V:2Z="-PL%6KG"4ZR:AWDVK!:ME]."
+MT^;;_#(?X7[1QJ&K.)G/QIL\CY(JC*AS5=^2U<KK:]4V+):_&ZFRZ#LDOY/1
+M32V:2M0#4J*+\8Y:6'W6C-U=G;\CB3,=<UNXL,>S5BLB?-.VJ-.&'BB__OW\
+M_ON?L>Q?@`(.2&"!!I9T8((*+LA@@[HPY&"$$DY(87_'58AAAAINR&&''GX(
+M8H@"XL>?1DNU]H*)))+!G8DBOAA1"2OFMTE'5!V!QXR"G&@>C##J*.-^QJR5
+M!)`I/(C13R6.H22#1MJH7TM62?$D4&,E56486:;4X4[9&#$??.=]EU)&HI!5
+MC%3O=<&<*6[>=`:6TKUIQ9RB/&1F)U'A])9[/K57&V9IXCG<4GPB1UJ=*N68
+MU47AP)8;<LUQUFAJM`E3J$G%*7:5<H5UJA%D7HG4%3N.H-E,8`=YQ=>A>;$)
+MJ$.0!D2,2I2*QNB#N7Q6J4D>P81/9;'(^BI'6HS:_M!>7Z[R3:'.S8K5A81)
+MF:@VL2J::#VY(A9K3\1*%RI[KCK+%TVAU74G;]=5FV2V4U8++92P.II<2)=>
+M]2F`,U)K'EFOH59:NY@"9FY>C$;J+VP"WQIP;`K?ZZ]1\?)8<*N3;1NG/:/:
+MVR.[LRE;[L<UI6;)JQ,OS%K#%A,Y[;43Y[95O(F-III@&R/TV:6L,AQ;Q47E
+MC+.M=]7;VJ`*C\/+OT/?%^F>\-)Z;*7Y"C>IE0++A(Q>/L?RV[B`A0+R<LA*
+MJFJIT:9IY[=[IAU>+M9Q74G'P<F&J9^&,N*V>*Q44U*X=O_+RRTQ4IRW8D+O
+MG:J?8G;L8R!;-@YYE$U&_J[EY)1?;J'EF%_Q^.:>/U'XYVIH+GKIII^.>NJ;
+MNUA@YZJ__B/IDL-.>^W]VHY[[IFCJ'OO'I;,-ISVM0VTM,\!?VB??;)W8O*^
+M/W\9.$MSJNFC]!5-SL,#Z:7I/Z%#WWO*D-YA\W0G1]N\QIFM6A_CX./^<-G?
+ML<[G^3V78^/Z:=G_ON_0BJ\D5#T->SN0A``']C+9]<]T`*237Z3&/^W1KUE_
+M2>`"W]=`\KC/4Q%\%]VBID%E\>^"\$O8A8X#M./U+(7`X]WRQ"4VHG&*A*^3
+M%M7FH[[%\28Z6`"83!J5`#&YCH8A6E%;'`2D(Q)QB5;CDFB0F*)#,'&*+BQ3
+=&@A;QSHK(H2*7!3/E;(XHBH9KXMD+*,9?5<``#L`
+`
+END
+#`
+;
+
+my $click      = param('click');
+my $obj = GetAceObject();
+
+unless ($obj) {
+  AceError(<<END) if param() && !param('name') && !param('class')
+Call this script with URL parameters of
+<VAR>name</VAR> and <VAR>class,</VAR> where
+"name" and "class" correspond to the name and class of the
+Ace object of interest.
+END
+;
+}
+
+my $style = Style();
+  $style->{'code'} =<<END;
+BODY {
+    background-color: #FFFFFF;
+}
+END
+;
+
+PrintTop($obj,undef,$obj ? "Graphic display of: $obj" : "Graphic display",
+	 '-Bgcolor' => '#FFFFFF', # important to have a white bg for the gifs
+	 '-Style'   => $style,
+	 -Script    => JSCRIPT
+	);
+
+print_prompt();
+AceNotFound() unless $obj;
+display_object($obj,$click);
+PrintBottom();
+
+sub print_prompt {
+  print
+    start_form(-name=>'question'),
+      table(
+	    TR (th('Name'),td(textfield(-name=>'name')),
+		th('Class'),td(textfield(-name=>'class',-size=>15,-onChange=>'document.question.submit()')),
+		td(submit({-style=>'background: white',-name=>'Change'}))),
+	   ),
+     end_form;
+}
+
+sub display_object {
+  my ($obj,$click) = @_;
+  my $class = param('class');
+  my $name  = $obj->name;
+
+  if (DISABLED) {
+      print h1({-class=>'error'},'Sorry, but graphical displays have been disabled temporarily.');
+      return;
+  }
+
+  # special case for sequences
+  if (lc($class) eq 'sequence' && $name =~ /SUPERLINK|CHROMOSOME/) {
+    print h1('This sequence is too large to display. Try a shorter segment.');
+    return;
+  }
+
+  build_map_navigation_panel($obj,$name,$class) if $class =~ /Map/i;
+
+  my $map_start = param('map_start');
+  my $map_stop  = param('map_stop');
+  my $has_coords = defined $map_start && defined $map_stop;
+
+  my $safe_name = $name;
+  $safe_name=~tr/[a-zA-Z0-9._\-]/_/c;
+  my $db = Configuration->Name;
+  $db=~s!^/!!;
+  my $path = join('/',$db,$class);
+
+  umask 002;  # want this writable by group
+  my ($pic,$picroot) = @{Configuration()->Pictures};
+
+  if ($ENV{MOD_PERL} && Apache->can('request')) { # we have apache, so no reason not to take advantage of it
+    my $r = Apache->request;
+    my $subr = $r->lookup_uri($pic ."/");
+    $picroot = $subr->filename if $subr;
+  }
+
+  mkpath (["$picroot/$path"],0,0777) || AceError("Can't create directory to store image in")
+    unless -d "$picroot/$path";
+
+  # should be some sort of state variable?
+  $safe_name .= "." . param('click') if param('click');
+  $safe_name .= ".start=$map_start,stop=$map_stop" if $has_coords;
+  $safe_name .= ".gif";
+  my $image_file = "$picroot/$path/$safe_name";
+  my $image_path = "$pic/$path/$safe_name";
+
+  # get the parameters for the image generation
+  my @clicks =  map { [ split('-',$_) ] } split(',',param('click'));
+
+  my @param = (-clicks=>\@clicks);
+  if ($class =~ /Map/) {
+    push(@param,(-dimensions=>[WIDTH,HEIGHT]));
+    push(@param,(-coords=>[param('map_start'),param('map_stop')])) if $has_coords;
+  }
+
+
+  my ($gif,$boxes) = $obj ? $obj->asGif(@param) : ();
+
+  unless (-e $image_file && -M $image_file < 0) {
+    local(*F);
+    open (F,">$image_file") || AceError("Can't open image file $image_file for writing: $!\n");
+    print F $gif || unpack("u",ERROR_GIF);
+    close F;
+  }
+
+  my $u = Url('pic') . "?" . query_string();
+  $u .= param('click') ? ',' : '&click=';
+
+  print
+    img({-src   => $image_path,
+	 -name  => 'theMapImg',
+	 -border=> 0,
+	 # this is for Internet Explorer, has no effect on Netscape!
+	 -onClick=>"send_click(event,'$u')",
+	 -usemap=>'#theMap',
+	 -isMap=>undef}),
+    ;
+
+  print_map($name,$class,$boxes);
+}
+
+sub print_map {
+    my ($name,$class,$boxes) = @_;
+    my @lines;
+    my $old_clicks = param('click');
+    Delete('click');
+
+    # Collect some statistics in order to inhibit those features
+    # that are too dense to click on sensibly.
+    my %centers;
+    foreach my $box (@$boxes) {
+	my $center = center($box->{'coordinates'});
+	$centers{$center}++;
+    }
+
+    my $user_agent =  http('User_Agent');
+    my $modern = $user_agent=~/Mozilla\/([\d.]+)/ && $1 >= 4;
+
+    my $max = Configuration()->Max_in_column || 100;
+
+    foreach my $box (@$boxes) {
+	my $center = center($box->{'coordinates'});
+	next if $centers{$center} > $max;
+	
+	my $coords = join(',',@{$box->{'coordinates'}});
+	(my $jcomment = $box->{'comment'} || "$box->{class}:$box->{name}" )
+	    =~ s/'/\\'/g; # escape single quotes for javascript
+
+	CASE :
+	{
+
+	    if ($box->{name} =~ /gi\|(\d+)/ or 
+		($box->{class} eq 'System' and $box->{'comment'}=~/([NP])ID:g(\d+)/)) {
+		my($db) = $2 ? $1 : 'n';
+		my($gid) = $2 || $1;
+		my $url = NCBI . "?db=$db&form=1&field=Sequence+ID&term=$gid";
+                push(@lines,qq(<AREA shape="rect"
+                                     onMouseOver="return s(this,'$jcomment')"
+                                     coords="$coords"
+                                     href="$url">));
+		last CASE;
+	    }
+
+	    last CASE if $box->{class} eq 'System';
+
+	    if ($box->{class} eq 'BUTTON') {
+		my ($c) = map { "$_->[0]-$_->[1]" } [ map { 2+$_ } @{$box->{coordinates}}[0..1]];
+		my $clicks = $old_clicks ? "$old_clicks,$c" : $c;
+                my $url = Url('pic',query_string() . "&click=$clicks");
+                push(@lines,qq(<AREA shape="rect"
+                                     coords="$coords"
+                                     onMouseOver="return s(this,'$jcomment')"
+                                     target="_self"
+                                     href="$url">));
+		last CASE;
+	    }
+	    my $n = escape($box->{'name'});
+	    my $c = escape($box->{'class'});
+	    my $href = Object2URL($box->{'name'},$box->{'class'});
+            push(@lines,qq(<AREA shape="rect"
+                                 onMouseOver="return s(this,'$jcomment')"
+                                 coords="$coords"
+                                 href="$href">));
+	}
+    }
+
+    # Create default handling.  Bad use of javascript, but can't think of any other way.
+    my $url = Url('pic', query_string());
+    my $simple_url = $url;
+    $url .= "&click=$old_clicks";
+    $url .= "," if $old_clicks;
+    push(@lines,qq(<AREA shape="default"
+                         alt=""
+                         onClick="send_click(event,'$url'); return false"
+                         onMouseOver="return s(this,'clickable region')"
+                         href="$simple_url">)) if $modern;
+    print qq(<map name="theMap">),join("\n",@lines),qq(</map>),"\n";
+}
+
+# special case for maps
+# this builds the whole map control/navigation panel
+sub build_map_navigation_panel {
+  my $obj = shift;
+  my ($name,$class) = @_;
+
+  my $map_start = param ('map_start');
+  my $map_stop  = param ('map_stop');
+
+  my($start,$stop) = $obj->asGif(-getcoords=>1);
+  $map_start ||= $start;
+  $map_stop  ||= $stop;
+
+  my($min,$max)    = get_extremes($obj->db,$name);
+
+  # this section is responsible for centering on the place the user clicks
+  if (param('click')) {
+    my ($x,$y) = split '-',param('click');
+    my $pos    = $map_start + $y/HEIGHT * ($map_stop - $map_start);
+
+    my $offset = $pos - ($map_start + $map_stop)/2;
+
+    $map_start += $offset;
+    $map_stop  += $offset;
+    param('map_start' => $map_start);
+    param('map_stop'  => $map_stop);
+
+    Delete('click');
+  }
+
+
+  my $self = url(-path_info=>1);
+  my $half = ($map_stop - $map_start)/2;
+  my $a1   = $map_start - $half;
+  $a1      = $min if $min > $a1;
+  my $a2   = $map_stop - ($map_start - $a1);
+
+  my $b2   = $map_stop + $half;
+  $b2      = $max if $b2 > $max;
+  my $b1   = $b2 - ($map_stop - $map_start);
+
+  my $m1   = $map_start + $half/2;
+  my $m2   = $map_stop  - $half/2;
+
+
+  print start_table({-border=>1});
+  print TR(td({-align=>'CENTER',-class=>'datatitle',-colspan=>2},'Map Control'));
+  print start_TR();
+  print td(
+	   table({-border=>0},
+		 TR(td('&nbsp;'),
+		    td(
+		       $map_start > $min ?
+		       a({-href=>"$self?name=$name;class=$class;map_start=$a1;map_stop=$a2"},
+			 img({-src=>UP_ICON,-align=>'MIDDLE',-border=>0}),' Up')
+		       :
+		       font({-color=>'#A0A0A0'},img({-src=>UP_ICON,-align=>'MIDDLE',-border=>0}),' Up')
+		      ),
+		    td('&nbsp;')
+		   ),
+		 TR(td({-valign=>'CENTER',-align=>'CENTER'},
+		       a({-href=>"$self?name=$name;class=$class;map_start=$a1;map_stop=$b2"},
+			 img({-src=>ZOOMOUT_ICON,-align=>'MIDDLE',-border=>0}),' Shrink')
+		      ),
+		    td({-valign=>'CENTER',-align=>'CENTER'},
+		       a({-href=>"$self?name=$name;class=$class;map_start=$min;map_stop=$max"},'WHOLE')
+		      ),
+		    td({-valign=>'CENTER',-align=>'CENTER'},
+		       a({-href=>"$self?name=$name;class=$class;map_start=$m1;map_stop=$m2"},
+			 img({-src=>ZOOMIN_ICON,-align=>'MIDDLE',-border=>0}),' Magnify')
+		      )
+		   ),
+		 TR(td('&nbsp;'),
+		    td(
+		       $map_stop < $max ?
+		       a({-href=>"$self?name=$name;class=$class;map_start=$b1;map_stop=$b2"},
+			 img({-src=>DOWN_ICON,-align=>'MIDDLE',-border=>0}),' Down')
+		       :
+		       font({-color=>'#A0A0A0'},img({-src=>DOWN_ICON,-align=>'MIDDLE',-border=>0}),' Down')
+		      ),
+		    td('&nbsp;'))
+		)
+
+	  );
+  print start_td({-rowspan=>2});
+
+  print start_form;
+  print start_p;
+  print hidden($_) foreach qw(class name);
+  print 'Show region between: ',
+    textfield(-name=>'map_start',-value=>sprintf("%.2f",$map_start),-size=>8,-override=>1),
+      ' and ',
+	textfield(-name=>'map_stop',- value=>sprintf("%.2f",$map_stop),-size=>8,-override=>1),
+	  ' ';
+  print submit('Change');
+  print end_p;
+  print end_form;
+  print end_td(),end_TR(),end_table();
+}
+
+sub get_extremes {
+  my $db = shift;
+  my $chrom = shift;
+  my $select = qq(select gm[Position] from g in object("Map","$chrom")->Contains[2], gm in g->Map where gm = "$chrom");
+  my @positions = $db->aql("select min($select),max($select)");
+  my ($min,$max) = @{$positions[0]}[0,1];
+  return ($min,$max);
+}
+
+sub center {
+  my $c = shift;
+  my ($left,$right) = @{$c}[0,2];
+  # round to nearest 2 pixels
+  int( ($left + (($right-$left)/2)) / 2 ) * 2;
+}

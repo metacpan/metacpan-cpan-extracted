@@ -1,0 +1,206 @@
+#!/opt/ActivePerl-5.8/bin/perl
+
+# $Id: ace_initd,v 1.5 2007/12/08 03:27:01 atobey Exp $
+
+use Authen::ACE;
+use IO::Socket::INET;
+use Sys::Syslog;
+use Crypt::CBC;
+use Getopt::Long;
+
+our( $port, $facility, $secret, $listen, $var_ace, $daemon, $pidfile );
+
+GetOptions(
+    "port=i"     => \$port,     "p=i" => \$port,
+    "facility=s" => \$facility, "f=s" => \$facility,
+    "secret=s"   => \$secret,   "s=s" => \$secret,
+    "listen=s"   => \$listen,   "l=s" => \$listen,
+    "var_ace=s"  => \$var_ace,  "a=s" => \$var_ace,
+    "daemon"     => \$daemon,   "d"   => \$daemon,
+    "pidfile=s"  => \$pidfile,  "p=s" => \$pidfile
+);
+
+# make the secret not visible in 'ps' output
+if ( $secret ) {
+    my $newname = $0;
+    $newname =~ s/$secret/###########/g;
+    $0 = $newname;
+}
+
+# background the program if --daemon/-d is specified
+if ( $daemon ) {
+    my $pid = fork();
+    if ( $pid ) {
+        exit 0;
+    }
+    else {
+        eval {
+            require POSIX;
+            POSIX::setsid();
+        };
+    }
+}
+
+$var_ace        ||= $ENV{VAR_ACE};
+$ENV{'VAR_ACE'} ||= $var_ace;
+$facility       ||= 'local2';
+$port           ||= 1969;
+$secret         ||= 'secret';
+$listen         ||= '127.0.0.1';
+write_pidfile( $pidfile );
+
+my $crypt = new Crypt::CBC ( $secret, "Blowfish" );
+
+# maybe make UNIX socket an option?
+my $server = IO::Socket::INET->new(
+    LocalPort    =>    $port,
+    Proto        =>    'udp',
+    LocalAddr    =>    $listen
+) or die "Couldn't be a tcp server on port $port: $!\n";
+
+openlog ( 'ace_initd', 'nowait', $facility );
+
+my %ACE;
+my $mesg;
+my $result;
+my $request;
+my $info;
+my $rand;
+
+while ( $server->recv($mesg, 1024) ) {
+   $mesg = $crypt->decrypt_hex ( $mesg );
+   my ( $rand, $request, $type, $username, $passcode ) = split /\:/, $mesg;
+      eval {
+       if ( ! $ACE{$request} ) {
+       $ACE{$request} = new Authen::ACE;
+       }
+       if ( $type eq "check" ) {
+       ($result,$info) = $ACE{$request}->Check($passcode,$username);
+       }
+       if ( $type eq "next" ) {
+       ($result,$info) = $ACE{$request}->Next($passcode);
+        }
+       if ( $type eq "pin" ) {
+       ($result,$info) = $ACE{$request}->PIN($passcode);
+       }
+       if ( $result != 5 && $result != 2 ) {
+       delete $ACE{$request};
+    } 
+      };
+   if ( $@ ) {
+    $result = 1;       
+       syslog ( 'err', "$type $username $result via exception");
+   }
+
+    syslog ( 'info', "$type $username $result" );
+    if ( $result ) {
+           $mesg = "$rand:$result:$$info{system_pin}:$$info{min_pin_len}:$$info{max_pin_len}:$$info{alphanumeric}:$$info{user_selectable}";
+    } else {
+        $mesg = "$rand:$result:::::";
+    }
+   $mesg = $crypt->encrypt_hex ( $mesg );
+   $server->send ($mesg);
+}
+
+sub write_pidfile {
+    my $file = shift;
+    return unless $file;
+    open( PID, "> $file" )
+        || die "could not open pidfile \"$pidfile\" for writing: $!";
+    print PID $$;
+    close PID;
+}
+
+
+__END__
+
+=head1 NAME
+
+ace_initd -  ACE Authentication daemon for Apache::AuthenSecurID::Auth 
+
+=head1 SYNOPSIS
+
+nohup ./ace_initd --listen=127.0.0.1 --facility=local2 --secret=123456 --port=1969 --var_ace=/var/ace
+
+=head1 DESCRIPTION
+
+This daemon handles the ACE authentication requests for the 
+Apache::SecurID::Auth module.  It is a single threaded, single
+fork server that listens on a specified UDP port.  Incoming requests
+are decrypted and requests forwarded to the ACE server.  If a specific
+request is in either in NEXT TOKEN MODE or SET PIN MODE the Authen::ACE
+object is not deleted.  It is instead kept in memory to handle those
+specific requests later.
+
+=head1 LIST OF TOKENS
+
+
+=item *
+--var_ace
+
+Specifies the location of the F<sdconf.rec> file.  It defaults to 
+F<$ENV{VAR_ACE}> if this variable is not set.
+
+=item *
+--secret
+
+The Blowfish key used to encrypt and decrypt the authentication cookie. 
+It defaults to F<my secret> if this variable is not set.
+
+=item *
+--port
+
+The port the that the Ace request daemon listens on.  It defaults to F<1969> 
+if this variable is not set.
+
+=item *
+--facility
+
+The syslog facility ace_initd logs to.  It defaults to F<local2> 
+if this variable is not set.
+
+=item *
+--daemon
+
+Break off from the shell and become a daemon.
+
+=head1 CONFIGURATION
+
+Either run from the command line;
+
+prompt$ nohup ./ace_initd &
+
+or write the appropriate scripts in the /etc/rc directories.
+
+=head1 PREREQUISITES
+
+ace_initd requires Crypt::Blowfish, Crypt::CBC and Authen::ACE.
+
+=head1 SEE ALSO
+
+L<Authen::ACE> L<Apache::AuthenSecurID> L<Apache::AuthenSecurID::Auth>
+
+=head1 AUTHORS
+
+=item *
+mod_perl by Doug MacEachern <dougm@osf.org>
+
+=item *
+Authen::ACE by Dave Carrigan <Dave.Carrigan@iplenergy.com>
+
+=item *
+Apache::AuthenSecurID by David Berk <dberk@lump.org>
+
+=item *
+Apache::AuthenSecurID::Auth by David Berk <dberk@lump.org>
+
+=item *
+Various changes by Al Tobey <tobert@gmail.com>
+
+=head1 COPYRIGHT
+
+ace_initd is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+=cut
+

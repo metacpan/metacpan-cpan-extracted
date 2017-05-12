@@ -1,0 +1,71 @@
+# title     = "Das Wohltemperierte Clavier I, Prelude 1 (c-major)"
+# composer  = "J.S.Bach"
+# opus      = "BWV846"
+\norel
+\transpose'
+\tempo80
+c16 e       g   c'  e'  g   c'  e'
+c   e       g   c'  e'  g   c'  e'
+c   d       a   d'  f'  a   d'  f'
+c   d       a   d'  f'  a   d'  f'
+b,  d       g   d'  f'  g   d'  f'
+b,  d       g   d'  f'  g   d'  f'
+c   e       g   c'  e'  g   c'  e'
+c   e       g   c'  e'  g   c'  e'
+c   e       a   e'  a'  a   e'  a'
+c   e       a   e'  a'  a   e'  a'
+c   d       fis a   d'  fis a   d'
+c   d       fis a   d'  fis a   d'
+b,  d       g   d'  g'  g   d'  g'
+b,  d       g   d'  g'  g   d'  g'
+b,  c       e   g   c'  e   g   c'
+b,  c       e   g   c'  e   g   c'
+a,  c       e   g   c'  e   g   c'
+a,  c       e   g   c'  e   g   c'
+d,  a,      d   fis c'  d   fis c'
+d,  a,      d   fis c'  d   fis c'
+g,  b,      d   g   b   d   g   b
+g,  b,      d   g   b   d   g   b
+g,  bes,    e   g  cis' e   g   cis'
+g,  bes,    e   g  cis' e   g   cis'
+f,  a,      d   a   d'  d   a   d'
+f,  a,      d   a   d'  d   a   d'
+f,  as,     d   f   b   d   f   b
+f,  as,     d   f   b   d   f   b
+e,  g,      c   g   c'  c   g   c'
+e,  g,      c   g   c'  c   g   c'
+e,  f,      a,  c   f   a,  c   f
+e,  f,      a,  c   f   a,  c   f
+g,, d,      g,  b,  f   g,  b,  f
+g,, d,      g,  b,  f   g,  b,  f
+c,  e,      g,  c   e   g,  c   e
+c,  e,      g,  c   e   g,  c   e
+c,  g,     bes, c   e  bes, c   e
+c,  g,     bes, c   e  bes, c   e
+f,, f,      a,  c   e   a,  c   e
+f,, f,      a,  c   e   a,  c   e
+fis,, c,    a,  c   es  a,  c   es
+fis,, c,    a,  c   es  a,  c   es
+as,,  f,    b,  c   d   b,  c   d
+as,,  f,    b,  c   d   b,  c   d
+g,, f,      g,  b,  d   g,  b,  d
+g,, f,      g,  b,  d   g,  b,  d
+g,, e,      g,  c   e   g,  c   e
+g,, e,      g,  c   e   g,  c   e
+g,, d,      g,  c   f   g,  c   f
+g,, d,      g,  c   f   g,  c   f
+g,, d,      g,  b,  f   g,  b,  f
+g,, d,      g,  b,  f   g,  b,  f
+g,, es,     a,  c   fis a,  c   fis
+g,, es,     a,  c   fis a,  c   fis
+g,, e,      g,  c   g   g,  c   g
+g,, e,      g,  c   g   g,  c   g
+g,, d,      g,  c   f   g,  c   f
+g,, d,      g,  c   f   g,  c   f
+g,, d,      g,  b,  f   g,  b,  f
+g,, d,      g,  b,  f   g,  b,  f
+c,, c,      g, bes, e   g, bes, e
+c,, c,      g, bes, e   g, bes, e
+c,, c,      f,  a,  c   f   c   a,  c   a,  f,  a,  f,  d,  f,  d,
+c,, b,,     g   b   d'  f'  d'  b   d'  b   g   b   d   f   e   d
+c,1

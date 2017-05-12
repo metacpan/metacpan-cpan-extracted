@@ -1,0 +1,30 @@
+Changes
+examples/bench.pl
+examples/profile.pl
+lib/Algorithm/SpatialIndex.pm
+lib/Algorithm/SpatialIndex/Bucket.pm
+lib/Algorithm/SpatialIndex/Node.pm
+lib/Algorithm/SpatialIndex/Storage.pm
+lib/Algorithm/SpatialIndex/Storage/DBI.pm
+lib/Algorithm/SpatialIndex/Storage/Memory.pm
+lib/Algorithm/SpatialIndex/Strategy.pm
+lib/Algorithm/SpatialIndex/Strategy/2D.pm
+lib/Algorithm/SpatialIndex/Strategy/3D.pm
+lib/Algorithm/SpatialIndex/Strategy/OctTree.pm
+lib/Algorithm/SpatialIndex/Strategy/QuadTree.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01load.t
+t/02pluggable.t
+t/20storage-memory.t
+t/21storage-dbi.t
+t/30strategy-quadtree.t
+t/31strategy-quadtree-dbi.t
+t/40strategy-octtree.t
+t/41strategy-octtree-dbi.t
+t/60max_depth.t
+t/lib/Algorithm/SpatialIndex/OTreeTest.pm
+t/lib/Algorithm/SpatialIndex/QTreeTest.pm
+t/lib/Algorithm/SpatialIndex/Strategy/Test.pm
+META.yml                                 Module meta-data (added by MakeMaker)

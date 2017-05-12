@@ -1,0 +1,34 @@
+NAME
+    Acme::Alien::DontPanic - Test Module for Alien::Base
+
+DESCRIPTION
+    Alien::Base comprises base classes to help in the construction of
+    "Alien::" modules. Modules in the Alien namespace are used to locate and
+    install (if necessary) external libraries needed by other Perl modules.
+
+    This module is a toy module to test the efficacy of the Alien::Base
+    system. This module is depended on by another toy module
+    Acme::Ford::Prefect, which needs the libdontpanic library to be able to
+    tell us the "answer".
+
+SEE ALSO
+    *   Alien::Base
+
+    *   Alien
+
+    *   Acme::Ford::Prefect
+
+SOURCE REPOSITORY
+    <http://github.com/Perl5-Alien/Acme-Alien-DontPanic>
+
+AUTHOR
+    Original author: Joel Berger, <joel.a.berger@gmail.com>
+
+    Current maintainer: Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Joel Berger
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

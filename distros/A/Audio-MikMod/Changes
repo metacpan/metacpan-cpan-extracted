@@ -1,0 +1,9 @@
+# $Id: Changes,v 1.3 1999/07/29 18:56:30 daniel Exp $
+
+Revision history for Perl extension Audio::MikMod.
+
+0.01  Mon Jun 28 11:06:17 1999
+	- original version; created by h2xs 1.19
+
+0.50  Thr Jul 29 14:01:13 1999
+	- Working interface, demo programs.

@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use App::Bondage;
+use Digest::MD5 qw(md5_hex);
+use Getopt::Long qw(:config auto_help);
+use Pod::Usage;
+use POE;
+
+GetOptions(
+    'c|crypt'     => \&encrypt_pass,
+    'd|debug'     => \my $debug,
+    'v|version'   => sub {
+       no strict 'vars';
+        my $version = defined $App::Bondage::VERSION
+            ? "Bondage $App::Bondage::VERSION, $App::Bondage::HOMEPAGE"
+            : 'Bondage dev-git';
+        print $version, "\n";
+        exit;
+    },
+    'w|workdir=s' => \(my $work_dir = "$ENV{HOME}/.bondage"),
+) or pod2usage();
+
+# Set process name
+{
+    my $name = "bondage" . ($ENV{USER} ? ": $ENV{USER}" : '');
+    $0 = $name;
+    if ($] < 5.013000 and $^O eq 'linux') {
+        local $@;
+        eval {
+            require Sys::Prctl;
+            Sys::Prctl::prctl_name($name);
+        };
+    }
+}
+
+my $bouncer = App::Bondage->new( Debug => $debug, Work_dir => $work_dir );
+if (!$debug) {
+    require Proc::Daemon;
+    eval {
+        Proc::Daemon::Init->();
+        $poe_kernel->has_forked();
+    };
+    chomp $@;
+    die "Can't daemonize: $@\n" if $@;
+}
+$poe_kernel->run();
+
+sub encrypt_pass {
+    print "Password:";
+    system('stty -echo');
+    chomp (my $password = <>);
+    system('stty echo');
+    print "\nEncrypted password: " . md5_hex($password, $App::Bondage::CRYPT_SALT) . "\n";
+    exit;
+}
+
+=encoding utf8
+
+=head1 NAME
+
+bondage - A featureful easy-to-use IRC bouncer
+
+=head1 SYNOPSIS
+
+B<bondage> [options]
+
+ Options:
+   -c, --crypt             Prompts you for a password and encrypts it
+   -d, --debug             Skip daemonizing and print everything to STDOUT
+   -h, --help              Display this help message
+   -v, --version           Display version information
+   -w DIR, --workdir=DIR   Working directory (default: ~/.bondage)
+
+=head1 DESCRIPTION
+
+This is the command-line program to use Bondage. See the
+L<App::Bondage|App::Bondage> documentation for more details.
+
+=head1 AUTHOR
+
+Hinrik E<Ouml>rn SigurE<eth>sson, hinrik.sig@gmail.com
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2008-2009 Hinrik E<Ouml>rn SigurE<eth>sson
+
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

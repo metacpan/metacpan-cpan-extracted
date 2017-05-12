@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+
+#  PODNAME: schlong
+# ABSTRACT: exe-cute-able for Acme::Schlong
+
+use v5.14;
+use strict;
+use warnings;
+
+use FindBin;
+
+use lib "$FindBin::Bin/../lib";
+
+use Data::Printer;
+
+use Acme::Schlong;
+
+# my $schlong = Acme::Schlong->new;
+# 
+# my $size = $schlong->size;
+# 
+# $schlong->testdrive();
+
+print "Your schlong size is @{[Acme::Schlong->new->size]}cm";
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+schlong - exe-cute-able for Acme::Schlong
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Daniel B. <dbr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Daniel B..
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut
+

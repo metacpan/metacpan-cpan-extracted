@@ -1,0 +1,26 @@
+Revision history for App-Nopaste-Service-Linode
+
+0.06 2010-03-25 11:59:03
+
+    - App-Nopaste-Service-AnyPastebin solved RT#55257. This makes my
+      code a lot simpler.
+
+0.05 2010-03-05 14:05:48
+
+    - 0.04 but with updated Changes
+
+0.04 2010-03-05 13:41:36
+
+    - Use Dist::Zilla Git plugins again, I fail.
+
+0.03 2010-03-05 13:27:48
+
+    - Don't use the Dist::Zilla Git plugins, they fail
+
+0.02 2010-03-05 13:19:57
+
+    - Fix some Dist::Zilla issues
+
+0.01 2010-03-05 13:14:09
+
+    - Initial release to CPAN

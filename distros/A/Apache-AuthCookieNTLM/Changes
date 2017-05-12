@@ -1,0 +1,33 @@
+Revision history for Perl extension Apache::AuthCookieNTLM
+
+0.07 Sat Sep 3 2004
+	- Applied patch from Steve Keay for 'POST' data
+
+0.06  Mon Nov 11 10:11 2003
+	- Changed the way this module should be inherited (see docs)
+	  as I'd forgotten about the global, much cleaner now.
+	- Found bug in the way I'd suggested to inherit - it didn't
+	  work!
+
+0.05  Mon Nov 10 11:39 2003
+	- REMOTE_USER is now set if 'username' and 'domainname' are
+	  set by choose_cookie_values().
+	  
+0.04  Fri Nov 6 13:45 2003
+	- More cleaning up and documentation
+	- added a bit more debugging as well
+	
+	
+0.03  Thur Nov 6 17:22 2003
+	- First CPAN release
+	- Clean up code & docs
+	- Add debuging
+	- Added domain and secure cookie settings
+	
+0.02  Wed Nov 5 17:22 2003
+	- First public release	
+	
+0.01  Tue Nov  4 11:05:31 2003
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Apache::AuthCookieNTLM
+

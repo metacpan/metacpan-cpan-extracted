@@ -1,0 +1,59 @@
+Revision history for Perl extension Array::Tour.
+
+0.01  Wed Mar 22 15:21:37 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -v 0.1 -n Array::Tour
+	- Refactored code to make Spiral.pm and Serpentine.pm
+	  child classes of Array::Tour.
+	- Added packages Spiral.pm and Serpentine.pm.
+
+0.02  Thurs Mar 28 2008
+	- Added methods _make_array() for creating an
+	  internal array for bookkeepping purposes (will be
+	  useful for a not-yet written module).
+	- Added get_array() to retrieve that internal array for
+	  the users.
+	- Added method uses_array() so that user can know whether
+	  the Array::Tour::XXXX module has an internal array to
+	  return, or whether the package works by touring only.
+	- Changed pod style to comment individual methods.
+
+0.03  Thurs Jul 31 2008
+	- Added RandomWalk.pm.  It's suspicously like the "make"
+	  code in Games::Maze.  I'm sure it's just a coincidence.
+	  Plan to add Prim's and Kruskal's later.
+	- Method adjusted_position(), added to Tour.pm, will
+	  automatically add the {offset} co-ordinates to the
+	  {position} co-ordinates.  Used by base and child classes
+	  in the next() method.
+
+0.04  Sat Aug 02 2008
+	- First upload to CPAN failed to include helper.pl and
+	  all the tests failed.  Added helper.pl to the MANIFEST.
+
+0.05  Wed Aug 06 2008
+	- Fairly bad POD documentation made less bad in Tour.pm.
+	- This time remembered to add RandomWalk.pm to MANIFEST.
+	  No tests for it yet.
+0.06  Wed Aug 13 2008
+	- Added {backtrack} attribute to RandomWalk to allow the saved list
+	  of previous positions to be accessed randomly or as a stack, in
+	  addition to the default queue.
+	- Fix the documentation of RandomWalk.pm with respect to the changes in
+	  documentation of Tour.pm.  Also document the new backtrack option.
+	- Added the walktour() function to the helper.pl file.
+      Fri Aug 29 2008
+        - The ongoing saga of making the documentation less incomprehensible.
+	  This time working on Serpentine.pm and Spiral.pm.
+      Mon Sep 01 2008
+	- It would be nice if I could be consistent with my ordering of columns,
+	  rows, and levels.  Fixed a problem with reversed rows and columns
+	  values in Array::Tour's _make_array() and dump_array().
+	- Added an eg directory and put in rnd_wlk.pl as my first example
+	  script.
+      Thurs Sep 04 2008
+	- Terrible documentation mistakes fixed in Serpentine.pm and Spiral.pm.
+	  This doesn't mean the documentation is good, of course.
+	- Some internal methods now use attributes instead of parameters to get
+	  their information.
+	- Added options to the rndwlk.pl script to test features at random.

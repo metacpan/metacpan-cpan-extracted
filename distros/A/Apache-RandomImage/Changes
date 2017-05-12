@@ -1,0 +1,14 @@
+Revision history for Perl extension Apache::RandomImage.
+
+0.3   2009-03-28
+    - Document imported Apache constants to make recent version of 
+      Test::Pod::Coverage happy
+
+0.2   2008-10-25
+    - mod_perl2 support
+    - Module house-keeping
+
+0.01  2003-11-03
+    - Initial release
+
+

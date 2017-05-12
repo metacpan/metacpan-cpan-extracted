@@ -1,0 +1,102 @@
+Apache2-AuthAny
+
+Apache2::AuthAny utilizes other authentication modules or internal
+code, and provides a single "GATE" page where the end user can choose
+between authentication mechanisms. AuthAny was developed to provide
+login to the Gossamer Health system. Login mechanisms for Gossamer
+include Google (OpenID), ProtectNetwork and UW NetID (Shibboleth),
+HTTP Authentication (LDAP and basic). Logout is supported for all
+mechanisms, including HTTP authentication which is not normally
+possible. AuthAny includes a role-based authorization system.
+
+The system supports the following features:
+
+    * Identity providers can be added through configuration.
+    * Log out without closing the browser window.
+    * Linking of accounts from different providers to a single identity.
+    * Apache "Require" directives for user or role authorization.
+    * Environment variables are passed to the protected application.
+    * Command-line tool for adding and updating users.
+    * Configurable timeout allowing both a "recognized" state and an 
+      "authenticated" state.
+
+The University of Washington maintains a demo site at:
+
+ https://authany.cirg.washington.edu/
+
+INSTALLATION
+
+AuthAny requires a relational database. The db/auth_any.sql file
+can be used to create a minimal database, or examined to determine
+which tables and columns are needed.
+
+Once the database is built, the following environment variables
+should be set prior to running "make test" below:
+
+AUTH_ANY_ROOT  [ex. /usr/share/authany]
+AUTH_ANY_CONFIG_ROOT [ex. /etc/authany]
+AUTH_ANY_DB [ex. mysql]
+AUTH_ANY_DB_PW_FILE [ex /etc/authany/db-passwd]
+AUTH_ANY_DB_USER  [ex. authany]
+AUTH_ANY_DB_NAME [ex auth_any_db]
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+        post-install.pl
+
+CONFIGURATION
+
+Following installation, Apache must be configured to load the AuthAny
+handlers. Under Debian, a file with the following lines can be added
+to the /etc/apache2/conf.d directory ...
+
+   PerlSetEnv AUTH_ANY_ROOT       /usr/share/authany
+   PerlSetEnv AUTH_ANY_CONFIG_ROOT  /etc/authany
+   PerlSetEnv AUTH_ANY_DB         mysql
+   PerlSetEnv AUTH_ANY_DB_PW_FILE /etc/authany/db-passwd
+   PerlSetEnv AUTH_ANY_DB_USER    kgoldov
+   PerlSetEnv AUTH_ANY_DB_NAME    auth_any
+   #PerlSetEnv AUTH_ANY_DB_HOST    not needed unless remote db
+   
+   PerlRequire              /usr/share/authany/startup.pl
+   PerlLoadModule Apache2::AuthAny
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Apache2::AuthAny
+
+This documentation explains how to add identity providers, set
+up a "GATE" page, and use "Require" directives to control access.
+
+Please see the TODO section for a list known desired improvements.
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Apache2-AuthAny
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Apache2-AuthAny
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Apache2-AuthAny
+
+    Search CPAN
+        http://search.cpan.org/dist/Apache2-AuthAny
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 University of Washington
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

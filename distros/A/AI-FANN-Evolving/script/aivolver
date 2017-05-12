@@ -1,0 +1,276 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use YAML::Any 'LoadFile';
+use File::Path 'make_path';
+use AI::FANN::Evolving;
+use AI::FANN::Evolving::TrainData;
+use Algorithm::Genetic::Diploid::Logger ':levels';
+
+# initialize config variables
+my $verbosity = WARN; # log level
+my $formatter = 'simple'; # log formatter
+my %initialize;       # settings to start the population
+my %data;             # train and test data files
+my %experiment;       # experiment settings
+my %ann;              # ANN settings
+my $outfile;
+
+# there are no arguments
+if ( not @ARGV ) {
+	pod2usage( '-verbose' => 0 );
+}
+
+# first argument is a config file
+if ( -e $ARGV[0] ) {
+	my $conf = shift;
+	my $yaml = LoadFile($conf);
+	$outfile    = $yaml->{'outfile'}         if defined $yaml->{'outfile'};
+	$verbosity  = $yaml->{'verbosity'}       if defined $yaml->{'verbosity'};
+	$formatter  = $yaml->{'formatter'}       if defined $yaml->{'formatter'};
+	%initialize = %{ $yaml->{'initialize'} } if defined $yaml->{'initialize'};
+	%data       = %{ $yaml->{'data'} }       if defined $yaml->{'data'};
+	%experiment = %{ $yaml->{'experiment'} } if defined $yaml->{'experiment'};
+	%ann        = %{ $yaml->{'ann'} }        if defined $yaml->{'ann'};
+}
+
+# process command line arguments
+GetOptions(
+	'verbose+'     => \$verbosity,
+	'formatter=s'  => \$formatter,
+	'outfile=s'    => \$outfile,
+	'initialize=s' => \%initialize,
+	'data=s'       => \%data,
+	'experiment=s' => \%experiment,
+	'ann=s'        => \%ann,
+	'help|?'       => sub { pod2usage( '-verbose' => 1 ) },
+	'manual'       => sub { pod2usage( '-verbose' => 2 ) },
+);
+
+# configure ANN
+AI::FANN::Evolving->defaults(%ann);
+
+# configure logger
+my $log = Algorithm::Genetic::Diploid::Logger->new;
+$log->level( 'level' => $verbosity );
+$log->formatter( $formatter );
+
+# read input data
+my $deps   = join ', ', @{ $data{'dependent'} };
+my $ignore = join ', ', @{ $data{'ignore'} };
+$log->info("going to read train data $data{file}, ignoring '$ignore', dependent columns are '$deps'");
+my $inputdata = AI::FANN::Evolving::TrainData->new(
+	'file'      => $data{'file'},
+	'dependent' => $data{'dependent'},
+	'ignore'    => $data{'ignore'},
+);
+my ( $traindata, $testdata );
+if ( $data{'type'} and lc $data{'type'} eq 'continuous' ) {
+	( $traindata, $testdata ) = $inputdata->sample_data( $data{'fraction'} );
+}
+else {
+	( $traindata, $testdata ) = $inputdata->partition_data( $data{'fraction'} );
+}
+
+$log->info("number of training data records: ".$traindata->size);
+$log->info("number of test data records: ".$testdata->size);
+
+# create first work dir
+my $wd  = delete $experiment{'workdir'};
+make_path($wd);
+$wd .= '/0';
+
+# create the experiment
+my $exp = AI::FANN::Evolving::Experiment->new(
+	'traindata' => $traindata->to_fann,
+	'env'       => $testdata->to_fann,
+	'workdir'   => $wd,
+	%experiment,
+);
+
+# initialize the experiment
+$exp->initialize(%initialize);
+
+# run!
+my ( $fittest, $fitness ) = $exp->run();
+$log->info("*** overall best fitness: $fitness");
+my ($gene) = sort { $a->fitness <=> $b->fitness } map { $_->genes } $fittest->chromosomes;
+$gene->ann->save($outfile);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+aivolver - Evolves optimal artificial neural networks
+
+=head1 SYNOPSIS
+
+ aivolver [<config.yml>] [OPTION]...
+	 try `aivolver --help' or `aivolver --manual' for more information
+
+=head1 OPTIONS AND ARGUMENTS
+
+B<***NO LONGER ACCURATE, CONSULT THE YAML CONFIG FILES***>
+
+=over
+
+=item B<<config.ymlE<gt>>
+
+If the first command line argument is a file location, this will be interpreted as the
+location of a configuration file in YAML syntax structured as in this
+example: L<https://raw.github.com/naturalis/ai-fann-evolving/master/examples/conf.yml>.
+
+Subsequent command line arguments can then be provided that override the defaults in this
+configuration file.
+
+=item B<-h/--help/-?>
+
+Prints help message and exits.
+
+=item B<-m/--manual>
+
+Prints manual page and exits.
+
+=item B<-v/--verbose>
+
+Increments verbosity of the process. Can be used multiple times.
+
+=item B<-o/--outfile <file.annE<gt>>
+
+File name for the fittest ANN file over all generations.
+
+=item B<-d/--data <key=valueE<gt>>
+
+The C<data> argument is used multiple times, each time followed by a key/value pair
+that defines the location of one of the data files. The key/value pairs are as follows:
+
+=over
+
+=item B<file=<data.tsvE<gt>>
+
+Defines the location of a file of input data.
+
+=item B<fraction=<numberE<gt>>
+
+Fraction of input data to use for training (versus testing).
+
+=back
+
+=item B<-i/--initialize <key=valueE<gt>>
+
+The C<initialize> argument is used multiple times, each time followed by a key/value
+pair that defines one of the initialization settings for the (genetic) structure of the
+evolving population. The key/value pairs are as follows:
+
+=over
+
+=item B<individual_count=<countE<gt>>
+
+Defines the number of individuals in the population.
+
+=item B<chromosome_count=<countE<gt>>
+
+Defines the number of non-homologous chromosomes (i.e. n for diploid org). Normally
+1 chromosome suffices.
+
+=item B<gene_count=<countE<gt>>
+
+Defines the number of genes per chromosome. Normally 1 gene (i.e. 1 ANN) suffices.
+
+=back
+
+=item B<-e/--experiment <key=valueE<gt>>
+
+The C<experiment> argument is used multiple times, each time followed by a key/value pair
+that defines one of the properties of the evolutionary process. The key/value pairs are
+as follows:
+
+=over
+
+=item B<crossover_rate=<rateE<gt>>
+
+p of exchange between chromosomes.
+
+=item B<mutation_rate=<rateE<gt>>
+
+p of a trait mutating.
+
+=item B<reproduction_rate=<rateE<gt>>
+
+Proportion of population contributing to next generation.
+
+=item B<ngens=<numberE<gt>>
+
+Number of generations. This should be the longer the better, at least while the
+fitness is still improving.
+
+=item B<workdir=<dirE<gt>>
+
+Output directory.
+
+=back
+
+=back
+
+=head1 DESCRIPTION
+
+Artificial neural networks (ANNs) are decision-making machines that develop their
+capabilities by training on input data. During this training, the ANN builds a
+topology of input neurons, hidden neurons, and output neurons that respond to signals
+in ways (and with sensitivities) that are determined by a variety of parameters. How
+these parameters will interact to give rise to the final functionality of the ANN is
+hard to predict I<a priori>, but can be optimized in a variety of ways.
+
+C<aivolver> is a program that does this by evolving parameter settings using a genetic
+algorithm that runs for a number of generations determined by C<ngens>. During this
+process it writes the intermediate ANNs into the C<workdir> until the best result is
+written to the C<outfile>.
+
+The genetic algorithm proceeds by simulating a population of C<individual_count> diploid
+individuals that each have C<chromosome_count> chromosomes whose C<gene_count> genes
+encode the parameters of the ANN. During each generation, each individual is trained
+on a sample data set, and the individual's fitness is then calculated by testing its
+predictive abilities on an out-of-sample data set. The fittest individuals (whose
+fraction of the total is determined by C<reproduction_rate>) are selected for breeding
+in proportion to their fitness.
+
+Before breeding, each individual undergoes a process of mutation, where a fraction of
+the ANN parameters is randomly perturbed. Both the size of the fraction and the
+maximum extent of the perturbation is determined by C<mutation_rate>. Subsequently, the
+homologous chromosomes recombine (i.e. exchange parameters) at a rate determined by
+C<crossover_rate>, which then results in (haploid) gametes. These gametes are fused with
+those of other individuals to give rise to the next generation.
+
+=head1 TRAINING AND TEST DATA
+
+The data that is used for training the ANNs and for subsequently testing their predictive
+abilities are provided as tab-separated tables. An example of an input data set is here:
+
+L<https://github.com/naturalis/ai-fann-evolving/blob/master/examples/butterbeetles.tsv>
+
+The tables have a header row, with at least the following columns:
+
+=over
+
+=item B<ID>
+
+The C<ID> column contains a unique identifier (a string) for each record in the data set.
+
+=item B<CLASS>
+
+Each C<CLASS> column (multiple are allowed) specifies the classification that should
+emerge from one of the output neurons. Often this would be an integer, for example
+either C<1> or C<-1> for a binary classification. The number of C<CLASS> columns
+determines the number of outputs in the ANN.
+
+=item B<[others]>
+
+All other columns are interpreted as the predictor columns from which the ANN must
+derive its capacity for classification. Normally these are continuous values, which
+are normalized between all records, e.g. in a range between -1 and 1.
+
+=back

@@ -1,0 +1,189 @@
+==================================================
+Changes from 2013-08-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.013 at 2014-08-28 03:57:09 +0000
+------------------------------------------
+
+  Change: c9e9ae4852ac563c904f3a1a22d750ef47373db6
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-28 00:52:40 +0000
+
+    Starting version 0.013. Removed comment method from API::Instagram
+    (replaced by internal _comment method). Added _post, _get_, _del
+    methods, proxy to _request main method in API::Instagram. Added
+    like,dislike and comment methods to API::Instagram::Media. Added
+    media attribute to API::Instagram::Media::Comment. Added remove
+    method to API::Instagram::Media::Comment. 
+
+  Change: ec7504d1d44f315b5db6c0d07a19fffe3dcbf9d5
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-27 00:20:02 +0000
+
+    Tests reorganized 
+
+  Change: 18d4c00985ef334e019f94be9d2d7a1bfd00764e
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-26 23:16:30 +0000
+
+    Starting version 0.012. Add popular_medias method to API::Instagram.
+    Some methods do not require token anymore (as Instagram API Docs
+    describes). Add relatioship get/set method to API::Instagramm::User. 
+
+  Change: 3e4383545f6a505294ff8a4eb0ed754e4720cd04
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-23 12:07:07 +0000
+
+    The Object is created via 'new' again, instance is a new method.
+    Removed MooX::Singleton dependencie. Starting version 0.011 
+
+  Change: 4436d8ec5c7eca17222ed619716760f1307c1309
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-22 14:51:36 +0000
+
+    Added search method to API::Instagram. Add API::Instagram::Search
+    module 
+
+  Change: 9d38ad15993ac27178e3ab9413ad29889ffaa45d
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-22 11:24:00 +0000
+
+    Fixed 00-instagram.t error 
+
+  Change: c5d019cd43e4e218f56f8529160f31a9de5b2680
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-22 11:18:15 +0000
+
+    Now API::Instagram is a singleton. Starting version 0.010 
+
+  Change: 3ad5168aebfb3b4f0bfbb5ea35c9804143c1001c
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-21 21:38:52 +0000
+
+    Starting version 0.009 
+
+  Change: c11b9ff04f2128df3e536b08fc54f108d659fad6
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-21 21:36:25 +0000
+
+    Added more tests. Now coverage of 100% 
+
+  Change: c7d6c67501d1e0ca0168f8c020fed2701cf76cb3
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-21 21:35:10 +0000
+
+    Some bugs fixed. Add last_likes and last_comments mehtods to
+    API::Instagram::Media objects 
+
+  Change: 78e1204e2c853e2e2f4f33261b0ac0a59b71f6e6
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-20 23:37:40 +0000
+
+    Adding API::Instagram::Media tests 
+
+  Change: 1014b57b8f0a5135a8e2c0c366160b70d9ec1a4e
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-20 20:24:03 +0000
+
+    Replacing LWP::UserAgent with Furl 
+
+  Change: 2284e36dc0b688c91ea316bfda29baedc9e803cd
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-20 17:29:55 +0000
+
+    Removed tabs from .travis.yml 
+
+  Change: f22e0e16a014f3b8a2ea2c9d63a9fd6e43579688
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-20 17:26:44 +0000
+
+    Trying Coveralls again 
+
+  Change: 69cab747152bf33aaa444479634466fa543e66d0
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-20 12:27:07 +0000
+
+    Removing Coveralls badge 
+
+  Change: e27f80a2a218910cb8df05e35a833d5097199ffa
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-20 12:15:22 +0000
+
+    Coveralls badge 
+
+  Change: 1a34fb41fcf395de0f1fb41cd7732b33a77c51a7
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-20 11:02:46 +0000
+
+    Adding Coverall badge 
+
+  Change: 5845d74efe9ca8a1e7c37378f892ba0e562edb81
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-19 22:37:32 +0000
+
+    Many bug fixes; Better cache management; Starting version 0.008' 
+
+  Change: 3d4f7c2554f544dfbf1607279d96ad908ec7a483
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-17 11:26:38 +0000
+
+    Fixed profile_picture method on API::Instagram::User. Objects
+    creation returns undef when Instagram returns an error during
+    request. API::Instagram::User keeps user previous data when attempt
+    to reload fails. Starting version 0.007. 
+
+  Change: ee143d09d124ba0f37b4710008b43d79d786ff73
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-17 01:37:20 +0000
+
+    Removed use API::Instagram::Direct request 
+
+  Change: 905fe6e5d9a8c1a161372a85a297e785f11113b0
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-17 01:28:00 +0000
+
+    Media Tags attribute is lazy now - only when requested the tags
+    objects are generated. Fixed Data request when generating an object.
+    It was doing resquests even when not needed. Starting version 0.006. 
+
+  Change: fddb24512b62762eabbc4bd6d7998a94de7d7aaa
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-16 09:31:23 +0000
+
+    Starting version 0.005.1 - DOC fixing thanks to Tudor Marghidanu
+    (marghidanu) 
+
+  Change: 5cd898120384c77242c6942d3f07d84391322e33
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-09 06:23:32 +0000
+
+    Starting version 0.005 
+
+  Change: baba439254b21ccec9d7c44c97bf758252b5313b
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-09 06:21:25 +0000
+
+    Starting version 0.005 
+
+  Change: 4157d26d61d49ece99ec8b2d01efd0296fe80208
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-08 13:54:53 +0000
+
+    Starting version 0.4 
+
+  Change: b863993d7f26d3bb45d3cfd2071b2a36daa445c3
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-06 07:19:09 +0000
+
+    Fixing no_cache option 
+
+  Change: 1d2c669050ce2fd810ef04f62b814b0e9eefbbe1
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-05 21:57:32 +0000
+
+    Updating cache control code 
+
+================
+End of releases.
+================

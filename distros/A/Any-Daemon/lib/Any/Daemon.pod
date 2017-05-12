@@ -1,0 +1,168 @@
+=encoding utf8
+
+=head1 NAME
+
+Any::Daemon - basic needs for a daemon
+
+=head1 SYNOPSIS
+
+  use Any::Daemon;
+  use Log::Report;
+
+  # Prepare a daemon for the Operating System
+  my $daemon = Any::Daemon->new(@os_opts);
+
+  # Start logging to syslog (see Log::Report::Dispatcher)
+  dispatcher SYSLOG => 'syslog';
+
+  # Run managing daemon
+  $daemon->run(@run_opts);
+
+=head1 DESCRIPTION
+
+This module delivers the basic needs for any daemon on UNIX systems.
+There are other standard daemon implementations available on CPAN,
+with as main common difference that this module is not dedicated to a
+specific task. By using Log::Report, you can easily redirect error
+reports to any logging mechanism you like.
+
+The code for this module is in use for many different daemons, some
+with heavy load (a few dozen requests per second)  Have a look in
+the examples directory!  Also, you may like Any::Daemon::HTTP
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Any::Daemon-E<gt>B<new>(%options)
+
+With C<new()> you provide the operating system integration %options,
+where C<run()> gets the activity related parameters: the real action.
+
+Be warned that the user, group, and workdir will not immediately be
+effected: delayed until L<run()|Any::Daemon/"Action">.
+
+ -Option  --Default
+  group     undef
+  pid_file  undef
+  user      undef
+  workdir   current working directory
+
+=over 2
+
+=item group => GID|GROUPNAME
+
+Change to this group (when started as root)
+
+=item pid_file => FILENAME
+
+=item user => UID|USERNAME
+
+Change to this user (when started as root)  If you want to run your
+daemon as root, then explicitly specify that with this option, to
+avoid a warning.
+
+=item workdir => DIRECTORY
+
+Change DIRECTORY so temporary files and such are not written in the
+random directory where the daemon got started.
+
+If the directory does not exist yet, it will be created with mode 0700
+when the daemon object is initialized. We only move to that directory
+when the daemon is run. The working directory does not get cleaned when
+the daemon stops.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<workdir>()
+
+[0.90] assigned working directory of the daemon in the file-system.
+
+=back
+
+=head2 Action
+
+=over 4
+
+=item $obj-E<gt>B<run>(%options)
+
+The C<run> method gets the activity related parameters.
+
+ -Option     --Default
+  background   <true>
+  child_died   spawn new childs
+  child_task   warn only
+  kill_childs  send sigterm
+  max_childs   10
+  reconfigure  ignore
+
+=over 2
+
+=item background => BOOLEAN
+
+Run the managing daemon in the background. During testing, it is
+prefered to run the daemon in the foreground, to be able to stop
+the daemon with Crtl-C and to see errors directly on the screen
+in stead of only in some syslog file.
+
+=item child_died => CODE
+
+The C<child_died> routine handles dieing kids and the restart of new
+ones.  It gets two parameters: the maximum number of childs plus the
+task to perform per kid.
+
+=item child_task => CODE
+
+The CODE will be run for each child which is started, also when they
+are started later on. If the task is not specified, only a warning is
+produced. This may be useful when you start implementing the daemon:
+you do not need to care about the task to perform yet.
+
+The returned value of thise CODE is used as exit code of the child
+process, where zero means 'ok'.
+
+=item kill_childs => CODE
+
+The CODE terminates all running children, maybe to start new ones,
+maybe to terminate the whole daemon.
+
+=item max_childs => INTEGER
+
+The maximum (is usual) number of childs to run.
+
+=item reconfigure => CODE
+
+The CODE is run when a SIGHUP is received; signal 1 is used by most
+daemons as trigger for reconfiguration.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Any-Daemon distribution version 0.94,
+built on March 10, 2014. Website: F<http://perl.overmeer.net/>
+All modules in this suite:
+L</Any::Daemon>,
+L</IOMux>, and
+L</IOMux::HTTP>.
+
+Please post questions or ideas to F<perl@overmeer.net>
+
+=head1 LICENSE
+
+Copyrights 2011-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

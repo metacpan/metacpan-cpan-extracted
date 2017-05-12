@@ -1,0 +1,629 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use CPAN;
+use Getopt::Long;
+use Module::CoreList;
+use Term::ANSIColor::Print;
+
+$| = 1;
+
+my $print = Term::ANSIColor::Print->new();
+
+my $d = shift @ARGV;
+
+my @mods = (
+    'App::Cpan',
+    'App::Prove',
+    'App::Prove::State',
+    'App::Prove::State::Result',
+    'App::Prove::State::Result::Test',
+    'Archive::Tar',
+    'Archive::Tar::Constant',
+    'Archive::Tar::File',
+    'Attribute::Handlers',
+    'AutoLoader',
+    'AutoSplit',
+    'B::Debug',
+    'CPAN',
+    'CPAN::Author',
+    'CPAN::Bundle',
+    'CPAN::CacheMgr',
+    'CPAN::Complete',
+    'CPAN::Debug',
+    'CPAN::DeferredCode',
+    'CPAN::Distribution',
+    'CPAN::Distroprefs',
+    'CPAN::Distrostatus',
+    'CPAN::Exception::RecursiveDependency',
+    'CPAN::Exception::blocked_urllist',
+    'CPAN::Exception::yaml_not_installed',
+    'CPAN::FTP',
+    'CPAN::FTP::netrc',
+    'CPAN::FirstTime',
+    'CPAN::HandleConfig',
+    'CPAN::Index',
+    'CPAN::InfoObj',
+    'CPAN::Kwalify',
+    'CPAN::LWP::UserAgent',
+    'CPAN::Meta',
+    'CPAN::Meta::Requirements',
+    'CPAN::Meta::YAML',
+    'CPAN::Mirrors',
+    'CPAN::Module',
+    'CPAN::Nox',
+    'CPAN::Prompt',
+    'CPAN::Queue',
+    'CPAN::Shell',
+    'CPAN::Tarzip',
+    'CPAN::URL',
+    'CPAN::Version',
+    'Compress::Raw::Bzip2',
+    'Compress::Raw::Zlib',
+    'Compress::Zlib',
+    'Config::Extensions',
+    'Config::Perl::V',
+    'Cwd',
+    'DB_File',
+    'Data::Dumper',
+    'Devel::PPPort',
+    'Digest',
+    'Digest::MD5',
+    'Digest::SHA',
+    'Digest::base',
+    'Digest::file',
+    'Encode',
+    'Encode::Alias',
+    'Encode::Byte',
+    'Encode::CJKConstants',
+    'Encode::CN',
+    'Encode::CN::HZ',
+    'Encode::Config',
+    'Encode::EBCDIC',
+    'Encode::Encoder',
+    'Encode::Encoding',
+    'Encode::GSM0338',
+    'Encode::Guess',
+    'Encode::JP',
+    'Encode::JP::H2Z',
+    'Encode::JP::JIS7',
+    'Encode::KR',
+    'Encode::KR::2022_KR',
+    'Encode::MIME::Header',
+    'Encode::MIME::Header::ISO_2022_JP',
+    'Encode::MIME::Name',
+    'Encode::Symbol',
+    'Encode::TW',
+    'Encode::Unicode',
+    'Encode::Unicode::UTF7',
+    'Env',
+    'Exporter',
+    'Exporter::Heavy',
+    'ExtUtils::CBuilder',
+    'ExtUtils::CBuilder::Base',
+    'ExtUtils::CBuilder::Platform::Unix',
+    'ExtUtils::CBuilder::Platform::VMS',
+    'ExtUtils::CBuilder::Platform::Windows',
+    'ExtUtils::CBuilder::Platform::Windows::BCC',
+    'ExtUtils::CBuilder::Platform::Windows::GCC',
+    'ExtUtils::CBuilder::Platform::Windows::MSVC',
+    'ExtUtils::CBuilder::Platform::aix',
+    'ExtUtils::CBuilder::Platform::cygwin',
+    'ExtUtils::CBuilder::Platform::darwin',
+    'ExtUtils::CBuilder::Platform::dec_osf',
+    'ExtUtils::CBuilder::Platform::os2',
+    'ExtUtils::Command',
+    'ExtUtils::Command::MM',
+    'ExtUtils::Constant',
+    'ExtUtils::Constant::Base',
+    'ExtUtils::Constant::Utils',
+    'ExtUtils::Constant::XS',
+    'ExtUtils::Install',
+    'ExtUtils::Installed',
+    'ExtUtils::Liblist',
+    'ExtUtils::Liblist::Kid',
+    'ExtUtils::MM',
+    'ExtUtils::MM_AIX',
+    'ExtUtils::MM_Any',
+    'ExtUtils::MM_BeOS',
+    'ExtUtils::MM_Cygwin',
+    'ExtUtils::MM_DOS',
+    'ExtUtils::MM_Darwin',
+    'ExtUtils::MM_MacOS',
+    'ExtUtils::MM_NW5',
+    'ExtUtils::MM_OS2',
+    'ExtUtils::MM_QNX',
+    'ExtUtils::MM_UWIN',
+    'ExtUtils::MM_Unix',
+    'ExtUtils::MM_VMS',
+    'ExtUtils::MM_VOS',
+    'ExtUtils::MM_Win32',
+    'ExtUtils::MM_Win95',
+    'ExtUtils::MY',
+    'ExtUtils::MakeMaker',
+    'ExtUtils::MakeMaker::Config',
+    'ExtUtils::Manifest',
+    'ExtUtils::Mkbootstrap',
+    'ExtUtils::Mksymlists',
+    'ExtUtils::Packlist',
+    'ExtUtils::ParseXS',
+    'ExtUtils::testlib',
+    'ExtUtils::Typemaps',
+    'Fatal',
+    'File::Fetch',
+    'File::GlobMapper',
+    'File::Path',
+    'File::Spec',
+    'File::Spec::Cygwin',
+    'File::Spec::Epoc',
+    'File::Spec::Functions',
+    'File::Spec::Mac',
+    'File::Spec::OS2',
+    'File::Spec::Unix',
+    'File::Spec::VMS',
+    'File::Spec::Win32',
+    'File::Temp',
+    'Filter::Simple',
+    'Filter::Util::Call',
+    'Getopt::Long',
+    'HTTP::Tiny',
+    'I18N::LangTags',
+    'I18N::LangTags::Detect',
+    'I18N::LangTags::List',
+    'IO',
+    'IO::Compress::Adapter::Bzip2',
+    'IO::Compress::Adapter::Deflate',
+    'IO::Compress::Adapter::Identity',
+    'IO::Compress::Base',
+    'IO::Compress::Base::Common',
+    'IO::Compress::Bzip2',
+    'IO::Compress::Deflate',
+    'IO::Compress::Gzip',
+    'IO::Compress::Gzip::Constants',
+    'IO::Compress::RawDeflate',
+    'IO::Compress::Zip',
+    'IO::Compress::Zip::Constants',
+    'IO::Compress::Zlib::Constants',
+    'IO::Compress::Zlib::Extra',
+    'IO::Dir',
+    'IO::File',
+    'IO::Handle',
+    'IO::Pipe',
+    'IO::Poll',
+    'IO::Seekable',
+    'IO::Select',
+    'IO::Socket',
+    'IO::Socket::INET',
+    'IO::Socket::UNIX',
+    'IO::Socket::IP',
+    'IO::Uncompress::Adapter::Bunzip2',
+    'IO::Uncompress::Adapter::Identity',
+    'IO::Uncompress::Adapter::Inflate',
+    'IO::Uncompress::AnyInflate',
+    'IO::Uncompress::AnyUncompress',
+    'IO::Uncompress::Base',
+    'IO::Uncompress::Bunzip2',
+    'IO::Uncompress::Gunzip',
+    'IO::Uncompress::Inflate',
+    'IO::Uncompress::RawInflate',
+    'IO::Uncompress::Unzip',
+    'IO::Zlib',
+    'IPC::Cmd',
+    'IPC::Msg',
+    'IPC::Semaphore',
+    'IPC::SharedMem',
+    'IPC::SysV',
+    'JSON::PP',
+    'List::Util',
+    'List::Util::PP',
+    'List::Util::XS',
+    'Locale::Codes',
+    'Locale::Codes::Constants',
+    'Locale::Country',
+    'Locale::Currency',
+    'Locale::Language',
+    'Locale::Maketext',
+    'Locale::Maketext::Guts',
+    'Locale::Maketext::GutsLoader',
+    'Locale::Maketext::Simple',
+    'Locale::Script',
+    'MIME::Base64',
+    'MIME::QuotedPrint',
+    'Math::BigFloat',
+    'Math::BigFloat::Trace',
+    'Math::BigInt',
+    'Math::BigInt::Calc',
+    'Math::BigInt::CalcEmu',
+    'Math::BigInt::FastCalc',
+    'Math::BigInt::Trace',
+    'Math::BigRat',
+    'Math::Complex',
+    'Math::Trig',
+    'Memoize',
+    'Memoize::AnyDBM_File',
+    'Memoize::Expire',
+    'Memoize::ExpireFile',
+    'Memoize::ExpireTest',
+    'Memoize::NDBM_File',
+    'Memoize::SDBM_File',
+    'Memoize::Storable',
+    'Module::CoreList',
+    'Module::Load',
+    'Module::Load::Conditional',
+    'Module::Loaded',
+    'Module::Metadata',
+    'NEXT',
+    'Net::Cmd',
+    'Net::Ping',
+    'Net::Config',
+    'Net::Domain',
+    'Net::FTP',
+    'Net::FTP::A',
+    'Net::FTP::E',
+    'Net::FTP::I',
+    'Net::FTP::L',
+    'Net::FTP::dataconn',
+    'Net::NNTP',
+    'Net::Netrc',
+    'Net::Ping',
+    'Net::POP3',
+    'Net::SMTP',
+    'Net::Time',
+    'Params::Check',
+    'Parse::CPAN::Meta',
+    'Perl::OSType',
+    'PerlIO::via::QuotedPrint',
+    'Pod::Checker',
+    'Pod::Escapes',
+    'Pod::Find',
+    'Pod::Html',
+    'Pod::InputObjects',
+    'Pod::Man',
+    'Pod::ParseLink',
+    'Pod::ParseUtils',
+    'Pod::Parser',
+    'Pod::Perldoc',
+    'Pod::Perldoc::GetOptsOO',
+    'Pod::Perldoc::ToChecker',
+    'Pod::Perldoc::ToMan',
+    'Pod::Perldoc::ToNroff',
+    'Pod::Perldoc::ToPod',
+    'Pod::Perldoc::ToRtf',
+    'Pod::Perldoc::ToText',
+    'Pod::Perldoc::ToTk',
+    'Pod::Perldoc::ToXml',
+    'Pod::PlainText',
+    'Pod::Select',
+    'Pod::Simple',
+    'Pod::Simple::BlackBox',
+    'Pod::Simple::Checker',
+    'Pod::Simple::Debug',
+    'Pod::Simple::DumpAsText',
+    'Pod::Simple::DumpAsXML',
+    'Pod::Simple::HTML',
+    'Pod::Simple::HTMLBatch',
+    'Pod::Simple::HTMLLegacy',
+    'Pod::Simple::LinkSection',
+    'Pod::Simple::Methody',
+    'Pod::Simple::Progress',
+    'Pod::Simple::PullParser',
+    'Pod::Simple::PullParserEndToken',
+    'Pod::Simple::PullParserStartToken',
+    'Pod::Simple::PullParserTextToken',
+    'Pod::Simple::PullParserToken',
+    'Pod::Simple::RTF',
+    'Pod::Simple::Search',
+    'Pod::Simple::SimpleTree',
+    'Pod::Simple::Text',
+    'Pod::Simple::TextContent',
+    'Pod::Simple::TiedOutFH',
+    'Pod::Simple::Transcode',
+    'Pod::Simple::TranscodeDumb',
+    'Pod::Simple::TranscodeSmart',
+    'Pod::Simple::XHTML',
+    'Pod::Simple::XMLOutStream',
+    'Pod::Text',
+    'Pod::Text::Color',
+    'Pod::Text::Overstrike',
+    'Pod::Text::Termcap',
+    'Pod::Usage',
+    'Safe',
+    'Scalar::Util',
+    'Scalar::Util::PP',
+    'SelfLoader',
+    'Seach::Dict',
+    'Storable',
+    'Sys::Syslog',
+    'Sys::Syslog::Win32',
+    'TAP::Base',
+    'TAP::Formatter::Base',
+    'TAP::Formatter::Color',
+    'TAP::Formatter::Console',
+    'TAP::Formatter::Console::ParallelSession',
+    'TAP::Formatter::Console::Session',
+    'TAP::Formatter::File',
+    'TAP::Formatter::File::Session',
+    'TAP::Formatter::Session',
+    'TAP::Harness',
+    'TAP::Harness::Env',
+    'TAP::Object',
+    'TAP::Parser',
+    'TAP::Parser::Aggregator',
+    'TAP::Parser::Grammar',
+    'TAP::Parser::Iterator',
+    'TAP::Parser::Iterator::Array',
+    'TAP::Parser::Iterator::Process',
+    'TAP::Parser::Iterator::Stream',
+    'TAP::Parser::IteratorFactory',
+    'TAP::Parser::Multiplexer',
+    'TAP::Parser::Result',
+    'TAP::Parser::Result::Bailout',
+    'TAP::Parser::Result::Comment',
+    'TAP::Parser::Result::Plan',
+    'TAP::Parser::Result::Pragma',
+    'TAP::Parser::Result::Test',
+    'TAP::Parser::Result::Unknown',
+    'TAP::Parser::Result::Version',
+    'TAP::Parser::Result::YAML',
+    'TAP::Parser::ResultFactory',
+    'TAP::Parser::Scheduler',
+    'TAP::Parser::Scheduler::Job',
+    'TAP::Parser::Scheduler::Spinner',
+    'TAP::Parser::Source',
+    'TAP::Source::SourceHandler',
+    'TAP::Source::SourceHandler::Executable',
+    'TAP::Source::SourceHandler::File',
+    'TAP::Source::SourceHandler::Handle',
+    'TAP::Parser::SourceHandler::Perl',
+    'TAP::Parser::SourceHandler::RawTAP',
+    'TAP::Parser::YAMLish::Reader',
+    'TAP::Parser::YAMLish::Writer',
+    'Term::ANSIColor',
+    'Term::Cap',
+    'Term::ReadLine',
+    'Test',
+    'Test::Builder',
+    'Test::Builder::Module',
+    'Test::Builder::Tester',
+    'Test::Builder::Tester::Color',
+    'Test::Harness',
+    'Test::More',
+    'Test::Simple',
+    'Text::Balanced',
+    'Text::ParseWords',
+    'Text::Tabs',
+    'Text::Wrap',
+    'Thread::Queue',
+    'Thread::Semaphore',
+    'Tie::File',
+    'Tie::RefHash',
+    'Time::HiRes',
+    'Time::Local',
+    'Time::Piece',
+    'Time::Seconds',
+    'Unicode::Collate',
+    'Unicode::Collate::CJK::Big5',
+    'Unicode::Collate::CJK::GB2312',
+    'Unicode::Collate::CJK::JISX0208',
+    'Unicode::Collate::CJK::Korean',
+    'Unicode::Collate::CJK::Pinyan',
+    'Unicode::Collate::CJK::Stroke',
+    'Unicode::Normalize',
+    'Win32',
+    'Win32API::File',
+    'XSLoader',
+    'autodie',
+    'autodie::exception',
+    'autodie::exception::system',
+    'autodie::hints',
+    'autouse',
+    'base',
+    'bigint',
+    'bignum',
+    'bigrat',
+    'constant',
+    'encoding',
+    'encoding::warnings',
+    'experimental',
+    'fields',
+    'if',
+    'lib',
+    'parent',
+    'threads',
+    'threads::shared',
+    'version',
+    'vmsish'
+);
+
+my @authors = qw(
+    ADAMK
+    AMS
+    ANDK
+    ANDYA
+    AUDREYT
+    BDFOY
+    BINGOS
+    BLM
+    CHORNY
+    CORION
+    DAGOLDEN
+    DANKOGAI
+    DLAND
+    DROLSKY
+    DWHEELER
+    ELIZABETH
+    FERREIRA
+    FLORA
+    GAAS
+    GBARR
+    ILYAZ
+    JDB
+    JDHEDDEN
+    JESSE
+    JHI
+    JSTOWE
+    JV
+    KANE
+    LDS
+    MAKAMAKA
+    MAREKR
+    MARKM
+    MHX
+    MJD
+    MSERGEANT
+    MSCHWERN
+    MSHELOR
+    MUIR
+    N/A
+    NWCLARK
+    NUFFIN
+    PJF
+    PMQS
+    RURBAN
+    RGARCIA
+    RKOBES
+    RMBARKER
+    RRA
+    SADAHIRO
+    SAPER
+    SBECK
+    SBURKE
+    SIMONW
+    SMUELLER
+    TJENNESS
+    TODDR
+    TOMHUGHES
+    YVES);
+
+my (@matches) = grep( ( $_ eq $d ), @mods );
+if (@matches) {
+
+    for $d ( CPAN::Shell->expand( "Module", "$d" ) ) {
+        $print->bold_black( "\n\tmodule: ", $d->id ),
+            $print->dark_blue( "\tauthor: ",          $d->cpan_userid ),
+            $print->dark_blue( "\tcurrent version: ", $d->cpan_version ),
+            $print->dark_red( "\tinstalled version: ", $d->inst_version ),
+            $print->dark_red( "\t",                    $d->inst_file );
+    }
+    $print->dark_magenta("\t@matches is core and is Dual-Lived");
+}
+else {
+    for $d ( CPAN::Shell->expand( "Module", $d ) ) {
+        $print->bold_black( "\n\tmodule: ", $d->id ),
+            $print->dark_blue( "\tauthor: ",             $d->cpan_userid ),
+            $print->dark_blue( "\tcurrent version is: ", $d->cpan_version ),
+            $print->dark_red( "\tinstalled version: ", $d->inst_version ),
+            $print->dark_red( "\t",                    $d->inst_file ),
+            ;
+    }
+    print "\tIt's not on the Dual-Lived list", "\n";
+}
+
+print "\tFetching more details...\n";
+
+my @d = Module::CoreList->find_modules(qr/^$d$/);
+if (Module::CoreList::is_core($d)) {
+     system("corelist $d");
+}
+
+else {
+    print "\t$d is not core\n";
+}
+
+my $package = 'dual-lived';
+my ( $name, $version ) = qw(App::DualLivedList 0.00_07);
+
+my $verbose = 1;
+my $debug   = 1;
+my $trace   = 1;
+my $test    = 1;
+
+app_options();
+
+$trace |= ( $debug || $test );
+
+my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP} || '/usr/tmp';
+exit 0;
+
+sub app_options {
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        'A|alpha'        => \&cpan_id,
+        'a|authors'      => \&authors,
+        'd|distribution' => \&distribution,
+        'f|filestats'    => \&filestats,
+        'l|list'         => \&list,
+        'm|mods'         => \&modlist,
+        'u|update'       => \&update,
+        'v|version'      => \&version
+    ) or Getopt::Long::HelpMessage(2);
+}
+
+sub version {
+    print STDOUT ("This is $package [$name $version]\n");
+}
+
+sub list {
+    print "module: ", "\n";
+    foreach my $mod (@mods) {
+        for $mod ( CPAN::Shell->expand( "Module", $mod ) ) {
+            $print->bold_black( $mod->id );
+        }
+    }
+}
+
+sub update {
+    CPAN::Shell->install($d);
+}
+
+sub filestats {
+
+    use File::CountLines qw(count_lines);
+    use Number::Bytes::Human qw(format_bytes);
+
+    my $h = Number::Bytes::Human->new;
+    for $d ( CPAN::Shell->expand( "Module", $d ) ) {
+        my $size = $h->format( -s $d->inst_file );
+        print "Installed size: ", $size, "\n";
+        my $path     = ( $d->inst_file );
+        my $no_lines = count_lines($path);
+        print "Number of lines: ", $no_lines, "\n";
+        print "Number of words: ";
+        system("wc -w $path");
+    }
+}
+
+sub authors {
+    foreach my $mod (@mods) {
+        for $mod ( CPAN::Shell->expand( "Module", $mod ) ) {
+            $print->dark_blue( $mod->cpan_userid );
+        }
+    }
+}
+
+sub distribution {
+    my $distribution
+        = CPAN::Shell->expand( "Module", $d )->distribution()->pretty_id($d);
+    print $distribution, "\n";
+
+    CPAN::Index->reload();
+    my @modules = CPAN::Shell->expand( "Distribution", $distribution )
+        ->containsmods();
+    foreach my $module (@modules) {
+        print $module, "\n";
+    }
+}
+
+sub cpan_id {
+    foreach my $author (@authors) {
+        $print->dark_blue($author);
+    }
+}
+
+sub modlist {
+    foreach my $mod (@mods) {
+        $print->dark_blue($mod);
+    }
+}
+

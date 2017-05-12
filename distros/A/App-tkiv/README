@@ -1,0 +1,42 @@
+Application:
+    iv (App-tkiv)
+
+Description:
+    iv is an image viewer in Perl::Tk based on IrfanView
+
+Copying:
+    Copyright (c) 2004-2016 H.Merijn Brand.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+    Recent changes can be (re)viewed in the public GIT repository at
+    https://github.com/Tux/App-tkiv
+    Feel free to clone your own copy:
+
+     $ git clone https://github.com/Tux/App-tkiv App-tkiv
+
+    or get it as a tgz:
+
+     $ wget --output-document=App-tkiv-git.tgz \
+               'https://github.com/Tux/App-tkiv/archive/master.tar.gz'
+
+Prerequisites:
+    A perl with defined-or (perl 5.8.4 + defined-or, 5.10.x or higher), Tk,
+    the plethora of Tk::* image format modules, some Image::* modules (see
+    Makefile.PL and/or META.yml) and ImagaMagick (not the perl module) for
+    iv uses the "convert" tool.
+
+    On Windows I'd suggest to use IrfanView from http://www.irfanview.com
+    plus its Plugins/AddOns instead of iv.
+
+    TIFF images will only display if you additionally install Tk::TIFF.
+
+Build/Installation:
+    Standard build/installation:
+	perl Makefile.PL
+	make test
+	make install
+
+Author:
+    H.Merijn Brand <h.m.brand@xs4all.nl>

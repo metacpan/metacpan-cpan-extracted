@@ -1,0 +1,21 @@
+<CCSV>
+sep_char	;
+	<overrideall>
+		binary	1
+	</overrideall>
+	<names>
+		<ab>
+			binary 1
+			sep_char	;
+		</ab>
+		<tab>
+			binary 1
+			sep_char	"	"
+			quote_char	"""
+		</tab>
+		<comma>
+			sep_char	,
+			quote_char	"""
+		</comma>
+	</names>
+</CCSV>

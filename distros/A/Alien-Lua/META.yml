@@ -1,0 +1,29 @@
+---
+abstract: 'Alien module for asserting a liblua is available'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires: {}
+configure_requires:
+  Alien::Base: 0.003
+  Config: 0
+  Getopt::Long: 0
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Alien-Lua
+provides:
+  Alien::Lua:
+    file: lib/Alien/Lua.pm
+    version: v5.2.2.2
+requires:
+  Alien::Base: 0
+  File::ShareDir: 1.00
+  parent: 0
+  perl: v5.14.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v5.2.2.2

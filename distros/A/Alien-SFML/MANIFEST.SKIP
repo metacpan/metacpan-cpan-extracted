@@ -1,0 +1,12 @@
+tidy\.pl
+\.git.+
+\.perltidyrc
+\.old
+MYMETA
+\.bak
+blib
+_build
+\bBuild$
+_share
+_alien
+Alien-SFML-\d.+

@@ -1,0 +1,3 @@
+Next version will integrate the hostname into the session identifier
+so that session tracking on a cluster ist easy without a dedicated
+session server.

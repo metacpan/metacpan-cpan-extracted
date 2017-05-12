@@ -1,0 +1,6 @@
+name = "App-merge_cpanfile"
+# badges = ["travis"]
+authority="cpan:AEREAL"
+
+module_maker="ModuleBuildTiny"
+

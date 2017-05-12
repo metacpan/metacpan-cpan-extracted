@@ -1,0 +1,8 @@
+Revision history for App-Bootstrap
+
+0.02    2007-07-19
+        Renamed App::Install -- go install that instead.
+
+0.01    2007-07-17
+        First version, may not even work.
+

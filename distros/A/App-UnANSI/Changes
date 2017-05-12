@@ -1,0 +1,11 @@
+0.003     2016-12-19 16:23:44+01:00 Europe/Amsterdam
+
+    * Provide minimum Perl version. (Mohammad S Anwar)
+
+0.002     2016-12-19 12:12:03+01:00 Europe/Amsterdam
+
+    * Fix packaging to get the documentation rendered properly.
+
+0.001     2016-12-18 11:40:34+01:00 Europe/Amsterdam
+
+    * This bugged me all too many times.

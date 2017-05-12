@@ -1,0 +1,72 @@
+
+Release Notes
+=============
+
+For more detail please see the commit log at
+
+  https://github.com/timj/perl-Astro-Catalog
+
+v4.31
+
+  + Fix test 4_skycat_gsc.t for users who have a SkyCat configuration
+    file which does not include "gsc@eso".
+
+v4.30
+
+  + Catalogs can now be sorted by distance in azimuth.
+
+v4.28
+
+  + Mercury has been added to the list of planets to be included
+    in the JCMT catalog.
+
+v4.27
+
+  + Test scripts skip query tests in the event of network problems.
+
+v4.26
+
+  + The search button in Tk::AstroCatalog is now operational.
+  + Minor updates to documentation.
+  + Fixes for SkyCat GSC test due to hash key randomization.
+
+v4.25
+
+  + Tk::AstroCatalog can now be told to display additional columns
+    in the widget.
+
+v4.24
+
+  + recommend that Astro::FITS::CFITSIO is installed rather than
+    requiring it. We can't guarantee that people have the CFITSIO
+    library installed.
+
+v4.23
+
+  + Tk::AstroCatalog now calls the onDestroy method correctly
+    when the widget is closed from the window manager (Graham Bell)
+
+v4.22
+
+  + Use File::Temp for temporary files in tests.
+  + Can now take IO::Handle objects for read_catalog and
+    write_catalog.
+
+v4.21
+
+  + Remove code that relies on CVS $Revision$ tags. Those
+    modules have now been updated to v2.00 to ensure that they
+    are seen as new.
+
+v4.2
+
+  + The MPC web service seems to have changed so MPC is not functioning
+    in this release.
+
+  - Added FITSTable, ASSM, NorthStar, Binary, RITMatch, XY
+    and LCOGFITSTable formats.
+  - Now uses Module::Build
+  - SuperCOSMOS and SIMBAD query classes have been removed since the
+    remote format has changed.
+  - Updated skycat.cfg file.
+  - Astro::VO::VOTable is now an optional module.

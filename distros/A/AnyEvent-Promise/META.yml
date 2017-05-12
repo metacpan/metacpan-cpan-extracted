@@ -1,0 +1,26 @@
+---
+abstract: 'Evented promises'
+author:
+  - 'Anthony Johnson <aj@ohess.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132661'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Promise
+provides:
+  AnyEvent::Promise:
+    file: lib/AnyEvent/Promise.pm
+    version: 0.02
+requires:
+  AnyEvent: 0
+  Carp: 0
+  Try::Tiny: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.02

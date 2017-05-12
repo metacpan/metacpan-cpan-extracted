@@ -1,0 +1,104 @@
+.:: Quickstart ::.
+
+To compile run the following in the commandline:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+
+
+.::lib::Alien::Jerl(3)User Contributed Perl Documentation.::lib::Alien::Jerl(3)
+
+
+
+NNAAMMEE
+       Alien::Jerl - micro perl running on JVM (MIPS Interpreter)
+
+SSYYNNOOPPSSIISS
+        java -jar ./lib/alien/jerl.jar --help
+
+        java -jar ./lib/alien/jerl.jar ./perl/fib.pl
+
+DDEESSCCRRIIPPTTIIOONN
+   IInnttrroodduuccttiioonn
+       Jerl allows perl to run within the JVM (not having to access any
+       external libs).
+
+   DDeettaaiillss
+       Jerl allows perl to run within the JVM (not having to access any
+       external libs). Perl has been virtualized to run within the JVM. The
+       current implementation is a version of microperl.
+
+FFAAQQ
+            https://code.google.com/p/jerl/wiki/JERL_FAQ
+
+   WWhhyy
+           Jerl's purpose is merely to pull Perl into Java (no JNI/native Perl)
+           Fun
+           Not speed (see Inline::Java in Alternatives Below)
+           Use Perl from a Jar
+
+   WWhhyy nneesstteeddVVMM // MMIIPPSS
+           nestedVM provided a straightforward means of recompilation
+           MIPS running within Java is not fast, but there are alternatives for Perl Java integration if speed is a concern(see below)
+           Implement project in a maintainable way so updates are not too time consuming
+
+   IIssnn''tt tthheerree ssoommeetthhiinngg lliikkee tthhiiss aallrreeaaddyy
+           For speed / optimization Inline::Java works
+           Check CPAN.org, search Java (there may be something similar)
+           Goto Perlmonks.org, search Java (there may be something similar)
+
+   JJeerrll AAlltteerrnnaattiivveess ((TTIIMMTTOOWWTTDDII))
+           Perl's interface to JAVA Inline::Java
+           --> http://search.cpan.org/search?mode=module&query=Inline::Java
+           JPL: A deprecated means of accessing JAVA & Perl
+           --> http://search.cpan.org/~gmpassos/PLJava-0.04/README.pod
+
+   WWhhaatt JJaarrss aarree rreeqquuiirreedd
+           jerl.jar is required for jerl
+           jerl_perlVM.jar is a wapper for interfacing with jerl via Java
+           you may find both in the eclipse sample project
+
+PPRROOJJEECCTT SSIITTEE
+            http://code.google.com/p/jerl/
+
+   ""jjeerrllVVeerrssiioonn(())""
+       "jerlVersion()" returns the current version of jerl from the Jar and of
+       this package
+
+       JVM A working JVM must be available for this to work properly
+
+AAUUTTHHOORR
+       Michaelt Shomsky  <_1_7_m_i_c_h_a_e_l_t_@_g_m_a_i_l_._c_o_m>
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (c) 2013 Michael Shomsky, All Rights Reserved.
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself, either Perl version 5 or, at your
+       option, any later version of Perl you may have available (perl and glue
+       code).
+
+       The Java library is covered by the GNU Lesser General Public License:
+
+       This library is free software; you can redistribute it and/or modify it
+       under the terms of the GNU Lesser General Public License as published
+       by the Free Software Foundation; either version 2 of the License, or
+       (at your option) any later version.
+
+       This library is distributed in the hope that it will be useful, but
+       WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+       General Public License for more details.
+
+       You should have received a copy of the GNU Lesser General Public
+       License along with this library; if not, write to the Free Software
+       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+       02110-1301 USA or download it from
+       http://www.gnu.org/licenses/lgpl.html
+
+
+
+perl v5.16.2                      2013-12-03            .::lib::Alien::Jerl(3)

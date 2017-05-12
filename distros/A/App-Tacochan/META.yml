@@ -1,0 +1,49 @@
+---
+abstract: 'Skype message delivery by HTTP'
+author:
+  - 'Takumi Akiyama <t.akiym at gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.9.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Tacochan
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Tacochan:
+    file: lib/App/Tacochan.pm
+    version: 0.07
+requires:
+  Amon2::Lite: 0.09
+  JSON: 2.53
+  Plack: 0
+  Plack::Builder::Conditionals: 0
+  Plack::Middleware::ReverseProxy: 0
+  Skype::Any: 0.04
+  Twiggy: 0
+  URI: 1.60
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/akiym/p5-App-Tacochan/issues
+  homepage: https://github.com/akiym/p5-App-Tacochan
+  repository: git://github.com/akiym/p5-App-Tacochan.git
+version: 0.07
+x_contributors:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'

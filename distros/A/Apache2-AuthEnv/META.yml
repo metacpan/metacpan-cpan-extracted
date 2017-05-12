@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name:               Apache2-AuthEnv
+version:            v1.3.8
+abstract:           Perl Authentication and Authorisation via Environment Variables.
+author:
+    - Anthony Fletcher
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Apache2::Access:      1
+    Apache2::Const:       1
+    Apache2::Log:         1
+    Apache2::Module:      1
+    Apache2::RequestRec:  1
+    Apache2::RequestUtil:  1
+    Apache2::ServerUtil:  1
+    BerkeleyDB:           0.32
+    Carp:                 1
+    Data::Dumper:         1
+    Memoize:              1
+    Memoize::Expire:      1
+    MLDBM:                1
+    mod_perl2:            2
+    ModPerl::Util:        1
+    Safe:                 1
+    Storable:             1
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

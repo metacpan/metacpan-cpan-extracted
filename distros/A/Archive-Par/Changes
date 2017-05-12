@@ -1,0 +1,14 @@
+Revision history for Archive-Par.
+
+1.01  Tue Mar  6  9:19 PM GMT 2002
+	- Remove _parse_par_output from API
+	- Fix handling of par files with corrupt columes
+	- Add fs_files to Archive::Par API
+	- Add handling of non-par files
+	- Fix bug #001
+
+1.00  Tue Feb 26  9:49 AM GMT 2002
+	- Fully fledged info lookup & restore
+
+0.01  Mon Feb 18  5:36 PM GMT 2002
+	- first basic framework (just simple info lookup)

@@ -1,0 +1,20 @@
+Changelog for Algorithm-SlopeOne
+
+0.004 2014-06-18T15:29:14
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - remove PWP::Encoding authordep from dist.ini (Сергей Романов)
+ - drop PWP::Encoding dependency (Сергей Романов)
+
+0.003 2012-12-23T14:01:03
+ - renamed update() method to add() (Stanislaw Pusep)
+ - removed non-core deps (Stanislaw Pusep)
+
+0.002 2012-12-20T15:41:42
+ - better encapsulation for diffs/freqs matrices (Stanislaw Pusep)
+ - don't leak a MovieLens dump to CPAN\! (Stanislaw Pusep)
+
+0.001 2012-12-20T15:12:24
+ - input verification (Stanislaw Pusep)
+ - stripped pointless user ID handling (Stanislaw Pusep)
+ - INIT (Stanislaw Pusep)
+

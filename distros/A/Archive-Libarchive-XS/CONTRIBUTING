@@ -1,0 +1,41 @@
+First of all, thanks for taking the time to try and make this project 
+better!  Secondly this is an optional document, if you have a small fix, 
+just submit as a pull request in GitHub, or send me a patch against the 
+latest released version on the GitHub issue tracker here:
+
+ https://github.com/plicease/Archive-Libarchive-XS/issues?state=open
+
+I will most likely be able to shoehorn it into the idiosyncrasies of 
+this project.
+
+That being said, if you want to save me time, and speed the process, 
+please do use dzil to help create and test your patch.
+
+ - I use Dist::Zilla, so you will have to install it plus the plugins 
+   that I am using, which may take a while if you aren't already using 
+   it.
+ 
+ - It isn't a pure-perl distribution, so you really do need dzil to 
+   build and test (you can't just prove -l to run the tests).
+   
+ - To save time when I was developing this distribution, some code and 
+   documentation is generated.  The templates are in the inc directory, 
+   instead of making changes to lib/Archive/Libarchive/XS.pm you should 
+   make changes to inc/XS.pm.template
+
+ - Even weirder is that part of lib/Archive/Libarchive/XS.xs is 
+   generated and part is human maintained.
+ 
+ - Code generation is done by inc/run/before_build.pl and is run by dzil 
+   when you do a build.
+ 
+ - Some of the generated content is intended to be checked back into the 
+   repository, which is probably a confusing and bad thing long term.
+
+ - This distribution shares some code and most of its tests with 
+   Archive::Libarchive::FFI and Archive::Libarchive::Any.  As part of 
+   the build process for those distributions, these files get pulled in 
+   from this distribution, usually changing olny XS to FFI or Any.
+
+I hope to refactor some of this in the future so that it is easier for 
+contributors.

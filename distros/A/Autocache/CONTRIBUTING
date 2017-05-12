@@ -1,0 +1,11 @@
+
+Source code repo can be found on github at the URL below, patches welcome.
+
+ - http://github.com/wiggly/autocache
+
+Additionally feel free to begin adding extra strategies/stores in seperate
+distributions under the Autocache namespace.
+
+The internal API, especially around configuration is very, very, very fluid
+right now, you should expect things to change rapidly until we reach a v1
+release.

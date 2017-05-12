@@ -1,0 +1,6 @@
+#!/bin/sh
+
+perl -MALPM::Conf=/etc/pacman.conf -e '
+print substr(sprintf("%-16s * %s", $_->name, $_->desc), 0, 78), "\n"
+  for($alpm->localdb->pkgs);
+'

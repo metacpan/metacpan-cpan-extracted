@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>GvaScript Form</title>
+  <link rel="stylesheet" type="text/css" href="form.gvascript.css" media="screen" />
+  <link href="../../test.css" rel="stylesheet" type="text/css">
+  <link href="../../images/GvaScript.css" rel="stylesheet" type="text/css">
+  <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <script src="effects.js"></script>
+  <script src="validation.js"></script>
+
+  <script type="text/javascript">
+    /**
+     * Declaring Form Global Responders
+     */
+  GvaScript.Form.Responders.register({
+    onInit: function(gva_form) {
+      gva_form.valid = new Validation(gva_form.formElt, {onSubmit:false});
+      log('Form <em>[Late]</em> onInit: validation module attached')
+    },
+
+    onChange: function(gva_form, event) {
+      log('Form <em>[Late]</em> onChange');
+      gva_form.formElt.addClassName('form-edited');
+      gva_form.formElt.removeClassName('form-error');
+      
+      setInfoMessage('form updated ... make sure to save.');
+    },
+
+    onBeforeSubmit: function(gva_form) {
+      log('Form <em>[Late]</em> onBeforeSubmit: hides form message and resets its classnames');
+      gva_form.formElt.removeClassName('form-edited');
+      gva_form.formElt.removeClassName('form-error');
+      hideMessage();
+    },
+
+    onAfterSubmit: function(gva_form) {
+      log('Form <em>[Late]</em> onAfterSubmit: display success message');
+      setInfoMessage('thank you!'); 
+    },
+
+    onDataValidationError: function(gva_form, msg) {
+      log('Form <em>[Late]</em> onDataValidationError: form submission failed on the client-side. set form-error classname and display error message');
+      gva_form.formElt.addClassName('form-error'); 
+      gva_form.formElt.removeClassName('form-edited'); 
+      setErrorMessage(msg);
+    },
+
+    onSubmitFailure: function(gva_form, msg) {
+      log('Form <em>[Late]</em> onSubmitFailure: form submission failed on server-side. set form-error classname and display error message');
+      gva_form.formElt.addClassName('form-error'); 
+      gva_form.formElt.removeClassName('form-edited'); 
+      setErrorMessage(msg);
+    },
+
+    onBeforeDestroy: function(gva_form) {
+      gva_form.valid = null;
+      log('Form <em>[Late]</em> onBeforeDestroy : validation module detached');
+    }
+
+  });
+
+  GvaScript.Form.EarlyResponders.register({
+    onBeforeSubmit: function(gva_form) {
+      log('Form <em>[Early]</em> onBeforeSubmit: checks for form changes then runs fields validation');
+
+      if(!gva_form.formElt.hasClassName('form-edited')) {
+        alert('nothing change - skip trip to server');
+        return false;
+      }
+      else {
+        if (gva_form.valid.validate()) return true;
+        else {
+          gva_form.fire('DataValidationError', 'Some fields failed to validate!');
+          return false;
+        }
+      }
+    }
+  });
+  </script>
+</head>
+
+<body>
+  [<a href="#" onclick="$('logs').update()">Clear</a>]
+  <div id="logs"></div>
+  <div class="message" id="app_message"></div>
+
+
+  <form id="my_book" onsubmit="return false;">
+
+    <h2>Book</h2>
+    
+    <div class="header">
+      <h3>Data</h3>
+
+      <div>
+        <label>Title <sup>*</sup></label>
+        <input type="text" name="book.TITLE" class="required" autofocus/>
+      </div>
+      <div>
+        <label>Description <sup>*</sup></label>
+        <textarea name="book.DESCRIPTION" class="required" minLength="10"></textarea>
+      </div>
+
+    </div>
+
+    <div class="authors">
+      <h3>Authors 
+        <span class="icon-add" onclick="GvaScript.Form.add('book.authors')"></span>
+      </h3>
+
+      <div repeat="authors" repeat-prefix="book" 
+           onAdd="" 
+           onRemove="">
+
+        <div class="author">
+          <span class="icon-delete" onclick="GvaScript.Form.remove('#{authors.path}')"></span>
+          <span class="counter">#{authors.count}</span> 
+          <div>
+            <label>Author name <sup>*</sup></label>
+            <input type="text" name="#{authors.path}.NAME" class="required" autofocus />
+          </div>
+          <div>
+            <label>Author email</label>
+            <input type="text" name="#{authors.path}.EMAIL" class="validate-email" />
+          </div>
+          <div>
+            <label>Author remarks</label>
+            <textarea name="#{authors.path}.REMARKS"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <div style="clear:both"></div>
+    <div id="actionsbar"></div>
+  </form>
+
+  <br/><br/>
+  <em>This example uses 
+  <a href="http://tetlaw.id.au/view/javascript/really-easy-field-validation" target="_blank">'really easy field validation'</a> 
+  module by Andrew Tetlaw (Dexagogo) to perform client-side form fields validation.</em>
+
+</body>
+
+<script type="text/javascript">
+var book_data = {
+  TITLE: 'The Bible',
+  DESCRIPTION: 'A book about Jesus, God and everything.\n\nBest-seller!',
+
+  authors: [
+    {
+      NAME: 'Jesus Christ', 
+      EMAIL: 'jesus@holy.org',
+      REMARKS: 'Savior of mankind, died for your sins.'
+    },
+    {
+      NAME: 'Moses ', 
+      REMARKS: 'Can write stuff in stone. Will split the sea when necessary.'
+    }
+  ]
+}
+
+var my_form_obj = new GvaScript.Form('my_book', {
+  datatree: book_data,
+  dataprefix: 'book',
+
+  actionsbar : {
+      container :  'actionsbar',
+      actions   : [
+          {
+              label : 'Submit Form',
+              type  : 'submit'
+          },
+          {
+              label : 'to_hash',
+              type  : 'button',
+              callback : function() {
+                log(Object.toJSON(my_form_obj.to_hash()))
+              }
+          },
+          {
+              label : 'to_tree',
+              type  : 'button',
+              callback : function() {
+                log(Object.toJSON(my_form_obj.to_tree()))
+              }
+          },
+          {
+              label : 'destroy',
+              type  : 'button',
+              callback : function() {
+                GvaScript.Forms.get('my_book').destroy();
+                $('my_book').remove();
+              }
+          }
+      ]
+  },
+
+  registry: [
+    ['input,textarea', 'change', function(event, newvalue, oldvalue) {log(event.target.name + ' changed value ['+oldvalue+'] -> ['+newvalue+']')}],
+    ['input,textarea', 'init', function(event, newvalue) {log(event.target.name + ' initialized value -> ['+newvalue+']')}],
+    ['input,textarea', 'mouseover', function(event) {event.target.addClassName('hover')}],
+    ['input,textarea', 'mouseout', function(event) {event.target.removeClassName('hover')}],
+    ['input,textarea', 'focus', function(event) {event.target.addClassName('focus')}],
+    ['input,textarea', 'blur',  function(event) {event.target.removeClassName('focus')}]
+  ],
+
+  onBeforeSubmit: function() {
+    log('Form <em>[instance]</em> onBeforeSubmit: asks for confirmation');
+    return confirm('ready to save book?');
+  },
+
+  onSubmit: function(gva_form) {
+    log('Form <em>[instance]</em> onSubmit: submits form and handels server-side failures');
+    var tree = gva_form.to_tree();
+
+    (function() {                
+      if(!tree.book.authors)
+      gva_form.fire('SubmitFailure', 'at least one author is required!');
+      else 
+      gva_form.fire('AfterSubmit');
+      }).delay(1);
+
+    return true;
+  }
+});
+
+
+function log(msg) {
+  $('logs').innerHTML += "<div class='msg'> >> "+msg+" </div>" ;
+  $('logs').scrollTop  = 99999; 
+}
+function setInfoMessage(msg) {
+  $('app_message').update(msg);
+  $('app_message').addClassName('message-info');
+  $('app_message').removeClassName('message-error');
+  $('app_message').show();
+}
+function setErrorMessage(msg) {
+  $('app_message').update(msg);
+  $('app_message').addClassName('message-error');
+  $('app_message').removeClassName('message-info');
+  $('app_message').show();
+}
+function hideMessage() {
+  $('app_message').hide();
+}
+</script>
+
+</html>

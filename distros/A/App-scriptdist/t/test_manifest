@@ -1,0 +1,4 @@
+compile.t
+pod.t
+pod_coverage.t
+run.t

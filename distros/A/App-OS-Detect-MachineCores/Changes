@@ -1,0 +1,41 @@
+Revision history for Perl module App::OS::Detect::MachineCores
+
+1.2.3
+
+    * Slim down more dependencies because toolchain can't handle it...
+
+1.2.2
+
+    * PAUSE won't accept generated META.yml
+
+1.2.1
+
+    * Slim down on Dist::Zilla / add POD back in
+
+1.2.0
+
+    * Support more operating systems (thanks @jbarrett!)
+
+1.1.2     2013-09-25 22:09:10 Europe/Berlin
+
+    * Reformatted Changes (pull request by neilbowers)
+    * GithubMeta is included in PluginBundle (as of 1.2.2)
+
+1.0.0 2013-09-24
+    * Change to semantic versioning
+    * Add basic test for dzil to pass
+    * Fixed cpan tester's error report 88855:
+      don't use smart matching with perl 5.18
+    * Got rid of given/when.
+
+0.038 2012-12-12
+    * Fixed cpan tester's error report
+
+0.037 2012-12-10
+    * Using [@Author::DBR] in dist.ini now
+
+0.036 2012-12-10
+    * Moo-ified distribution (from Any::Moose / ::Mouse)
+        * thus doesn't install both, Moose _and_ Mouse through Dist::Zilla
+    * (Introduced this Changes file - earlier releases not listed)
+

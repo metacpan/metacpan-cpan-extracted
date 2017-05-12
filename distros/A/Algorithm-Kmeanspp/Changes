@@ -1,0 +1,8 @@
+Revision history for Perl extension Algorithm::Kmeanspp
+
+0.03    Fri Oct 16 11:27:00 2009
+        - declare the dependency on constant explicity
+        for old version of constants.pm (< ver.1.03)
+
+0.01    Tue Oct  6 10:48:22 2009
+        - original version

@@ -1,0 +1,4 @@
+~$
+^.git
+^MYMETA.yml$
+^t/autocache.log

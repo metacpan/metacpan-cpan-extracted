@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::TracksBot;
+
+App::TracksBot->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+tracks-bot - Script for running the Tracks bot.
+
+=head1 USAGE
+
+  tracks-bot [config file]
+
+=head1 DESCRIPTION
+
+The bulk of the documentation for this module is
+in L<App::TracksBot>.
+
+=head1 SEE ALSO
+
+L<http://getontracks.org/>,
+L<App::TracksBot>

@@ -1,0 +1,7 @@
+[% META title = 'RESULT' %]
+<!--
+<p>
+<span class="message">[% message || Catalyst.flash.message %]</span>
+<span class="error">[% error || Catalyst.flash.error %]</span>
+</p>
+-->

@@ -1,0 +1,15 @@
+Revision history for Perl extension Amon2-Auth-Site-Hatena
+
+0.04 2014-11-27T04:48:43Z
+    - Re-release for override UNAUTHORIZED flag (same as 0.03)
+
+0.03 2014-11-26T15:13:02Z
+
+    - depends on Woothee for parsing UserAgent
+    - migrate to Minilla
+
+0.02     2011-10-19
+    - added smartphone, cellphone(jp) support.
+
+0.01     2011-10-18
+    - original version

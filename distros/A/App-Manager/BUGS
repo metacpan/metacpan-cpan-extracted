@@ -1,0 +1,8 @@
+
+- ldconfig is statically linked so changes by ldconfig
+  aren't noticed
+- this probably breaks when threads are being used
+- files with holes are not restored properly (this
+  is impossible)
+- hardlinks are neither recognized nor restored.
+

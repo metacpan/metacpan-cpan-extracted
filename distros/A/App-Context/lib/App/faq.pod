@@ -1,0 +1,182 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::faq - App-Context Frequently Asked Questions
+
+=head1 INTRODUCTION
+
+This is the FAQ for the
+App-Context software framework
+(a variant of the Perl 5 Enterprise Environment).
+You can find out more background to the project on the web.
+
+  http://www.officevision.com/pub/p5ee
+  http://p5ee.perl.org
+
+=head1 GENERAL
+
+=head2 Why should I use App-Context rather than J2EE or .NET?
+
+Perhaps it's because you prefer writing in Perl?
+But besides that, there are other reasons.
+
+Java's promise of "write once, run anywhere" is actually
+better fulfilled by Perl than Java.
+
+The .NET CLR's promise of "any language, one runtime
+environment" is great.  But Parrot will do for dynamically
+typed languages what the .NET CLR does for statically typed
+languages.  (See http://www.parrotcode.org/faq/.)
+And Perl6 will support the CLR as well.
+
+I looked around at the state of various cross-platform application
+runtime environments, and saw that the most pervasive execution 
+environments, available across many platforms were: 
+Perl (on servers), Java (on servers and browsers), 
+and Javascript (on browsers).  Each of these technologies
+holds the promise, to some varying degree, of
+"write once, run anywhere". ".Net" was not yet on the scene,
+but even when it arrived, the promise of proper cross-platform
+support for .Net was a long way off and altogether uncertain.
+
+Perl has excellent support even for unprivileged accounts
+at ISP's, whereas Servlet support is hard to come by unless
+you own the machine (or you go to a very specialized ISP).
+Also, Perl offers several ways to do web applications: CGI for
+unprivileged, quick and dirty implementations, and mod_perl
+for high performance implementations when you have full control
+over the web server (also PerlEx, FastCGI, etc.).
+
+If you have a desire to program in Java and you like the API's
+that Sun (and others) have created, you should probably focus
+on Java. I think that things could be a lot simpler (or maybe
+higher level) than the J2EE specifies them.
+
+It seemed that the one thing that Perl was lacking was
+a blueprint for large-scale development and deployment of 
+high-performance, high-availability systems (i.e. enterprise 
+systems) along with guides of discipline for coding and 
+documentation.  The App-Context framework fills this gap.
+
+So that's the explanation of "why App-Context?"
+
+For an explanation of "why not App-Context?" you might consider that it
+is still largely vaporware.
+
+=head2 How well does the App-Context fit into a .NET technical strategy?
+
+It may seem that App-Context is most at home with the following technologies.
+
+  * Perl, Linux, Apache, CGI, and MySQL.
+
+However, the App-Context framework abstracts much of the 
+runtime environment, so that it is just as easy to use:
+
+  * Perl, Windows NT, IIS, ISAPI, and SQLServer.
+
+So the question becomes, "How well does Perl fit into a .NET
+technical strategy?"
+
+Although Perl is not a core .NET language from Microsoft's
+perspective, the following three considerations would suggest
+that Perl is not outside of a .NET technical strategy.
+
+ 1. Perl integration with Windows and .NET is substantial 
+    (using the ActiveState port of Perl)
+    http://www.activestate.com/Products/ActivePerl/
+
+ 2. Perl's predominant SOAP implementation is very mature
+    http://www.soaplite.com/
+
+ 3. When Perl 6 is complete, both Perl 5 and Perl 6 will be able
+    to run on the .NET CLR.
+    http://www.parrotcode.org/faq/
+
+=head2 What is the relation between App-Context and mod_perl?
+
+The people who have been developing and working on mod_perl have done
+an incredible service to Enterprise Perl in general, and therefore
+the App-Context in particular.  Other efforts that dramatically enhance
+Enterprise Perl are SOAP projects, XML projects, DBD/DBI::*,
+Templating projects, etc.  These are all making dramatic contributions,
+and they need not change anything they are doing in order to continue
+to do so.
+
+On the contrary, the responsibility is on the designers of the App-Context
+to accommodate and incorporate these many enterprise-class technologies
+into an integrates whole.  Browse the classes envisioned for App-Context
+to see one way that these might fit together.  Take
+special note of the "Classes (Planned)" at the bottom of the 
+"All Classes" frame.
+
+  http://www.officevision.com/pub/p5ee/software/htdocs/api/
+
+As for mod_perl, it would seem to be the container of choice for
+web applications and SOAP services.  
+
+  http://www.officevision.com/pub/p5ee/software/htdocs/Appx/Blue/Context.html
+
+There is no need for the mod_perl project to explicitly 
+integrate with App-Context.  However, in the spirit of community, 
+as the App-Context grows in its capabilities, I would imagine a 
+natural cross-fertilization of ideas would occur so that if App-Context needed
+any specific feature in mod_perl it would be implemented without
+too much trouble.
+
+However, App-Context reaches further than just running in a mod_perl Context.
+App-Context is equipped with (when they are written, of course) a variety of 
+Context classes which allow App-Context software to run in many other Contexts 
+besides mod_perl.
+
+=head2 What does it mean for App-Context to support Perl 5.5.3 if some of its components require a higher version of Perl?
+
+The App-Context is like a software backplane
+for many services required by an enterprise application.  Into that
+backplane plug the App-Context Services.  There may be many implementations
+of each of the App-Context Services, making for an almost limitless array
+of possible combinations.  (Hopefully, favorites will emerge.)
+
+The Context is a Core Service, like Session and Config.
+(A Core Service is one that is not derived from App::Service
+but maintains the concept of "a pluggable implementation of an 
+abstract service".)  An examination of the App::Context
+documentation will show that there are many Contexts from which
+the implementer may choose to deploy the software, and the software
+could reasonably run on all of them.  The fact that (the envisioned)
+App::Context::Modperl2 depends on 5.6.0 does not invalidate
+the fact that the App-Context depends only on 5.5.3.  Implementers who
+choose to deploy with Services that have higher Perl version 
+dependencies must of course satisfy those dependencies.
+
+The important thing to realize is that there is some combination of
+implementations of Services which will run on 5.5.3.  Thus, the
+implementer who is stuck with 5.5.3 on a platform does indeed have a
+set of possible combinations of Services which will work.
+
+The dependency on Perl version is not the only issue like this.
+Some modules are dependent upon certain operating systems.
+It is acceptable for a Service implementation to use these OS-specific
+functions as long as there is some other Service implementation 
+(perhaps lower performing) which meets the cross-platform requirement.
+
+i.e. App::Context::Modperl2 may require 5.6.0, but
+App::Context::Modperl and App::Context::CGI will
+both run on 5.5.3.
+
+Sometimes when we think about Enterprise Systems, we think about
+big budget projects with the latest new hardware.  My experience 
+with customers who are large enterprises is that they have an 
+incredible mish-mash of systems and legacy environments.  I envision 
+that App-Context software could be installed on every platform they own 
+(isn't Perl almost the most-ported language on the planet?).  
+That is why I believe that App-Context must support 5.5.3 (or perhaps 
+earlier, but I won't go there yet until I see a real need to
+and understand exactly what I would be giving up).
+
+=cut
+

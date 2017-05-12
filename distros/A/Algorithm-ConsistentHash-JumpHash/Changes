@@ -1,0 +1,9 @@
+Revision history for Perl extension Algorithm::ConsistentHash::JumpHash.
+
+0.01  Wed Oct 22 20:00:00 2014
+  - original version
+
+0.02 - 0.05
+  - fix minor isses in build process
+  - Resolve various build issues. No real
+    changes involved.

@@ -1,0 +1,2 @@
+action=[send-mail] account=[uwonnotice@example.net] ip=[200.1.2.3] group=[user] dow=[wed]
+account=[pblair@example.adm] action=[login_mac] group=[super-admin] dow=[mon] time=[09:00]

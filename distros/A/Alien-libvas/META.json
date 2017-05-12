@@ -1,0 +1,64 @@
+{
+   "abstract" : "Perl distribution for libvas",
+   "author" : [
+      "Ahmad Fatoum <athreef@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-libvas",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::CMake" : "0.07",
+            "IO::Socket::SSL" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
+            "Alien::CMake" : "0.07",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Socket::SSL" : "0"
+         },
+         "requires" : {
+            "Alien::Base" : "0.030",
+            "File::ShareDir" : "1.00",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test2" : "1.302015",
+            "Test2::Bundle::More" : "0",
+            "Test2::Suite" : "0.000030",
+            "Test::Alien" : "0.05"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::libvas" : {
+         "file" : "lib/Alien/libvas.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name: Apache-SSI
+version: 2.19
+author:
+  - Ken Williams ken@mathforum.org
+  - |-
+    Concept based on original version by Doug MacEachern dougm@osf.org .
+    Implementation different.
+abstract: Implement Server Side Includes in Perl
+license: perl
+requires:
+  Apache::Constants: 1.00
+  HTML::SimpleParse: 0.06
+  mod_perl: 1.24_01
+provides:
+  Apache::FakeSSI:
+    file: lib/Apache/FakeSSI.pm
+  Apache::SSI:
+    file: lib/Apache/SSI.pm
+    version: 2.19
+  main:
+    file: lib/Apache/SSI.pm
+    version: 2.19
+generated_by: Module::Build version 0.26

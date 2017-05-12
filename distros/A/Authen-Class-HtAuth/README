@@ -1,0 +1,118 @@
+NAME
+    Authen::Class::HtAuth - class-based authentication backend using Apache
+    user and group files
+
+SYNOPSIS
+      use Authen::Class::HtAuth;
+
+      my $htauth = Authen::Class::HtAuth->new(
+        htusers  => "/path/to/users",
+        htgroups => "/path/to/groups",
+      );
+
+      if ($htauth->check($user, $pass)) { ... }
+      if ($htauth->check($user, $pass, groups => [qw/foo bar baz/])) { ... }
+
+DESCRIPTION
+    Authen::Class::HtAuth is an authentication backend for use with Apache
+    passwd and group files. Authen::Class::HtAuth can be instantiated as an
+    object or inherited into your own class.
+
+    Class-based example:
+
+      package MyAuth;
+      use base 'Authen::Class::HtAuth';
+
+      MyAuth->htusers("/path/to/users");
+      MyAuth->htgroups("/path/to/groups"); # optional
+
+    # elsewhere...
+
+      use MyAuth;
+      if (MyAuth->check("user", "pass", groups => ["foo"]))  # groups is optional
+      { ... }
+
+    Object example:
+
+      use Authen::Class::HtAuth;
+
+      my $htauth = Authen::Class::HtAuth->new(
+        htusers => "/path/to/users",   # optional
+        htgroups => "/path/to/groups", # optional
+      );
+
+      # or you can load the user and group files after object creation
+
+      $htauth->htusers("/path/to/users");
+      $htauth->htgroups("/path/to/groups"); # optional
+
+      if ($htauth->check(qw/user pass/, groups => ['foo'])) # groups is optional
+      {
+        ...
+      }
+
+Methods
+    new Creates a Authen::Class::HtAuth object
+
+    htusers
+        Where $foo is a class name or an instance of Authen::Class::HtAuth
+
+          $foo->htusers("/path/to/users");
+
+        This method loads an Apache style "users" file.
+
+    htgroups
+        Where $foo is a class name or an instance of Authen::Class::HtAuth
+
+          $foo->htgroups("/path/to/groups");
+
+        This method loads an Apache style "groups" file.
+
+    check
+        Where $foo is a class name or an instance of Authen::Class::HtAuth
+
+          $foo->check($username, $password, groups => \@groups);
+
+        This method checks $username and $password against the current
+        htusers file, and optionally checks whether the user is in all the
+        groups specified in the list of scalars given in named parameter
+        groups.
+
+        Alternatively, groups may contain array refs, each with a first
+        element of either "One" or "All", in which case, ->check determines
+        that, in the case of "One", the user is in at least one of the
+        groups, and in the case of "All", the user is in all the groups.
+        There is no built-in limit to the depth of the logic.
+
+        For example:
+
+          $foo->check($u, $p, groups => [
+            [One =>
+              [One => qw/admin root/],          # one of these
+              [All => qw/foos editor/]          # or all of these
+            ],
+            [Not => qw/crazy bastard invalid/], # but none of these
+          ])                                    # must match
+
+    groupcheck
+        Where $foo is a class name or an instance of Authen::Class::HtAuth
+
+          $foo->groupcheck($username, groups => \@groups);
+
+AUTHOR
+    Ryan McGuigan, <ryan@cardweb.com>
+
+BUGS
+    Please report any bugs or feature requests to <ryan@cardweb.com>
+
+SEE ALSO
+    Apache::Htpasswd
+    Apache::Htgroup
+    Class::Data::Inheritable
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Ryan McGuigan, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

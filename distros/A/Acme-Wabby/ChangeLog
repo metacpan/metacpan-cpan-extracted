@@ -1,0 +1,13 @@
+version 0.13 (09/21/2005):
+	* No changes, accidently uploaded 0.11 as 0.12, bump version so I can
+  	  upload this to CPAN.
+
+version 0.12 (09/21/2005):
+	* Fix dumb logic in the constructor and expand the test cases to be more
+	  complete.
+
+version 0.11 (08/10/2005):
+	* Swap to using ref to ensure that a reference is an Acme::Wabby object
+
+version 0.10 (03/01/2004):
+    * First public release.

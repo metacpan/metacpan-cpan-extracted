@@ -1,0 +1,38 @@
+#############################################################################
+## Name:        layer.pm
+## Purpose:     AI::NNEasy::NN::layer
+## Author:      Graciliano M. P. 
+## Modified by:
+## Created:     2005-01-14
+## RCS-ID:      
+## Copyright:   (c) 2005 Graciliano M. P. 
+## Licence:     This program is free software; you can redistribute it and/or
+##              modify it under the same terms as Perl itself
+#############################################################################
+
+use Class::HPLOO qw(base alloo) ;
+
+class AI::NNEasy::NN::layer {
+
+  use AI::NNEasy::NN::node ;
+
+  sub layer ($params) {
+    $this->{nodes} = [] ;
+    for (1 .. $$params{nodes}) { push( @{$this->{nodes}} , AI::NNEasy::NN::node->new($params) ) ;}
+    return $this ;
+  }
+  
+  sub layer_output ($params) {
+    my @outputs ;
+    foreach my $node ( @{$this->{nodes}} ) {
+      push(@outputs , $$node{activation}) ;
+    }
+
+    return \@outputs;    
+  }
+
+}
+
+1;
+
+

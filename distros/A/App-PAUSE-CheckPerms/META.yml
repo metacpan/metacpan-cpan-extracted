@@ -1,0 +1,27 @@
+---
+abstract: 'check if PAUSE permissions are consistent for all modules in a dist'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PAUSE-CheckPerms
+requires:
+  Moo: '0'
+  MooX::Options: '0'
+  PAUSE::Packages: '0.07'
+  PAUSE::Permissions: '0.06'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/App-PAUSE-CheckPerms
+  repository: https://github.com/neilb/App-PAUSE-CheckPerms.git
+version: '0.05'

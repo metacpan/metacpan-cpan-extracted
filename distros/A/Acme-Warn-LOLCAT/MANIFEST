@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Acme-Warn-LOLCAT.t
+lib/Acme/Warn/LOLCAT.pm

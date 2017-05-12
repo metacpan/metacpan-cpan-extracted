@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Tests HTMLPageSync's ask_about_keep_destination_directory() new() helper subroutine that uses
+# Term::UI to ask the user questions. This "test script" is called by
+# t/App-FetchwareX-HTMLPageSync.t's test suite using Test::Expect, if its
+# optionally installed. And Test::Expect answer's the questsions that this
+# script asks thereby testing ask_about_keep_destination_directory()'s Q&A interface.
+
+
+use Test::More;
+use Test::Builder;
+use Term::ReadLine;
+
+use App::FetchwareX::HTMLPageSync ':TESTING';
+use App::Fetchware::Fetchwarefile;
+
+my $term = Term::ReadLine->new('testing HTMLPageSync new');
+
+
+my $fetchwarefile = App::Fetchware::Fetchwarefile->new(
+    header => 'use App::FetchwareX::Test;',
+    descriptions => {
+        keep_destination_directory => <<EOD,
+destination_directory is the directory on your computer where you want the files
+that you configure HTMLPageSync to parse to be copied to.
+EOD
+    }
+);
+
+isa_ok($fetchwarefile, 'App::Fetchware::Fetchwarefile');
+
+ask_about_keep_destination_directory($term, $fetchwarefile);
+
+my $keep_destination_directory = $fetchwarefile->config_options('keep_destination_directory');
+# Only test it if it exists, because if the caller supplies a 'n' as the answer,
+# then it is not added, so I must account for both possibilities.
+if (defined $keep_destination_directory) {
+    is($keep_destination_directory, 'True',
+        'checked ask_about_keep_destination_directory() added config option.');
+}
+
+# Spit out # of tests run.
+done_testing();
+
+# Print a bogus "prompt" to keep Expect from freaking out, because it presumes
+# the prompt works like it does in a shell, but fetchware new is not a shell.
+print "Bogus shell: \n";
+
+# Because we're in a child process not the same one that is running the main
+# test suite, if any tests fail this failure will not be reported back to our
+# caller. So, we use Test::Builder to check if our tests have passed, and if
+# they have we do nothing and return succes, but if not we throw an exception.
+my $test = Test::Builder->new();
+unless ($test->is_passing()) {
+    diag explain \[$test->details()];
+    die <<EOD;
+ask_about_keep_destination_directory test file for testing
+ask_about_keep_destination_directory() using Test::Expect has failed! The
+details() method of this process's Test::Builder object should have been printed
+above to help you figure out what went wrong.
+EOD
+}

@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Apache/Hadoop/Watcher.pm
+lib/Apache/Hadoop/Watcher/Base.pm
+lib/Apache/Hadoop/Watcher/Conf.pm
+lib/Apache/Hadoop/Watcher/Jmx.pm
+lib/Apache/Hadoop/Watcher/Yarn.pm
+t/Apache-Hadoop-Watcher.t
+t/Apache-Hadoop-Watcher-Base.t
+t/Apache-Hadoop-Watcher-Conf.t
+t/Apache-Hadoop-Watcher-Jmx.t
+t/Apache-Hadoop-Watcher-Yarn.t
+META.yml                                 Module meta-data (added by MakeMaker)

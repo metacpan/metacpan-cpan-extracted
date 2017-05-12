@@ -1,0 +1,25 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+App::FileSummoner	lib/App/FileSummoner.pm	/^package App::FileSummoner;$/;"	p
+App::FileSummoner::CreateFile	lib/App/FileSummoner/CreateFile.pm	/^package App::FileSummoner::CreateFile;$/;"	p
+App::FileSummoner::Register	lib/App/FileSummoner/Register.pm	/^package App::FileSummoner::Register;$/;"	p
+App::FileSummoner::Register::Rules	lib/App/FileSummoner/Register/Rules.pm	/^package App::FileSummoner::Register::Rules;$/;"	p
+App::FileSummoner::SkeletonDirsFinder	lib/App/FileSummoner/SkeletonDirsFinder.pm	/^package App::FileSummoner::SkeletonDirsFinder;$/;"	p
+BelowDirectory	lib/App/FileSummoner/Register/Rules.pm	/^sub BelowDirectory {$/;"	s
+HasExt	lib/App/FileSummoner/Register/Rules.pm	/^sub HasExt {$/;"	s
+InsideDirectory	lib/App/FileSummoner/Register/Rules.pm	/^sub InsideDirectory {$/;"	s
+chooseSkeleton	lib/App/FileSummoner/Register.pm	/^sub chooseSkeleton {$/;"	s
+findForFile	lib/App/FileSummoner/SkeletonDirsFinder.pm	/^sub findForFile {$/;"	s
+findSkeletonsParentDirs	lib/App/FileSummoner/SkeletonDirsFinder.pm	/^sub findSkeletonsParentDirs {$/;"	s
+loadRules	lib/App/FileSummoner/CreateFile.pm	/^sub loadRules {$/;"	s
+registerSkeleton	lib/App/FileSummoner/Register.pm	/^sub registerSkeleton {$/;"	s
+ruleMatches	lib/App/FileSummoner/Register.pm	/^sub ruleMatches {$/;"	s
+rulesMatches	lib/App/FileSummoner/Register.pm	/^sub rulesMatches {$/;"	s
+run	lib/App/FileSummoner.pm	/^sub run {$/;"	s
+skeletonsParentDirs	lib/App/FileSummoner/SkeletonDirsFinder.pm	/^sub skeletonsParentDirs {$/;"	s
+summonFile	lib/App/FileSummoner/CreateFile.pm	/^sub summonFile {$/;"	s
+unregisterAll	lib/App/FileSummoner/Register.pm	/^sub unregisterAll {$/;"	s

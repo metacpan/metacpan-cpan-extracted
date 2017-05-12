@@ -1,0 +1,19 @@
+Revision history for Perl extension Apache::Session::NoSQL.
+
+0.01  Thu May 13 09:06:50 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn Apache::Session::NoSQL
+
+0.02  Mon Sep 6 11:42:44 +0200 2010
+    - added Redis backend
+
+0.03  Fri Sep 24 11:58:12 +0200 2010
+    - More doc
+    - Dependencies
+    (revision 1599)
+
+0.1   Mon Dec 6 21:54:55 +0100 2010
+    - Bug: materialize does not work with Redis
+
+0.2   Wed Jul 22 2015
+    - Bug: [RT#94613] Bug in Apache::Session::NoSQL when trying to use Apache::Session::Redis #2

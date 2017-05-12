@@ -1,0 +1,21 @@
+NAME
+    Acme::CPAN::Testers::FAIL - generate a FAILing test report
+
+VERSION
+    version 0.02
+
+DESCRIPTION
+    Acme::CPAN::Testers::FAIL generates a "FAIL" test report when run by a
+    CPAN Tester.
+
+    That's pretty much it, really.
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,26 @@
+Version history for Perl module Alien::CMake
+
+0.08    05/09/2016
+        - Prefer 64bit cmake on Linux x86_64 (rt#114240)
+
+0.07    02/13/2016
+        - Add bin_dir method for Alien::Base compatibility
+
+0.06    25/08/2015
+        - update to cmake-3.3.0 on Solaris, Windows, Linux and OS X
+
+0.05	02/02/2014
+	- fix arch detection for Windows/x64 [plicease]
+
+0.04	30/12/2013
+	- update to cmake-2.8.12.1 (was 2.8.4) [plicease]
+
+0.03	28/05/2010
+	- added binaries options for netbsd, openbsd and solaris [FROGGS]
+
+0.02	26/05/2010
+	- added sub set_path [FROGGS]
+	- it detects already installed cmake now [FROGGS]
+
+0.01	22/05/2010
+	- initial version

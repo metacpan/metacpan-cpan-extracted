@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Acme-USIG
+version: 1.04
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Acme::USIG:
+    file: lib/Acme/USIG.pm
+    version: 1.04
+generated_by: Module::Build version 0.20

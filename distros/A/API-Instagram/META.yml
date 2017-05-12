@@ -1,0 +1,40 @@
+---
+abstract: 'Object Oriented Interface for the Instagram REST and Search APIs'
+author:
+  - 'Gabriel Vieira <gabriel.vieira@gmail.com>'
+build_requires:
+  File::Spec: 0
+  Furl::Response: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Inline::Files: 0
+  Test::MockObject::Extends: 0
+  Test::More: 0
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: API-Instagram
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Digest::MD5: 0
+  Furl: 0
+  JSON: 0
+  Moo: 0
+  Time::Moment: 0
+  URI: 0
+  experimental: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/gabrielmad/api-instagram/issues
+  homepage: http://metacpan.org/release/API-Instagram
+  repository: git://github.com/gabrielmad/api-instagram.git
+version: 0.013

@@ -1,0 +1,11 @@
+# d7
+# Most anyone allowed, however the default timeout is set to
+# two minutes, and the user must be authenticated. "Authenticated"
+# means "not timed out".
+
+AuthType auth-any
+
+Require authenticated
+
+Require user aatest1|basic julian.assange@gmail.com|google
+Require role admin scientist

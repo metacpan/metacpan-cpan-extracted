@@ -1,0 +1,22 @@
+---
+abstract: 'select pairings (designed for Go tournaments, but can be used for anything).'
+author:
+  - 'Reid Augustin <reid@hellosix.com>'
+build_requires:
+  IO::File: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Pair-Best2
+requires:
+  Carp: '0'
+  perl: '5.002'
+  strict: '0'
+  warnings: '0'
+version: '2.040'

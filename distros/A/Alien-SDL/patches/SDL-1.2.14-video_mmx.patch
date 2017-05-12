@@ -1,0 +1,11 @@
+--- SDL-1.2.14/src/video/mmx.h	2009-10-13 01:07:15.000000000 +0200
++++ SDL-1.2.14/src/video/mmx.h	2011-06-29 16:36:00.000000000 +0200
+@@ -355,7 +355,7 @@
+ 
+ #define	mmx_r2m(op, reg, mem) \
+ 	__asm__ __volatile__ (#op " %%" #reg ", %0" \
+-			      : "=X" (mem) \
++			      : "=m" (mem) \
+ 			      : /* nothing */ )
+ 
+ #define	mmx_r2r(op, regs, regd) \

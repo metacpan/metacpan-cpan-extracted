@@ -1,0 +1,23 @@
+2005-09-27 22:16  chris
+
+	* Build.PL, MANIFEST, lib/AnnoCPAN/Perldoc/SyncDB.pm,
+	  script/syncannopod: v0.11 Bugfixes: fix errors in almost all of
+	  the command line flags(!) Add recommendations for
+	  Compress::(Zlib|Bzip2) ChangeLog was omitted from MANIFEST
+
+2005-09-20 23:13  chris
+
+	* MANIFEST: Fix MANIFEST error
+
+2005-09-20 23:10  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/AnnoCPAN/Perldoc/SyncDB.pm, script/syncannopod,
+	  t/pod-coverage.t, t/pod.t, t/sync.t: Initial revision
+
+2005-09-20 23:10  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/AnnoCPAN/Perldoc/SyncDB.pm, script/syncannopod,
+	  t/pod-coverage.t, t/pod.t, t/sync.t: initial import
+

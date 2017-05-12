@@ -1,0 +1,11 @@
+Revision history for App-installdeps
+
+v0.0.3    2013-08-13 09:05:10 Asia/Tokyo
+    - Add recursive check option (-R).
+    - Add default filter and its disable option (-X).
+
+v0.0.2    2013-05-16 07:58:52 Asia/Tokyo
+    - Fix a bug not to install modules actually.
+
+v0.0.1    2013-04-25 06:39:35 Asia/Tokyo
+    - Initial release.

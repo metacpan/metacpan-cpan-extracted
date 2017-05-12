@@ -1,0 +1,10 @@
+QWORD   T_IV
+DWORD   T_IV
+BOOL    T_IV
+HWND    T_IV
+HSTREAM T_IV
+const void *    T_SV
+const GUID *    T_IV
+DOWNLOADPROC *  T_PV
+const char *	T_PV
+float           T_FLOAT

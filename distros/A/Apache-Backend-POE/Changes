@@ -1,0 +1,8 @@
+Revision history for Apache::Backend::POE.
+
+0.02 Mon Apr 04 11:37:00 2005
+	- Added non blocking reads
+	- Docs were lacking, now they lacking even less than before :)
+
+0.01 Fri Mar 25 16:17:00 2005
+	- First work based off Apache::DBI

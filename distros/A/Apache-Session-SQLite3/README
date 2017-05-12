@@ -1,0 +1,24 @@
+This is the README file for Apache::Session::SQLite3, an Apache::Session
+subclass using DBD::SQLite 1.x.
+
+Please type "perldoc Apache::Session::SQLite3" after installation to see
+the module usage information.
+
+* Installation
+
+Apache::Session::SQLite3 uses the standard perl module install process:
+
+cpansign -v		# optional; see SIGNATURE for details
+perl Makefile.PL
+make			# or 'nmake' on Win32
+make test
+make install
+
+* Copyright
+
+Copyright 2004, 2005 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

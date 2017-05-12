@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 63e3400720d425c500f8eead2e16b45a63013f47 Build.PL
+SHA1 c1f62834f1118972445007babe2b6cb95fbf8fed Changes
+SHA1 329ffcb4ef1aab5d8da04c753898d60848fa13c8 MANIFEST
+SHA1 25c84faadca60536cc9ee2f89cdfec68194389aa MANIFEST.SKIP
+SHA1 d720c8d8ec8554af267bf826af43a40f1e34f06e META.json
+SHA1 ea95148fb90693921c8be9315a160b1f2e2dcb08 META.yml
+SHA1 758dc581fcf6ba330b7516e9ff54efbf91a360dd README
+SHA1 7a203ffd9a8f87f01d5924d47ec8c01c57df2872 lib/Alien/OpenSSL.pm
+SHA1 3835f20e2d299321bd9e5c2c6889d8bd5989ac40 t/00-use.t
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/01-signature.t
+SHA1 88cea9987d9fb6fab5ec1f4b0b37cb85785603d3 t/author-pod.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - https://gpgtools.org
+
+iQIcBAEBCgAGBQJWoBa3AAoJECOZ8Wl8E8Zd/roP/23FIqKln1e8sXF6gvQ97IFF
+bGE1ymTl0wfy7YKm/uJh+sE+DLkjnlw6RjdUxh6RO/ZTXpqZnVmFyn8qm+mmMR3E
+f04PRgIhgwXIhdtr4KqxJZ+5dEk/p/0G+qWrZGkHGmdB9h8hd2FK3wZRHE5Z4MBy
+kTcAhPi6wNM+eYzHnd/LXcefCV4wodYuYt58KElR7bNRJOanSDPHj0lf/qjJ4KER
+n5oCVuBK8HyF5uF4mM2MArrEvUDUMqPVflY+oComi7s1MSVFR0eWQRr/by7GpRCK
+ZBixdmho97Ryafr5JZnDqzOCG85GQjk92c6SgpWuAJdyb6x1u0FsXur7av3CCj7I
+Wj3WKtJlkhJEYSuPciB0PS81/6SYHzFTIK7MV+KrGAw62ytYvHwQbItRYePPDGyo
+mUHAd3g/969HbiTMNr9nj9Wej11yWmBu+7m0ZBbbqo4uJAgxIgEsQkZceL2WaseD
+A8pyD4CsTrAs18f0SKMpWlaB1csshMhhLAEkbJHrculHGWCBUO/xL2ebsDpGYTDZ
+xyWhrMykjusmmzcu6FWwi/MhzZY+diNyz1XmeJhrY2dLcktEmdTC0SF17nn8I5B/
+eX9uhPQCQiRj2YvuGCEXFOKUqDgc7qQbEYpJ+3khAb5QJE/pDlHxEc7cTrEA8m8K
+6Vpeis5MhEVOPzunybYs
+=tMAe
+-----END PGP SIGNATURE-----

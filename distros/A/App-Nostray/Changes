@@ -1,0 +1,17 @@
+Revision history for App::Nostray
+
+1.01   2014-08-22
+       - merged pull request to integrate github links 
+         into META files (szabgab)
+
+1.00   2014-08-22
+       - bump version to 1.00
+       
+0.003   2014-08-16
+       - dropped dependency on JSON::XS, take two
+
+0.002   2014-08-16
+       - dropped dependency on JSON::XS
+
+0.001   2014-01-05
+       - Initial release

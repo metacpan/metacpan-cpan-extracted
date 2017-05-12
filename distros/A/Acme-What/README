@@ -1,0 +1,65 @@
+NAME
+    Acme::What - the f**k?
+
+SYNOPSIS
+     use Acme::What;
+     sub WHAT { warn @_ }
+ 
+     what is happening?
+     what is the problem?
+
+WHAT?
+    Acme::What installs a new `what` keyword for you.
+
+    The `what` keyword takes the rest of the line of source code on which it
+    occurs (up to but excluding any semicolon), treats it as a single string
+    scalar and passes it through to a function called `WHAT` in the caller
+    package.
+
+    So the example in the SYNOPSIS will warn twice, with the following
+    strings:
+
+      "is happening?"
+      "is the problem?"
+
+    If you'd rather use a function other than `WHAT`, then that is OK. Simply
+    provide the name of an alternative function:
+
+     use Acme::What '_what';
+     sub _what { warn @_ }
+ 
+     what is happening?
+     what is the problem?
+
+    Acme::What is lexically scoped, so you can define different handling for
+    it in different parts of your code. You can even use:
+
+     no Acme::What;
+
+    to disable Acme::What for a scope. (The `what` keyword is still parsed
+    within the scope, but when the line is executed, it throws a catchable
+    error.)
+
+WHY?
+    It's in the Acme namespace. There is no why.
+
+HOW?
+    Acme::What uses Devel::Declare to work its magic.
+
+WHITHER?
+    Devel::Declare, Acme::UseStrict.
+
+WHO?
+    Toby Inkster <tobyink@cpan.org>.
+
+MAY I?
+    This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+REALLY?
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

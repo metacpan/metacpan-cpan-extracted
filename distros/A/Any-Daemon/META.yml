@@ -1,0 +1,23 @@
+---
+abstract: 'general purpose daemon'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Any-Daemon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Report::Optional: 1.00
+  Test::More: 0.8
+version: 0.94

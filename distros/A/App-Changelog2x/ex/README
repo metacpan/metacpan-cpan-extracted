@@ -1,0 +1,33 @@
+The files in this directory are sample applications (other than the
+changelog2x script) and sample CSS stylesheets that can be used with
+the XHTML output styles.
+
+The changelog2x script allows two CSS files to be specified (not counting
+the open-ended 'headcontent' or 'headcontentfile' command-line parameters).
+The main one, specified with the '--css' option, is assumed to be general
+styling, fonts, spacing, etc. The second, specified via '--color', can be
+used to select a color-scheme defined using the same class names and applied
+via the cascade mode.
+
+
+FILES:
+
+changelogml.css
+    This is a basic set of styles for the XHTML content, with no colors
+    explicitly specified. It sets up fonts, spacing, etc. The fonts preference
+    is for the Deja Vu Sans family, falling back to Bitstream Vera Sans,
+    Helvetica, then finally Arial. No specific font is given for fixed-width
+    text in the filenames, but the table-of-contents links are styled to use
+    Deja Vu Sans Mono, falling back to Bitstream Vera Sans Mono, Courier New
+    and finally monospace. The <ul> containers used for listing filenames have
+    the <li> tags styled to use the "»" character in place of the traditional
+    bullet.
+
+black-white.css
+    This is a very short set of styles that augment the above sheet by
+    specifying a black-text-on-white color scheme. All other colors are
+    grey-tones (the annotation of file actions and the hover-color over
+    hyperlinks). Lastly, a hovor-color is set for the release-container to
+    highlight it with a slightly darker background.
+
+# $Id: README 17 2009-01-24 10:38:38Z rjray $

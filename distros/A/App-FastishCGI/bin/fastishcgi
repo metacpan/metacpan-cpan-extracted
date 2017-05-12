@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+
+# PODNAME: fastishcgi
+# ABSTRACT: run CGI scripts through a FastCGI interface
+
+use strict;
+use warnings;
+
+use Getopt::Long qw/:config no_ignore_case bundling/;
+use App::FastishCGI;
+use Pod::Usage;
+
+my $opt = {
+    port   => 4001,
+    ip     => '127.0.0.1',
+    debug  => 0,
+    stderr => 0,
+    timeout => 10,
+};
+
+sub get_options {
+
+    # TODO ipv6
+    GetOptions( $opt, 'help|h', 'longhelp', 'ip=s', 'port|p=i', 'socket|s=s', 'css=s', 'debug|D!', 'stderr!', )
+        or pod2usage();
+
+    pod2usage(2) if $opt->{help};
+    pod2usage(1) if $opt->{options};
+    
+}
+
+get_options();
+
+my $app = App::FastishCGI->new($opt);
+
+$app->main_loop;
+
+
+
+=pod
+
+=head1 NAME
+
+fastishcgi - run CGI scripts through a FastCGI interface
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+fastishcgi [help] [longhelp] [ip] [port] [socket] [css] [debug] [stderr]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help|-h>
+
+Basic help message
+
+=item B<--longhelp>
+
+Full options (this message)
+
+=item B<--ip> <ip address>
+
+IP to listen on, defaults to 127.0.0.1
+
+=item B<--port|-p> <port>
+
+Port to listen on, defaults to 4001
+
+=item B<--socket|-s> <path>
+
+UNIX socket to listen on. Defaults to INET socket.
+
+=item B<--css> <path>
+
+Path to a stylesheet for error pages as it will be passed to the web server
+e.g. "http://myserver/error.css" or just "/error.css"
+
+=item B<--debug|-D>
+
+Debugging messages will be enabled and outputted on STDERR
+
+=item B<--stderr>
+
+By default, errors are sent to syslog only. This flag also copies errors to stderr,
+which usually gets logged by the webserver
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/ioanrogers/App-FastishCGI/issues>.
+
+=head1 SOURCE
+
+The development version is on github at L<http://github.com/ioanrogers/App-FastishCGI>
+and may be cloned from L<git://github.com/ioanrogers/App-FastishCGI.git>
+
+=head1 AUTHOR
+
+Ioan Rogers <ioan.rogers@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Ioan Rogers.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

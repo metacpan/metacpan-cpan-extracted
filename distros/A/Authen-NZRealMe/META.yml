@@ -1,0 +1,34 @@
+---
+abstract: "Integrate with RealMe login and identity services (formerly \"igovt logon\")"
+author:
+  - 'Grant McLean <grant@catalyst.net.nz>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Authen-NZRealMe
+requires:
+  Crypt::OpenSSL::RSA: 0
+  Crypt::OpenSSL::X509: 0
+  Data::UUID: 0
+  Date::Parse: 0
+  Digest::SHA: 0
+  IO::Compress::RawDeflate: 0
+  LWP: 0
+  MIME::Base64: 3.11
+  URI: 0
+  WWW::Curl: 0
+  XML::Generator: 0
+  XML::LibXML: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/catalyst/Authen-NZRealMe/issues
+  homepage: https://github.com/catalyst/Authen-NZRealMe
+  repository: https://github.com/catalyst/Authen-NZRealMe.git
+version: 1.16

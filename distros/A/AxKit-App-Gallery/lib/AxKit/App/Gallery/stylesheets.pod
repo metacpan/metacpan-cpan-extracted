@@ -1,0 +1,185 @@
+# Copyright (c) 2003 Nik Clayton
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+# 
+# $Id: stylesheets.pod,v 1.2 2004/02/25 16:45:59 nik Exp $
+ 
+=head1 NAME
+
+AxKit::App::Gallery::stylesheets
+
+=head1 DESCRIPTION
+
+AxKit::App::Gallery works by generating XML, and then passing the
+generated XML through a collection of stylesheets.  The output of one
+stylesheet is passed on as input to the next.  In this way, a pipeline of
+stylesheets if formed.
+
+Some of the stylesheets are written in XSLT, some are written in
+XPathScript.  This manual page provides a brief description of the
+stylesheets that are shipped with AxKit::App::Gallery, in the order in
+which they are supposed to run.  For further details, see the comments in
+the stylesheets.
+
+=head1 STYLESHEETS FOR GENERATING THE PROOFSHEET
+
+=over 4
+
+=item AxHandleDirs
+
+Not strictly a stylesheet.  The C<AxHandleDirs> directive in the
+F<httpd.conf> file configures AxKit to generate XML containing a list of
+the files and directories in a given directory.  
+
+=item scrubfilelist.xps
+
+The filelist is scrubbed to remove files and directories that should not 
+be processed.  The rules are (note: check the code in case this has 
+changed -- if it has, send in a bug report):
+
+=over 4
+
+=item *
+
+Remove all directories that start with a C<.>, with the exception of the
+current directory, C<.>.
+
+=item *
+
+Remove all files that start with a C<.>.
+
+=item *
+
+Remove all files that are not images -- i.e., their MIME type does not
+start C<image/>.
+
+=item *
+
+Remove all files that are unreadable.
+
+=back
+
+=item sortfilelist.xsl
+
+The file list may not be supported, with directories and files appearing
+in any order.  The file list is sorted, with directories appearing first
+in alphabetical order, followed by files, in alphabetical order.
+
+=item filelist2proofsheet.xsl
+
+The remainder of the stylesheets work on building and formatting a 
+C<proofsheet> structure.  This stylesheet builds the basic proofsheet
+structure, and does the initial population of the C<albums> and C<images>
+elements.  See C<AxKit::App::Gallery::proofsheet> for complete details of
+this format.
+
+=item trimproofsheet.xps
+
+::Gallery can be configured to display a maximum number of images per
+proofsheet.  If there are too many images to display then the proofsheet
+is divided in to pages, and the end user can navigate between the pages.
+
+Given the current page number, this stylesheet removes all the images from 
+the proofsheet that would not appear on the current page.
+
+In the out-of-the-box configuration, this stylesheet is placed here
+because some of the later stylesheets may be computationally expensive, so
+on a slow box you want to trim the list down to the minimum number of
+images that must be processed.  On a faster box this can be placed later
+in the chain.  This would speed up the appearance of subsequent pages from
+a large proofsheet.  I haven't benchmarked it, but this speed up is likely
+to be negligible...
+
+=item addconfig.xps
+
+The XSLT stylesheets have no access to the gallery configuration variables
+that are specified in the Apache config file.  Nor can they retrieve
+information about the query (its URI, and so forth).  This XPathScript
+stylesheet retrieves this information, and plugs it in to the <proofsheet>
+structure so that subsequent XSLT stylesheets can use this information.
+
+=item extractimageinfo.xps
+
+Each image has meta-data associated with it.  Image dimensions, EXIF data,
+and so on.  This stylesheet checks to see whether or not this data should
+be extracted -- is the cached copy out of date? -- and if necessary 
+extracts it and saves it in the correct cache directory to a file called
+F<imageinfo.xml>.
+
+=item mergeimageinfo.xsl
+
+After the metadata has been extracted and cached, this stylesheet finds
+the cached metadata and incorporates it in to the document.
+
+=item proofsheet2html.xsl
+
+Finally, once the complete proofsheet has been compiled, it's converted to
+HTML.  This stylesheet is intended to serve as an example.  If you want to
+change the look and feel of the gallery proofsheet pages then this is the
+stylesheet to adjust.
+
+=back
+
+=head1 STYLESHEETS FOR GENERATING THE IMAGESHEET
+
+=over 4
+
+=item AxKit::App::Gallery::Provider
+
+Not strictly a stylesheet.  The ::Provider is run whenever one of the
+image files is requested, and AxKit::App::Gallery::Plugin returns OK
+(indicating that AxKit should process the request, instead of letting
+Apache serve the file).
+
+The C<get_strref()> method generates the initial XML <imagesheet>
+document.  See L<AxKit::App::Gallery::imagesheet> for complete
+documentation about this document and its structure.
+
+=item mergeimageinfo.xsl
+
+See the earlier description of F<mergeimageinfo.xsl>.
+
+=item imagesheet2html.xsl
+
+Once the complete imagesheet has been compiled, it's converted to HTML.
+This stylesheet is intended to server as an example.  If you want to
+change the look and feel of the gallery imagesheet pages then this is the
+stylesheet to adjust.
+
+=item imagesheet2html.xsl
+
+=back
+
+=head1 SEE ALSO
+
+AxKit::App::Gallery, AxKit::App::Gallery::proofsheet, 
+AxKit::App::Gallery::imagesheet, AxKit::App::Gallery::Plugin, 
+AxKit::App::Gallery::Provider
+
+=head1 AUTHOR
+
+Nik Clayton, nik@FreeBSD.org
+
+=head1 BUGS
+
+Undoubtedly.

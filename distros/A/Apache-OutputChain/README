@@ -1,0 +1,30 @@
+
+		------------------------------------
+			Apache::OutputChain
+		------------------------------------
+
+This is the README file for the Apache::OutputChain package. It allows
+parsing the output of other stacked mod_perl handlers in the Apache
+http server that has compiled in mod_perl with PERL_STACKED_HANDLERS
+enabled.
+
+The distribution also contains modules that show how to use this
+module. The man page is included.
+
+Installation:
+        Unpack the tar.gz, change to the Apache-OutputChain-*
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make install
+
+Available:
+	http://www.fi.muni.cz/~adelton/perl/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+
+Copyright: (c) 1997--1998 Jan Pazdziora, adelton@fi.muni.cz. All rights
+	reserved. This package is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself.
+
+

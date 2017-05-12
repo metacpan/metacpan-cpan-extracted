@@ -1,0 +1,9 @@
+0.002 2009-12-23
+  - Fix to not exec ditaa but instead run it and return..
+  - Suppress command STDOUT and store it in an attribute (as
+    it is only useful for debugging non-zero exit status).
+  - Additional documentation.
+
+0.001 2009-12-14
+  - Initial version.
+

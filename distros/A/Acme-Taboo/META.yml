@@ -1,0 +1,39 @@
+---
+abstract: 'Automated Cencoring Micro Engine'
+author:
+  - 'ytnobody <ytnobody aaaaaaaaaaaaatttttttttttttt acme^D^D^D^Dgmail dddooottt com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.6, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-Taboo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Acme::Taboo:
+    file: lib/Acme/Taboo.pm
+    version: 0.01
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/ytnobody/Acme-Taboo/issues
+  homepage: https://github.com/ytnobody/Acme-Taboo
+  repository: git://github.com/ytnobody/Acme-Taboo.git
+version: 0.01
+x_contributors:
+  - 'ytnobody / satoshi azuma <ytnobody@gmail.com>'

@@ -1,0 +1,15 @@
+SYNOPSIS
+
+    See the included script wordlist.
+
+ENVIRONMENT
+
+ DEBUG => bool
+
+SEE ALSO
+
+    App::GamesWordlist (games-wordlist) which greps from
+    Games::Word::Wordlist::* instead.
+
+    WordList and WordList::* modules.
+

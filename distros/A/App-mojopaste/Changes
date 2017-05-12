@@ -1,0 +1,112 @@
+Revision history for perl distribution App-mojopaste
+
+0.24 2016-10-13T10:01:53+0200
+ - Writing/reading files are more robust
+
+0.23 2016-09-08T20:08:22+0200
+ - Fix rendering 404 for paste_not_found() and .txt extension
+
+0.22 2016-09-06T21:18:39+0200
+ - Will never allow robots
+ - Will only graph csv data
+
+0.21 2016-06-30T14:44:51+0200
+ - Change default paste directory
+ - Can embed paste and graphs
+ - Fix using the whole window and nothing more when showing a graph
+
+0.20 2016-06-29T18:08:30+0200
+ - Fix X-Plain-Text-URL must be an absolute URL
+ - Add line numbers to pretty printed code
+ - Change "Paste" button to "Save"
+
+0.19 2016-06-29T13:59:26+0200
+ - Fix selecting only pastebin text on ctrl+a or cmd+a
+ - Fix handling of empty paste
+ - Add EXPERIMENTAL X-Plain-Text-URL header to paste web page
+ - Add support for header and description for graph view #7
+ - Change from dark to light color theme
+
+0.18 2016-01-15T07:52:58+0100
+ - Try to fix failing MSWin32 test
+   http://www.cpantesters.org/cpan/report/873ffedb-6bf4-1014-a355-7b0739136c96
+
+0.17 2016-01-13T21:36:27+0100
+ - Fix unicode.t by bumping Mojolicious version #10
+ - Cannot make empty paste
+ - Non-existing paste will result in 404 instead of 500 #8
+   Contributor: Stephan Jauernick
+ - Use File::Spec to construct correct paths on all OS #8
+   Contributor: Stephan Jauernick
+
+0.16 2016-01-13T09:25:51+0100
+ - Recommends JSON::Syck
+ - Recommends Text::CSV
+ - No need to encode/decode UTF-8 anymore
+
+0.15 2015-04-30T10:17:13+0200
+ - Change "Powered by" URL
+ - Change styling for .morris-hover
+ - Change 404 page to show that the paste could not be found.
+
+0.14 2015-04-20T17:03:36+0200
+ - Fix unit tests
+
+0.13 2015-04-20T16:54:30+0200
+ - SECURITY FIX! Cannot read ../../private/file #6
+ - Capture chart errors
+ - Will construct default ykeys from all chart elements
+
+0.11 2015-04-20T15:15:43+0200
+ - Can make charts using morris.js
+
+0.10 2014-08-07T17:51:23Z
+ - Fix button border styling, #2
+
+0.09 2014-08-07T11:14:00Z
+ - Add support for .txt as raw format
+ - Add focus on textarea on load
+ - Change to plain javascript (no jQuery)
+ - New design with bottom navbar
+
+0.08 2014-07-22T17:00:15Z
+ - Compatible with Mojolicious 5.xx
+
+0.07 2014-07-21T06:52:09Z
+ - Compatible with Mojolicious 5.xx
+
+0.06 2014-07-18T02:13:05Z
+ - Change bugracker
+
+0.0501 2014-05-30T08:02:31Z
+ - Fix fragile test t/mojopaste.t
+
+0.05 2013-12-31T19:39:07Z
+ - Allow pasting without javascript enabled
+
+0.0403 2013-09-09T16:27:19Z
+ - Fix showing unicode characters
+
+0.0402 2013-09-09T16:08:21Z
+ - Fix pasting unicode characters
+
+0.0401 2013-09-06T23:34:51Z
+ - Fix Makefile.PL
+
+0.04 2013-09-05T23:55:30Z
+ - Fix including jquery.js from Mojo
+ - Render as HTML5
+ - Looks better on iPhone
+ - Render 404 when paste is not found
+ - Trying to trick the dumbest robots
+
+0.03 2013-09-05T16:54:59Z
+ - Fix typo in PREREQ_PM
+
+0.02 2013-09-05T16:48:08Z
+ - Fix repository path
+
+0.01 2013-09-05T16:46:19Z
+ - Add bin/mojopaste
+ - Add documentation
+

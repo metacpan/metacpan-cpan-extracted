@@ -1,0 +1,26 @@
+Revision history for Alien-MSYS
+
+0.07      2014-05-15 09:17:18 -0400
+  - fix reinstall bug (GH#3)
+
+0.06      2014-05-15 04:00:21 -0400
+  - Fix build bug where Win32::Shortcut is installed
+    but no desktop icon for the MSYS GUI installer (GH#3)
+
+0.05      2014-05-08 08:54:54 -0400
+  - documentation tweaks
+  - search PATH for mingw-setup.exe as a method
+    for discovering the msys root
+
+0.04      2013-12-13 16:39:45 -0500
+  - First CPAN release
+
+0.03      2013-12-13 14:36:20 -0500
+  - MSYS now downloaded and installed if not found
+
+0.02      2013-12-08 16:08:37 -0500
+  - documentation
+  - msys_run does an exit(non-zero) on child failure
+
+0.01      2013-12-07 13:37:22 -0500
+  - initial version

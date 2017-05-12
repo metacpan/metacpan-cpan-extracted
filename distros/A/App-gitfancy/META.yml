@@ -1,0 +1,24 @@
+---
+abstract: 'shows `git log` with a more readable graph'
+author:
+  - 'Geunyoung Park <gypark@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120530'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-gitfancy
+requires:
+  Getopt::Long: 0
+  Pod::Usage: 0
+  autodie: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/gypark/App-gitfancy.git
+version: 0.003

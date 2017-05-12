@@ -1,0 +1,30 @@
+---
+abstract: 'yet another json grep'
+author:
+  - 'Grigoriy Koudrenko <gragory.mail@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-yajg
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  Pod::Find: '0'
+  Pod::Usage: '0'
+  Test::More: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/gragory/app-yajg
+version: '0.20'

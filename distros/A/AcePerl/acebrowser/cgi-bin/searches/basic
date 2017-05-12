@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+
+use strict 'vars';
+use vars qw/$DB $URL %EQUIV/;
+
+use Ace 1.51;
+use CGI 2.42 qw/:standard :html3 escape/;
+use CGI::Carp qw/fatalsToBrowser/;
+use Ace::Browser::AceSubs qw(:DEFAULT DoRedirect);
+use Ace::Browser::SearchSubs;
+
+my $classlist = Configuration()->Basic_objects;
+my @classlist = @{$classlist}[map {2*$_} (0..@$classlist/2-1)];  # keep keys, preserving the order
+
+my $JSCRIPT=<<END;
+function focussearch()  {
+         document.SimpleForm.query.focus();
+         document.SimpleForm.query.select();
+         return (false);
+
+} 
+END
+
+
+# fetch database handle
+$DB = OpenDatabase() || AceError("Couldn't open database.");
+
+my $search_class   = param('class');
+my $search_pattern = param('query');
+my $offset         = AceSearchOffset();
+
+$URL = url();
+$URL=~s!^http://[^/]+!!;
+
+my ($objs,$count);
+if (defined $search_class) {
+    if ($search_class eq 'Any' && $search_pattern) {
+	($objs,$count) = do_grep ($search_pattern,$offset);
+    } else {
+	($objs,$count) = do_search($search_class,$search_pattern || '*',$offset);
+    }
+    param('query' => param('query') . '*') if !$count && param('query') !~ /\*$/;  #autoadd
+}
+DoRedirect(@$objs) if $count==1;
+
+PrintTop(undef,undef,img({-src=>SEARCH_ICON,-align=>CENTER}).'Simple Search');
+
+print p({-class=>'small'},
+	"Select the type of object you are looking for and optionally",
+	"type in a name or a wildcard pattern",
+	"(? for any one character. * for zero or more characters).",
+	"If no name is entered, the search displays all objects of the selected type.",
+	i('Anything'),'searches for the entered text across the entire database.');
+
+display_search_form();
+display_search($objs,$count,$offset,$search_class) if $search_class;
+
+
+PrintBottom();
+
+
+sub display_search_form {
+  CGI::autoEscape(0);
+    print start_form(-name=>'SimpleForm'),
+      table(
+          TR({-valign=>TOP},
+             td(radio_group(-name=>'class',
+			    -Values=>\@classlist,
+			    -Labels=>{@$classlist},
+			    -default=>'Any',
+			    -rows=>3)),
+             td({-align=>LEFT,-class=>'large'},
+                b('Name:'),textfield(-name=>'query'),br,
+		submit(-name=>'Search')
+		)
+	     ),
+	    );
+  CGI::autoEscape(1);
+    print  end_form();
+}
+
+sub do_search {
+    my ($class,$pattern,$offset) = @_;
+    my $count;
+    my (@objs) = $DB->fetch(-class=>$class,-pattern=>$pattern,
+			    -count=>MAXOBJECTS,-offset=>$offset,
+			    -total=>\$count);
+    return unless @objs;
+    return (\@objs,$count);
+}
+
+sub display_search {
+    my ($objs,$count,$offset,$class) = @_;
+    my $label = $class eq 'Any' ? '' :$class;
+    if ($count > 0) {
+	print p(strong($count),"$label objects found");
+    } else {
+	print p(font{-color=>'red'},'No matching objects found.',
+		'Try searching again with a * wildcard before or after the name (already added for you).');
+	return;
+    }
+    my @objects;
+    if ($class eq 'Any') {
+	@objects = map { a({-href=>Object2URL($_)},$_->class . ":&nbsp;$_") } 
+	           sort { $a->class cmp $b->class } @$objs;
+    } else {
+	@objects = map { a({-href=>Object2URL($_)},"$_") } @$objs;
+    }
+    AceResultsTable(\@objects,$count,$offset);
+}
+
+sub do_grep {
+  my ($text,$offset) = @_;
+  my $count;
+  my (@objs) = $DB->grep(-pattern=> $text,
+			 -count  => MAXOBJECTS,
+			 -offset => $offset,
+			 -total => \$count,
+			 );
+  return unless @objs;
+  return (\@objs,$count);
+}

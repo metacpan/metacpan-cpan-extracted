@@ -1,0 +1,6 @@
+---
+files:
+  lib/Test.pm: lib/Test.pm
+dirs-recursive:
+  t/: lib/Test/t/
+

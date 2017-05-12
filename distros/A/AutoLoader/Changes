@@ -1,0 +1,66 @@
+Revision history for Perl extension AutoLoader
+
+5.74  Fri Oct 25 19:08 2013
+  - Makefile.PL: Set installdirs to "site" on Perl >= 5.12
+
+5.73  Tue Oct 16 16:45 2012
+  - AutoLoader::autoload_sub
+    Same as actually autoloading a function, but doesn't
+    execute it. Cf. documentation for details.
+
+5.72  Thu Nov 24 19:15 2011
+  - Update FSF address.
+  - Fix META.yml info on upstream.
+
+5.71  Sat Nov 20 01:20 2010
+  - Merge another test change from core:
+    Use "lvalue" attribute for testing since "locked"
+    is deprecated.
+
+5.70  Mon Sep 21 15:46 2009
+  - Merge trivial test change from core that was done
+    as part of the lib-to-ext migration.
+
+5.69  Sat Aug  8 12:33 2009
+  - CPAN distribution upgrade: Add resources section to META.yml.
+
+5.68  Mon Jan  5 17:50 2009
+  - VMS fixes for the AutoSplit tests (John Malmberg, RT #42137)
+
+5.67  Tue Sep 12 16:50 2008
+  - Added a test case for the bug that was fixed in 5.66_01,
+    courtesy of Christoph Lamprecht.
+
+5.66_01  Tue Sep  2 14:40 2008
+  - Fix determination of the autosplit.ix in ugly edge cases.
+    Explanation:
+    If the module file isn't called $Foo.pm, but
+    something random, then the static substitution which
+    tries to determine the location of autosplit.ix fails.
+    Up until now, the substitution would fail, so AutoLoader
+    evaluated the module code again instead of falling back
+    searching the autosplit.ix in @INC. The code was there
+    but not triggered in some circumstances.
+    For an example error in a PAR context, run
+     pp --clean -e 'use Storable; retrieve("foo")'
+    and then ./a.out and which it explode.
+
+5.66  Wed May 14 18:29 2008
+  - Fix broken distribution.
+
+5.65  Tue May 13 11:53 2008
+  - Remove AutoLoader::can.
+
+5.64  Wed Dec 26 16:08 2007
+  - Include AutoSplit in the distribution.
+
+5.63  Mon Jan 17 14:17 2007
+  - Adding INSTALLDIRS => 'perl' to Makefile.PL
+
+5.62  Mon Jan 15 15:13 2007
+  - First release to CPAN. Previously available in core perl.
+  - Fixes an obscure bug in 5.61/5.60 which would result in infinite
+    recursion if a module's %INC element is changed to a different
+    file name and AutoLoader's AUTOLOAD is used by the module.
+    (This can happen with PAR.)
+

@@ -1,0 +1,6 @@
+MANIFEST
+README
+ChangeLog
+Makefile.PL
+lib/Apache/Perldoc.pm
+t/00load.t

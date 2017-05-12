@@ -1,0 +1,4 @@
+Revision history for Perl module Alien::Base.
+
+0.040 2017-03-29 01:26:09 -0400
+  - Split Alien::Build::ModuleBuild from Alien::Build

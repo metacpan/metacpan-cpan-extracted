@@ -1,0 +1,36 @@
+$Id: /local/CPAN/AxKit-XSP-Minisession/Changes 1430 2008-03-08T21:44:59.461106Z claco  $
+Revision history for Perl module AxKit::XSP::Minisession
+
+1.10000 Sat Mar 8 16:43:23 2008
+    - Converted to Module::Install
+
+1.09 Mon Mar 21 19:13:53 2005
+    - Added Test::Strict warnings_ok tests
+
+1.08 Mon Mar 14 21:13:53 2005
+    - Added Test::Strict tests
+
+1.07 Sat Mar 05 13:27:02 2005
+    - Added README To make CPANTS happy. :-)
+    - Various pod cleanups and corrections
+    - Makefile.PL and extra.conf.in now use IfDefine to die gracefully
+
+1.06 Sat Feb 05 13:36:26 2005
+    - Changed Makefile.PL to use File::Path to fix permissions issues on
+        *nix for generated session* directories
+
+1.05 Thur Feb 03 18:33:26 2005
+    - Moved from CVS to Subversion
+    - Adjusted Id tags for SVN move
+    - Fixed encoding="utf8" error in t/*.xsp files
+    - Added MANIFEST.SKIP
+
+1.04 Wed Nov 24 20:21:51 2004
+    - Added Test::Pod and Test::Pod::Coverage tests
+    - Added Apache::Test -> AxKit Taglib tests
+
+1.03 Sat Nov 20 18:25:51 2004
+    - Converted to ExtUtils::ModuleMaker directory structure
+    - Added PREREQ_PM to Makefile.PL
+    - Updated contact information
+    - Added basic Test::More tests

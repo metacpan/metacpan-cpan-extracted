@@ -1,0 +1,40 @@
+PBDD version 0.01
+=================
+
+This module provides a Perl interface to the BuDDy 2.4 library for Binary Decision Diagrams. The interface is as close as possible to JBDD, a Java interface to the BuDDy and CUDD packages written by Arash Vahidi.
+
+DEPENDENCIES
+
+Before building the PBDD module, you must:
+1) download the buddy-2.4 library from:
+      http://sourceforge.net/projects/buddy/
+2) build and install buddy-2.4 as follows:
+      export CFLAGS='-fPIC -O2'
+      export CXXFLAGS='-fPIC -O2'
+      ./configure --prefix=/my/buddy/home --disable-shared
+      make
+      make install
+   NOTE: /my/buddy/home stands for the directory where you unzipped buddy-2.4
+
+INSTALLATION
+
+First of all set the environment variable BUDDYPATH to the directory where you unzipped buddy-2.4, e.g.:
+   export BUDDYPATH=/my/buddy/home
+
+Then type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Gianluca Torta
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+The interface design and part of the C code and documentation are modifications of the JBDD package by Arash Vahidi. A copy of the JBDD licence can be found in the directory licenses of this package.

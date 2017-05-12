@@ -1,0 +1,9 @@
+To Do
+-----
+
+- Add ability for units to be extracted from item comments
+
+- Read HISTORY from NDF and merge it into FITS header. On writing the
+  merged HISTORY should be writing to the HISTORY extension of the NDF
+  as this is regarded as canonical.
+

@@ -1,0 +1,211 @@
+Astro::FITS::Header module
+--------------------------
+
+What is it?
+-----------
+Astro::FITS::Header and associated sub-classes are tools for reading,
+modifying and then writing out FITS standard header blocks to FITS, NDF
+and GSD files. The module now fully supports ESO HIERARCH header keywords.
+Support for instantiating Astro::FITS:Header objects from Starlink::AST
+FrameSet objects is also supported.
+
+Full documentation is included in the POD attached to the modules.
+
+Tied Interface
+--------------
+This is a warning for those of you using the tied interface from previous
+versions of the module. The interface now acts very differently, theoretically
+the changes shouldn't break existing code, but it has diverged sufficiently
+far from the original that I'm no longer convinced that it will work in all
+cases. Be warned!
+
+Requirements
+------------
+
+The Astro::FITS::Header module can work with FITS Header blocks, either
+directly from the primary FITS HDU of a file complying with the FITS data
+standard, or from the FITS extension in an extensible N-dimensional data
+format (NDF) file or from a Global Section Data file (GSD). Additionally
+the module also supports .HEADER in HDS contanier files, and Starlink::AST
+FrameSet objects.
+
+To work with FITS files, the Astro::FITS::Header module requires Pete
+Ratzlaff's <pratzlaff@cfa.harvard.edu> Astro::FITS::CFITSIO library
+(v 1.01 or greater), which in turn requires William Pence's CFITSIO
+subroutine library (v2.430 or greater). It should be noted that to
+build the CFITSIO subroutine library on RedHat Linux 7.x you need to
+use version 2.202 or above, however the module requires v2.400 at least
+to work with the Astro::FITS::CFITSIO module.
+
+For more information on CFITSIO, see http://heasarc.gsfc.nasa.gov/fitsio/
+
+To work with NDF, HDS and GSD files, the Astro::FITS::Header module
+requires Tim Jenness' <t.jenness@jach.hawaii.edu> NDF (version 1.42 or
+greater) and GSD modules. These modules are installed as part of the
+PERLMODS package in the Starlink Software Collection.
+
+To work with AST FrameSet objects the Starlink::AST module is required,
+this module (should) be available from CPAN or by contacting the authors
+of this package.
+
+For more information on the Starlink Software Collection and the Starlink
+Project in general see http://www.starlink.ac.uk/
+
+Provides
+--------
+The package provides the following classes
+
+   Astro::FITS::Header
+   Astro::FITS::Header::Item
+   Astro::FITS::Header::NDF
+   Astro::FITS::Header::CFITSIO
+   Astro::FITS::Header::GSD
+   Astro::FITS::Header::AST
+
+which all include POD format documentation.
+
+Where can I get it?
+-------------------
+The package is available from CPAN <http://www.cpan.org/> and from
+http://www.astro.ex.ac.uk/people/aa/pages/computing/fitsheader.html
+
+Installation
+------------
+Installation is automated using the ExtUtils::MakeMaker library
+
+     % perl Build.PL
+     % ./Build
+     % ./Build test
+     % ./Build install
+
+If the Astro::FITS::CFITSIO, NDF or Starlink::AST modules are not
+installed 'make test' will detect this and skip the test harness
+for the relevant modules with a warning.
+
+Note on Versioning
+---------------
+
+Due to misunderstandings on the CPAN versioning scheme all modules in this
+release have jumped to version >= 3.0 to force reindexing. Patch numbers are
+no longer included in the distribution.
+
+Authors
+-------
+The module was originally written by Alasdair Allan <aa@astro.ex.ac.uk>, of
+the University of Exeter Astrophysics Group (http://www.astro.ex.ac.uk/) as
+part of his work for the Starlink Project (http://www.starlink.ac.uk/), and
+Tim Jenness <timj@jach.hawaii.edu> of the Joint Astronomy Center (JAC)
+(http://www.jach.hawaii.edu/) in Hawaii.
+
+This version of the module includes patches supplied by Diab Jerius
+<dj@head-cfa.harvard.edu>, of the Harvard-Smithsonian Center for Astrophysics,
+and by Jim Lewis <jrl@ast.cam.ac.uk>, of the Cambridge Astronomy Survey Unit
+at the Institute of Astronomy, to allow access to Multi-Extension FITS files.
+
+The tied interface was updated for version 2.x by Craig DeForest
+<deforest@boulder.swri.edu> of the Department of Space Studies, Southwest
+Research Institute and Tim Jenness <timj@jach.hawaii.edu> of the Joint
+Astronomy Center (JAC) in Hawaii. Patches to fix some bugs in the tied
+interface when dealing with blank cards were supplied by Brad Cavangh
+<bradc@jach.hawaii.edu> of the Joint Astronomy Center (JAC) in Hawaii.
+
+Modifications to parse ESO HIERARCH keywords, read-only, were added by
+Malcolm Currie <mjc@star.rl.ac.uk> of the Rutherford Appleton Laboratory.
+
+Maintainer
+----------
+The package is currently maintained by Tim Jenness <tjenness@cpan.org>.
+Please use CPAN RT for bug reports and github pull requests for patches.
+The source code repository is at
+
+  git://github.com/timj/perl-Astro-FITS-Header.git
+
+License
+-------
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+Major Changes
+------------
+
+For full details of changes see the source code repository.
+
+V3.07
+
+  - Respect ReadOnly flag when opening FITS extensions.
+    Fixes RT #78746 from Diab Jerius.
+
+V3.06
+
+  - Minor fix to header merging to properly treat an undef card
+    as an undef values rather than as a comment card.
+
+V3.05
+
+  - Spelling fixes from debian (RT #78071)
+
+V3.04
+
+  - Numeric cards with no space before the comment are now parsed correctly.
+
+  - A HISTORY item is now written to NDF files when the header is updated.
+
+  - The ChangeLog has been removed from this release.
+
+V3.03
+
+  - Ensure that GPL is used throughout package rather than a mix of Perl licence
+    and GPL. Fixes RT #61875
+
+V3.02
+
+  - Use Module::Build
+
+V3.01
+
+  - New append() method to append a header or items to an existing
+    header, overwriting duplicates.
+
+  - A header can now be constructed from a simple perl hash
+
+  - Item objects now have a copy constructor.
+
+  - When importing an AST frameset a specific encoding can be
+    specified.
+
+  - The Item constructor can now guess the header type.
+
+  - Fixes in item removal, tied interface for history and subheaders
+    and NDF opening when a directory has a space.
+
+V3.0
+
+ - Can now select items by type using the itembytype() method.
+
+ - Add equals() method.
+
+ - Add ability to merge two Header objects into one.
+
+ - Subheaders now supported by tie.
+
+ - Fix bug RT#4816 (Diab Jerius)
+
+ - change the distribution layout to be more in line with standard usage.
+
+V2.9.2:
+
+ - Fix tied interface to recognized proper FITS undef cards
+
+ - Fix bug in comment parsing (duplicate of RT #11722)
+
+ - Add optional support for Starlink::AST module

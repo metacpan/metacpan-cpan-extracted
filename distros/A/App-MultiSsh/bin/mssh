@@ -1,0 +1,266 @@
+#!/usr/bin/perl
+
+# Created on: 2012-01-18 08:29:06
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Path::Tiny;
+use POSIX ":sys_wait_h";
+use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
+
+our $VERSION = '0.19';
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    host    => [],
+    verbose => 0,
+    man     => 0,
+    help    => 0,
+    VERSION => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    $option{cssh_cmd} = which('cssh');
+    $option{tmux_cmd} = which('tmux');
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'cssh|c',
+        'cssh_cmd|cssh-cmd|C=s',
+        'fork|f',
+        'group|g=s@',
+        'host|h=s@',
+        'interleave|i!',
+        'parallel|p=i',
+        'script|s=s',
+        'tmux_cmd|tmux-cmd|T=s',
+        'tmux|m',
+        'test|t!',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+    elsif (
+        !@ARGV &&
+        !(
+            ( $option{cssh_cmd} && -x $option{cssh_cmd} ) ||
+            ( $option{tmux_cmd} && -x $option{tmux_cmd} ) ||
+            ( $option{script}   && -x $option{script}   )
+        )
+    ) {
+        warn "You must specify a command or script or install / specify the"
+            . " location of cssh or tmux!\n";
+        pod2usage( -verbose => 1 );
+    }
+    elsif ( !@ARGV && $option{cssh} && !$option{cssh_cmd} ) {
+        warn "Cannot find cssh use --cssh-cmd to specify it's location!\n";
+        pod2usage( -verbose => 1 );
+    }
+    elsif ( !@ARGV && $option{tmux} && !$option{tmux_cmd} ) {
+        warn "Cannot find tmux use --tmux-cmd to specify it's location!\n";
+        pod2usage( -verbose => 1 );
+    }
+
+
+    if ($option{fork}) {
+        $option{parallel}   ||= 4;
+        $option{interleave} //= 1;
+    }
+
+    # no command and not specified cssh or tmux
+    if ( !@ARGV && !($option{cssh} || $option{tmux}) ) {
+        # pick cssh or tmux
+        $option{cssh} = !!$option{cssh_cmd};
+        $option{tmux} = !!$option{tmux_cmd};
+    }
+
+    # add any group hosts to the current hosts
+    if ($option{group}) {
+        push @{ $option{host} }, App::MultiSsh::get_groups($option{group});
+    }
+
+    if ( !@ARGV && $option{cssh} ) {
+        exec $option{cssh_cmd}, hosts_from_map($option{host});
+    }
+
+    # do stuff here
+    my $remote_cmd = pop @ARGV || '';
+    #my $remote_cmd = join ' ', map {s{'}{'\\''}gxms; $_} @ARGV;
+
+    if (@ARGV) {
+        push @{$option{host}}, @ARGV;
+    }
+
+    my @hosts = hosts_from_map($option{host});
+
+    if ( !@hosts ) {
+        warn "You must specify at least one host!\n";
+        pod2usage( -verbose => 1 );
+    }
+
+    print join "\n", @hosts, '' if $option{verbose} > 1 or $remote_cmd eq '-';
+    return if $remote_cmd eq '-';
+
+    multi_run(\@hosts, $remote_cmd, \%option);
+
+    return;
+}
+
+sub which {
+    my ($cmd) = @_;
+
+    for my $path (split /:/, $ENV{PATH}) {
+        next if !-d $path || !-x path($path, $cmd);
+        return '' . path($path, $cmd);
+    }
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+mssh - Multi host ssh executer
+
+=head1 VERSION
+
+This documentation refers to mssh version 0.19.
+
+=head1 SYNOPSIS
+
+   mssh [ --VERSION | --help | --man ]
+   mssh [ -t | --test ] [ -v | --verbose ] -h host [-h host2 ..] 'remote command'
+   mssh [ -t | --test ] [ -v | --verbose ] host [host2 ...] 'remote command'
+   mssh [ -t | --test ] [ -v | --verbose ] [-c|--cssh|-m|--tmux] -h host [-h host2 ..]
+
+ OPTIONS:
+  'remote command'
+                The command to execute on the remote hosts.
+  host          See --host, only use if specifying a remote command
+
+  -h --host[=]str
+                Host or range of hosts to execute 'remote command' on
+                The range must be sourounded by [] and can be either comma
+                seperated integer/letters or .. for a range of all values
+                from the first to last. Note if clusterssh (cssh) is
+                installed and no 'remote command' specified C<cssh> will
+                be run, similarly if tmux is installed.
+                EG [0..5] for 1,2,3,4 and 5
+                   [0,5]      1 and 5
+                   [0..3,5]   1,2,3 and 5
+                   [0-5]      1,2,3,4 and 5
+                   [0-3,5]    1,2,3 and 5
+                   {0..5} for 1,2,3,4 and 5
+                   {0,5}      1 and 5
+                   {0..3,5}   1,2,3 and 5
+                   {0-5}      1,2,3,4 and 5
+                   {0-3,5}    1,2,3 and 5
+  -g --group[=]name
+                Specify a host name group from your ~/.mssh file. (see --man
+                for more details)
+  -p --parallel[=]int
+                Fork calls to each server to run in parallel the value limits
+                the number of processes called at once.
+                Note without --interleave you wont see results until the each
+                server has completed so that results are groupped.
+  -i --interleave
+                When running parallel commands interleave the output of each host
+     --no-interleave
+                Turn off --fork interleaving of output (the default)
+  -t --test     Just show all the commands that would be run don't actually
+                run anything
+  -f --fork     Fork the ssh processes so they run in parallel, output may
+                not be legible. (Equivalent of --parallel=4 --interleave)
+  -c --cssh     Use cssh to run the ssh commands
+     --cssh-cmd[=]str
+                Use str as the C<cssh> program (defaults to cssh found in $PATH)
+  -m --tmux     Create a tmux session with each window pane connecting to a host
+     --tmux-cmd[=]str
+                Use str as the C<tmux> program (defaults to tmux found in $PATH)
+
+  -v --verbose  Show more detailed option
+     --VERSION  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for mssh
+
+=head1 DESCRIPTION
+
+=head2 Groups
+
+You can configure host name groups in ~/.mssh (a YAML formatted file)
+
+    ---
+    groups:
+        prod: myhost0[1-9].prod
+        dev:
+            - myhost0[1-4].dev
+            - myhost0[1-4].test
+
+This can save some effort with commonly used groups of hosts. The argument
+I<--group> adds any configured hosts to any specified host names.
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

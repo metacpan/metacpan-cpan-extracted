@@ -1,0 +1,3 @@
+
+BASHRC_FOR_TESTING=seen
+eval "$( psst prompt $PS1_FROM_TEST )"

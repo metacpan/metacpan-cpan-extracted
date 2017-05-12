@@ -1,0 +1,29 @@
+language: perl
+perl:
+  - "5.10"
+  - "5.12"
+  - "5.14"
+  - "5.16"
+  - "5.18"
+
+before_install:
+# install tiff
+  - sudo apt-get -y purge ruby libtiff4 libtiff4-dev libtiffxx0c2 zlib1g-dev
+  - sudo apt-get autoremove
+  - sudo apt-get install automake
+
+# install deps
+  - cat ./cpan-deps | cpanm --sudo --notest -v
+  - cat ./cpan-deps
+  - dpkg -l
+
+install:
+  - perl ./Build.PL --travis
+  - ./Build
+  - sudo ./Build install
+
+script:
+  - prove
+
+notifications:
+  irc: "irc.perl.org#sdl"

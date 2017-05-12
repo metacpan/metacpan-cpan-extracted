@@ -1,0 +1,11 @@
+Revision history for Perl extension Anansi::Script::Shell.
+
+0.01  Mon May 20 11:38:19 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Anansi::Script::Shell
+0.02  Wed May 22 13:36:30 2013
+	- modified the POD.
+	- corrected HASH reference deprecations.
+0.03  Sat May 25 02:29:52 2013
+        - modified the POD.
+

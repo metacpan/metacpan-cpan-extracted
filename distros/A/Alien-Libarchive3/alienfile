@@ -1,0 +1,81 @@
+use alienfile;
+use Text::ParseWords qw( shellwords );
+
+plugin 'PkgConfig' => (
+  pkg_name => 'libarchive',
+  minimum_version => '3.0.0',
+);
+
+share {
+
+  #requires 'Alien::Libxml2' => '0.01'; # disable for now till it is on CPAN
+  requires 'Env::ShellWords' => '0.01';
+
+  plugin Download => (
+    url     => 'http://libarchive.org',
+    version => qr/^libarchive-([0-9\.]+)\.tar\.gz$/,
+  );
+
+  # TODO: release Alien::Libxml2 if Alien::LibXML doesn't get its act together
+  # TODO: lz4 https://github.com/lz4/lz4/releases 
+  # TODO: http://zlib.net/
+  my @aliens = qw( Alien::Nettle Alien::xz Alien::LZO Alien::Libbz2 );
+  requires $_ for @aliens;
+  
+  meta->around_hook(
+    build => sub {
+      my($orig, $build) = @_;
+
+      local $ENV{CFLAGS} = $ENV{CFLAGS};
+      local $ENV{LDFLAGS} = $ENV{LDFLAGS};
+
+      tie my @CFLAGS,  'Env::ShellWords', 'CFLAGS';
+      tie my @LDFLAGS, 'Env::ShellWords', 'LDFLAGS';
+      
+      my $cflags = $build->install_prop->{my_cflags} = [];
+      my $ldflags = $build->install_prop->{my_ldflags} = [];
+
+      foreach my $other (@aliens)
+      {
+        my $other_cflags;
+        my $other_libs;
+        if($other->install_type('share'))
+        {
+          $other_cflags = $other->cflags_static;
+          $other_libs   = $other->libs_static;
+        }
+        else
+        {
+          $other_cflags = $other->cflags;
+          $other_libs   = $other->libs;
+        }
+        unshift @$cflags,  grep /^-I/, shellwords($other_cflags);
+        unshift @$ldflags, grep /^-L/, shellwords($other_libs);
+      }
+      
+      unshift @CFLAGS, @$cflags;
+      unshift @LDFLAGS, @$ldflags;
+
+      $orig->($build);
+    }
+  );
+
+  plugin Extract => 'tar.gz';
+
+  plugin 'Build::Autoconf' => ();
+  
+  meta->after_hook(
+    'gather_share' => sub {
+      my($build) = @_;
+      
+      $build->runtime_prop->{$_} = join(' ', @{ $build->install_prop->{my_cflags} }) . ' ' . $build->runtime_prop->{$_}
+        for qw( cflags cflags_static );
+
+      $build->runtime_prop->{$_} = join(' ', @{ $build->install_prop->{my_ldflags} }) . ' ' . $build->runtime_prop->{$_}
+        for qw( libs libs_static );
+      
+    },
+  );
+
+};
+

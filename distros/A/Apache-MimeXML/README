@@ -1,0 +1,64 @@
+NAME
+    Apache::MimeXML - mod_perl mime encoding sniffer for XML files
+
+SYNOPSIS
+    Simply add this line to srm.conf or httpd.conf:
+
+      PerlTypeHandler +Apache::MimeXML
+
+    Alternatively add it only for certain files or directories using
+    the standard Apache methods. There is about a 30% slowdown for
+    files using this module, so you probably want to restrict it to
+    certain XML locations only.
+
+DESCRIPTION
+    An XML Content-Type sniffer. This module reads the encoding
+    attribute in the xml declaration and returns an appropriate
+    content-type heading. If no encoding declaration is found it
+    returns utf-8 or utf-16 depending on the specific encoding.
+
+CONFIGURATION
+    There are a few small configuration options for this module,
+    allowing you to set various parameters.
+
+  XMLMimeType
+
+    Allows you to set the mime type for XML files:
+
+            PerlSetVar XMLMimeType application/xml
+
+    That changes the mime type from the default text/xml to
+    application/xml. You can use this on a per-directory basis.
+
+  XMLUtf16EncodingBE
+
+    Allows you to set the encoding of big-endian (read: normal) utf
+    16 (unicode) documents. The default is 'utf-16'
+
+            PerlSetVar XMLUtf16EncodingBE utf-16-be
+
+  XMLUtf16EncodingLE
+
+    Allows you to set the encoding of little-endian utf-16 encoded
+    documents. The default is 'utf-16-le'
+
+            PerlSetVar XMLUtf16EncodingLE utf-16-wierd
+
+Use From Other Modules
+    If you want to use Apache::MimeXML's detection routines from
+    other modules, you can manually call the check_for_xml()
+    function yourself, passing in either a filename, or an open
+    filehandle. The function returns the encoding if it finds that
+    the file contains XML, otherwise it returns nothing:
+
+            my $encoding;
+            if ($encoding = Apache::MimeXML::check_for_xml($filename)) {
+                    print "$filename is XML in $encoding encoding\n";
+            }
+
+AUTHOR
+    Matt Sergeant matt@sergeant.org
+
+LICENCE
+    This module is distributed under the same terms as perl itself
+

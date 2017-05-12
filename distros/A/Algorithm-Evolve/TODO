@@ -1,0 +1,15 @@
+Add double tournament selection
+
+Allow fitness to not be memo-ized (re-evaulate every generation)
+
+Write more tests
+
+Support for freezing state using Storable or Data::Dumper or something
+
+Non-aligned crossover
+
+Better POD for EA-n00bs ;)
+
+Rewrite the slow stuff in C, doesn't that sound fun?
+
+Consider some way of combining A::E::Util, StringEvolver, ArrayEvolver

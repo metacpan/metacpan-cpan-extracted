@@ -1,0 +1,6 @@
+e	,	3 1 0	,	myFirstCommentHere
+r	,	2 1 0	,
+r	,	0 3 2	,	myThirdCommentHere
+r	,	2 1 2	,	myFourthCommentHere
+r	,	3 1 1	,	myFifthCommentHere
+# r	,	3 3 3	,	this line is removed

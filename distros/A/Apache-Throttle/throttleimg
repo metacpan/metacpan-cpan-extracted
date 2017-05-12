@@ -1,0 +1,246 @@
+#!/usr/bin/perl -w
+#
+# $Id: throttleimg,v 1.4 1998/09/14 16:15:01 don Exp $
+
+use Image::Magick;
+use Getopt::Long;
+
+GetOptions( "help|h|?!" => \$help,
+	    "quiet|q!" => \$quiet,
+	    "time|t=f" => \$time,
+	    "steps|s=i" => \$steps,
+	    "same-size!" => \$same_size,
+	    "same-quality!" => \$same_quality,
+	    "same-colors!" => \$same_colors,
+            "undo|u" => \$undo,
+	    );
+
+usage() if $help || !@ARGV;
+do_undo() if $undo;
+
+if (!$time) {
+    print STDERR "--time option wasn't specified, assuming 5.0 seconds.\n";
+    $time = 5.0;
+} elsif ($time < 0) {
+    print STDERR "--time option must be a positive float.\n";
+    exit 1;
+}
+if (!$steps) {
+    print STDERR "--steps option wasn't specified, assuming 3 steps.\n";
+    $steps = 3;
+} elsif ($steps < 1 || $steps > 35 || ($steps != int($steps))) {
+    print STDERR "--steps option must be an integer between 1 and 35.\n";
+    exit 1;
+}
+
+my $count = 0;
+foreach my $file (@ARGV) {
+    if (-d $file) {
+	print STDERR "Skipping $file, it's already a directory.\n";
+        next;
+    } elsif ($file !~ /\.(?:gif|jpg)$/) {
+	print STDERR "Skipping $file, doesn't appear to be a GIF or JPEG.\n";
+	next;
+    }
+
+    print "Processing $file...\n" unless $quiet;
+    
+    mkdir "$file.dir", 0775 or die $!;
+    rename $file, "$file.dir/Z-$file" or die $!;
+    rename "$file.dir", $file or die $!;
+
+    print "Creating control file for $time seconds.\n" unless $quiet;
+    open (CONF, "> $file/.throttle") or die $!;
+    flock (CONF, 2);
+    print CONF "$time\n";
+    close CONF;
+
+    my $des = "0";
+    for my $i (0 .. $steps - 1) {
+	my $percent = $i / $steps;
+	
+	my $image = new Image::Magick;
+	$image->Read("$file/Z-$file");
+	my ($width, $height) = $image->Get("width", "height");
+	
+	my @changes = ();
+	if (!$same_size) {
+	    my $new_width = $width * (.25 + .75 * $percent);
+	    my $new_height = $height * (.25 + .75 * $percent);
+	    $image->Scale(width => $new_width, height => $new_height);
+	    push(@changes, "size=${new_width}x${new_height}");
+	}
+	if (!$same_quality && ($image->Get("magick") eq "JPG")) {
+	    my $quality = 10 + 90 * $percent;
+	    $image->Set(quality => $quality);
+	    push(@changes, "quality=${quality}%");
+	}
+	if (!$same_colors && ($image->Get("magick") eq "GIF")) {
+            my $colors = 10 + 245 * $percent;
+            $image->Quantize(colors => $colors, colorspace => "RGB",
+                             dither => "true");
+            push(@changes, "colors=$colors");
+
+	}
+	$image->Write("$file/" . ++$des . "-$file");
+	print "Wrote $des-$file, ", (-s "$file/$des-$file"), " bytes: ",
+	      join(", ", @changes), "\n" unless $quiet;
+    }
+    print "Original is now Z-$file, ", (-s "$file/Z-$file"),
+          " bytes\n" unless $quiet;
+    $count++;
+}
+
+print "Done.  Modified $count file", $count == 1 ? "":"s", ".\n" unless $quiet;
+
+sub do_undo {
+    foreach my $file (@ARGV) {
+	$file =~ s|/$||;
+	if (!(-d $file)) {
+	    print STDERR "Skipping $file, it isn't directory.\n";
+	    next;
+	} elsif (!(-e "$file/.throttle")) {
+	    print STDERR "Skipping $file, no .throttle file found.\n";
+	    next;
+	} elsif ($file !~ /\.(?:gif|jpg)$/) {
+	    print STDERR "Skipping $file, doesn't appear to be a ".
+                         "GIF or JPEG.\n";
+	    next;
+	} elsif (!(-e "$file/Z-$file")) {
+	    print STDERR "Skipping $file, no original (\"Z-$file\") found.\n";
+	    next;
+	}
+
+	print "Processing $file...\n" unless $quiet;
+    
+	rename "$file", "$file.dir" or die $!;
+	rename "$file.dir/Z-$file", "$file" or die $!;
+
+	opendir (SF, "$file.dir") || die $!;
+	foreach (readdir(SF)) {
+	    if (/^[0-9A-Y]-$file$/ || /^\.throttle/) {
+		print "Removing $_...\n" unless $quiet;
+		unlink "$file.dir/$_";
+	    }
+	}
+        closedir SF;
+
+	rmdir "$file.dir" or
+	    print STDERR "The directory contained non-throttle files... ".
+		"moved them to $file.dir/\n";
+	
+	print "Unthrottled $file from $file/Z-$file.\n" unless $quiet;
+    }
+    print STDERR "Done.\n" unless $quiet;
+    exit;
+}
+
+sub usage {
+    print STDERR <<"EndOfUsage";
+Usage:  throttleimg [options] file1 ...
+
+  --help           this screen
+  --quiet          don't output anything to STDOUT
+  --time=2.3       time (in seconds) that the image should take to load
+  --steps=4        number of different images to create
+  --same-size      don't change the image resolution
+  --same-colors    don't change the number of colors (default for JPEGs)  
+  --same-quality   don't change the image quality (default for GIFs)
+  --undo           does the opposite: makes it a normal image
+EndOfUsage
+    exit 1;
+}
+
+__END__
+
+=head1 NAME
+
+throttleimg - Script to automatically split images into multiple sizes
+
+=head1 SYNOPSIS
+
+throttleimg [options] file1 ...
+
+=head1 DESCRIPTION
+
+throttleimg is a script distributed with Apache::Throttle.  It can be used
+to automatically create a set of different size images from one large image
+and store them in a format that Apache::Throttle will understand.
+
+The file (or files) you specify will be replaced with a directory of the
+same name. The original file will be saved in this directory as
+"Z-<original name>".  throttleimg will then create a set of images (the
+number of images can be set with the --steps option and defaults to 3)
+that look like the original image but have a lower quality.
+
+Theoretically, this script can be used to automatically convert all of your
+existing images to be controlled by Apache::Throttle.  You might try a
+command like:
+
+    find /home/httpd -name '*.gif' -o -name '*.jpg' | \
+        xargs throttleimg --time=5 --steps=3
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help, -h
+
+Shows usage information.
+
+=item --quiet, -q
+
+This option tells throttleimg not to output any status messages to
+STDOUT.  Only warnings and errors are printed to STDERR.
+
+=item --time=<seconds>, -t=<seconds>
+
+This is the time in seconds that the image should take to load.  It is
+used to determine the speed required to download each image.  This can
+be a floating point number.
+
+=item --steps=<images>, -s=<seconds>
+
+This option tells throttleimg how many different images to make.
+
+=item --same-size
+
+This option tells throttleimg not to change the size of the images
+created.  You probably want to use this if you're using these images
+inline in a HTML page and don't plan to use WIDTH and HEIGHT arguments
+in the <IMG> tag.
+
+=item --same-colors
+
+This option tells throttleimg not to change the number of colors in
+the images created.  It is the default value for JPEGs.
+
+=item --same-quality
+
+This option tells throttleimg not to change the quality of the images
+created.  It is the default value for GIFs.
+
+=item --undo, -u
+
+This option causes throttleimg to do the opposite of what it normally
+does.  Instead of turning an image into a directory of different images,
+it removes all of the images created by a previous call to throttleimg
+and replaces the directory with the original image.
+
+=back
+
+=head1 AUTHOR
+
+Don Schwarz <dons@xnet.com>
+
+=head1 SEE ALSO
+
+L<Apache::Throttle>, L<mod_perl>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998 Don Schwarz. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=cut

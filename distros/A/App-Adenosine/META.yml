@@ -1,0 +1,41 @@
+---
+abstract: 'Handy CLI HTTP tool'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Adenosine
+requires:
+  Capture::Tiny: '0'
+  Config::Any: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  JSON: '2.53'
+  Module::Runtime: '0'
+  Moo: '1.000006'
+  Path::Class: '0'
+  Scalar::Util: '0'
+  Text::ParseWords: '0'
+  Time::HiRes: '0'
+  URI: '0'
+  URI::Escape: '0'
+  YAML: '0'
+resources:
+  bugtracker: https://github.com/frioux/app-adenosine/issues
+  homepage: https://github.com/frioux/app-adenosine
+  repository: https://github.com/frioux/app-adenosine.git
+version: '2.001008'

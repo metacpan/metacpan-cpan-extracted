@@ -1,0 +1,49 @@
+Apache-Sling version 0.27
+=========================
+
+Welcome to the Apache Sling library for perl. This library sets out to make it
+simple to interact with the apache sling web framework from a perl application,
+thus making it easier to harness the power of java and perl simultaneously!
+
+Apache Sling is a web framework that uses a Java Content Repository, such as
+Apache Jackrabbit, to store and manage content.
+
+Sling applications use either scripts or Java servlets, selected based on
+simple name conventions, to process HTTP requests in a RESTful way.
+
+The embedded Apache Felix OSGi framework and console provide a dynamic runtime
+environment, where code and content bundles can be loaded, unloaded and
+reconfigured at runtime.
+
+As the first web framework dedicated to JSR-170 Java Content Repositories,
+Sling makes it very simple to implement simple applications, while providing an
+enterprise-level framework for more complex applications.
+
+See: http://sling.apache.org for more information about sling.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Data::Dumper
+Fcntl
+File::Temp
+HTTP::Request::Common
+LWP::UserAgent
+Net::LDAP
+Text::CSV
+
+COPYRIGHT AND LICENCE
+
+COPYRIGHT: (c) 2011 Daniel David Parry <perl@ddp.me.uk>
+
+LICENSE: http://dev.perl.org/licenses/artistic.html

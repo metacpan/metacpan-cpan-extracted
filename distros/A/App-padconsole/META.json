@@ -1,0 +1,54 @@
+{
+   "abstract" : "A console to manage your etherpad instance",
+   "author" : [
+      "Luc Didry <luc@didry.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-padconsole",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Browser::Open" : "0",
+            "Config::YAML" : "0",
+            "DateTime" : "0",
+            "Etherpad" : "v1.2.10.3",
+            "Term::ReadLine" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ldidry/padconsole.git",
+         "web" : "https://github.com/ldidry/padconsole"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

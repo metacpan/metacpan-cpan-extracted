@@ -1,0 +1,120 @@
+<td>
+<div class="middle">
+ <h2>Rename</h2>
+
+ <form action="change_schema_name<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+  <input type="hidden" name="schema" value="<% $s->name %>">
+  <input type="text" name="name" value="<% $s->name %>">
+  <input type="submit" value="Change name">
+ </form>
+</div>
+
+<div class="middle">
+ <h2>Add a table</h2>
+
+ <form action="add_table<% Alzabo::GUI::Mason::Config::mason_extension() %>" method="post">
+  <input type="hidden" name="schema" value="<% $s->name %>">
+
+  <h4>Table name:</h4>
+  <input type="textfield" name="table_name" size="20"><br>
+
+% if ( Alzabo::Table->can('attributes') ) {
+  <h4>Attributes</h4>
+  <input type="textfield" name="attributes" size="20"><br />
+  <input type="textfield" name="attributes" size="20"><br />
+% }
+
+  <h4>Comments:</h4>
+  <textarea name="comment"></textarea>
+
+% if ($s->tables) {
+  <h4>After table:</h4>
+  <select name="after">
+%   foreach my $t ($s->tables) {
+   <option value="<% $t->name %>"<% $t->name eq ($s->tables)[-1]->name ? ' selected' : '' %>><% $t->name %></option>
+%   }
+   </select>
+% }
+   <input type="submit" value="Submit">
+  </form>
+</div>
+</td>
+
+<td>
+<div class="right">
+ <h2>Delete</h2>
+
+ <form action="delete_schema_confirm<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+  <input type="hidden" name="schema" value="<% $s->name %>">
+  <input type="submit" value="Delete schema">
+ </form>
+</div>
+
+<div class="right">
+ <h2>SQL</h2>
+
+  <form action="view_schema_sql<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+  <input type="hidden" name="schema" value="<% $s->name %>">
+  <input type="submit" value="View schema SQL"><br>
+  <p>
+  This page allows you to execute the SQL once you have viewed it.
+  </p>
+ </form>
+</div>
+
+<div class="right">
+ <h2>Syncing SQL</h2>
+
+ <form action="view_sync_sql<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+  <input type="hidden" name="schema" value="<% $s->name %>">
+<& login_form.mas &>
+  <input type="submit" value="View Syncing SQL"><br>
+  <p>
+  This page shows you the SQL needed to sync up this schema object
+  and any corresponding schema in the RDBMS backend that may exist.
+  </p>
+ </form>
+</div>
+
+% if ($has_graphviz) {
+<div class="right">
+ <h2>Graph</h2>
+
+ <form action="view_graph<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+  <input type="hidden" name="schema" value="<% $s->name %>">
+  <input type="submit" value="View graph">
+ </form>
+</div>
+% }
+
+<div class="right">
+ <h2>Instantiation</h2>
+
+ <form action="change_schema_instantiation<% Alzabo::GUI::Mason::Config::mason_extension() %>">
+  <input type="hidden" name="schema" value="<% $s->name %>">
+% if ($s->instantiated) {
+  <input type="hidden" name="instantiated" value="0">
+  <input type="submit" value="Mark schema as not instantiated">
+% } else {
+  <input type="hidden" name="instantiated" value="1">
+  <input type="submit" value="Mark schema as instantiated">
+% }
+  <br />
+  <p>
+  <b>Note:</b> This action only changes the schema object's internal
+  state.  It will not actually remove the schema from the backend
+  RDBMS.
+  </p>
+ </form>
+</div>
+</td>
+<%args>
+$s
+</%args>
+
+<%init>
+my @tables = $s->tables;
+my $last = $tables[-1];
+
+my $has_graphviz = eval { require GraphViz; 1 };
+</%init>

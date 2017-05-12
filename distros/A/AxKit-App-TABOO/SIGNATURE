@@ -1,0 +1,116 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 11de8027c21d3906739efa863fe93444de924aff Changes
+SHA1 ef4763a68812d3b759c0b5618cd0f0c28958aed8 MANIFEST
+SHA1 abeb8cfb3635a72dd25d5a21c20fc94b09f4e827 MANIFEST.SKIP
+SHA1 1199771a6f0aa581f8aea651d3a7e0a05cf5a0c9 META.yml
+SHA1 d4edd68e5ad3b9f642b4bff33bd6c05b31a22142 Makefile.PL
+SHA1 33189f82cd1b8b9f09df7a60e862923f335d1d33 README
+SHA1 871f731f31fe12bcc5b7a83e0cf4353bdfda175b htdocs/articles/edit.xsp
+SHA1 786152d3dfc41181099e8aa4d90b2bfec8d09367 htdocs/articles/provider.xsp
+SHA1 fd96d1f33d51f8377dbbedeaffb9cf6c8796851e htdocs/articles/submit.xsp
+SHA1 a9c0038753dcbc65bf17273a83ab8b0419bd3f5a htdocs/categories/submit.xsp
+SHA1 b8259926f8dfa8054fa61cf5496cb2e6383684be htdocs/css/basic.css
+SHA1 aab56d0e7bc10a27a59c19ee9c31a1aae408489b htdocs/i18n.en.xml
+SHA1 93eb82b64c9a15b19ec87cd9a7a1d2b635a1b982 htdocs/i18n.nb.xml
+SHA1 04faf3bda5f9b45608d38d80e2eff640cde08f00 htdocs/index.xsp
+SHA1 759a5992619f859f0019ba7d19a72e46b3b2e928 htdocs/menu.xsp
+SHA1 9071572d9fc5f628d61ce838872ba3410143da58 htdocs/news/comment.xsp
+SHA1 1f4dfd066270102f94595a516b7f84177708002b htdocs/news/submit.xsp
+SHA1 0ec7dea22e4a6130b3d11067e8c0ef475850f26b htdocs/site/main.rdf
+SHA1 2c0b20f12165a074fb788fd992ae97833eb050be htdocs/transforms/articles/insert-values-edit.xsl
+SHA1 4be3f71b950ff456ad8e83e7149429fb177b33a3 htdocs/transforms/articles/xhtml/article-provider.xsl
+SHA1 10072428d34b95e11c79b37f2bbddb2740baf105 htdocs/transforms/articles/xhtml/match-author.xsl
+SHA1 b3bce5113d0369c6845deafd00ac8934ac20c674 htdocs/transforms/articles/xhtml/match-content.xsl
+SHA1 f1fba1e19559743085ff2aac68d2373db2b99b6d htdocs/transforms/articles/xhtml/match-metadata.xsl
+SHA1 92cc6ceb24c4f2191596d0f997ada8d3660924a6 htdocs/transforms/articles/xhtml/oo2html.xsl
+SHA1 4afe7a69116ea81da1ecc24d3c22d5d2e6534f4a htdocs/transforms/articles/xhtml/oocommon.xsl
+SHA1 2017626e35d56eb66d1be8eb1a735cb3094a8b0f htdocs/transforms/articles/xhtml/submit.xsl
+SHA1 b0760d6a8b2574e7fc3fed4ee83f1ef36b8feec2 htdocs/transforms/categories/xhtml/class-provider.xsl
+SHA1 f83b78c4288e83501df59fc4cc373b7dd59a3d92 htdocs/transforms/categories/xhtml/submit.xsl
+SHA1 49cf551ed0f4c5ac3afc3b4ae4227474fddf06c1 htdocs/transforms/do-nothing.xsl
+SHA1 fb947aa0ffb0955de2da7628538750169fc428ae htdocs/transforms/ends-with.xsl
+SHA1 e1b9bf2e2452babdcdccb1a08c6c7bf1bca2ebc6 htdocs/transforms/index-aggregate.xsl
+SHA1 504fce9351e98e0bfa247715d46127c9b59f67f4 htdocs/transforms/insert-i18n.xsl
+SHA1 2edc47a8f251e5605fad8d7b79a02c7d6db2525f htdocs/transforms/news/insert-values-edit.xsl
+SHA1 f86e611156f7292a556c114dfd6fd6f476d80348 htdocs/transforms/news/xhtml/comment.xsl
+SHA1 665058a5af16856769bc4f2814185446ad6a1f92 htdocs/transforms/news/xhtml/match-breadcrumbs.xsl
+SHA1 fd5529dc612f540e84eb2a999ea07a7b7220f39d htdocs/transforms/news/xhtml/match-comment.xsl
+SHA1 9fea5bba45f362eb1c255bfc69ad5803e4cf84a1 htdocs/transforms/news/xhtml/match-story.xsl
+SHA1 84e050a0690c1c391b87b78cd6bfb7b90317bc3e htdocs/transforms/news/xhtml/match-user.xsl
+SHA1 e437e21e46c5a554d3bcd2d2da7ecfe0861f8a4d htdocs/transforms/news/xhtml/news-provider.xsl
+SHA1 83a018dddd94f09afdf3743ac88f0476e333c0a8 htdocs/transforms/news/xhtml/newslist-provider.xsl
+SHA1 bf2610e1d019b38fa2e479b94aeac4f6042aa130 htdocs/transforms/news/xhtml/submit.xsl
+SHA1 e66e95b4ada6f68c82ef773060f0333439a2df5b htdocs/transforms/user/make-control.xsl
+SHA1 c985d403422564ae2115f44dfe68a824605e1b8e htdocs/transforms/user/xhtml/match-user.xsl
+SHA1 13a31f7f9399da82a62a8bf500df51d69fe1de79 htdocs/transforms/user/xhtml/new.xsl
+SHA1 d8b4dc0480fd29a185d4a665b4e3c66911ac89d8 htdocs/transforms/user/xhtml/user.xsl
+SHA1 19551e1609f7881ca8632cddeaa7d52f6f71fd6a htdocs/transforms/xhtml/footer.xsl
+SHA1 e7bc0fd365f106c69d4a56158e6ac31b30cb8d0d htdocs/transforms/xhtml/header.xsl
+SHA1 7f44d450bc021e78b7642874108f645bfcd87294 htdocs/transforms/xhtml/index.xsl
+SHA1 9060c339fca6b426e732b506058a25d4889c8fbc htdocs/transforms/xhtml/login.xsl
+SHA1 3e2af1d2c906662da0e741dffe799e3b5e0b087d htdocs/transforms/xhtml/match-control.xsl
+SHA1 335f60255fe16d4413701859f2019c4540786897 htdocs/transforms/xhtml/match-menu.xsl
+SHA1 9c2a0f444b4a6fa859b40e9d97f3b89b214925ea htdocs/transforms/xhtml/rightsidebar.xsl
+SHA1 2b812c125b5e6f6aedc051b2d9f1a086cdc06f12 htdocs/user/submit/new.xsp
+SHA1 70bbad5f80644a571d3cf1c6809c7837f1e78929 htdocs/user/submit/user.xsp
+SHA1 b66431337c8630de8b564d892a6341780eb93504 lib/AxKit/App/TABOO.pm
+SHA1 6dbe391253da11af984f94e27ceee1b4e8a4e687 lib/AxKit/App/TABOO/AddXSLParams/Session.pm
+SHA1 9d466afa1d5c77b6455750738b00b76df29b1db9 lib/AxKit/App/TABOO/Data.pm
+SHA1 eeff37c6eab8a1e5fe9898659ce20a20ed765ae8 lib/AxKit/App/TABOO/Data/Article.pm
+SHA1 af81f1fb4c9e9101403d0fc7413b66e60d516665 lib/AxKit/App/TABOO/Data/Category.pm
+SHA1 72b2ffd0a300d5621f40bf6b0e4194b882c9c623 lib/AxKit/App/TABOO/Data/Comment.pm
+SHA1 13b624284c53ac91f98fd11b034d04d4732969d5 lib/AxKit/App/TABOO/Data/Language.pm
+SHA1 d6d8fcbdf44834d7dddd3f85d46fa373d7bc5347 lib/AxKit/App/TABOO/Data/MediaType.pm
+SHA1 cdafb6b724a8a971e3af9074185c1f178e86a9c0 lib/AxKit/App/TABOO/Data/Plurals.pm
+SHA1 9a5527dc4ddc12d5be182cb36fb0ae0ed1ad9e23 lib/AxKit/App/TABOO/Data/Plurals/Articles.pm
+SHA1 df72ef0d1f779c1cff2b20c834ad983a084ac891 lib/AxKit/App/TABOO/Data/Plurals/Categories.pm
+SHA1 f0be955ccdbfc59e7836aa74adbb4f5599bd647b lib/AxKit/App/TABOO/Data/Plurals/Comments.pm
+SHA1 c42b3aac0862a0e82a0eb7135bf8393c8319aa47 lib/AxKit/App/TABOO/Data/Plurals/Languages.pm
+SHA1 05a1f1cfbba862e9ff8e0b500f9c76b4cf0fca7f lib/AxKit/App/TABOO/Data/Plurals/MediaTypes.pm
+SHA1 15f72f5275da12d1eaed4c9fbbc1c826d63875b4 lib/AxKit/App/TABOO/Data/Plurals/Stories.pm
+SHA1 14c2c3bd1531aab36b0f10d6382b1fe72a3729cd lib/AxKit/App/TABOO/Data/Plurals/Users.pm
+SHA1 19dd98676c1327274f50e8dcc8f60b6988bb89dc lib/AxKit/App/TABOO/Data/Story.pm
+SHA1 4ddf8b1bd0bfdc23c0f3ef7d0a79b145c40de545 lib/AxKit/App/TABOO/Data/User.pm
+SHA1 defe9f52380040a2c52921ba4f298683458f60f1 lib/AxKit/App/TABOO/Data/User/Contributor.pm
+SHA1 76753ed52b7114b8df6e74f002f0744cafadabde lib/AxKit/App/TABOO/Handler/Login.pm
+SHA1 2fc9b24ba0e64fa7545a68ee90039e66b95603f8 lib/AxKit/App/TABOO/Provider/Article.pm
+SHA1 f5ea2fcf88161a74aa832bf4a763f60792157fe1 lib/AxKit/App/TABOO/Provider/Classification.pm
+SHA1 06bb4561b0141fd04680d71d44647f83d43bdfa4 lib/AxKit/App/TABOO/Provider/News.pm
+SHA1 3413a2b61f08837a88e40294fca9fd2f7c08afd8 lib/AxKit/App/TABOO/Provider/NewsList.pm
+SHA1 e78b8dd31937cd61c79d7ccd76158689f92ec0c8 lib/AxKit/App/TABOO/XSP/Article.pm
+SHA1 580f0e976ca654b6482140a247ddf97c67159063 lib/AxKit/App/TABOO/XSP/Category.pm
+SHA1 b1a66f2038cf1d047e3818027b902084ee11db3c lib/AxKit/App/TABOO/XSP/Comment.pm
+SHA1 8ef6a198422ca63d13a1665f98aa964a9a1cd860 lib/AxKit/App/TABOO/XSP/Language.pm
+SHA1 1e2907196a6cf647384b113d8e5e5b08d409867b lib/AxKit/App/TABOO/XSP/Story.pm
+SHA1 2201ae80b590695e2968db6988facd8d72b7bff0 lib/AxKit/App/TABOO/XSP/User.pm
+SHA1 70be8fe009e01cae36581669ad8a4e05d9fdcfd8 scripts/upgrade04to05.pl
+SHA1 ae9031fae667f9d62bf69d3cbbef6562eb5b27bd sql/article-create.sql
+SHA1 b30a0070c90ebb9b1945916c2c5b98b3ac0ddedc sql/article-test.sql
+SHA1 83d794a9982f8e3579bb8269afb7c2529ce6343e sql/grant.sql
+SHA1 4402cebe05314bb7473e4cdecac9924c5b4931ea sql/news-create.sql
+SHA1 1ae9520095a0d28cbc936f203485fbcb619210b0 sql/news-minimal-nb.sql
+SHA1 ae01cf3f4c4aa3e49498aa98dd97136005adc86f sql/news-minimal.sql
+SHA1 7325722116eccc3e08637d78e893cce12e4d63fd sql/news-test.sql
+SHA1 835b4545bdf1054b755c56cb24f92819156d51d0 test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFHUV9tlE/Gp2pqC7wRArUjAKCVVYo3rpulmpD/2jTwXqMmPb52YgCeOWSy
+3xswvEQeJJ8yTLxdcVxw2R8=
+=Q4/H
+-----END PGP SIGNATURE-----

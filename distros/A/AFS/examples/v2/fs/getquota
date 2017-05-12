@@ -1,0 +1,18 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::FS qw(getquota);
+
+my ($path, $quota);
+
+die "Usage: $0 path\n" if ($#ARGV == -1);
+
+$path = shift;
+
+$quota = getquota($path);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "quota = $quota\n"; }
+

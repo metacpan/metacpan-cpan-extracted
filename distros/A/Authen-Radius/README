@@ -1,0 +1,32 @@
+This is RadiusPerl version 0.16. RadiusPerl is a Perl 5 module (Radius.pm)
+which allows you to communicate with a Radius server from Perl. You can
+just authenticate usernames/passwords via Radius, or comletely imitate
+AAA requests and process server response.
+
+IMPORTANT: As of v0.04 the name of this module has changed to Authen::Radius,
+           instead of just 'Radius'.
+           Please update your scripts accordingly!
+
+See the file 'INSTALL' for installation instructions. See the file 'Changes'
+for modifications or new additions to the module interface. Type 'perldoc
+Authen::Radius' for a quick synopsis of the available methods.
+
+RadiusPerl currently is developed & tested on FreeBSD (originally on Linux).
+It should run on any Perl 5 supported platform though. Let me know if it
+doesn't work on your machine (and *why* you think it doesn't work :).
+
+I welcome any feedback, enhancements, new ideas etc. for this module. Please
+send them to carl@miskatonic.inbe.net or to the andrew@portaone.com (current
+maintainer of the module). Please note that I am not able to provide services
+for debugging your scripts or RADIUS servers.
+
+\RadiusPerl is (c)1997 Carl Declerck.
+
+See the Perl Artistic License 2.0
+(http://www.perlfoundation.org/artistic_license_2_0) for copying and
+usage policy.
+
+That's it!
+
+Carl Declerck, Andrew Zhilenko
+

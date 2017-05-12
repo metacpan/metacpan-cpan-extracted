@@ -1,0 +1,23 @@
+---
+abstract: 'Use every function everywhere.'
+author:
+  - 'Felix Bytow <felix.bytow@googlemail.com>'
+build_requires:
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-AutoloadAll
+provides:
+  Acme::AutoloadAll:
+    file: lib/Acme/AutoloadAll.pm
+    version: '0.005'
+requires:
+  perl: '5.006'
+version: '0.005'

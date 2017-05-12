@@ -1,0 +1,15 @@
+ChangeLog                               History of Changes, Sort of
+MANIFEST			        This file
+Makefile.PL			        creates the Makefile
+README
+lib/Apache/HeavyCGI.pm		        Defines framework
+lib/Apache/HeavyCGI/Date.pm	        Handles dates
+lib/Apache/HeavyCGI/Debug.pm	        Debugging
+lib/Apache/HeavyCGI/Exception.pm	Exception handling
+lib/Apache/HeavyCGI/ExePlan.pm	        Execution plan
+lib/Apache/HeavyCGI/IfModified.pm	If-Modified-Since
+lib/Apache/HeavyCGI/Layout.pm	        Array-Utilities
+lib/Apache/HeavyCGI/SquidRemoteAddr.pm	X-Forwarded-For to remote_ip
+lib/Apache/HeavyCGI/UnmaskQuery.pm	Semicolon instead of question mark
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

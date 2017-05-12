@@ -1,0 +1,49 @@
+{
+   "abstract" : "a prove plugin to set environment variables",
+   "author" : [
+      "Dagfinn Ilmari Manns\u00c3\u00a5ker <ilmari@photobox.com>;"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Prove-Plugin-SetEnv",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Prove" : 0,
+            "Capture::Tiny" : "0.12",
+            "Test::Fatal" : 0,
+            "Test::More" : 0,
+            "ok" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ilmari/App-Prove-Plugin-SetEnv",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ilmari/App-Prove-Plugin-SetEnv.git",
+         "web" : "https://github.com/ilmari/App-Prove-Plugin-SetEnv"
+      }
+   },
+   "version" : "0.001"
+}
+

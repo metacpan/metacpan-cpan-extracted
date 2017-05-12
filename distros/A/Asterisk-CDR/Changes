@@ -1,0 +1,6 @@
+Revision history for Perl extension Asterisk::CDR.
+
+0.01  Mon Jan 30 16:56:30 2006
+	- original version; created by h2xs 1.23 with options
+		-Xn Asterisk::CDR
+

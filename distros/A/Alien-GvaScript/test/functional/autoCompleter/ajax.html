@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <link href="/test.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="/images/GvaScript.css" rel="stylesheet" type="text/css" media="screen"/>
+    <script src="../../../lib/Alien/GvaScript/lib/prototype.js"></script>
+    <script src="../../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+
+    <script>
+      var ac, ac_strict, ac_noblank;
+      var url = "http://localhost:8085/ac/country/";
+
+      function setup() {  
+        ac = new GvaScript.AutoCompleter(url, {
+          minimumChars : 2,
+          labelField   : 'value'
+        });
+
+        ac_notypeahead = new GvaScript.AutoCompleter(url, {
+          minimumChars : 2,
+          labelField   : 'value',
+          typeAhead    : false
+        });
+
+        ac_strict = new GvaScript.AutoCompleter(url, {
+          minimumChars : 2,
+          labelField   : 'value',
+          strict       : true
+        });
+
+        ac_noblank = new GvaScript.AutoCompleter(url, {
+          minimumChars : 2,
+          labelField   : 'value',
+          strict       : true,
+          blankOK      : false
+        });
+
+        ac_strict_nosuggest = new GvaScript.AutoCompleter(url, {
+          minimumChars : 2,
+          labelField   : 'value',
+          strict       : true,
+          autoSuggest  : false
+        });
+
+        ac_strict_notypeahead = new GvaScript.AutoCompleter(url, {
+          minimumChars : 2,
+          labelField   : 'value',
+          strict       : true,
+          autoSuggest  : true,
+          typeAhead  : false
+        });
+      }
+
+      document.observe('dom:loaded', setup);
+    </script>
+
+  </head>
+
+  <body>
+
+    <h1>Ajax Autocompleter</h1>
+
+<p>
+This autocompleter example is bound to a complete list of countries
+served by the perl HTTP service at http://localhost:8085/ac/country/ that responds 
+by an array: <tt>[{value: ..., label:  ..., code: ...}, ... ]</tt>
+</p>
+
+<form>
+
+Autocomplete 1 : <input onfocus="ac.autocomplete(this)" class="AC_input">
+
+Normal : <input value="just a normal field">
+
+<p>
+
+Autocomplete 2 : <input  onfocus="ac_notypeahead.autocomplete(this)" class="AC_input"/> 
+<em>(typeAhead: false)</em>
+    
+<p>
+
+Autocomplete 3 : <input  onfocus="ac_strict.autocomplete(this)" class="AC_input" />
+<em>(strict: true, blankOK: true)</em>
+    
+<p>
+
+Autocomplete 4 : <input  onfocus="ac_noblank.autocomplete(this)" class="AC_input" />
+<em>(strict: true, blankOK: false)</em>
+    
+<p>
+
+
+Autocomplete 5 : <input  name="foo.bar.3.tst" class="AC_input"
+                         onfocus="ac_strict_nosuggest.autocomplete(this)"
+                         ac:dependentFields="{i:'value',c:'code'}" >
+  <input  name="foo.bar.3.i" size=10 readonly>
+  <input  name="foo.bar.3.c" size=2 readonly>
+  <em>(strict: true, blankOK: true, autoSuggest: false, typeAhead: true)</em>
+<p>
+
+
+Autocomplete 6 : <input  name="foo.bar.4.tst" class="AC_input"
+                         onfocus="ac_strict_notypeahead.autocomplete(this)"
+                         ac:dependentFields="{i:'value',c:'code'}" >
+  <input  name="foo.bar.4.i" size=10 readonly>
+  <input  name="foo.bar.4.c" size=2 readonly>
+  <em>(strict: true, blankOK: true, autoSuggest: true, typeAhead: false)</em>
+
+</form>
+
+</body>
+</html>

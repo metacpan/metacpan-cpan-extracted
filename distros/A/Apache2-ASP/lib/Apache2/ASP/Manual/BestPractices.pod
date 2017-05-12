@@ -1,0 +1,678 @@
+
+=pod
+
+=head1 NAME
+
+Apache2::ASP::Manual::BestPractices - How to use Apache2::ASP properly
+
+=head1 DESCRIPTION
+
+This is a collection of best practices for using Apache2::ASP in the real world.
+
+As more "Best Practices" are discovered, they will end up in some kind of collection.
+Probably a Wiki or similar.
+
+=head1 FORMATTING
+
+Do this:
+
+  <html>
+  <head>
+    <title><%= $title %></title>
+    ...
+  <%
+  
+  %>
+  </head>
+  <body>
+    <p>
+  <%
+    for( 1...5 ) {
+  %>
+    Hello <%= $_ %>
+  <%
+    }# end for()
+  %>
+    </p>
+  </body>
+
+B<Don't do this>:
+
+  <html>
+  <head>
+    <title><%= $title %></title>
+    ...
+          <%
+
+      %>
+  </head>
+  <body>
+    <p>
+            <%
+        for( 1...5 ) {
+    %>
+    Hello <%= $_ %>
+      <%
+        }# end for()
+              %>
+    </p>
+  </body>
+
+The reason is that visually locating the "<%" and "%>" tags becomes increasingly
+difficult when they are not lined up vertically in the first column.
+
+The "<%=" tags can be interspersed through your code where needed, since they
+do not enclose blocks of logic.
+
+=head1 SUBROUTINES
+
+Do not declare subroutines within your code.
+
+To get around this limitation, do the following:
+
+  <%
+    my $add = sub {
+      my ($arg) = shift;
+      ...
+      return $arg + 1;
+    };
+    
+    ...
+    my $val = $add->( 10 ); # returns 11
+  %>
+
+=head1 PAGE COMPOSITION
+
+Apache2::ASP supports multiple modes of page composition.
+
+=head2 SSI Includes
+
+Only basic SSI includes (aka "Apache-Style" or "Server-Side" includes) are supported.
+
+Example:
+
+  <!-- #include virtual="/inc/top.asp" -->
+  ...
+  <!-- #include virtual="/inc/bottom.asp" -->
+
+=head2 $Response->Include( $path, { args } )
+
+If you need to pass in some arguments to your include, do this:
+
+Example:
+
+  <% $Response->Include( $Server->MapPath("/inc/top.asp"), { foo => "bar" } ); %>
+  ...
+  <% $Response->Include( $Server->MapPath("/inc/bottom.asp"), { foo => "bar" } ); %>
+
+Your includes would access the passed-in arguments like this:
+
+  <%
+    my ($s, $context, $args) = @_;
+    
+    $args->{foo}; # bar
+  %>
+
+=head2 MasterPages
+
+Think of MasterPages as a kind of page "class" that other pages can subclass.
+
+Example (MasterPage): - C</masters/main.asp>
+
+  <%@ MasterPage %>
+  <html>
+    <head>
+      <title><asp:ContentPlaceHolder id="ph_title" runat="server"></asp:ContentPlaceHolder></title>
+    </head>
+    <body>
+      <div class="content"><asp:ContentPlaceHolder id="ph_content" runat="server"></asp:ContentPlaceHolder></div>
+    </body>
+  </html>
+
+Example (normal Page):
+
+  <%@ Page UseMasterPage="/masters/main.asp">
+  
+  <asp:Content PlaceHolderID="ph_title">The Title</asp:Content>
+  
+  <asp:Content PlaceHolderID="ph_content">
+    Hello World!
+  </asp:Content>
+
+The resulting page that will be printed to the browser will look like this:
+
+  <html>
+    <head>
+      <title>The Title</title>
+    </head>
+    <body>
+      <div class="content">Hello World!</div>
+    </body>
+  </html>
+
+=head2 Nested Master Pages
+
+MasterPages can "subclass" other MasterPages as well, as many levels deep as necessary.
+
+Example MasterPage: C</masters/main.asp>
+
+  <%@ MasterPage %>
+  <html>
+    <head>
+      <title><asp:ContentPlaceHolder id="ph_title" runat="server"></asp:ContentPlaceHolder></title>
+    </head>
+    <body>
+      <div class="content"><asp:ContentPlaceHolder id="ph_content" runat="server"></asp:ContentPlaceHolder></div>
+    </body>
+  </html>
+
+Example "nested" MasterPage: C</masters/child.asp>
+
+  <%@ MasterPage %>
+  <%@ Page UseMasterPage="/masters/main.asp">
+  
+  <asp:Content PlaceHolderID="ph_content">
+    <div class="left_column">
+      <!-- menu goes here -->
+    </div>
+    <div class="right_column">
+      <!-- individual page content goes here -->
+      <asp:ContentPlaceHolder id="ph_page_content" runat="server"></asp:ContentPlaceHolder>
+    </div>
+  </asp:Content>
+
+And a page that uses C</masters/child.asp> as a MasterPage would look like this:
+
+  <%@ Page UseMasterPage="/masters/child.asp" %>
+  
+  <asp:Content id="title" PlaceHolderID="ph_title" runat="server">The Title</asp:Content>
+  
+  <asp:Content id="copy" PlaceHolderID="ph_page_content" runat="server">
+    Hello World!
+  </asp:Content>
+
+The resulting HTML printed to the browser would look like this:
+
+  <html>
+    <head>
+      <title>The Title</title>
+    </head>
+    <body>
+      <div class="content">
+        <div class="left_column">
+          <!-- menu goes here -->
+        </div>
+        <div class="right_column">
+          <!-- individual page content goes here -->
+          Hello World!
+        </div>
+      </div>
+    </body>
+  </html>
+
+=head2 Advantages of MasterPages
+
+Not only do you get inheritance for your web pages, they actually execute faster.
+Why?  Because includes require extra overhead of setting up "mock" requests
+in which the included ASP scripts are executed.  MasterPages do not require this
+extra work.
+
+=head1 HANDLERS
+
+Generally speaking, all forms should submit to handlers, rather than other ASP
+scripts.  This results in a predictable MVC setup.
+
+Of course, Apache2::ASP doesn't B<force> you to do this.  You can do whatever you want.
+
+However, if you upload a file, you must upload it to a subclass of L<Apache2::ASP::UploadHandler>.
+Generally you would inherit from L<Apache2::ASP::MediaManager> though, if you plan on
+doing much with uploaded files.
+
+=head2 Namespaces
+
+Because of the way namespaces work in Perl, web servers with multiple VirtualHosts
+should keep all handlers in their own namespaces.
+
+For example:
+
+B<Site 1>:
+
+  /handlers/site1.user.login
+  /handlers/site1.user.logout
+  /handlers/site1.user.register
+
+B<Site 2>:
+
+  /handlers/site2.user.login
+  /handlers/site2.user.logout
+  /handlers/site2.user.register
+
+If you were to simply use C</handlers/user.login>, that one handler would be
+invoked for any website's C</handlers/user.login> URI.  Unless this is what you
+want, avoid the namespace clashes by going with the naming convention described
+above.
+
+=head2 Path-to-Class Mapping
+
+Apache2::ASP converts URI's matching C</handlers/*> to their corresponding Perl
+class names.
+
+Examples:
+
+=over 4
+
+=item * C</handlers/site1.user.login>
+
+C<site1::user::login>
+
+=item * C</handlers/site1.user.logout>
+
+C<site1::user::logout>
+
+=back
+
+=head1 FILE UPLOADS
+
+Just inherit from L<Apache2::ASP::MediaManager> unless you need more control.
+
+See the documentation for L<Apache2::ASP::MediaManager> for more information.
+
+=head1 VALIDATION
+
+Apache2::ASP supports - but does not provide - server-side validation.  In fact,
+it is recommended that all validation is performed on the server, in one way or
+another.
+
+AJAX may be your preferred means of doing form validations and such, which Apache2::ASP
+fully supports.  Apache2::ASP simply does not B<require> the use of AJAX or any other
+idiom.
+
+=head2 How-To
+
+The recommended form validation idiom for Apache2::ASP is as follows:
+
+B<The Form>:
+
+  <%
+    if( my $args = delete($Session->{__lastArgs}) )
+    {
+      $Form->{$_} = $args->{$_} foreach keys(%$args);
+    }# end if()
+    
+    my $errors = delete($Session->{validation_errors}) || { };
+    my $errLabel = sub {
+      my $name = shift;
+      return unless $errors->{$name};
+  %><span class="field_error"><%= $Server->HTMLEncode( $errors->{$name} ) %></span><%
+    };
+  %>
+  
+  <%
+    if( my $msg = delete($Session->{msg}) ) {
+  %>
+  <div class="message"><%= $Server->HTMLEncode( $msg ) %></div>
+  <%
+    }# end if()
+  %>
+  
+  <%
+    if( $errors->{general} ) {
+  %>
+  <div class="general_error"><%= $Server->HTMLEncode( $errors->{general} ) %></div>
+  <%
+    }# end if()
+  %>
+  
+  <form action="/handlers/site1.user.login" method="post">
+    <input type="text" name="username" value="<%= $Server->HTMLEncode( $Form->{username} ) %>" />
+    <% $errLabel->( 'username' ); %>
+    <br />
+    <input type="password" name="password" />
+    <% $errLabel->( 'password' ); %>
+    <br />
+    <input type="submit" value="Submit" />
+  </form>
+
+The form submits to the URI C</handlers/site1.user.login> which maps to the package
+C<site1::user::login>.
+
+It is recommended that inside your C</etc> folder you have a YAML file, C</etc/properties.yaml>:
+
+B<The YAML File>: (C</etc/properties.yaml>)
+
+  ---
+  user_login:
+    username:
+      is_missing: Required
+      is_invalid: Invalid username
+    password:
+      is_missing: Required
+      is_invalid: Invalid password
+    general:
+      success: Successfully Logged In
+      fail: Invalid username and/or password.  Please try again.
+
+B<The Handler>: (C</handlers/site1/user/login.pm>)
+
+  package site1::user::login;
+  
+  use strict;
+  use warnings 'all';
+  use base 'Apache2::ASP::FormHandler';
+  use vars __PACKAGE__->VARS;
+  use Data::Properties::YAML;
+  
+  #============================================================================
+  sub run
+  {
+    my ($s, $context) = @_;
+    
+    if( my $errors = $s->validate( $context ) )
+    {
+      # We found some kind of validation error:
+      $Session->{__lastArgs} = $Form;
+      $Session->{validation_errors} = $errors;
+      return $Response->Redirect( $ENV{HTTP_REFERER} );
+    }# end if()
+    
+    # Success! - no validation errors:
+    my ($user) = find_user( ... );
+    $Session->{user} = $user;
+    
+    # Find our success message:
+    my $props = Data::Properties::YAML->new(
+      properties_file => $Config->web->application_root . '/etc/properties.yaml'
+    )->user_login;
+    $Session->{msg} = $props->general->success;
+    
+    # Redirect the user to the logged-in page:
+    return $Response->Redirect("/logged-in.asp");
+  }# end run()
+  
+  #============================================================================
+  sub validate
+  {
+    my ($s, $context) = @_;
+    
+    # Remove leading and trailing whitespace:
+    map {
+      $Form->{$_} =~ s/^\s+//;
+      $Form->{$_} =~ s/\s+$//;
+    } keys(%$Form);
+    
+    my $props = Data::Properties::YAML->new(
+      properties_file => $Config->web->application_root . '/etc/properties.yaml'
+    )->user_login;
+    
+    my $errors = { };
+    
+    no warnings 'uninitialized';
+    
+    # username:
+    if( length($Form->{username}) )
+    {
+      # Username cannot contain whitespace:
+      if( $Form->{username} =~ m/\s/ )
+      {
+        $errors->{username} = $props->username->is_invalid;
+      }# end if()
+    }
+    else
+    {
+      $errors->{username} = $props->username->is_missing;
+    }# end if()
+    
+    # password:
+    if( length($Form->{password}) )
+    {
+      # Password cannot contain whitespace:
+      if( $Form->{password} =~ m/\s/ )
+      {
+        $errors->{password} = $props->password->is_invalid;
+      }# end if()
+    }
+    else
+    {
+      $errors->{password} = $props->password->is_missing;
+    }# end if()
+    
+    # Only check to see if the user exists if we haven't encountered other errors:
+    unless( keys(%$errors) )
+    {
+      if( ! find_user( ... ) )
+      {
+        $errors->{general} = $props->general->fail;
+      }# end if()
+    }# end unless()
+    
+    return unless keys(%$errors);
+    return $errors;
+  }# end validate()
+  
+  1;# return true:
+
+=head1 UNIT TESTING
+
+Unit testing was the number one reason behind the development of Apache2::ASP.
+
+Apache2::ASP offers a unit testing environment that is not dependent on Apache
+or any other server.
+
+Unit tests are made possible via instances of L<Apache2::ASP::Test::Base> and 
+use L<Apache2::ASP::Test::UserAgent> to make "requests" to ASP scripts and handlers
+in your Apache2::ASP web application.
+
+=head2 Example
+
+Supposing your website is at C</var/www/www.example.com>, create a folder C</t>
+at C</var/www/www.example.com/t>.
+
+Inside C</t> create C</t/00-basic.t> which contains:
+
+  #!/usr/bin/env perl -w
+  
+  use strict;
+  use warnings 'all';
+  use Test::More 'no_plan';
+  use base 'Apache2::ASP::Test::Base';
+  
+  # Create our base test object:
+  my $s = __PACKAGE__->SUPER::new();
+  
+  # Make a request:
+  my $res = $s->ua->get("/index.asp");
+  
+  # $res is a normal HTTP::Response object:
+  ok( $res->is_success => "Got /index.asp" );
+  like $res->content, qr/Hello, World/, "Contents look right";
+  is( $res->header('content-type') => 'text/html' );
+
+Run your tests with:
+
+  prove t
+
+All of your tests will be run.
+
+=head1 CODE COVERAGE
+
+Along with unit testing, code coverage is another great reason to use Apache2::ASP.
+
+Just by using the L<Devel::Cover> utility C<cover> you can get code coverage
+for not only your website's libraries, but also its handlers and ASP scripts.
+
+=head1 PROFILING
+
+Profiling an Apache2::ASP web application fits right in with your unit tests and
+code coverage.
+
+L<Devel::NYTProf> is an excellent profiler tool for Perl and works very well with
+Apache2::ASP web applications.
+
+=head1 ERROR HANDLING
+
+Errors are handled by subclasses of L<Apache2::ASP::ErrorHandler>.
+
+The default ErrorHandler prints a stacktrace to the browser and sends a copy
+to the email address specified in your config file.
+
+=head2 Configuration
+
+Open your C</conf/apache2-asp-config.xml> file and look for the following:
+
+  <errors>
+    <error_handler>...</error_handler>
+    <mail_errors_to>...</mail_errors_to>
+    <mail_errors_from>...</mail_errors_from>
+    <smtp_server>...</smtp_server>
+  </errors>
+
+Make changes as necessary.
+
+=head1 FILE UPLOADS
+
+Almost any time you need to process a file upload, your best bet is to subclass
+L<Apache2::ASP::MediaManager>.
+
+See L<Apache2::ASP::MediaManager> for details.
+
+If you really need to do something special, either subclass L<Apache2::ASP::UploadHandler>
+or write your own C<mod_perl> handler and submit to it.
+
+=head1 SECURITY
+
+=head2 Restricting Access
+
+Apache2::ASP simplifies this by providing the RequestFilter interface (L<Apache2::ASP::RequestFilter>).
+
+B<Example>:
+
+Suppose you want all requests to C</members/*> to require authentication.
+
+Adjust your C</conf/apache2-asp-config.xml> like this:
+
+  <configuration>
+    ...
+    <web>
+      ...
+      <request_filters>
+        <filter>
+          <uri_match>/members/.*</uri_match>
+          <class>My::MembersOnlyFilter</class>
+        </filter>
+      </request_filters>
+    </web>
+    ...
+  </configuration>
+
+Somewhere in your C<@INC> (like, say, C</lib>) add C<My/MembersOnlyFilter.pm> 
+with the following code:
+
+  package My::MembersOnlyFilter;
+  
+  use strict;
+  use warnings 'all';
+  use base 'Apache2::ASP::RequestFilter';
+  use vars __PACKAGE__->VARS;
+  
+  #======================================================
+  sub run
+  {
+    my ($s, $context) = @_;
+    
+    unless( $Session->{logged_in} )
+    {
+      # User is *not* logged in:
+      return $Response->Redirect("/login.asp");
+    }# end unless()
+    
+    # User is logged in:
+    return $Response->Declined;
+  }# end run()
+  
+  1;# return true:
+
+Now, every request to C</members/*> will be denied unless the Session variable 
+C<logged_in> is set to a true value.
+
+=head2 Cross-Site-Scripting (xSS)
+
+Never, ever, ever, Ever $Response->Write() or <%= %> something you received from
+your users.  That goes for user data that might have been stored in a database
+as well.
+
+Examples:
+
+B<Good>:
+
+  <input type="text" name="color" value="<%= $Server->HTMLEncode( $Form->{color} ) %>" />
+
+B<Bad>:
+
+  <input type="text" name="color" value="<%= $Form->{color} %>" />
+
+The reason is that the user could have input text like the following:
+
+  red"/><script type="text/javascript">alert(document.cookie)</script><br
+
+Which would evaluate to this:
+
+  <input type="text" name="color" value="red"/><script type="text/javascript">alert(document.cookie)</script><br />
+
+Using Server->HTMLEncode causes that same attack to be rendered harmless, like this:
+
+  <input type="text" name="color" value="red/&gt;&lt;script type=&quot;text/javascript&quot;&gt;alert(document.cookie)&lt;/script&gt;&lt;br" />
+
+The attacker gets nothing, and moves on.
+
+=head1 DATABASE ACCESS
+
+By default, Apache2::ASP uses 3 database handles, defined within the <data_connections>
+element in the XML config:
+
+=head2 Connections
+
+=over 4
+
+=item * session
+
+Sessions are serialized and stored in a database, one record per session.
+
+=item * application
+
+Applications are serialized and stored in a database, one record per application.
+
+=item * main
+
+Most web applications use a "main" database handle.  This is the configuration
+for that connection.
+
+=back
+
+=head2 Choosing an ORM
+
+Depending on your preference and the task at hand, an ORM (Object/Relational Mapper)
+such as L<DBIx::Class> or L<Class::DBI> may be chosen without any problems.
+
+Apache2::ASP was developed specifically to work with L<Class::DBI::Lite> and this
+combination has been tested thoroughly.
+
+=head2 Preventing SQL Injection
+
+Whatever you do, always use SQL placeholders (C<?>).  For more information on 
+preventing SQL injection attacks, see L<http://www.perlmonks.org/?node_id=661423>
+
+=head1 AUTHOR
+
+John Drago <jdrago_999@yahoo.com>
+
+=head1 COPYRIGHT
+
+Copyright 2008 John Drago.  All rights reserved.
+
+=head1 LICENSE
+
+This software is Free software and may be used and redistributed under the same
+terms as perl itself.
+
+=cut
+

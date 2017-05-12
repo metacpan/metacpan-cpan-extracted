@@ -1,0 +1,76 @@
+
+Version 2.02: 2008-03-06  steffen mueller <smueller@cpan.org>
+	* Remove debugging statements from last release.
+
+Version 2.01: 2008-03-06  steffen mueller <smueller@cpan.org>
+	* Patch from Francesco Rotondella:
+	  --> Add GetBareList() method.
+	  --> Better shell escaping.
+	  --> Some more cosmetics.
+
+Version 2.00_02: 2008-02-29  steffen mueller <smueller@cpan.org>
+	* Fix A::R::Passthrough's Win32.
+	* Skip searching for 'rar' during Makefile.PL on win32.
+
+Version 2.00_01: 2008-02-29  steffen mueller <smueller@cpan.org>
+	* Add more tests.
+	* Add Archive::Rar::Passthrough: A minimal 'rar' wrapper
+	  which tries to much more portable and safe.
+	* Eventually Archive::Rar might become a wrapper of said
+	  module...
+	* More Archive::Rar code cleanup
+	* Depend on IPC::Cmd and IPC::Run.
+	* Cool, a leap year! :)
+
+Version 1.96_01: 2008-02-28  steffen mueller <smueller@cpan.org>
+	* Add rudimentary test suite.
+	* Remove some goto()'s. Yes you read that right.
+	* General code cleanup in preparation of bigger changes.
+	* Slightly more documentation.
+	* Depend on having Perl 5.004 at least.
+
+Version 1.95: 2008-02-20  steffen mueller <smueller@cpan.org>
+	* Fix RT #33459. (Francesco Rotondella)
+
+Version 1.94: 2008-02-03  steffen mueller <smueller@cpan.org>
+	* Upgrade to newest Module::Install again.
+	* Big patch from Francesco Rotondella:
+	  --> Fix overwrite option to constructor. (#32623)
+	  --> Error with blanks in file name (#31835)
+	  --> Previously could only open files with .RAR
+	      extension (#32090).
+	  --> Extract to cwd (#32196)
+	  --> Implement lowprio feature.
+
+Version 1.93: 2007-06-17  steffen mueller <smueller@cpan.org>
+	
+	* Upgrade to newest Module::Install.
+	* Fix formatting bug. (RT #27593)
+	* Fix List method -files default (RT #1924)
+
+Version 1.92: 2006-12-16  steffen mueller <smueller@cpan.org>
+	
+	* Switch to using Module::Install as a build tool so we can test
+	  for the availability of 'rar' during Makefile.PL.
+	* Remove additional "$version" variable from lib/Archive/Rar.pm
+
+Version 1.91: 2006-12-14  steffen mueller <smueller@cpan.org>
+
+	Some of these changes were contributed by Alexandr Ciornii:
+	* Changed distribution file layout to be a little more modern.
+	* Added dependency on Data::Dumper to Makefile.PL.
+	* Added dependency on Win32::Registry to Makefile.PL (for win32 only).
+	* Machine-readable license statement in Makefile.PL.
+	* Add META.yml to distribution.
+	* Corrected MANIFEST.
+	* Now using "use strict".
+	* Removed "#!/usr/local/bin" from module.
+	* Converted to unix line endings.
+	* Corrected error in README.
+	* Converted tests to use Test::Simple.
+	* Added (optional!) POD tests.
+
+Version 1.9: 2002-03-24  jean-marc boulade <jmbperl@hotmail.com>
+
+	* First public version.
+

@@ -1,0 +1,309 @@
+<HTML>
+<HEAD>
+<TITLE>Apache::Wombat::Request - Apache connector request class</TITLE>
+<LINK REL="stylesheet" HREF="../../../wombat.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Apache::Wombat::Request - Apache connector request class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Apache connector request class. Extends
+<STRONG>Wombat::Connector::HttpRequestBase</STRONG>. Overrides many superclass
+methods to delegate to an underlying <STRONG>Apache::Request</STRONG> instance.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Create and return an instance, initializing fields to default values.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAttribute"><CODE>getAttribute($name)</CODE></A></STRONG><BR>
+<DD>
+Return the value of the named attribute from the <STRONG>Apache</STRONG> pnotes table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name">$name</A></STRONG><BR>
+<DD>
+the name of the attribute
+<P></P></DL>
+<DT><STRONG><A NAME="item_getAttributeNames"><CODE>getAttributeNames()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the names of the attributes available in
+the <STRONG>Apache</STRONG> pnotes table.
+<P></P>
+<DT><STRONG><A NAME="item_removeAttribute"><CODE>removeAttribute($name)</CODE></A></STRONG><BR>
+<DD>
+Remove the named attribute from the <STRONG>Apache</STRONG> pnotes table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the attribute
+<P></P></DL>
+<DT><STRONG><A NAME="item_setAttribute">setAttribute($name, $value)</A></STRONG><BR>
+<DD>
+Set the named attribute in the <STRONG>Apache</STRONG> pnotes table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the attribute
+<P></P>
+<DT><STRONG><A NAME="item_%24value">$value</A></STRONG><BR>
+<DD>
+the value to be set, a scalar or a reference
+<P></P></DL>
+<DT><STRONG><A NAME="item_getAuthType"><CODE>getAuthType()</CODE></A></STRONG><BR>
+<DD>
+Return the authentication type used for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setAuthType"><CODE>setAuthType($type)</CODE></A></STRONG><BR>
+<DD>
+Set the authentication type used for this request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24type">$type</A></STRONG><BR>
+<DD>
+the authentication type, as defined in
+<CODE>Servlet::Http::HttpServletRequest</CODE>
+<P></P></DL>
+<DT><STRONG><A NAME="item_getDateHeader"><CODE>getDateHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return the value of the named header from the <STRONG>Apache</STRONG> headers_in table
+as the number of seconds since the epoch, or -1.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_addHeader">addHeader($name, $value)</A></STRONG><BR>
+<DD>
+Add a value for the named request header to the <STRONG>Apache</STRONG> headers_in
+table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the parameter name
+<P></P>
+<DT><STRONG>$value</STRONG><BR>
+<DD>
+the parameter value, scalar
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHeader"><CODE>getHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Return the first value for the named request header from the Apache
+headers_in table.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaderNames"><CODE>getHeaderNames()</CODE></A></STRONG><BR>
+<DD>
+Return the names of all the request headers from the <STRONG>Apache</STRONG>
+headers_in table.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaders"><CODE>getHeaders($name)</CODE></A></STRONG><BR>
+<DD>
+Return the list of values for the named request header from the Apache
+headers_in table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearHeaders"><CODE>clearHeaders()</CODE></A></STRONG><BR>
+<DD>
+Unset all request headers from the <STRONG>Apache</STRONG> headers_in table.
+<P></P>
+<DT><STRONG><A NAME="item_getMethod"><CODE>getMethod()</CODE></A></STRONG><BR>
+<DD>
+Return the HTTP request method used for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setMethod"><CODE>setMethod($method)</CODE></A></STRONG><BR>
+<DD>
+Set the HTTP request method used for this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24method">$method</A></STRONG><BR>
+<DD>
+the request method
+<P></P></DL>
+<DT><STRONG><A NAME="item_getParameter"><CODE>getParameter($name)</CODE></A></STRONG><BR>
+<DD>
+Return the value of the named request parameter from the
+<STRONG>Apache::Request</STRONG> params structure. If more than one value is
+defined, return only the first one.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the parameter
+<P></P></DL>
+<DT><STRONG><A NAME="item_getParameterNames"><CODE>getParameterNames()</CODE></A></STRONG><BR>
+<DD>
+Return an array containing the names of the parameters contained in
+the <STRONG>Apache::Request</STRONG> params structure.
+<P></P>
+<DT><STRONG><A NAME="item_getParameterValues"><CODE>getParameterValues($name)</CODE></A></STRONG><BR>
+<DD>
+Return an array containing all of the values of the named request
+parameter from the <STRONG>Apache::Request</STRONG> params structure.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the parameter
+<P></P></DL>
+<DT><STRONG><A NAME="item_addParameter">addParameter($name, @values)</A></STRONG><BR>
+<DD>
+Add a named parameter with one or more values to the
+<STRONG>Apache::Request</STRONG> params table.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG>$name</STRONG><BR>
+<DD>
+the name of the parameter to add
+<P></P>
+<DT><STRONG><A NAME="item_%40values">@values</A></STRONG><BR>
+<DD>
+a list of one or more parameter values, scalar or <CODE>undef</CODE>
+<P></P></DL>
+<DT><STRONG><A NAME="item_clearParameters"><CODE>clearParameters()</CODE></A></STRONG><BR>
+<DD>
+Clear the set of parameters from the <STRONG>Apache::Request</STRONG> params table.
+<P></P>
+<DT><STRONG><A NAME="item_getProtocol"><CODE>getProtocol()</CODE></A></STRONG><BR>
+<DD>
+Return the name and version of the protocol used for the request.
+<P></P>
+<DT><STRONG><A NAME="item_setProtocol"><CODE>setProtocol($protocol)</CODE></A></STRONG><BR>
+<DD>
+Set the name and version of the protocol used for the request in the
+form <EM>protocol/majorVersion.minorVersion</EM>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24protocol">$protocol</A></STRONG><BR>
+<DD>
+the name and version of the protocol
+<P></P></DL>
+<DT><STRONG><A NAME="item_getQueryString"><CODE>getQueryString()</CODE></A></STRONG><BR>
+<DD>
+Return the query string for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setQueryString"><CODE>setQueryString($query)</CODE></A></STRONG><BR>
+<DD>
+Set the query string for this Request. This is normally called by the
+Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24query">$query</A></STRONG><BR>
+<DD>
+the query string
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRemoteAddr"><CODE>getRemoteAddr()</CODE></A></STRONG><BR>
+<DD>
+Return the remote IP address of the client making this request.
+<P></P>
+<DT><STRONG><A NAME="item_setRemoteAddr"><CODE>setRemoteAddr($addr)</CODE></A></STRONG><BR>
+<DD>
+Set the remote IP address of the client making this request. This
+value will be used to resolve the name of the remote host if necessary
+(see <A HREF="#item_getRemoteHost"><CODE>getRemoteHost()</CODE></A>).
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24addr">$addr</A></STRONG><BR>
+<DD>
+the remote IP address
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRemoteHost"><CODE>getRemoteHost()</CODE></A></STRONG><BR>
+<DD>
+Return the remote host name of the client making this request.
+<P></P>
+<DT><STRONG><A NAME="item_setRemoteHost"><CODE>setRemoteHost($host)</CODE></A></STRONG><BR>
+<DD>
+Set the remote host name of the client making this request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24host">$host</A></STRONG><BR>
+<DD>
+the remote host name
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequestRec"><CODE>getRequestRec()</CODE></A></STRONG><BR>
+<DD>
+Return the Apache request record for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setRequestRec"><CODE>setRequestRec($apr)</CODE></A></STRONG><BR>
+<DD>
+Set the Apache request record for this Request.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24apr">$apr</A></STRONG><BR>
+<DD>
+the <STRONG>Apache::Request</STRONG> instance
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRequestURI"><CODE>getRequestURI()</CODE></A></STRONG><BR>
+<DD>
+Return the request URI for this Request.
+<P></P>
+<DT><STRONG><A NAME="item_setRequestURI"><CODE>setRequestURI($uri)</CODE></A></STRONG><BR>
+<DD>
+Set the unparsed request URI for this Request. This is normally called
+by the Connector when it parses the request headers.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24uri">$uri</A></STRONG><BR>
+<DD>
+the request URI
+<P></P></DL>
+<DT><STRONG><A NAME="item_recycle"><CODE>recycle()</CODE></A></STRONG><BR>
+<DD>
+Release all object references and initialize instances variables in
+preparation for use or reuse of this object.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><EM>Apache</EM>,
+<A HREF="../../../api/Apache/Request.html">the Apache::Request manpage</A>,
+<A HREF="../../../api/Apache/Table.html">the Apache::Table manpage</A>,
+<A HREF="../../../api/Apache/Util.html">the Apache::Util manpage</A>,
+<A HREF="../../../api/Wombat/Connector/HttpRequestBase.html">the Wombat::Connector::HttpRequestBase manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

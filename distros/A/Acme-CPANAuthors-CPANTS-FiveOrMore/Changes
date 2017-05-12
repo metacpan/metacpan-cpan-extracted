@@ -1,0 +1,33 @@
+Version 2010072801 Wed Jul 28 00:20:19 CEST 2010
++ New authors
++ Remove Kwalitee test
+
+Version 2010022301 Tue Feb 23 18:11:05 CET 2010
++ New authors
+
+Version 2010011301 Wed Jan 13 21:50:30 CET 2010
++ New authors
++ Kwalitee test author only
+
+Version 2010010401 Mon Jan  4 13:18:42 CET 2010
++ New authors
+
+Version 2009121601
++ Propagate requirements in Makefile.PL
++ New author(s)
+
+Version 2009121401
++ Require Test::More 0.88.
+
+Version 2009120701
++ New author(s)
++ Require version 1.01 of Test::Kwalitee for optional Kwalitee tests.
+
+Version 2009112401
++ New author(s)
+
+Version 2009111701
++ New authors
+
+Version 2009110901
++ First release

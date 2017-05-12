@@ -1,0 +1,52 @@
+#!/bin/sh
+
+replica=$(git config --get sd.local-replica)
+if [ -z "$replica" ]; then
+    gitdir=$(git rev-parse --git-dir 2>/dev/null)
+    if [ -z "$gitdir" ]; then
+        echo "Can't find a .git directory anywhere in your current directory"
+        echo "or any higher directories."
+        exit 1;
+    fi
+    # Special case: when in the toplevel directory, rev-parse --git-dir only
+    # returns '.git' instead of the full path.
+    if [ "$gitdir" = ".git" ]; then
+        gitdir="$(pwd)/.git"
+    fi
+    replica="$gitdir/sd"
+    echo "You don't appear to have an sd.local-replica defined in your .git/config"
+    echo "Setting it to '$replica':"
+    echo ""
+    echo "  git config --add sd.local-replica $replica"
+    echo ""
+    git config --add sd.local-replica "$replica"
+fi
+
+if [ "$1" = "init" ] || [ "$1" = "clone" ] && [ "$2" != "-h" ] \
+    && [ "$2" != "--help" ]; then
+    gitemail=$(git config --get user.email)
+    # It shouldn't happen very often that we're using init or clone from
+    # an already-existing db, but don't mess around with peoples' configs
+    # once they've already been created anyway.
+    if [ -n "$gitemail" ] && [ ! -e "$replica/config" ]; then
+        echo "Setting your SD email address to your git email:"
+        echo ""
+        echo "  git config --get user.email"
+        if [ ! -d "$replica" ]; then
+            mkdir "$replica"
+        fi
+        echo "  sd config user.email-address $gitemail"
+        echo ""
+        SD_REPO="$replica" sd config user.email-address "$gitemail"
+    fi
+    gitorigin=$(git config remote.origin.url 2>/dev/null)
+    if [ `echo $gitorigin | grep github` ]; then
+	echo "Cloning issues from $gitorigin:"
+	echo ""
+        echo "  sd clone --from github:$gitorigin"
+	echo ""
+        SD_REPO="$replica" sd clone --from "github:$gitorigin"
+    fi
+fi
+
+SD_REPO="$replica" exec sd "$@"

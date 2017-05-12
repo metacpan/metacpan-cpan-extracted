@@ -1,0 +1,78 @@
+
+=pod
+
+=head1 NAME
+
+ AnyData::Storage::File -- manipulate files with rich warnings
+
+=head1 DESCRIPTION
+
+ Opens, reads from, writes to, creates and destroys files with numerous
+ options for error handling, flocking, binmode, etc.
+
+ The simplest form is the equivalent of
+
+       my $f    = AnyData::Storage::File->new(dirs=>\@dirs,flock=>1);
+       my $str1 = $f->adSlurp($file);
+
+       
+       for( @dirs ) {
+           open(IN,$file) or die $!;
+       }
+       sub slurp {
+           local *IN;
+           local $/ = undef;
+       }
+
+ But, depending on how you set the default behaviour
+
+=head1 SYNOPSIS
+
+ use AnyData;
+ my $f = AnyData::Storage::File->new;
+ $f->set('binmode',1|0);
+ $f->set('PrintError',1|0);
+ $f->set('RaiseError',1|0);
+ $f->set('Trace',1|0);
+ $f->set('f_dir',$dir|$dir_array)
+
+<  input, fail if doesn't exist
+>  output, truncate if exists, create if doesn't
+>> append, create if doesn't exist
++< read/write, fail if doesn't exist
+
+r  = <
+r+ = 
+
+
+=head1 new()
+
+ my $f = AnyData::Storage::File->new;
+
+ or
+
+ my $f = AnyData::Storage::File->new( %flags );
+
+ %flags is a hash which can contain any or all of:
+
+     f_dir      => $directory,   # defaults to './' (
+     binmode    => $binmode,     # defaults to 0 (doesn't binmode files)
+     printError => $warnings,    # defaults to 1 (print warning on errors)
+
+
+=head1 open_local_file( $fname, $mode );
+
+ Mode is one of
+
+ a = append     open for reading & writing, create if doesn't exist
+ r = read       open for reading, fail if doesn't exist
+ u = open       open for reading & writing, fail if doesn't exist
+ c = create     open for reading & writing, fail if it already exists
+ o = overwrite  open for reading & writing, overwrite if it already exists
+
+ Additionally, all modes fail if the file can't be opened.  On systems
+ that support flock, 'r' fails if a shared lock can not be obtained; the
+ other modes fail if an exclusive lock can't be obtained.
+
+=cut
+

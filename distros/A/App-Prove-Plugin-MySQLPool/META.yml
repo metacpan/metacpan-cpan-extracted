@@ -1,0 +1,55 @@
+---
+abstract: 'pool of Test::mysqld-s reused while testing'
+author:
+  - 'Masakazu Ohtsuka <o.masakazu@gmail.com>'
+build_requires:
+  DBD::mysql: '0'
+  DBI: '0'
+  ExtUtils::MakeMaker: '6.36'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Prove-Plugin-MySQLPool
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Prove::Plugin::MySQLPool:
+    file: lib/App/Prove/Plugin/MySQLPool.pm
+    version: '0.06'
+  TAP::Formatter::MySQLPool:
+    file: lib/App/Prove/Plugin/MySQLPool.pm
+  TAP::Formatter::MySQLPool::Session:
+    file: lib/App/Prove/Plugin/MySQLPool.pm
+  Test::mysqld::Pool:
+    file: lib/Test/mysqld/Pool.pm
+requires:
+  App::Prove: '0'
+  Cache::FastMmap: '0'
+  File::Temp: '0'
+  Mouse: '0'
+  POSIX::AtFork: '0'
+  Test::mysqld: '0.20'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/mash/App-Prove-Plugin-MySQLPool/issues
+  homepage: https://github.com/mash/App-Prove-Plugin-MySQLPool
+  repository: git://github.com/mash/App-Prove-Plugin-MySQLPool.git
+version: '0.06'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+  - 'mackee <macopy123@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

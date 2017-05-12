@@ -1,0 +1,32 @@
+Changes
+eg/examples.pl
+eg/mojo.pl
+eg/synopsis.pl
+eg/watcher_synopsis.pl
+lib/Async/Selector.pm
+lib/Async/Selector/Aggregator.pm
+lib/Async/Selector/Example/Mojo.pod
+lib/Async/Selector/Watcher.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-single.t
+t/15-undef_watch.t
+t/17-watcher.t
+t/18-watchers.t
+t/19-fire.t
+t/20-multi.t
+t/30-error.t
+t/40-leak.t
+t/50-aggregator.t
+t/55-aggregation_usecase.t
+t/lib/Async/Selector/testutils.pm
+t/v00-10-single.t
+t/v00-15-undef_select.t
+t/v00-20-multi.t
+t/v00-30-error.t
+xt/manifest.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

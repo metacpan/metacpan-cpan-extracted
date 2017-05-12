@@ -1,0 +1,14 @@
+#!/usr/local/bin/perl
+
+use blib;
+use strict;
+use warnings;
+
+use AFS::Cell qw (expandcell);
+
+die "Usage: $0 cellname \n" if $#ARGV != 0;
+my $c = shift;
+
+my $cell = expandcell($c);
+if ($AFS::CODE) { print "AFS::CODE = $AFS::CODE\n"; }
+else            { print "cell = $cell\n"; }

@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bin/bcvi
+dist.ini
+lib/App/BCVI.pm
+lib/App/BCVI/Plugins.pod
+t/00_syntax.t
+t/01_version.t
+t/release-pod-syntax.t

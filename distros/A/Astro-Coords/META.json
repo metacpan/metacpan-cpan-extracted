@@ -1,0 +1,92 @@
+{
+   "abstract" : "Class for handling astronomical coordinates",
+   "author" : [
+      "Tim Jenness E<lt>tjenness@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Astro-Coords",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Number::Delta" : "0",
+            "Test::Pod" : "1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Astro::PAL" : "0",
+            "Astro::Telescope" : "0.71",
+            "DateTime" : "0.76",
+            "Scalar::Util" : "1.13",
+            "Time::Piece" : "1.02"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::Coords" : {
+         "file" : "lib/Astro/Coords.pm",
+         "version" : "0.14"
+      },
+      "Astro::Coords::Angle" : {
+         "file" : "lib/Astro/Coords/Angle.pm",
+         "version" : "0.03"
+      },
+      "Astro::Coords::Angle::Hour" : {
+         "file" : "lib/Astro/Coords/Angle/Hour.pm",
+         "version" : "0.03"
+      },
+      "Astro::Coords::Calibration" : {
+         "file" : "lib/Astro/Coords/Calibration.pm",
+         "version" : "0.03"
+      },
+      "Astro::Coords::Elements" : {
+         "file" : "lib/Astro/Coords/Elements.pm",
+         "version" : "0.05"
+      },
+      "Astro::Coords::Equatorial" : {
+         "file" : "lib/Astro/Coords/Equatorial.pm",
+         "version" : "0.07"
+      },
+      "Astro::Coords::Fixed" : {
+         "file" : "lib/Astro/Coords/Fixed.pm",
+         "version" : "0.04"
+      },
+      "Astro::Coords::Interpolated" : {
+         "file" : "lib/Astro/Coords/Interpolated.pm",
+         "version" : "0.03"
+      },
+      "Astro::Coords::Offset" : {
+         "file" : "lib/Astro/Coords/Offset.pm",
+         "version" : "0.02"
+      },
+      "Astro::Coords::Planet" : {
+         "file" : "lib/Astro/Coords/Planet.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/timj/perl-Astro-Coords/tree/master",
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ],
+      "repository" : {
+         "url" : "git://github.com/timj/perl-Astro-Coords.git"
+      }
+   },
+   "version" : "0.18"
+}

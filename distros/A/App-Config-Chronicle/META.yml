@@ -1,0 +1,38 @@
+---
+abstract: 'Provides Data::Chronicle-backed configuration storage'
+author:
+  - 'binary.com <cpan@binary.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::MockObject: '0'
+  Test::More: '0.98'
+  perl: '5.014'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Config-Chronicle
+requires:
+  Data::Chronicle::Reader: '0'
+  Data::Chronicle::Writer: '0'
+  Data::Hash::DotNotation: '0'
+  Date::Utility: '0'
+  JSON::XS: '0'
+  Moose: '0'
+  Time::HiRes: '0'
+  YAML::XS: '0'
+  namespace::autoclean: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/binary-com/perl-App-Config-Chronicle/issues
+  repository: git://github.com/binary-com/perl-App-Config-Chronicle.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.66'

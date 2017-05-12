@@ -1,0 +1,207 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#ABSTRACT">ABSTRACT</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#GLOBAL-OPTIONS">GLOBAL OPTIONS</a></li>
+      <li><a href="#SUBCOMMANDS">SUBCOMMANDS</a>
+        <ul>
+          <li><a href="#GET">GET</a></li>
+          <li><a href="#GET-author-:author">GET /author/:author</a></li>
+          <li><a href="#GET-distribution-:distribution">GET /distribution/:distribution</a></li>
+          <li><a href="#GET-module-:module">GET /module/:module</a></li>
+          <li><a href="#GET-pod-:module">GET /pod/:module</a></li>
+          <li><a href="#GET-release-:author-:release">GET /release/:author/:release</a></li>
+          <li><a href="#GET-release-:distribution">GET /release/:distribution</a></li>
+          <li><a href="#GET-release-_search">GET /release/_search</a></li>
+          <li><a href="#POST">POST</a></li>
+          <li><a href="#POST-file">POST /file</a></li>
+          <li><a href="#help">help</a></li>
+          <li><a href="#meta">_meta</a></li>
+          <li><a href="#meta-completion">_meta completion</a></li>
+          <li><a href="#meta-completion-generate">_meta completion generate</a></li>
+          <li><a href="#meta-pod">_meta pod</a></li>
+          <li><a href="#meta-pod-generate">_meta pod generate</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>metacpancl - MetaCPAN API</p>
+
+<h1 id="ABSTRACT">ABSTRACT</h1>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<h2 id="GLOBAL-OPTIONS">GLOBAL OPTIONS</h2>
+
+<pre><code>    --data-file     File with data for POST/PUT/PATCH/DELETE requests
+    --debug -d      debug (flag)                                     
+    --verbose -v    verbose (flag)                                   
+    --help -h       Show command help (flag)                         </code></pre>
+
+<h2 id="SUBCOMMANDS">SUBCOMMANDS</h2>
+
+<h3 id="GET">GET</h3>
+
+<pre><code>    metacpancl  GET &lt;subcommands&gt;</code></pre>
+
+<p>GET call</p>
+
+<h3 id="GET-author-:author">GET /author/:author</h3>
+
+<pre><code>    metacpancl GET /author/:author &lt;author&gt;</code></pre>
+
+<p>Author information</p>
+
+<p>Parameters:</p>
+
+<pre><code>    author  *  CPAN handle</code></pre>
+
+<h3 id="GET-distribution-:distribution">GET /distribution/:distribution</h3>
+
+<pre><code>    metacpancl GET /distribution/:distribution &lt;distribution&gt;</code></pre>
+
+<p>Distribution information not specific to a version...</p>
+
+<p>Parameters:</p>
+
+<pre><code>    distribution  *  distribution name</code></pre>
+
+<h3 id="GET-module-:module">GET /module/:module</h3>
+
+<pre><code>    metacpancl GET /module/:module &lt;module&gt;</code></pre>
+
+<p>Module information</p>
+
+<p>Parameters:</p>
+
+<pre><code>    module  *  Module name</code></pre>
+
+<h3 id="GET-pod-:module">GET /pod/:module</h3>
+
+<pre><code>    metacpancl GET /pod/:module [options] &lt;module&gt;</code></pre>
+
+<p>Module POD</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-content-type    Default is text/html</code></pre>
+
+<p>Parameters:</p>
+
+<pre><code>    module  *  Module name</code></pre>
+
+<h3 id="GET-release-:author-:release">GET /release/:author/:release</h3>
+
+<pre><code>    metacpancl GET /release/:author/:release &lt;author&gt; &lt;release&gt;</code></pre>
+
+<p>Release information</p>
+
+<p>Parameters:</p>
+
+<pre><code>    author   *  CPAN handle            
+    release  *  release, e.g. Moose-123</code></pre>
+
+<h3 id="GET-release-:distribution">GET /release/:distribution</h3>
+
+<pre><code>    metacpancl GET /release/:distribution &lt;distribution&gt;</code></pre>
+
+<p>Release information</p>
+
+<p>Parameters:</p>
+
+<pre><code>    distribution  *  distribution name</code></pre>
+
+<h3 id="GET-release-_search">GET /release/_search</h3>
+
+<pre><code>    metacpancl GET /release/_search [options]</code></pre>
+
+<p>Search releases</p>
+
+<p>Options:</p>
+
+<pre><code>    --q-q       *  query (&quot;author:ANDK AND status:latest&quot;)
+    --q-fields     resultset fields                       
+    --q-size       how many results                       </code></pre>
+
+<h3 id="POST">POST</h3>
+
+<pre><code>    metacpancl  POST &lt;subcommands&gt;</code></pre>
+
+<p>POST call</p>
+
+<h3 id="POST-file">POST /file</h3>
+
+<pre><code>    metacpancl POST /file</code></pre>
+
+<p>file</p>
+
+<h3 id="help">help</h3>
+
+<pre><code>    metacpancl  help &lt;subcommands&gt; [options]</code></pre>
+
+<p>Show command help</p>
+
+<p>Options:</p>
+
+<pre><code>    --all     (flag)</code></pre>
+
+<h3 id="meta">_meta</h3>
+
+<pre><code>    metacpancl  _meta &lt;subcommands&gt;</code></pre>
+
+<p>Information and utilities for this app</p>
+
+<h3 id="meta-completion">_meta completion</h3>
+
+<pre><code>    metacpancl _meta completion &lt;subcommands&gt;</code></pre>
+
+<p>Shell completion functions</p>
+
+<h3 id="meta-completion-generate">_meta completion generate</h3>
+
+<pre><code>    metacpancl _meta completion generate [options]</code></pre>
+
+<p>Generate self completion</p>
+
+<p>Options:</p>
+
+<pre><code>    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      </code></pre>
+
+<h3 id="meta-pod">_meta pod</h3>
+
+<pre><code>    metacpancl _meta pod &lt;subcommands&gt;</code></pre>
+
+<p>Pod documentation</p>
+
+<h3 id="meta-pod-generate">_meta pod generate</h3>
+
+<pre><code>    metacpancl _meta pod generate</code></pre>
+
+<p>Generate self pod</p>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,9 @@
+Revision history for App::PodPreview
+
+0.002	29 September 2010
+		Added "use Carp" in App::PodPreview
+		POD fixes		
+
+0.001	28 September 2010
+		Initial release
+

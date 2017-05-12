@@ -1,0 +1,93 @@
+=head1 NAME
+
+apicli - API::CLI utils
+
+=head1 ABSTRACT
+
+
+
+=head1 DESCRIPTION
+
+apicli lets you create an appspec file from an OpenAPI file.
+
+
+=head2 GLOBAL OPTIONS
+
+    --help -h    Show command help (flag)
+
+
+=head2 SUBCOMMANDS
+
+=head3  appspec
+
+    apicli  appspec [options] <file>
+
+Generate App::Spec file
+
+This will generate an App::Spec file from an OpenAPI file
+
+Options:
+
+    --from      Currently only 'openapi' is supported
+    --out       Output file (default stdout)         
+    --name   *  appname                              
+    --class     Class name (default API::CLI)        
+
+Parameters:
+
+    file  *  openapi file
+
+=head3  help
+
+    apicli  help <subcommands> [options]
+
+Show command help
+
+Options:
+
+    --all     (flag)
+
+
+=head3  _meta
+
+    apicli  _meta <subcommands>
+
+Information and utilities for this app
+
+
+=head3 _meta completion
+
+    apicli _meta completion <subcommands>
+
+Shell completion functions
+
+
+=head3 _meta completion generate
+
+    apicli _meta completion generate [options]
+
+Generate self completion
+
+Options:
+
+    --name    name of the program (optional, override name in spec)
+    --zsh     for zsh (flag)                                       
+    --bash    for bash (flag)                                      
+
+
+=head3 _meta pod
+
+    apicli _meta pod <subcommands>
+
+Pod documentation
+
+
+=head3 _meta pod generate
+
+    apicli _meta pod generate
+
+Generate self pod
+
+
+
+

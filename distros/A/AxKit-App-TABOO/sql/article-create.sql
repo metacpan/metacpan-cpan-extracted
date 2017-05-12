@@ -1,0 +1,54 @@
+CREATE TABLE mediatypes (
+	ID 		SERIAL PRIMARY KEY,
+	mimetype 	VARCHAR(40) NOT NULL UNIQUE,
+	URI 		VARCHAR(150),
+	name 		VARCHAR(64)
+
+);
+
+CREATE TABLE languages (
+	ID 		SERIAL PRIMARY KEY,
+	code 		VARCHAR(10) NOT NULL UNIQUE,
+	localname 	VARCHAR(64)
+);
+
+CREATE TABLE articles (
+	ID 		SERIAL PRIMARY KEY,
+       filename		VARCHAR(30) NOT NULL UNIQUE,
+       authorok		BOOLEAN DEFAULT false,
+       editorok		BOOLEAN DEFAULT false,
+       title		VARCHAR(254) NOT NULL,
+       description	VARCHAR(500) NOT NULL,
+       publisher	VARCHAR(254),
+       date		DATE,
+       type		VARCHAR(254),
+       format_ID 	INTEGER NOT NULL REFERENCES mediatypes ON DELETE RESTRICT ON UPDATE CASCADE,
+       identifieruri  	VARCHAR(254),
+       identifierurn  	VARCHAR(254),
+       lang_ID		INTEGER NOT NULL REFERENCES languages ON DELETE RESTRICT ON UPDATE CASCADE,
+       coverage		VARCHAR(254),
+       rights		VARCHAR(254)[]
+);
+
+
+
+CREATE TABLE articlecats (
+  ID         SERIAL PRIMARY KEY
+, Article_ID INTEGER    REFERENCES articles (ID) ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL 
+, Cat_ID     INTEGER    REFERENCES categories (ID) ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL
+, field      VARCHAR(11) NOT NULL
+);
+
+CREATE TABLE articleuserroles (
+  ID   SERIAL  PRIMARY KEY
+, Code VARCHAR(8) NOT NULL UNIQUE
+, Name VARCHAR(64)
+);
+
+CREATE TABLE articleusers (
+  ID         SERIAL PRIMARY KEY
+, Article_ID INTEGER    REFERENCES articles (ID) ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL 
+, Users_ID   INTEGER    REFERENCES users (ID)    ON DELETE RESTRICT ON UPDATE CASCADE NOT NULL
+, Role_ID    INTEGER    REFERENCES articleuserroles (ID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL
+, Enabled    BOOLEAN   DEFAULT TRUE
+);

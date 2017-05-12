@@ -1,0 +1,10 @@
+async_t *	T_ASYNC
+s_epipe *	T_EPIPE
+
+INPUT
+
+T_ASYNC
+	$var = SvASYNC ($arg);
+
+T_EPIPE
+	$var = INT2PTR (s_epipe *, SvIVX (SvRV ($arg)))

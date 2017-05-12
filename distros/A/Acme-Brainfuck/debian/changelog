@@ -1,0 +1,43 @@
+libacme-brainfck-perl (1.1.1) unstable; urgency=low
+
+  * New upstream version.
+  * Apparently I need a build dependency on libmodule-build-perl. 
+  * Really uploaded to Debian this time.  (Closes: #160014)
+  * Note to ftpmaster: the package name and provides: implements the
+    denaughtification scheme proposed when I first tried to upload this.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Tue,  6 Apr 2004 11:56:29 -0400
+
+libacme-brainfck-perl (1.1.0) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Tue,  6 Apr 2004 00:56:13 -0400
+
+libacme-brainfuck-perl (1.0.1-1) unstable; urgency=low
+
+  * First upload to debian.  (Closes: #160014) 
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Sun, 22 Sep 2002 22:22:12 -0400
+
+libacme-brainfuck-perl (1.0.0-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Tue,  3 Sep 2002 14:42:55 -0400
+
+libacme-brainfuck-perl (0.9.1-1) unstable; urgency=low
+
+  * New upstream version.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Fri, 30 Aug 2002 23:19:31 -0400
+
+libacme-brainfuck-perl (0.9.0-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Jaldhar H. Vyas <jaldhar@debian.org>  Fri, 30 Aug 2002 00:41:47 -0400
+
+Local variables:
+mode: debian-changelog
+End:

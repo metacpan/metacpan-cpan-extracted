@@ -1,0 +1,6 @@
+Revision history for Perl extension Acme::Goto::Line.
+
+0.01  Sat Mar 27 19:39:58 2004
+	- original version; created by h2xs 1.22 with options
+		-n Acme::Goto::Line -c
+

@@ -1,0 +1,129 @@
+      _                               ___            _           _      
+     / \   ___ _ __ ___   ___   _ _  |_ _|_ __   ___| |_   _  __| | ___ 
+    / _ \ / __| '_ ` _ \ / _ \ (_|_)  | || '_ \ / __| | | | |/ _` |/ _ \
+   / ___ \ (__| | | | | |  __/  _ _   | || | | | (__| | |_| | (_| |  __/
+  /_/   \_\___|_| |_| |_|\___| (_|_) |___|_| |_|\___|_|\__,_|\__,_|\___|
+                                                                        
+         ____        _        
+   _ _  |  _ \  __ _| |_ __ _ 
+  (_|_) | | | |/ _` | __/ _` |
+   _ _  | |_| | (_| | || (_| |
+  (_|_) |____/ \__,_|\__\__,_|
+                              
+
+
+This is the README for Acme::Include::Data version 0.05.
+
+Acme::Include::Data is a "module" for the Perl computer programming
+language, a library of computer code to install on a computer.  This
+document contains four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Acme::Include::Data - how to include data files with a CPAN module
+
+This is a demonstration module which demonstrates how to include a
+data file with a Perl module and how to read it in at run time.
+
+If you are a CPAN author or use the CPAN-style tools to distribute
+your data, you may have wondered how to include data with your Perl
+distribution.
+
+Any file under lib in the distribution is bundled into the
+distribution by "Makefile.PL". So if your distribution is called
+"Acme::Include::Data", then a file called
+"lib/Acme/Include/this-is-a-data-file.txt" is automatically included
+into the distribution.
+
+To read the data file in, simply use __FILE__: 
+
+    my $data = __FILE__;
+    
+    # Make whatever substitutions are necessary:
+    
+    $data =~ s/Data\.pm$/this-is-a-data-file.txt/;
+    
+    # Read the data in:
+    
+    open my $in, "<", $data or die $!;
+    my $text = '';
+    while (<$in>) {
+        $text .= $_;
+    }
+    
+
+(This example is included as "read-data.pl" in the distribution.)
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Acme::Include::Data
+    * http://metacpan.org/release/Acme-Include-Data
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Acme::Include::Data
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.0 or later.
+
+To install the module from CPAN, use
+
+    cpan Acme::Include::Data
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Acme::Include::Data
+
+To install the module from the source file, Acme-Include-Data-0.05.tar.gz,
+follow this sequence of commands:
+
+    tar xfz Acme-Include-Data-0.05.tar.gz
+    cd Acme-Include-Data-0.05
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Acme-Include-Data/issues>,
+
+or if you want to alter the source code of Acme::Include::Data, try the
+public repository on github at 
+
+<https://github.com/benkasminbullock/Acme-Include-Data>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Feb  2 09:04:35 2017.
+
+-----------------------------------------------------------------------------

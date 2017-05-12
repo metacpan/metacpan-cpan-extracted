@@ -1,0 +1,24 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Apache-PageKit
+version:      1.18
+version_from: lib/Apache/PageKit.pm
+installdirs:  site
+requires:
+    Apache::Cookie:                0
+    Apache::Request:               0
+    Apache::SessionX:              0
+    Apache::Test:                  1.05
+    Apache::URI:                   0
+    Apache::Util:                  0
+    Compress::Zlib:                0
+    Data::FormValidator:           0
+    HTML::Clean:                   0
+    HTML::FillInForm:              0.12
+    HTML::Template:                2.2
+    HTML::Template::XPath:         0.1
+    mod_perl:                      1.2401
+    XML::LibXML:                   1.53
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

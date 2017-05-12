@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+META.yml
+lib/Algorithm/Partition.pm
+t/00-load.t
+t/99-kwalitee.t
+t/usage.t
+t/pod-coverage.t
+t/pod.t

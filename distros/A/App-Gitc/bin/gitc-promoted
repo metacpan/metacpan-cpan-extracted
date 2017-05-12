@@ -1,0 +1,161 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+#    Copyright 2012 Grant Street Group, All Rights Reserved.
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# PODNAME: gitc-promoted
+# ABSTRACT: Return a list of promoted changesets
+our $VERSION = '0.60'; # VERSION
+
+use App::Gitc::Util qw(
+    changesets_promoted_between
+    git
+    project_name
+    sort_changesets_by_name
+);
+use Date::PeriodParser ();
+use Getopt::Long qw( :config pass_through );
+use POSIX qw( strftime );
+use Time::Local qw( timegm timelocal );
+use List::MoreUtils qw( first_index );
+
+# process command line arguments
+our ($period, $bare) = ('sometime');
+GetOptions(
+    'period|p=s' => \$period,
+    'bare|b'     => \$bare,
+);
+our $target = shift or die "You must specify a promotion target\n";
+
+# parse and verify the period
+our ( $start, $end ) = parse_period($period);
+die "I don't understand the period '$period'\n" if $start < 0;
+
+my ( $start_stamp, $end_stamp ) = period( local => '%FT%T' );
+my @additions = changesets_promoted_between({
+    project => scalar project_name(),
+    target  => $target,
+    start   => $start_stamp,
+    end     => $end_stamp,
+});
+
+# display the output
+my $between = english_date_range( $start, $end );
+if ($bare) {
+    print join "\n", @additions;
+}
+else {
+    print "# Changesets promoted to $target $between\n";
+    print "promoted:\n";
+    print "    - $_\n" for @additions;
+}
+
+############################## helper subs #########################
+
+sub parse_period {
+    my $period = shift;
+    $period = q{} if not defined $period; # /me glances wistfully at v5.10
+
+    # a single release branch name (which, conveniently, is a timestamp)
+    if ( my $end_time = parse_promotion_tag_time($period) ) {
+        our $target;
+        my @tags = git "tag -l $target/*";
+        my $index = first_index { $_ eq "$target/$period" } @tags;
+        die "Can't find the tag $target/$period\n" if $index < 0;
+        my $start_time = $index == 0
+                       ? 0
+                       : parse_promotion_tag_time( $tags[ $index - 1 ] );
+        return ( $start_time + 1, $end_time );
+    }
+
+    my $mdy = qr{ \d{1,2} / \d{1,2} / (?: \d{2} | \d{4} ) }xms;
+    if ( $period =~ m{\A ($mdy) \s* - \s* ($mdy)\z}xms ) {
+        my ($start_m, $start_d, $start_y) = split /\//, $1;
+        my ($end_m, $end_d, $end_y) = split /\//, $2;
+        my $start = timelocal( 0,   0,  0, $start_d, --$start_m, $start_y );
+        my $end   = timelocal( 59, 59, 23,   $end_d,   --$end_m,   $end_y );
+        return ($start, $end);
+    }
+
+    return Date::PeriodParser::parse_period($period);
+}
+
+sub parse_promotion_tag_time {
+    my ($tag) = @_;
+    return if not $tag;
+    if ( $tag =~ m{(\d{4}-\d{2}-\d{2}T\d{2}_\d{2}_\d{2})\z} ) {
+        my $stamp = $1;
+        my ($y,$m,$d,$H,$M,$S) = split /[-T_Z]/, $stamp;
+        $m--;  # number of months since January
+        my $time = timegm( $S, $M, $H, $d, $m, $y );
+        return $time;
+    }
+
+    return;
+}
+
+sub period {
+    my ( $zone_name, $format ) = @_;
+    our ( $start, $end );
+    die "You must specify a time zone.  Either 'gm' or 'local'\n"
+        if not $zone_name;
+
+    my $zone = $zone_name eq 'local'
+             ? sub { localtime(shift) }
+             : sub { gmtime(shift)    };
+    return map { strftime($format, $zone->($_)) } $start, $end;
+}
+
+sub english_date_range {
+    my ( $start, $end ) = period( local => '%m/%d/%Y' );
+
+    # same dates, so include the times
+    if ( $start eq $end ) {
+        my ( $start_time, $end_time ) = period( local => '%T' );
+        $start .= ' ' . $start_time;
+        $end   .= ' ' . $end_time;
+    }
+
+    return "between $start and $end";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+gitc-promoted - Return a list of promoted changesets
+
+=head1 VERSION
+
+version 0.60
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The GNU Affero General Public License, Version 3, November 2007
+
+=cut

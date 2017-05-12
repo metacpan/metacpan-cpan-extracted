@@ -1,0 +1,34 @@
+---
+abstract: 'Application of Sys::Info to gather information from the system'
+author:
+  - 'Burak Gursoy <burak@cpan.org>'
+build_requires:
+  Test::More: 0.40
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-Sys-Info
+no_index:
+  directory:
+    - monolithic_version
+    - builder
+    - t
+    - xt
+provides:
+  App::Sys::Info:
+    file: lib/App/Sys/Info.pm
+    version: 0.24
+requires:
+  Format::Human::Bytes: 0
+  Sys::Info: 0.73
+  Text::Table: 0
+  Time::Elapsed: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/burak/cpan-app-sys-info/
+version: 0.24

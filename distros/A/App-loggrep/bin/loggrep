@@ -1,0 +1,353 @@
+#!perl
+
+# PODNAME: loggrep
+# ABSTRACT: quickly find relevant lines in a log searching by date
+
+
+use strict;
+use warnings;
+
+use Getopt::Long::Descriptive -all;
+
+use constant TPAT => '^\[(.*?) [A-Z]';
+
+my ( $opt, $usage ) = describe_options(
+   prog_name() . ' %o [<log file>]',
+   [],
+   ['Grep lines out of a log.'],
+   [],
+   [ 'log|l=s', "log file; may also be provided as an argument" ],
+   [],
+   [ 'start|s=s', "start timestamp; first time in log by default" ],
+   [ 'end|e=s',   "end timestamp; last time in log by default" ],
+   [
+      'moment|m=s',
+      "set start and end to be a single timestamp; "
+        . "overridden by --start and --end"
+   ],
+   [
+      'date|d=s',
+      "a pattern to be used to find the timestamp in a log line; default: "
+        . TPAT,
+      { default => TPAT }
+   ],
+   [],
+   [ 'include|n=s@',        "regex for lines to include; repeatable" ],
+   [ 'include-quoted|N=s@', "literal substring to include; repeatable" ],
+   [ 'exclude|v=s@',        "regex for lines to exclude; repeatable" ],
+   [ 'exclude-quoted|V=s@', "literal substring to exclude; repeatable" ],
+   [ 'case-insensitive|i',  'let all matching be case-insensitive' ],
+   [],
+   [ 'warn|w', "warn of lines without dates" ],
+   [ 'die',    "throw an error upon finding a line without a date" ],
+   [],
+   [ 'blank|b', 'print a blank separator line between non-adjacent log lines' ],
+   [ 'separator|sep=s', 'a separator to print between non-adjacent blocks' ],
+   [
+      'context|C=i',
+      'a number of lines before and after the match line to show'
+   ],
+   [ 'before|B=i', 'a number of lines before the match line to show' ],
+   [ 'after|A=i',  'a number of lines after the match line to show' ],
+   [],
+   [
+      'time|t=s',
+      'perl code to convert a log line into a Unix timestamp; '
+        . 'this is an alternative to --date'
+   ],
+   [
+      'exec|E=s',
+      'perl code to call before printing a line; '
+        . '@_ will contain the line, the line number, and whether it was a match;'
+        . ' the value returned by this code is what will be printed'
+   ],
+   [
+      'module|M=s@',
+      'Perl module to load for use by --time or --exec code; repeatable'
+   ],
+   [],
+   [ 'help|h|?', "print usage message and exit" ],
+   [ 'version',  'print ' . prog_name() . "'s version number" ],
+);
+
+usage() if $opt->help;
+require App::loggrep;
+print( prog_name() . " $App::loggrep::VERSION\n" ), exit if $opt->version;
+
+my @errors;
+push @errors, 'you cannot specify both --warn and --die'
+  if $opt->warn && $opt->die;
+
+my $grepper = App::loggrep->new( $opt->log // shift, $opt );
+push @errors, $grepper->init;
+
+error() if @errors;
+
+$grepper->grep;
+
+# print errors and minimal usage information
+sub error {
+   return unless @errors;
+   print STDERR "ERRORS\n\n";
+   print STDERR "\t$_\n" for @errors;
+   print STDERR "\n";
+
+   print STDERR $usage->text;
+   exit;
+}
+
+# print maximal usage information
+sub usage {
+   print $usage->text;
+   print <<"END";
+
+@{[prog_name()]} facilitates search for lines in a log file within a specified date range.
+If you aren't interested in filtering by date range, use grep instead.
+
+If multiple expression to include are provided, a line which matches any will be printed.
+Likewise, if a line matches any of the exclusion expressions, it will be excluded.
+
+@{[prog_name()]} uses Date::Parse to convert a timestamp into a Unix timestap (a number of
+seconds since time zero). Date::Parse is pretty clever, but if it doesn't understand your
+timestamps you'll have to use the --time option. If you want to use a particular module,
+like Date::Parse or DateTime, in your --time code, you'll have to use or require it inside
+your code or load it in with the --module option like so
+
+  -M Date::Parse --time '(\$m=shift)=~s/(.*?) foo/\$1/;\$m eq "bar" ? 1 : str2time \$m'
+
+END
+   exit;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+loggrep - quickly find relevant lines in a log searching by date
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+=over 8
+
+  loggrep --start <date> --end <date> [ --include <pattern> ]+ [ --exclude <pattern> ]+ <file>
+
+=back
+
+=head1 DESCRIPTION
+
+B<loggrep> allows one to search for lines in a file that match particular patterns. In this it is
+like grep and ack and many other utilities. The functionality it adds is an ability to narrow the
+search window to those lines that fall within temporal limits. It can find these limits quickly by
+a variety of binary search, allowing one to search very large log files efficiently. This requires, 
+of course, that the lines in the file (usually) have times stamps which (usually) are in sequence
+and parsable in a common way.
+
+Loggrep searches for an initial temporal limit by estimating the line offset for the line sought
+based on the marginal timestamps of the search region and the assumption that lines are added at
+a roughly constant rate. This candidate line is found; then the nearest line bearing a timestamp is
+sought. This time is compared the to target time and the process is repeated within the new search
+region until either the target time is found or the search region cannot be narrowed further.
+
+=head1 OPTIONS
+
+Run loggrep with the C<--help> option to see the option default values, if any.
+
+=head2 Log
+
+=over 8
+
+=item -l I<file>, --log=I<file>
+
+The log file to search may be provided either as the final argument or as the value of a C<--log>
+option.
+
+=back
+
+=head2 Temporal Limits
+
+All temporal limits are parsed by L<Date::Parse>. L<Date::Parse> will turn a temporal expression
+into a Unix timestamp. You can test whether it understands your temporal expressions like so:
+
+  $ perl -MDate::Parse -E 'say str2time shift' "21/dec/93 17:05"
+  756511500
+
+It does not actually need to get the timestamp right so long as it puts them in the right
+sequence.
+
+If L<Date::Parse> fails you, see the C<--time> option.
+
+=over 8
+
+=item -s I<time>, --start=I<time>
+
+The initial temporal limit.
+
+=item -e I<time>, --end=I<time>
+
+The final temporal limit.
+
+=item -m I<time>, --moment=I<time>
+
+C<--moment> sets the initial and final temporal limits to the same time. This is useful for extracting
+a single log line with a known timestamp, perhaps with its context (see C<--context>).
+
+=item -d I<pattern>, --date=I<pattern>
+
+The pattern used to identify timestamps in log lines.
+
+=back
+
+=head2 Search Patterns
+
+All patterns are Perl regular expressions of the idiom understood by the Perl executing loggrep. If no
+patterns are provided, all lines within the temporal limits are printed. If both including and excluding
+patterns match a line, the latter take precedence and the line is not printed. Multiple search patterns,
+or none, may be provided.
+
+=over 8
+
+=item -n I<pattern>, --include=I<pattern>
+
+Print the lines matching the given pattern.
+
+=item -N I<string>, --include-quoted=I<string>
+
+Print lines containing the given substring.
+
+=item -v I<pattern>, --exclude=I<pattern>
+
+Exclude lines matching the given pattern.
+
+=item -V I<string>, --exclude-quoted=I<string>
+
+Exclude lines containing the given substring.
+
+=item -i, --case-insensitive
+
+Pattern and substring matching is case-insensitive. Note that one may turn on case-insensitivity for
+a single pattern like so:
+
+  -i "(?i:match me)"
+
+Likewise, one may turn it off for a single pattern:
+
+  -i "(?-i:match me)"
+
+This technique will not work for substring matching.
+
+=back
+
+=head2 Debugging
+
+=over 8
+
+=item -w, --warn
+
+Warn upon finding a log line with no timestamp.
+
+=item --die
+
+Throw an error upon finding a log line with no timestamp.
+
+=back
+
+=head2 Context
+
+These options facilitate understanding matches by grouping them or providing log context.
+
+=over 8
+
+=item -b, --blank
+
+Print a blank line between non-sequential matches. This is shorthand for C<--sep=''>.
+
+=item --sep=I<string>, --separator=I<string>
+
+Print the given separator between non-sequential matches.
+
+=item -C I<num>, --context=I<num>
+
+Print up to the given number of non-matching lines before and after a match. This is equivalent
+to C<--before=I<num> --after=I<num>>.
+
+=item -B I<num>, --before=I<num>
+
+Print up to the given number of non-matching lines before a match.
+
+=item -A I<num>, --after=I<num>
+
+Print up to the given number of non-matching lines after a match.
+
+=back
+
+=head2 Overrides
+
+These options allow one to provide alternative functionality when printing lines or parsing times.
+The code defined by these options is evaluated in its own package to prevent your accidentally changing
+the behavior of basic loggrep functionality. It provides no protection against deliberate perversity, of
+course, but if you can already run Perl code from the command line, why go to the trouble of doing
+perverse things inside loggrep?
+
+All code is executed by default with strict mode and warnings off and a "use vX" line is injected, where
+C<X> represents the major and minor version numbers of the Perl running loggrep itself. This facilitates
+using modern Perl features.
+
+=over 8
+
+=item -t I<code>, --time=I<code>
+
+Code to be used to convert a timestamp expression to a Unix timestamp. This code will see the pattern
+matched as the sole value in C<@_>, and whatever it returns will be interpreted as the timestamp.
+
+=item -E I<code>, --exec=I<code>
+
+Code to be used to convert a matched line into something to print. The values in C<@_> for this code
+will be the raw line, the line number, and whether it was a match. The last parameter allows one to
+distinguish contextual lines from match lines. Whatever this code returns will be printed.
+
+=item -M I<module>, --module=I<module>
+
+Additional modules to be imported into the package in which user-provided code is evaluated. This option
+may be repeated.
+
+=back
+
+=head2 Miscellaneous
+
+=over 8
+
+=item -h, -?, --help
+
+Print basic usage information and exit.
+
+=item --version
+
+Print loggrep's version number.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks go to Green River for letting me spend some time on this when I needed to create a utility
+to search a large log file quickly.
+
+=head1 AUTHOR
+
+David F. Houghton <dfhoughton@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by David F. Houghton.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

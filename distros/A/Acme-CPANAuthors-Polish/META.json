@@ -1,0 +1,42 @@
+{
+   "abstract" : "We are Polish CPAN authors",
+   "author" : [
+      "Przemyslaw Wesolek <jest@go.art.pl>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-CPANAuthors-Polish",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::CPANAuthors" : "0",
+            "Acme::CPANAuthors::Register" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jest/perl.mod.Acme-CPANAuthors-Polish/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jest/perl.mod.Acme-CPANAuthors-Polish.git",
+         "web" : "https://github.com/jest/perl.mod.Acme-CPANAuthors-Polish"
+      }
+   },
+   "version" : "0.03"
+}
+

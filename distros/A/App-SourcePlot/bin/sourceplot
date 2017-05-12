@@ -1,0 +1,305 @@
+#!/local/bin/perl
+
+=head1 NAME
+
+sourceplot - display a plot of astronomical sources on adjustable axes
+
+=head1 SYNOPSIS
+
+    sourceplot [--help | --version]
+
+=head1 PURPOSE
+
+Source Plot was created to help observers decide which sources to observe
+at particular times to optimise the observing time at the telescope.
+The main purpose of this program is to plot the movement of a source
+throughout the night.  The movement can be plotted by the source's
+elevation, azimuth, parallactic angle, or by time.
+
+=head1 DESCRIPTION
+
+Source Plot is designed to display the path of a source throughout
+a night.  This path can be displayed in several ways, using Time,
+Elevation, Parallactic Angle, and Azimuth as the different axes.
+The sources can either be taken from a catalog or manually inserted.
+The first thing most observers will want to double click on is a source
+in the Catalog Window, which will plot that source.  Currently the only
+moving sources that can be plotted are planets, the Sun and the Moon,
+which can be added via the 'Planets' button in the Edit Window.
+
+=head2 Plotting Window
+
+The Plotting Window contains the actual plot and has control over the
+other windows.  The display itself has several features.  Each colored
+line in the Plotting Window is associated with the source with the same
+color in the Edit Window.  In the event that two lines have the same or
+similar color, moving the mouse over a plotted source will highlight the
+source in the Edit Window.  The large dot along the plotted source is
+the position of the source at the current time, called from here on a
+'location dot'.  These dots are updated automatically as time passes.
+Moving the mouse over a location dot will display the elevation and
+azimuth for the source in respect to an RA-Dec graph, where Dec is
+the y-axis.  This feature does not work in the
+L<Azimuth-Elevation graph|/"Elevation vs Azimuth Mode">.  The small
+dots along the plotted lines are 15 minutes apart, showing the precise
+time the source will be at a given location.
+
+There are several buttons in this window.  Starting from the left,
+here's an explanation of each:
+
+=over 4
+
+=item B<Options>
+
+Opens a window in which the relevant telescope, x-axis and y-axis can
+be changed.  The time the plot is centred around can also be changed.
+To apply these changes without closing the window, press the 'Apply'
+button.
+
+=item B<UT Date>
+
+A window will appear with the current UT Date in it which can be modified
+to see future or past dates.
+
+=item B<Edit>
+
+This button will open the Edit Window if it is closed.  This button
+becomes disabled when the Edit Window is open.
+
+=item B<Catalog>
+
+Like the 'Edit' button, the button opens the Catalog Window if it is
+closed.  This button will be disabled if the Catalog Window is open to
+prevent more than one Catalog Window from being created.
+
+=item B<Print>
+
+See L</"Printing the Graph"> for a description of this button.
+
+=item B<Exit>
+
+Exits the program, closing all associated windows.
+
+=back
+
+=head2 Edit Window
+
+This window contains the list of sources chosen by the observer.
+Only the sources that are active will be shown in the plot.  The first
+thing that should be known is how to select sources so they can be added,
+deleted, or deactivated.  To select a source, single click on it in the
+Edit Window.  The source will turn red indicating it has been selected.
+Several sources can be selected by clicking on each one individually.
+To deselect a source, single click on the source again.
+
+There are several small features in this window.  Moving the mouse
+over a source in the Edit Window will highlight its plotted line in
+the Plot Window.  To edit a source's coordinates, double click on it.
+A window will appear in which the source's information can be changed.
+The final set of features require the use of the Edit Window Buttons.
+The following is a description of each, starting from the left:
+
+=over 4
+
+=item B<On/Off>
+
+This button will activate or disable the selected sources.  Disabled
+sources will not be displayed in the Plotting Window
+
+=item B<Delete All>
+
+This button will remove the sources in the Edit Window.  It will not
+delete the source from the Catalog Window.
+
+=item B<Delete>
+
+The selected sources will be removed from the Edit Window.
+
+=item B<Undo>
+
+This button will undo the last major command.  Major commands are
+considered to be deletions, additions, and source coordinate changes.
+
+=item B<New>
+
+This will allow a source to be created manually, inserting the appropriate
+coordinates and a name.  The new source will be added to the list in
+the Edit Window and to the plot.  The RA/Dec coordinates can be entered
+with spaces or colons separating the parts.  If only the first one or
+two parts are inserted, the remaining parts will be filled with 0's.
+
+=item B<Planets>
+
+By pressing this button, a list of the planets will appear.  Selecting one
+will add it to the list of sources in the Edit Window and to the plot.
+
+=item B<Done>
+
+This button will close the Edit Window.  It can be re-opened by pressing
+the 'Edit' button in the Plot Window.
+
+=back
+
+=head2 Catalog Window
+
+The Catalog Window is provided by L<Tk::AstroCatalog> (part of the
+L<Astro::Catalog> package).
+Through it, the observer is able to add sources from
+a catalog file to be plotted.  The JCMT unified source catalog, which
+is included with this program, is initally shown in the Catalog Window.
+There are
+several features that are not obvious.  To select sources in the Catalog
+Window, click the mouse button once over top of it.  The source will turn
+red to indicate it has been selected.  Several sources can be selected
+in this way, creating a list of selected sources to do actions on.
+To deselect a source, click on it a second time.  Double clicking on a
+source will add it and all the selected sources to the Edit Window where
+the sources will be plotted.
+
+The following are explanations of the features contained within the
+buttons on the Catalog Window:
+
+=over 4
+
+=item B<Catalogs>
+
+The 'Catalogs' button will allow the observer to load a default catalog
+or to load a catalog from file.  If the file is chosen, a window will
+appear in which to find the desired path and file.  The path and file
+can be entered manually in the 'Catalog file:' field.  The default
+catalog, to be loaded when the 'Default Catalog' menu entry is selected,
+can be changed by setting the C<ASTRO_CATALOG_JCMT> environmental
+variable
+by typing C<setenv ASTRO_CATALOG_JCMT /path/catalog>.  Although Source Plot has
+been programmed to accept different variations of catalogs, the Catalog
+Window loads catalogs in the JCMT pointing catalog format.
+
+=item B<Rescan>
+
+'Rescan' rescans the currently selected catalog, displaying any entries
+that may have been lost in a search.
+
+=item B<Search>
+
+Using 'Search' will display a window in which the user can fill one
+or more fields in which to search for a specific source.  If any of
+the fields is not filled in, the program will ignore that field and
+search based on the other fields.  If only part of a field is known,
+the program will display any sources containing the partial information.
+For example, if the RA starts with '5' and the Dec begins with '-9 45',
+type '5' in the RA field and '-9 45' in the Dec field and the resulting
+search will display all the sources that have an RA starting with '5'
+and a Dec starting with '-9 45'.  Since the other fields were not used,
+the search will not be limited by them.
+
+=item B<Add>
+
+'Add' adds the selected sources to the Edit Window.
+
+=item B<Done>
+
+To close the Catalog Window, press 'Done'.  It can be re-opened by
+pressing the 'Catalog' button in the Plot Window.
+
+=back
+
+=head2 Printing the Graph
+
+Once all of your sources are plotted, press the 'Print' button in the
+Plotting Window.  A window will appear.  Source Plot will let you print
+to a printer or to a file.  Select the method you prefer by pressing the
+diamond to the left of that option.  If using the 'To File' method, fill
+in the 'Filename' field with the path and filename desired.  If using the
+'To Printer' method, the command to print can be changed in the 'Printer
+Command' field.  The default command is 'lp'.  Additional arguments
+can be added to the line or a totally different command can be used by
+replacing this line with the desired command.  For example, to print to
+a specific printer, just add '-d printer' after 'lp'.  When everything
+is ready, press 'Print'.
+
+=head2 Elevation vs Azimuth Mode
+
+The Elevation vs Azimuth Graph was created to better show the distance
+between sources in the sky.  The plot will be shown in this mode if
+the selected axes are azimuth and either elevation or air mass.
+
+The elevation is indicated by the circular
+lines, with the white outside circle 0 degrees and the middle of the graph
+90 degrees.  The azimuth rotates around the circle, 0 degrees at the top
+and 180 degrees at the bottom.  Like the other graphs, the large dots
+on the lines represent the position of the source at the current time.
+The small dots are 15 minute intervals apart.  The times written on the
+graph around the 30 degree mark for each source is the time, in HST,
+that the source will be passing through that point.
+
+=head1 FILES
+
+=over 4
+
+=item C<~/.splotcfg>
+
+Stores the settings from the L<Options Window|/Options> when
+'Save Setting' is selected.  This file is read to configure
+sourceplot when it starts up.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+
+our $VERSION = '1.27';
+
+use Pod::Usage;
+use Getopt::Long;
+use App::SourcePlot;
+
+my ($option_help, $option_version);
+GetOptions('help|man' => \$option_help,
+           'version' => \$option_version)
+  or pod2usage(-verbose => 0);
+pod2usage(-verbose => 2) if $option_help;
+
+if ($option_version) {
+  print 'SourcePlot launch script version ' . $VERSION . "\n";
+  print 'Using App::SourcePlot application version ' . $App::SourcePlot::VERSION . "\n";
+  exit(0);
+}
+
+App::SourcePlot::run_sourceplot_gui();
+
+__END__
+
+=head1 SEE ALSO
+
+L<Tk::AstroCatalog>
+
+=head1 AUTHORS
+
+Casey Best (University of Victoria),
+Pam Shimek (University of Victoria),
+Tim Jenness (Joint Astronomy Centre),
+Remo Tilanus (Joint Astronomy Centre),
+Graham Bell (Joint Astronomy Centre).
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012 Science and Technology Facilities Council.
+Copyright (C) 1998, 1999 Particle Physics and Astronomy Research
+Council. All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+=cut

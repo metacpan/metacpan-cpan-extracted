@@ -1,0 +1,54 @@
+2003-03-03  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Added a license statement on request of Steve Hay
+
+2002-08-26  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Added washing off of UTF-8 flag by Encode if $] > 5.007
+
+	* Adding a t/loadme.t. At least we know we can be loaded
+
+	* Rewriting Changes as ChangeLog for my own convenience
+
+	* Removed peeking into User-Agent. Today all browsers behave OK,
+	as far as I know. Removed Vary flag for User-Agent too. If no
+	Accept-Encoding header is sent, fix the "undefined" error.
+
+1998-07-25
+
+	* Added option C<GzipForce> which turns on gzipping
+	unconditionally. Thanks for the patch to Eric Cholet.
+
+	* Removed the Alpha warning, as all problems seem to have
+	disappeared.
+
+1997-12-05
+
+	* Added a Vary header, because that's the way HTTP 1.1 commands
+	us.
+
+1997-12-05
+
+	* Bummer: a user reported that his Internet Explorer 3.02 cannot
+	uncompress. Ok, we said, but we wouldn't send gzipped files to IE
+	3.02. But the guy was sure he couldn't read the files we were
+	sending. Inspection revealed that his version of IE (which he
+	insisted was 3.02) sent a User-Agent header that was not a single
+	bit different from what IE 4.0 sends. GzipChain thusly refrains
+	from sending gzipped data to IE customers which really hurts.
+	Sorry folks.
+
+	* Changes in Apache::PassFile: now sends the Last Modified header
+	(can be turned off)
+
+1997-11-29
+	
+	* Improved User-Agent regex for speed. Added the check for the
+	Accept-Encoding header. Improved documentation.
+
+1997-11-28
+
+	* original version
+
+
+

@@ -1,0 +1,41 @@
+{
+   "abstract" : "Test module that sums",
+   "author" : [
+      "AndrÃ© Philipp <aphilipp@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-APHILIPP-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Acme::APHILIPP::Utils" : {
+         "file" : "lib/Acme/APHILIPP/Utils.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.05"
+}

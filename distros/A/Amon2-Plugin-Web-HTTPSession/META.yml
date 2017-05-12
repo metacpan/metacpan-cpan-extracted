@@ -1,0 +1,43 @@
+---
+abstract: 'HTTP::Session bindings for Amon2'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Amon2-Plugin-Web-HTTPSession
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Plugin::Web::HTTPSession:
+    file: lib/Amon2/Plugin/Web/HTTPSession.pm
+    version: 5.04
+requires:
+  Amon2: 5.03
+  Amon2::Util: 0
+  HTTP::Session: 0.48
+  Plack::Request: 0
+  Plack::Util: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tokuhirom/Amon2-Plugin-Web-HTTPSession/issues
+  homepage: https://github.com/tokuhirom/Amon2-Plugin-Web-HTTPSession
+  repository: git://github.com/tokuhirom/Amon2-Plugin-Web-HTTPSession.git
+version: 5.04

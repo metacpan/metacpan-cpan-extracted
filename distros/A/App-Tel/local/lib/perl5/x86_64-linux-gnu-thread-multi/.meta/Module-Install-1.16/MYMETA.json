@@ -1,0 +1,108 @@
+{
+   "abstract" : "Standalone, extensible Perl module installer",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Install",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Harness" : "3.13",
+            "Test::More" : "0.86",
+            "YAML::Tiny" : "1.33",
+            "autodie" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Archive::Zip" : "1.37",
+            "File::HomeDir" : "1",
+            "JSON" : "2.9",
+            "LWP::Simple" : "6.00",
+            "LWP::UserAgent" : "6.05",
+            "PAR::Dist" : "0.29"
+         },
+         "requires" : {
+            "Devel::PPPort" : "3.16",
+            "ExtUtils::Install" : "1.52",
+            "ExtUtils::MakeMaker" : "6.59",
+            "ExtUtils::ParseXS" : "2.19",
+            "File::Path" : "0",
+            "File::Remove" : "1.42",
+            "File::Spec" : "3.28",
+            "Module::Build" : "0.29",
+            "Module::CoreList" : "2.17",
+            "Module::ScanDeps" : "1.09",
+            "Parse::CPAN::Meta" : "1.4413",
+            "YAML::Tiny" : "1.38",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Perl-Toolchain-Gang/Module-Install.git"
+      }
+   },
+   "version" : "1.16",
+   "x_contributors" : [
+      "Adam Kennedy <adam@ali.as>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "Paul Fenwick <pjf@perltraining.com.au>",
+      "bowtie <bowtie@cpan.org>",
+      "Matt S Trout <dbix-class@trout.me.uk>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Chris \\BinGOs' Williams <chris@bingosnet.co.uk>",
+      "Christian Walde <walde.christian@googlemail.com>",
+      "Ricardo Signes <rjbs@cpan.org>",
+      "Ingy <ingy@ingy.net>",
+      "Hans Dieter Pearcey <hdp@cpan.org>",
+      "Olivier Mengue <dolmen@cpan.org>",
+      "Curtis Jewell <csjewell@cpan.org>",
+      "Rafael Kitover <rkitover@gmail.com>",
+      "Avar Arnfjord Bjarmason <avarab@gmail.com>",
+      "Dan Brook <dbrook@venda.com>",
+      "Leo Lapworth <leo@cuckoo.org>",
+      "Marcel Grunauer <hanekomu@gmail.com>",
+      "Alex Vandiver <github@chmrr.net>",
+      "Joshua ben Jore <twists@gmail.com>",
+      "Ash Berlin <ash_github@firemirror.com>",
+      "gregor herrmann <gregoa@debian.org>",
+      "Gabor Szabo <szabgab@gmail.com>",
+      "Thomas Sibley <tsibley@cpan.org>",
+      "Tokuhiro Matsuno <tokuhirom@cpan.org>",
+      "Tom Wyant <wyant@cpan.org>",
+      "Kang-min Liu <gugod@gugod.org>",
+      "David Golden <dagolden@cpan.org>",
+      "Kent Fredric <kentfredric@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

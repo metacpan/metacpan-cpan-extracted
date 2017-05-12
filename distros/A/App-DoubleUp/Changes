@@ -1,0 +1,18 @@
+Changes for App-Doubleup
+ 
+0.4.2  2013-08-05 12:42:35 CEST
+		- New command 'version'
+		- Add synopsys
+
+0.4.1  2013-08-05 12:17:14 CEST
+		- Add dependency on File::Slurp
+
+0.4.0 2010-09-27 CEST
+		- Added YAML dependency in Build.PL
+		- Use SQL::SplitStatement as the sql file split function
+
+0.3.0 2010-08-23 CEST
+		- Added config_file option
+
+0.2.0 2010-08-19 CEST
+		- First version

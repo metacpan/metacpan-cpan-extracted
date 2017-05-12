@@ -1,0 +1,7 @@
+PerlModule Apache::ClearSilver
+<Files *.cs>
+  SetHandler     perl-script
+  PerlHandler    Apache::ClearSilver
+  HDFSetValue    Foo hello
+  CSContentType "text/html; charset=utf-8"
+</Files>

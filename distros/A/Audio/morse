@@ -1,0 +1,58 @@
+#!/usr/local/bin/perl -w
+use Audio::Data;
+use Audio::Play;
+
+my $freq = 400;
+my $dot  = 0.07;
+my $dash = 3*$dot;
+
+my %morse = ( A => '.-', B => '-...', C => '-.-.', D => '-..',
+           E => '.', F => '..-.', G => '--.', H => '....', 
+           I => '..', J => '.---', K => '-.-', L=> '.-..',
+           M => '--', N => '-.', O => '---', P => '.--.',
+           Q => '--.-', R => '.-.', S => '...', T => '-',
+           U => '..-', V => '...-', W => '.--', X => '-..-',
+           Y => '-.--', Z => '--..',
+           1 => '.----', 2 => '..---', 3 => '...--', 4 => '....-',
+           5 => '.....', 6 => '-....', 7 => '--...', 8 => '---..',
+           9 => '----.', 0 => '-----', ' ' => ' ');
+
+my $au = Audio::Data->new(rate => 8000);
+
+sub morse
+{
+ my ($au,$s) = @_;
+ while (length $s)
+  {
+   my $sym = $morse{uc(substr($s,0,1))};
+   if (defined $sym)
+    {
+     while (length($sym))
+      {
+       for (substr($sym,0,1))
+        {
+         $au->tone($freq,$dot) if (/\./); 
+         $au->tone($freq,$dash) if (/-/); 
+         $au->silence(3*$dash) if (/\s/); 
+        }
+       $au->silence($dot);
+       substr($sym,0,1) = "";
+      }
+     $au->silence($dash);
+    }
+   substr($s,0,1) = "";
+  }
+}
+
+foreach (@ARGV)
+ {
+  morse($au,$_);
+ }
+
+my $svr = Audio::Play->new;
+
+$svr->play($au);
+
+open(F,">out.au") || die;
+$au->Save(\*F);
+close(F);

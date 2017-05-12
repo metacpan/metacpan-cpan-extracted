@@ -1,0 +1,30 @@
+---
+abstract: 'Built or find libtool 2.4.x'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.023'
+  Capture::Tiny: '0'
+  File::ShareDir: '1.03'
+  File::chdir: '0'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libtool24
+requires:
+  Alien::Base: '0.023'
+  File::ShareDir: '1.03'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/Alien-libtool24/issues
+  homepage: http://perl.wdlabs.com/Alien-libtool24
+  repository: git://github.com/plicease/Alien-libtool24.git
+version: '0.04'

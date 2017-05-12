@@ -1,0 +1,59 @@
+App-PDF-Link
+
+The pdflink tool inserts arbitrary file links into PDF documents.
+
+When invoked without a --targets option, this program will process
+the PDF document using the associated CSV as table of contents.
+
+For every item in the PDF that has one or more additional files (files
+with the same name as the title, but differing extensions), clickable
+icons are added to the first page of the item. When clicked in a
+suitable PDF viewing tool, the corrresponding file will be activated.
+
+For example, if the CSV contains
+
+  title;pages;
+  Blue Moon;24;
+
+And the following files are present in the current directory
+
+  Blue Moon.html
+  Blue Moon.mscz
+
+Then two clickable icons will be added to page 24 of the document,
+leading to these two files.
+
+Upon completion, the updated PDF is written out under the specified name.
+
+When invoked with the --targets option, all specified PDF files get
+links inserted to the targets on the first page. If there is only one
+PDF file you can use the --pdf option to designate the name of the
+new PDF document, otherwise all PDF files are updated (rewritten.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc App::PDF::Link
+
+or
+
+    pdflink --man
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-PDF-Link
+
+    Search CPAN
+        http://search.cpan.org/dist/App-PDF-Link
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

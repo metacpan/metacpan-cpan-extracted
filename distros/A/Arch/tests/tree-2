@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+
+# The script tests Arch::Tree methods.
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::Bin/../perllib";
+
+use Test::More;
+use Arch::Util qw(is_tla_functional);
+
+BEGIN {
+	plan skip_all => "No functional arch backend" unless is_tla_functional;
+	plan tests => 5;
+
+	# import constants at compile time
+	use_ok("Arch::Inventory", qw(:category :type));
+}
+
+use_ok("Arch::Tree");
+
+my $expected_entry_path = 'perllib/Arch/Tree.pm';
+my $expected_entry = {
+	category => SOURCE,
+	untagged => '',
+	type     => FILE,
+	path     => $expected_entry_path,
+	id       => 'x_Mikhael_Goikhman_<migo@homemail.com>_Thu_Aug_26_16:34:45_2004_18965.1',
+	id_type  => 'x',
+};
+
+SKIP: {
+	my $tree = eval { Arch::Tree->new("$FindBin::Bin/..") };
+	skip("not in arch tree ($FindBin::Bin/..)", 3) if $@;
+
+	# get_inventory
+	my $inventory = $tree->get_inventory();
+	ok($inventory, "got inventory");
+
+	my $entry = $inventory->get_entry($expected_entry_path);
+	ok($entry, "inventory contains Arch/Tree.pm");
+	ok(eq_hash($entry, $expected_entry), "inventory entry is valid");
+}

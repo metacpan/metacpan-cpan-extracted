@@ -1,0 +1,86 @@
+Revision history for Perl module App-vaporcalc
+
+0.005004 2016-07-05
+
+  - Fix frontend breakage in prev release
+
+0.005003 2016-07-05
+
+  - Fix deprecated '-with_types' import in bin/vaporcalc
+
+0.005002 2016-06-24
+
+  - Depend on newer Defaults::Modern & drop (now unneeded) MooX::late
+
+  - Syntactical cleanups
+
+  - More recipes/
+
+0.005001 2015-11-07
+
+  - Fix CmdEngine to be more easily pluggable; subject_list is now dynamically
+    generated via Module::Pluggable and tests are now friendlier towards
+    external Cmd::Subject modules
+
+  - Documentation improvements
+
+0.004001 2015-11-06
+
+  - Always show 'max VG' total
+
+0.003004 2015-09-11
+
+  - Fix a bug related to handling unknown flavor base types
+    (due to stale pre-0.2.x code)
+
+0.003003 2015-08-15
+
+  - Switch to cpanfile packaging
+
+  - More recipes/
+
+  - Minor optimizations
+
+0.003002 2014-08-16
+
+  - Support loading 'relaxed' JSON for friendlier recipe-munging
+
+  - Happy CPAN day!
+
+0.003001 2014-04-25
+
+  - 'vaporcalc --recipe=PATH' syntax
+
+  - More recipes/
+
+  - use Test::Modern;
+
+  - FDA proposed regs (that would shut down small-time e-liquid makers)
+    published today. Hurrah?
+
+0.002002 2014-03-05
+
+  - Support 'flavor clear'
+
+  - Fix Percentage type to be a subtype of StrictNum
+
+0.002001 2014-02-21
+
+  - Support for multiple flavors
+
+0.001004 2014-02-10
+
+  - vaporcalc interface improvements;
+    default to calling 'calc', improve recipe/result output template
+
+0.001003 2014-02-09
+
+  - Explicitly depend on JSON::MaybeXS-1.001+
+
+0.001002 2014-02-09
+
+  - Fix some Windows test failures relating to temp files
+
+0.001001 2014-02-09
+
+  - Initial release

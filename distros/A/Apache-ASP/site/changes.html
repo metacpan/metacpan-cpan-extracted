@@ -1,0 +1,3229 @@
+
+
+<html>
+<head>
+<title>Apache::ASP::Changes</title>
+
+
+
+<style type="text/css">
+<!--
+      td {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      font {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
+      .title {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 16px}
+
+
+
+
+-->
+</style>
+
+
+</head>
+<body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
+marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
+
+
+
+
+<center>
+<table border=0 cellpadding=0 width=99% cellspacing=8>
+<tr><td align=center>
+
+<table border=0 cellpadding=3 width=100% cellspacing=0>
+<tr bgcolor=#063678>
+<td>
+	<table border=0 cellpadding=1 cellspacing=0 width=100%>
+	<tr>
+	<td><img border=0 src=asptitlelogo.gif alt="Apache::ASP" width=267 height=44 ></td>	
+	
+		<td align=right></td>
+	
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+  <td bgcolor=#005196 align=center>
+    <b>
+    <font color=#ffffff>&lt;% Web Applications with Apache &amp; mod_perl %&gt;</font>  
+    </b>
+  </td>
+</tr>
+</table>
+
+
+<table border=0 cellpadding=10 cellspacing=0 width=100% bgcolor=#005196>
+<tr>
+<td valign=top width=120 bgcolor=#005196>
+    
+        <table cellpadding=5 cellspacing=0 border=1 bgcolor=white><tr><td>
+
+	<table border=0 cellpadding=0 cellspacing=0 width=105 bgcolor=white>
+	
+	
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="index.html" style="text-decoration:none"><font color=#063678>INTRO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="install.html" style="text-decoration:none"><font color=#063678>INSTALL</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="config.html" style="text-decoration:none"><font color=#063678>CONFIG</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="syntax.html" style="text-decoration:none"><font color=#063678>SYNTAX</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="events.html" style="text-decoration:none"><font color=#063678>EVENTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="objects.html" style="text-decoration:none"><font color=#063678>OBJECTS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="ssi.html" style="text-decoration:none"><font color=#063678>SSI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sessions.html" style="text-decoration:none"><font color=#063678>SESSIONS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="xml.html" style="text-decoration:none"><font color=#063678>XML/XSLT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="cgi.html" style="text-decoration:none"><font color=#063678>CGI</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="perlscript.html" style="text-decoration:none"><font color=#063678>PERLSCRIPT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="style.html" style="text-decoration:none"><font color=#063678>STYLE GUIDE</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="faq.html" style="text-decoration:none"><font color=#063678>FAQ</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="tuning.html" style="text-decoration:none"><font color=#063678>TUNING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="kudos.html" style="text-decoration:none"><font color=#063678>CREDITS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="support.html" style="text-decoration:none"><font color=#063678>SUPPORT</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="sites.html" style="text-decoration:none"><font color=#063678>SITES USING</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="testimonials.html" style="text-decoration:none"><font color=#063678>TESTIMONIALS</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="resources.html" style="text-decoration:none"><font color=#063678>RESOURCES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="todo.html" style="text-decoration:none"><font color=#063678>TODO</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>%</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><font color=#993399>CHANGES</font></nobr></b></font></td>		
+
+		</tr>
+		
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="license.html" style="text-decoration:none"><font color=#063678>LICENSE</font></a></nobr></b></font></td>		
+
+		</tr>
+		<tr><td colspan=2><hr size=1></td></tr>
+		<tr>
+		<td bgcolor=white><font size=-2 face="verdana" color=#993399><b><nobr>&nbsp;</nobr></b></font></td>
+
+		<td bgcolor=white ><font face="verdana,helvetica" size=-1><b><nobr><a href="eg/index.html" style="text-decoration:none"><font color=#063678>EXAMPLES</font></a></nobr></b></font></td>		
+
+		</tr>
+		
+	</table>
+
+	</td></tr>
+	</table>
+
+		<br>
+		<center>
+		<a href=http://www.apache-asp.org/><img src="powered_by_apache_asp.jpg" width="88" height="31" alt="Powered by Apache::ASP" border="0"></a>
+		<br>
+		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
+		<br>
+		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
+		</center>
+
+</center>
+
+</td>
+
+
+
+<td valign=top bgcolor=white>
+<font size=+0 face=verdana,arial>
+
+<font face=verdana><font class=title size=+1 color=#555555><b>CHANGES</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Apache::ASP has been in development since 1998, and 
+was production ready since its .02 release.  Releases
+are always used in a production setting before being
+made publically available.
+<font face="courier new" size=3><pre>
+</pre></font>In July 2000, the version numbers of releases went 
+from .19 to 1.9 which is more relevant to software development
+outside the perl community.  Where a .10 perl module usually
+means first production ready release, this would be the
+equivalent of a 1.0 release for other kinds of software.
+<font face="courier new" size=3><pre>
+ + = improvement   - = bug fix    (d) = documentations
+</pre></font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2021803a342>$VERSION = 2.59; $DATE="05/23/2005"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202909e81ef>$VERSION = 2.03; $DATE="08/01/2000";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2022aa8a3f0>$VERSION = 2.57; $DATE="01/29/2004"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202727b0736>$VERSION = 2.01; $DATE="07/22/2000";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202d9674a90>$VERSION = 2.55; $DATE="08/09/2003"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202784583b1>$VERSION = 2.00; $DATE="07/15/2000";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2022c8082fb>$VERSION = 2.53; $DATE="04/10/2003"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2010d78b35d>$VERSION = 1.95; $DATE="07/10/2000";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2025b84bf7e>$VERSION = 2.51; $DATE="02/10/2003"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%201b231718a>$VERSION = 1.93; $DATE="07/03/2000";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202eaeef6e0>$VERSION = 2.49; $DATE="11/10/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2010d8c7b1b>$VERSION = 1.91; $DATE="07/02/2000";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202a705193b>$VERSION = 2.47; $DATE="11/06/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200f0c93549>$VERSION = 0.19; $DATE="NOT RELEASED";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2029e470448>$VERSION = 2.45; $DATE="10/13/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2004a1da04f>$VERSION = 0.18; $DATE="02/03/2000";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2022337f806>$VERSION = 2.41; $DATE="09/29/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200792d4e8d>$VERSION = 0.17; $DATE="11/15/99";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%20252d85c29>$VERSION = 2.39; $DATE="09/10/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2003dd1597d>$VERSION = 0.16; $DATE="09/22/99";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202c1fa6b38>$VERSION = 2.37; $DATE="07/03/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200a2fa9027>$VERSION = 0.15; $DATE="08/24/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202af464d94>$VERSION = 2.35; $DATE="05/30/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200b667e0c4>$VERSION = 0.14; $DATE="07/29/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%20276381ac3>$VERSION = 2.33; $DATE="04/29/2002"</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200fcc7c76f>$VERSION = 0.12; $DATE="07/01/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202a77480eb>$VERSION = 2.31; $DATE="01/22/2002";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200bd024b52>$VERSION = 0.11; $DATE="06/24/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202be948898>$VERSION = 2.29; $DATE="11/19/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200c7f99fbe>$VERSION = 0.10; $DATE="05/24/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%20211fd057b>$VERSION = 2.27; $DATE="10/31/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2005ee189f2>$VERSION = 0.09; $DATE="04/22/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%20276d7fe30>$VERSION = 2.25; $DATE="10/11/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200ea85a09a>$VERSION = 0.08; $DATE="02/06/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2024674da9c>$VERSION = 2.23; $DATE="10/11/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2003960e08a>$VERSION = 0.07; $DATE="01/20/1999";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202c37caa32>$VERSION = 2.21; $DATE="8/5/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200394bbc7f>$VERSION = 0.06; $DATE="12/21/1998";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2029e6581ab>$VERSION = 2.19; $DATE="7/10/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2003a5fe2db>$VERSION = 0.05; $DATE="10/19/1998";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%20282c9e25e>$VERSION = 2.17; $DATE="6/17/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2009ffce1f9>$VERSION = 0.04; $DATE="10/14/1998";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202d4094038>$VERSION = 2.15; $DATE="06/12/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%200ec664faf>$VERSION = 0.03; $DATE="09/14/1998";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2023614edca>$VERSION = 2.11; $DATE="05/29/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%20055b248f9>$VERSION = 0.02; $DATE="07/12/1998";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%202023e855d>$VERSION = 2.09; $DATE="01/30/2001";</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2009faee67f>$VERSION = 0.01; $DATE="06/26/1998";</a>
+			</font>
+			</td>
+							
+		</tr>
+		
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#%24VERSION%20%3D%2021002eb7e>$VERSION = 2.07; $DATE="11/26/2000";</a>
+			</font>
+			</td>
+		<td>&nbsp;</td>					
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=%24VERSION%20%3D%2021803a342></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.59; $DATE="05/23/2005"</b></font>
+<font face="courier new" size=3><pre>
+ + added &quot;use bytes&quot; to Response object to calculate Content-Length
+   correctly for UTF8 data, which should require therefore at least
+   perl version 5.6 installed
+
+ + updated to work with latest mod_perl 2.0 module naming convention,
+   thanks to Randy Kobes for patch
+
+ + examples now exclude usage of Apache::Filter &amp; Apache::SSI under mod_perl 2.0
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2022aa8a3f0></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.57; $DATE="01/29/2004"</b></font>
+<font face="courier new" size=3><pre>
+ - $Server-&gt;Transfer will update $0 correctly
+
+ - return 0 for mod_perl handler to work with latest mod_perl 2 release
+   when we were returning 200 ( HTTP_OK ) before
+
+ - fixed bug in $Server-&gt;URL when called like $Server-&gt;URL($url)
+   without parameters.  Its not clear which perl versions this bug 
+   affected.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202d9674a90></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.55; $DATE="08/09/2003"</b></font>
+<font face="courier new" size=3><pre>
+ - Bug fixes for running on standalone CGI mode on Win32 submitted
+   by Francesco Pasqualini
+
+ + Added Apache::ASP::Request::BINMODE for binmode() being
+   called on STDIN after STDIN is tied to $Request object
+
+ + New RequestBinaryRead configuration created, may be turned off
+   to prevent $Request object from reading POST data
+
+ ++ mod_perl 2 optmizations, there was a large code impact on this,
+   as much code was restructured to reduce the differences between
+   mod_perl 1 and mod_perl 2, most importantly, Apache::compat is
+   no longer used
+
+ + preloaded CGI for file uploads in the mod_perl environment
+
+ - When XSLT config is set, $Response-&gt;Redirect() should work now
+   Thanks to Marcus Zoller for pointing problem out
+
+ + Added CookieDomain setting, documented, and added test to cover 
+   it in t/cookies.t . Setting suggested by Uwe Riehm, who nicely 
+   submitted some code for this.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2022c8082fb></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.53; $DATE="04/10/2003"</b></font>
+<font face="courier new" size=3><pre>
+ + XMLSubs tags with &quot;-&quot; in them will have &quot;-&quot; replaced with &quot;_&quot; or underscore, so a
+   tag like &lt;my:render-table /&gt; will be translated to &amp;my::render_table() ... tags with
+   - in them are common in extended XML syntaxes, but perl subs cannot have - in them only.
+
+ + Clean setting now works on output when $Response-&gt;{ContentType} begins with text/html;
+   like &quot;text/html; charset=iso-8859-2&quot; ... before Clean would only work on output marked
+   with ContentType text/html.  Thanks to Szymon Juraszczyk for recommending fix.
+
+ --Fixed a bug which would cause Session_OnEnd to be called twice on sessions in a certain case,
+   particularly when an old expired session gets reused by and web browser... this bug was
+   a result of a incomplete session cleanup method in this case.  Thanks to Oleg Kobyakovskiy 
+   for reporting this bug.  Added test in t/session_events.t to cover this problem going forward.
+
+ - Compile errors from Apache::ASP-&gt;Loader() were not being reported.  They will
+   be reported again now.  Thanks to Thanos Chatziathanassiou for discovering and
+   documenting this bug.  Added test in t/load.t to cover this problem going forward.
+
+ + use of chr(hex($1)) to decode URI encoded parameters instead of pack(&quot;c&quot;,hex($1))
+   faster &amp; more correct, thanks to Nikolay Melekhin for pointing out this need.
+
+ (d) Added old perlmonth.com articles to ./site/articles in distribution
+   and linked to them from the docs RESOURCES section
+
+ (d) Updated documention for the $Application-&gt;SessionCount API
+
+ + Scripts with named subroutines, which is warned against in the style guide,
+   will not be cached to help prevent my closure problems that often
+   hurt new developers working in mod_perl environments.  The downside
+   is that these script will have a performance penalty having to be
+   recompiled each invocation, but this will kill many closure caching 
+   bugs that are hard to detect.
+
+ - $Request-&gt;FileUpload(&#39;upload_file&#39;, &#39;BrowserFile&#39;) would return
+   a glob before that would be the file name in scalar form.  However
+   this would be interpreted as a reference incorrectly.  The fix
+   is to make sure this is always a scalar by stringifying 
+   this data internally.  Thanks to Richard Curtis for pointing
+   out this bug.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2025b84bf7e></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.51; $DATE="02/10/2003"</b></font>
+<font face="courier new" size=3><pre>
+ + added t/session_query_parse.t test to cover use of SessionQueryParse
+   and $Server-&gt;URL APIs
+
+ - Fixed duplicate &quot;&amp;&quot; bug associated with using $Server-&gt;URL 
+   and SessionQueryParse together
+
+ + Patch to allow $Server-&gt;URL() to be called multiple times on the same URL
+   as in $Server-&gt;URL($Server-&gt;URL($url, \%params), \%more_params)
+
+ (d) Added new testimonials &amp; sites &amp; created a separate testimonials page.
+
+ - SessionQueryParse will now add to &amp;amp; to the query strings
+   embedded in the HTML, instead of &amp; for proper HTML generation.
+   Thanks to Peter Galbavy for pointing out and Thanos Chatziathanassiou
+   for suggesting the fix.
+
+ - $Response-&gt;{ContentType} set to text/html for developer error reporting,
+   in case this was set to something else before the error occured.
+   Thanks to Philip Mak for reporting.
+
+ - Couple of minor bug fixes under PerlWarn use, thanks Peter Galbavy
+   for reporting.
+
+ + Added automatic load of &quot;use Apache2&quot; for compat with mod_perl2 
+   request objects when Apache::ASP is loaded via &quot;PerlModule Apache::ASP&quot;
+   Thanks to Richard Curtis for reporting bug &amp; subsequent testing.
+
+ - When GlobalPackage config changes, but global.asa has not, global.asa
+   will be recompiled anyway to update the GlobalPackage correctly.
+   Changing GlobalPackage before would cause errors if global.asa was
+   already compiled.
+
+ ++ For ANY PerlSetVar type config, OFF/Off/off will be assumed 
+    to have value of 0 for that setting.  Before, only a couple settings
+    had this semantics, but they all do now for consistency.
+
+ - Fix for InodeNames config on OpenBSD, or any OS that might have
+   a device # of 0 for the file being stat()&#39;d, thanks to Peter Galbavy
+   for bug report.
+
+ ++ Total XSLT speedups, 5-10% on large XSLT, 10-15% on small XSLT
+
+ + bypass meta data check like expires for XSLT Cache() API use
+   because XSLT tranformations don&#39;t expire, saves hit to cache dbm
+   for meta data
+
+ + use of direct Apache::ASP::State methods like FETCH/STORE
+   in Cache() layer so we don&#39;t have to go through slower tied interface.
+   This will speed up XSLT &amp; and include output caching mostly.
+
+ + minor optimizations for speed &amp; memory usage
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202eaeef6e0></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.49; $DATE="11/10/2002"</b></font>
+<font face="courier new" size=3><pre>
+ -- bug introduced in 2.47 cached script compilations for executing
+    scripts ( not includes ) of the same name in different directories
+    for the same Global/GlobalPackage config for an application.
+    Fix was to remove optimization that caused problem, and
+    created test case t/same_name.t to cover bug.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202a705193b></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.47; $DATE="11/06/2002"</b></font>
+<font face="courier new" size=3><pre>
+ ++ Runtime speed enhancements for 15-20% improvement including:
+   + INTERNAL API ReadFile() now returns scalar ref as memory optimization
+   + cache InodeNames config setting in ASP object now for common lookups
+   + removed CompileChecksum() INTERNAL API, since it was an unnecesary
+     method decomposition along a common code path
+   + removed IsChanged() INTERNAL API since compiling of scripts
+     is now handled by CompileInclude() which does this functionality already
+   + removed unnecessary decomp of IncludesChanged() INTERNAL API, which was along
+     critical code path
+   + do not call INTERNAL SearchDirs() API when compiling base script
+     since we have already validated its path earlier
+   + Use stat(_) type shortcut for stat() &amp; -X calls where possible
+   + Moved @INC initilization up to handler() &amp; consolidated with $INCDir lib
+   + removed useless Apache::ASP::Collection::DESTROY
+   + removed useless Apache::ASP::Server::DESTROY
+   + removed useless Apache::ASP::GlobalASA::DESTROY
+   + removed useless Apache::ASP::Response::DESTROY
+
+ - Default path for $Response-&gt;{Cookies} was from CookiePath
+   config, but this was incorrect as CookiePath config is only
+   for $Session cookie, so now path for $Response-&gt;{Cookies}
+   defaults to /
+
+ - Fixed bug where global.asa events would get undefined with
+   StatINC and GlobalPackage set when the GlobalPackage library
+   changed &amp; get reloaded.
+
+ (d) Documented long time config NoCache.
+
+ -- Fixed use with Apache::Filter, capable as both source
+    and destination filter.  Added <a href=eg/filter.filter>./site/eg/filter.filter</a> example
+    to demonstrate these abilities.
+
+ + Use $r-&gt;err_headers_out-&gt;add Apache::Table API for cookies 
+   now instead of $r-&gt;cgi_header_out.  Added t/cookies.t test to 
+   cover new code path as well as general $Response-&gt;Cookies API.
+   Also make cookies headers sorted by cookie and dictionary key 
+   while building headers for repeatable behavior, this latter was 
+   to facilitate testing.
+
+ - fixed $Server-&gt;Mail error_log output when failing to connect
+   to SMTP server.
+
+ + added tests to cover UniquePackages &amp; NoCache configs since this
+   config logic was updated
+
+ + made deprecated warnings for use of certain $Response-&gt;Member
+   calls more loudly write to error_log, so I can remove the AUTOLOAD
+   for Response one day
+
+ - Probably fixed behavior in CgiHeaders, at least under perl 5.8.0, and
+   added t/cgi_headers.t to cover this config.
+
+ + removed $Apache::ASP::CompressGzip setting ability, used to possibly
+   set CompressGzip in the module before, not documented anyway
+
+ + removed $Apache::ASP::Filter setting ability to set Filter globally, 
+   not documented anyway
+
+ + removed old work around for setting ServerStarting to 0
+   at runtime, which was bad for Apache::DBI on win32 a long
+   time ago:
+
+    $Apache::ServerStarting and $Apache::ServerStarting = 0;
+
+   If this code is still needed in Apache::ASP-&gt;handler() let
+   me know.
+
+ + check to make sure data in internal database is a HASH ref
+   before using it for session garbage collection.  This is to
+   help prevent against internal database corruption in a 
+   network share that does not support flock() file locking.
+
+ + For new XMLSubs ASP type &lt;%= %&gt; argument interpolation
+   activated with XMLSubsPerlArgs 0, data references can now
+   be passed in addition to SCALAR/string references, so one
+   can pass an object reference like so:
+
+     &lt;my:tag value=&quot;&lt;%= $Object %&gt;&quot; /&gt;
+
+   This will only work as long as the variable interpolation &lt;%= %&gt;
+   are flushed against the containing &quot; &quot; or &#39; &#39;, or else the object
+   reference will be stringified when it is concatenated with 
+   the rest of the data.
+
+   Testing for this feature was added to ./t/xmlsubs_aspargs.t
+
+   This feature is still experimental, and its interface may change.
+   However it is slated for the 3.0 release as default method,
+   so feedback is appreciated.
+
+ + For new XMLSubs ASP type &lt;%= %&gt; argument interpolation
+   activated with XMLSubsPerlArgs 0, &lt;% %&gt; will no longer work,
+   just &lt;%= %&gt;, as in 
+
+     &lt;my:tag value=&quot;some value &lt;%= $value %&gt; more data&quot; /&gt;
+
+   This feature is still experimental, and its interface may change.
+   However it is slated for the 3.0 release as default method,
+   so feedback is appreciated.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2029e470448></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.45; $DATE="10/13/2002"</b></font>
+<font face="courier new" size=3><pre>
+ ++New XMLSubsPerlArgs config, default 1, indicates how 
+  XMLSubs arguments have always been parsed.  If set to 0,
+  will enable new XMLSubs args that are more ASP like with
+  &lt;%= %&gt; for dynamic interpolation, such as:
+
+    &lt;my:xmlsub arg=&quot;&lt;%= $data %&gt;&quot; arg2=&quot;text &lt;%= $data2 %&gt;&quot; /&gt;
+ 
+  Settings XMLSubsPerlArgs to 0 is experimental for now, but
+  will become the default by Apache::ASP version 3.0
+
+ ++Optimization for static HTML/XML files that are served up 
+  via Apache::ASP so that they are not compiled into perl subroutines
+  first.  This makes especially native XSLT both faster &amp; take
+  less memory to serve, before XSL &amp; XML files being transformed
+  by XSLT would both be compiled as normal ASP script first, so 
+  now this will happen if they really are ASP scripts with embedded
+  &lt;% %&gt; code blocks &amp; XMLSubs being executed.
+
+ +Consolidate some config data for Apache::ASP-&gt;Loader to use
+  globals in @Apache::ASP::CompileChecksumKeys to know which 
+  config data is important for precompiling ASP scripts.
+
+ +Further streamlined code compilation.  Now both base
+  scripts and includes use the internal CompileInclude() API
+  to generate code.
+
+ -Fixed runtime HTML error output when Debug is set to -2/2,
+  so that script correctly again gets rendered in final perl form.
+  Added compile time error output to <a href=eg/syntax_error.htm>./site/eg/syntax_error.htm</a>
+  when a special link is clicked for a quick visual test.
+
+ -Cleaned up some bad coding practices in <a href=eg/global.asa>./site/eg/global.asa</a>
+  associated changes in other example files.  Comment example
+  global.asa some for the first time reader
+
+ -DemoASP.pm examples module needed &quot;use strict&quot; fix, thanks
+  to Allan Vest for bug report
+
+ --$rv = $Response-&gt;Include({ File =&gt; ..., Cache =&gt; 1});
+  now works to get the first returned value fetched from
+  the cache.  Before, because a list was always returned,
+  $rv would have been equal to the number of items returned,
+  even if the return value list has just one element.
+
+ (d) added site/robots.txt file with just a comment for
+     search engine indexing
+
+ -fixed <a href=eg/binary_write.htm>./site/eg/binary_write.htm</a> to not use 
+  $Response-&gt;{ContentLength} because it does not exist.
+  Fixed it to use $Response-&gt;AddHeader now instead
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2022337f806></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.41; $DATE="09/29/2002"</b></font>
+<font face="courier new" size=3><pre>
+ -Removed CVS Revision tag from Apache::ASP::Date, which 
+  was causing bad revision numbers in CPAN after CVS integration
+  of Apache::ASP
+
+ +removed cgi/asp link to ../asp-perl from distribution.  This
+  link was for the deprecated asp script which is now asp-perl
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%20252d85c29></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.39; $DATE="09/10/2002"</b></font>
+<font face="courier new" size=3><pre>
+ -Turn off $^W explicitly before reloading global.asa.  Reloading
+  global.asa when $^W is set will trigger subroutine redefinition
+  warnings.  Reloading global.asa should occur without any problems
+  under normal usage of the system, thus this work around.
+
+  This fix is important to UseStrict functionality because warnings
+  automatically become thrown as die() errors with UseStrict enabled,
+  so we have to disable normal soft warnings here.
+
+ -$Response-&gt;Include() runtime errors now throw a die() that
+  can be trapped.  This was old functionality that has been restored.
+  Other compile time errors should still trigger a hard error
+  like script compilation, global.asa, or $Response-&gt;Include()
+  without an eval()
+
+ +Some better error handling with Debug 3 or -3 set, cleaned
+  up developer errors messages somewhat.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202c1fa6b38></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.37; $DATE="07/03/2002"</b></font>
+<font face="courier new" size=3><pre>
+ -Fixed the testing directory structures for t/long_names.t
+  so that tar software like Archive::Tar &amp; Solaris tar that
+  have problems with long file names will still be able 
+  to untar distribution successfully.  Now t/long_names.t
+  generates its testing directory structures at runtime.
+
+ -Fixes for &quot;make test&quot; to work under perl 5.8.0 RC2, 
+  courtesy of Manabu Higashida
+
+ +SessionQueryForce setting created for disabling use of cookies
+  for $Session session-id passing, rather requiring use of SessionQuery*
+  functionality for session-id passing via URL query string.
+
+  By default, even when SessionQuery* options are used, cookies will
+  be used if available with SessionQuery* functionality acting only
+  as a backup, so this makes it so that cookies will never be used.
+
+ +Escape &#39; with HTMLEncode() to &amp;#39;
+
+ -Trying to fix t/server_mail.t to work better for platforms
+  that it should skip testing on.  Updated t/server.t test case.
+
+ +Remove exit() from Makefile.PL so CPAN.pm&#39;s automatic
+  follow prereq mechanism works correctly.  Thanks to Slaven Rezic
+  for pointing this out.
+
+ +Added Apache::compat loading in mod_perl environment for better
+  mod_perl 2.0 support.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202af464d94></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.35; $DATE="05/30/2002"</b></font>
+<font face="courier new" size=3><pre>
+ +Destroy better $Server &amp; $Response objects so that my 
+  closure references to these to not attempt to work in the future 
+  against invalid internal data. There was enough data left in these 
+  old objects to make debugging the my closure problem confusing, where 
+  it looked like the ASP object state became invalid.
+
+ +Added system debug diagnostics to inspect StateManager group cleanup
+
+ (d) Documentation update about flock() work around for 
+  Win95/Win98/WinMe systems, confirmed by Rex Arul
+
+ (d) Documentation/site build bug found by Mitsunobu Ozato, 
+  where &lt;% %&gt; not being escaped correctly with $Server-&gt;HTMLEncode().
+  New japanese documentation project started by him 
+  at <a href=http://sourceforge.jp/projects/apache-asp-jp/>http://sourceforge.jp/projects/apache-asp-jp/</a> 
+
+ -InitPackageGlobals() called after new Apache::ASP object created so 
+  core system templates can be compiled even when there was a runtime
+  compilation error of user templates.  Bug fix needed pointed out by
+  Eamon Daly
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%20276381ac3></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.33; $DATE="04/29/2002"</b></font>
+<font face="courier new" size=3><pre>
+ - fixed up t/server_mail.t test to skip if a sendmail server
+   is not available on localhost.  We only want the test to run
+   if there is a server to test against.
+
+ + removed cgi/asp script, just a symlink now to the ./asp-perl script
+   which in this way deprecates it.  I had it hard linked, but the 
+   distribution did not untar very well on win32 platform.
+
+ + Reordered the modules in Bundle::Apache::ASP for a cleaner install.
+
+ - Fixed bug where XMLSubs where removing &lt;?xml version ... ?&gt; tag
+   when it was needed in XSLT mode.
+
+ + $Server-&gt;Mail({ CC =&gt; &#39;...&#39;, BCC =&gt; &#39;...&#39; }), now works to send
+   CC &amp; BCC headers/recipients.
+
+ + Removed $Apache::ASP::Register definition which defined the current
+   executing Apache::ASP object.  Only one part of the application was
+   using it, and this has been fixed.  This would have been an unsafe
+   use of globals for a threaded environment.
+
+ + Decreased latency when doing Application_OnStart, used to sleep(1) 
+   for CleanupMaster sync, but this is not necessary for Application_OnStart 
+   scenario
+
+ + Restructure code / core templates for MailErrorsTo funcationality.  
+   Wrote test mail_error.t to cover this.  $ENV{REMOTE_USER} will now 
+   be displayed in the MailErrorsTo message when defined from 401 basic auth.
+
+ + $Server-&gt;RegisterCleanup should be thread safe now, as it no longer relies
+   on access to @Apache::ASP::Cleanup for storing the CODE ref stack.
+
+ + test t/inode_names.t for InodeNames and other file tests covering case
+   of long file names.
+
+ - Fixed long file name sub identifier bug.  Added test t/long_names.t.
+
+ + CacheDir may now be set independently of StateDir.  It used to default
+   to StateDir if it was set.
+
+ ++ Decomposition of modules like Apache::ASP::Session &amp; Apache::ASP::Application
+   out of ASP.pm file.  This should make the source more developer friendly.  
+
+   This selective code compilation also speeds up CGI requests that do not 
+   need to load unneeded modules like Apache::ASP::Session, by about 50%,
+   so where CGI mode ran at about 2.1 hits/sec before, now for 
+   light requests that do not load $Session &amp; $Application, requests
+   run at 3.4 hits/sec, this is on a dual PIII-450 linux 2.4.x
+
+ - Caching like for XSLTCache now works in CGI mode.  
+   This was a bug that it did not before.
+
+ + $Server-&gt;File() API added, acts as a wrapper around 
+   Apache-&gt;request-&gt;filename Added test in t/server.t
+
+ ++  *** EXPERIMENTAL / ALPHA FEATURE NOTE BEGIN ***
+
+   New $PERLLIB/Apache/ASP/Share/ directory created to 
+   hold system &amp; user contributed components, which will be found
+   on the $Server-&gt;MapInclude() path, which helps $Response-&gt;Include
+   search &#39;.&#39;,Global,IncludesDir, and now Apache::ASP::Share for
+   includes to load at runtime.  
+
+   The syntax for loading a shared include is to prefix the file
+   name with Share:: as in:
+
+    $Response-&gt;TrapInclude(&#39;Share::CORE/MailError.inc&#39;);
+
+   New test to cover this at t/share.t
+
+   This feature is experimental.  The naming convention may change
+   and the feature may disappear altogether, so only use if you
+   are interesting in experimenting with this feature &amp; will
+   provide feedback about how it works.
+
+   *** EXPERIMENTAL / ALPHA FEATURE NOTE END ***
+
+ + asp-perl script now uses ./asp.conf instead of ./asp.config
+   for runtime configuration via %Config defined there.  Update docs
+   for running in standalone CGI mode
+
+ + Make use of MANFEST.SKIP to not publish the dev/* files anymore.
+
+ - Script_OnEnd guaranteed to run after $Response-&gt;End, but 
+   it will not run if there was an error earlier in the request.
+
+ + lots of new test cases covering behaviour of $Response-&gt;End
+   and $Response-&gt;Redirect under various conditions like XMLSubs
+   and SoftRedirect and global.asa Script_OnStart
+
+ + asp-perl will be installed into the bin executables when
+   Apache::ASP is installed.  asp-perl is the command line version
+   of Apache::ASP that can also be used to run script in CGI mode.
+   Test case covering asp-perl functionality.
+
+ + asp CGI/command line script now called asp-perl.  I picked this 
+   name because Apache::ASP often has the name asp-perl in distributions
+   of the module.
+
+ + Apache::ASP::CGI::Test class now subclass of Apache::ASP::CGI.  To facilitate
+   this Apache::ASP::CGI::init() now called OO like Apache::ASP::CGI-&gt;init()
+   Fixed up places where the old style was called.  New Test class allows
+   a dummy Apache request object to be built which caches header &amp; body output
+   for later inspection instead of writing it to STDOUT.
+
+ - $Response-&gt;Redirect() under SoftRedirect 1 will not first Clear() buffer
+
+ - $Response-&gt;Redirect() in an XMLSubs will work now ... behavior
+   of $Response-&gt;Flush() being turned off in an XMLSubs was interfering with this.
+
+ + srand() init tracking done better, thanks for patch from Ime Smits
+
+ + Added file/directory being used for precompilation in 
+   Apache::ASP-&gt;Loader($file, ...) to output like:
+
+    [Mon Feb 04 20:19:22 2002] [error] [asp] 4215 (re)compiled 22 scripts 
+      of 22 loaded for $file
+
+   This is so that when precompiling multiple web sites
+   each with different directories, one can easier see the 
+   compile output relevant to the Loader() command being run.
+
+ + better decomp of Apache::ASP site build files at ./build/* files,
+   which is good should anyone look at it for ideas.
+
+ + improved test suite to error when unintended output results from
+   t/*.t test scripts.
+
+ - () now supported in XMLSubsMatch config, added xmlsubsmatch.t test...
+   specifically a config like 
+
+     PerlSetVar (aaa|bbb):\w+ 
+
+   should now work.  Thanks for bug report from David Kulp.
+
+ + Added an early srand() for better $ServerID creation
+
+ + Work around for DSO problems where $r is not always correctly 
+   defined in Apache::ASP::handler().  Thanks to Tom Lear for patch.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202a77480eb></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.31; $DATE="01/22/2002";</b></font>
+<font face="courier new" size=3><pre>
+ + $Server-&gt;MapInclude() API extension created to wrap up Apache::ASP::SearchDirs 
+   functionality so one may do an conditional check for an include existence befor 
+   executing $Response-&gt;Include().  Added API test to server.t
+
+ + $Server-&gt;Transfer() now allows arguments like $Response-&gt;Include(), and now acts just
+   as a wrapper for:
+
+     $Response-&gt;Include($file, @args);
+     $Response-&gt;End();
+
+   added test case at t/server_transfer.t
+
+ + Removed dependency of StatINC functionality on Apache::Symbol.  Apache::Symbol 
+   is no longer required.  Added test of t/stat_inc.t for correct StatINC initialization
+   for platforms where Devel::Symdump is present.
+
+ + Better error message when $Request-&gt;Params has not been defined with RequestParams
+   config &amp; it gets used in script.  Added test case as t/request_params_none.t
+
+ + Directories cannot now be included as scripts via $Response-&gt;Include(), added
+   test case to t/include.t
+
+ - No longer make $Response-&gt;Flush dependent on $Response-&gt;IsClientConnected() to 
+   be true to write output to client.  There have been spurious errors reported
+   about the new ( &gt;= 2.25 ) IsClientConnected code, and this will limit the impact 
+   of that functionality possibly not working still to those users explicitly using 
+   that API.
+
+ + $Response-&gt;AddHeader($header_name, $value) now will set $Response members
+   for these headers: Content-Type, Cache-Control, Expires.  This is to avoid
+   both the application &amp; Apache::ASP sending out duplicate headers.  Added
+   test cases for this to t/response.t
+
+ + split up Bundle::Apache::ASP into that, and Bundle::Apache::ASP::Extra
+   the former with just the required modules to run, and the latter 
+   for extra functionality in Apache::ASP
+
+ + new $Request-&gt;{Method} member to return $r-&gt;method of GET or POST that 
+   client browser is requesting, added t/request.t sub test to cover this member.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202be948898></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.29; $DATE="11/19/2001";</b></font>
+<font face="courier new" size=3><pre>
+ +Added some extra help text to the ./cgi/asp --help message
+  to clarify how to pass arguments to a script from the command line.
+
+ +When using $Server-&gt;Mail() API, if Content-Type header is set,
+  and MIME-Version is not, then a &quot;MIME-Version: 1.0&quot; header will be sent
+  for the email.  This is correct according to RFC 1521 which specifies
+  for the first time the Content-Type: header for email documents.
+  Thanks to Philip Mak for pointing out this correct behavior.
+
+ +Made dependent on MLDBM::Sync version .25 to pass the taint_check.t test
+
+ +Improved server_mail.t test to work with mail servers were relaying is denied
+
+ +Added &lt;html&gt;&lt;body&gt; tags to MailErrorsTo email
+
+ --Fixed SessionCount / Session_OnEnd bug, where these things were not
+  working for $Sessions that never had anything written to them.
+  This bug was introduced in 2.23/2.25 release.
+
+  There was an optimization in 2.23/2.25 where a $Session that was never
+  used does not write its state lock file &amp; dbm files to disk, only if
+  it gets written too like $Session-&gt;{MARK}++.  Tracking of these NULL $Sessions 
+  then is handled solely in the internal database.  For $Session garbage 
+  collection though which would fire Session_OnEnd events and update 
+  SessionCount, the Apache::ASP::State-&gt;GroupMembers() function was just 
+  looking for state files on disk ... now it looks in the internal database 
+  too for SessionID records for garbage collection.
+
+  Added a test at ./t/session_events.t for these things.
+
+ +Some optimizations for $Session API use.
+
+ +Added support for XSLT via XML::LibXSLT, patch courtesy of Michael Buschauer
+
+ -Got rid of an warning when recompiling changing includes under perl 5.6.1...
+  undef($code) method did not work for this perl version, rather undef(&amp;$code) does.
+  Stopped using using Apache::Symbol for this when available.
+
+ -Make Apache::ASP script run under perl taint checking -T for perl 5.6.1...
+  $code =~ tr///; does not work to untaint here, so much use the slower:
+  $code =~ /^(.*)$/s; $code = $1; method to untaint.
+
+ -Check for inline includes changing, included in a dynamic included
+  loaded at runtime via $Response-&gt;Include().  Added test case for
+  this at t/include_change.t.  If an inline include of a dynamic include
+  changes, the dynamic include should get recompiled now.
+
+ -Make OK to use again with PerlTaintCheck On, with MLDBM::Sync 2.25.
+  Fixed in ASP.pm, t/global.asa, and created new t/taint_check.t test script
+
+ +Load more modules when Apache::ASP is loaded so parent will share more
+  with children httpd: 
+   Apache::Symbol 
+   Devel::Symdump 
+   Config 
+   lib 
+   MLDBM::Sync::SDBM_File
+
+ +When FileUploadMax bytes is exceeded for a file upload, there will not
+  be an odd error anymore resulting from $CGI::POST_MAX being triggered,
+  instead the file upload input will simply be ignored via $CGI::DISABLE_UPLOADS.
+  This gives the developer the opportunity to tell the user the the file upload
+  was too big, as demonstrated by the <a href=eg/file_upload.asp>./site/eg/file_upload.asp</a> example.
+
+  To not let the web client POST a lot of data to your scripts as a form
+  of a denial of service attack use the apache config LimitRequestBody for the 
+  max limits.  You can think of PerlSetVar FileUploadMax as a soft limit, and 
+  apache&#39;s LimitRequestBody as a hard limit.
+
+ --Under certain circumstances with file upload, it seems that IsClientConnected() 
+  would return an aborted client value from $r-&gt;connection-&gt;aborted, so
+  the buffer output data would not be flushed to the client, and 
+  the HTML page would return to the browser empty.  This would be under
+  normal file upload use.  One work-around was to make sure to initialize
+  the $Request object before $Response-&gt;IsClientConnected is called,
+  then $r-&gt;connection-&gt;aborted returns the right value.
+  
+  This problem was probably introduced with IsClientConnected() code changes
+  starting in the 2.25 release.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%20211fd057b></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.27; $DATE="10/31/2001";</b></font>
+<font face="courier new" size=3><pre>
+ + Wrapped call to $r-&gt;connection-&gt;fileno in eval {} so to 
+   preserve backwards compatibility with older mod_perl versions
+   that do not have this method defined.  Thanks to Helmut Zeilinger
+   for catching this.
+
+ + removed ./dev directory from distribution, useless clutter
+
+ + Removed dependency on HTTP::Date by taking code into
+   Apache::ASP as Apache::ASP::Date.  This relieves
+   the dependency of Apache::ASP on libwww LWP libraries.
+   If you were using HTTP::Date functions before without loading
+   &quot;use HTTP::Date;&quot; on your own, you will have to do this now.
+
+ + Streamlined code execution.  Especially worked on 
+   $Response-&gt;IsClientConnected which gets called during
+   a normal request execution, and got rid of IO::Select
+   dependency. Some function style calls instead of OO style 
+   calls where private functions were being invokes that one 
+   would not need to override.
+
+ - Fixed possible bug when flushing a data buffer where there
+   is just a &#39;0&#39; in it.
+
+ + Updated docs to note that StateCache config was deprecated
+   as of 2.23.  Removed remaining code that referenced the config.
+
+ + Removed references to unused OrderCollections code.
+
+ - Better Cache meta key, lower chance of collision with 
+   unrelated data since its using the full MD5 keyspace now
+
+ + Optimized some debugging statements that resulted 
+   from recent development.
+
+ + Tie::TextDir .04 and above is supported for StateDB
+   and CacheDB settings with MLDBM::Sync .21. This is good for 
+   CacheDB where output is larger and there are not many 
+   versions to cache, like for XSLTCache, where the site is 
+   mostly static.
+
+ + Better RESOURCES section to web site, especially with adding
+   some links to past Apache::ASP articles &amp; presentations.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%20276d7fe30></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.25; $DATE="10/11/2001";</b></font>
+<font face="courier new" size=3><pre>
+ + Improved ./site/apps/search application, for better
+   search results at Apache::ASP site.  Also, reengineered
+   application better, with more perl code moved to global.asa.
+   Make use of MLDBM::Sync::SDBM_File, where search database
+   before was engineering around SDBM_File&#39;s shortcomings.
+
+ - Fix for SessionSerialize config, which broke in 2.23
+   Also, added t/session_serialize.t to test suite to catch
+   this problem in the future.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2024674da9c></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.23; $DATE="10/11/2001";</b></font>
+<font face="courier new" size=3><pre>
+ +Make sure a couple other small standard modules get loaded
+  upon &quot;PerlModule Apache::ASP&quot;, like Time::HiRes, Class::Struct,
+  and MLDBM::Serializer::Data::Dumper.  If not available
+  these modules won&#39;t cause errors, but will promote child httpd
+  RAM sharing if they are.
+
+ -XMLSubs args parsing fix so an arg like z-index
+  does not error under UseStrict.  This is OK now:
+
+   &lt;my:layer z-index=3 top=0 left=0&gt; HTML &lt;/my:layer&gt;
+
+ -Only remove outermost &lt;SCRIPT&gt; tags from global.asa
+  for IIS/PerlScript compatibility.  Used to remove
+  all &lt;SCRIPT&gt; tags, which hurt when some subs in globa.asa
+  would be printing some JavaScript.
+
+ +$Response-&gt;{IsClientConnected} now updated correctly 
+  before global.asa Script_OnStart.  $Response-&gt;IsClientConnect()
+  can be used for accurate accounting, while 
+  $Response-&gt;{IsClientConnected} only gets updated
+  after $Response-&gt;Flush().  Added test cases to response.t
+
+ +$Server-&gt;HTMLEncode(\$data) API extension, now can take
+  scalar ref, which can give a 5% improvement in benchmarks
+  for data 100K in size.
+
+ -Access to $Application is locked when Application_OnEnd &amp; 
+  Application_OnStart is called, creating a critical section
+  for use of $Application
+
+ ++MLDBM::Sync used now for core DBM support in Apache::ASP::State.
+  This drastically simplifies/stabilizes the code in there
+  and will make it easier for future SQL database plugins.
+
+ +New API for accessing ASP object information in non content
+  handler phases:
+
+    use Apache::ASP;
+    sub My::Auth::handler {
+      my $r = shift;
+      my $ASP = Apache::ASP-&gt;new($r) 
+      my $Session = $ASP-&gt;Session;
+    }
+
+  In the above example, $Session would be the same $Session
+  object created later while running the ASP script for this
+  same request.  
+
+  Added t/asp_object.t test for this.  Fixed global.asa to only 
+  init StateDir when application.asp starts which is the first 
+  test script to run.
+
+ -Fixed on Win32 to make Apache::ASP-&gt;new($r) able to create
+  multiple master ASP objects per request.  Was not reentrant 
+  safe before, particularly with state locking for dbms like 
+  $Application &amp; $Session.  
+
+ ++Output caching for includes, built on same layer ( extended )
+  as XSLTCache, test suite at t/cache.t.  Enabled with special 
+  arguments to 
+
+    $Response-&gt;Include(\%args, @include_args)
+    $Response-&gt;TrapInclude(\%args, @include_args)
+    $Server-&gt;Execute(\%args, @include_args)
+
+  where %args = (
+    File =&gt; &#39;file.inc&#39;,
+    Cache =&gt; 1, # to activate cache layer
+    Expires =&gt; 3600, # to expire in one hour
+    LastModified =&gt; time() - 600, # to expire if cached before 10 minutes ago
+    Key =&gt; $Request-&gt;Form, # to cache based on checksum of serialized form data,
+    Clear =&gt; 1, # to not allow fetch from cache this time, will always execute include
+  );
+
+  Like the XSLTCache, it uses MLDBM::Sync::SDBM_File
+  by default, but can use DB_File or GDBM_File if
+  CacheDB is set to these.
+
+  See t/cache.t for API support until this is documented.
+
+ +CacheSize now supports units of M, K, B like 
+
+   CacheSize 10M
+   CacheSize 10240K
+   CacheSize 10000000B
+   CacheSize 10000000
+
+ -Better handling of $Session-&gt;Abandon() so multiple
+  request to the same session while its being destroyed
+  will have the right effect.
+
+ +Optimized XMLSubs parsing.  Scripts with lots lof XMLSubs 
+  now parse faster for the first time.  One test script with 
+  almost 200 such tags went from a parse time of around 3 seconds
+  to .7 seconds after optimizations.
+
+ +Updated performance tuning docs, particularly for using
+  Apache::ASP-&gt;Loader()
+
+ +$Server-&gt;URL($url, \%params) now handles array refs
+  in the params values like
+    $Server-&gt;URL($url, { key =&gt; [ qw( value1 value2 ) ] })
+
+  This is so that query string data found in 
+  $Request-&gt;QueryString that gets parsed into this form
+  from a string like: ?key=value&amp;key=value2 would be 
+  able to be reused passed back to $Server-&gt;URL to 
+  create self referencing URLs more easily.
+
+ -Bug fix where XMLSubs like &lt;s:td /&gt; now works on perl 
+  5.005xx, thanks to Philip Mak for reporting &amp; fix.
+
+ +When searching for included files, will now join
+  the absolute path of the directory of the script
+  with the name of the file if its a relative file
+  name like ./header.inc.  Before, would just look
+  for something like ././header.inc by using &#39;.&#39;
+  as the first directory to look for includes in.
+
+  The result of this is that scripts in two directories
+  configured with the same Global setting should be able
+  to have separate local header.inc files without causing
+  a cached namespace collision.
+
+ +$Server-&gt;Config() call will return a hash ref 
+  to all the config setting for that request, like
+  Apache-&gt;dir_config would.
+
+ -StatINC setting with Apache::ASP-&gt;Loader() works again.
+  This makes StatINC &amp; StatINCMatch settings viable 
+  for production &amp; development use when the system has
+  very many modules.
+
+ -Cookieless session support with configs like SessionQueryParse
+  and SessionQuery now work for URLs with frags in them
+  like <tt>http://localhost?arg=value#frag</tt>
+
+ +@rv = $Response-&gt;Include() now works where there are
+  multiple return values from an include like:
+  &lt;% return(1,2); %&gt;
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202c37caa32></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.21; $DATE="8/5/2001";</b></font>
+<font face="courier new" size=3><pre>
+ +Documented RequestParams config in CONFIG misc section.
+
+ +Documented new XSLT caching directives.
+
+ +Updated <a href=eg/.htaccess>./site/eg/.htaccess</a> XSLT example config
+  to use XSLTCache setting.
+
+ +New FAQ section on why perl variables are sticky globals,
+  suggested by Mark Seger.
+
+ -push Global directory onto @INC during ASP script execution
+  Protect contents of original @INC with local.  This makes
+  things compatible with .09 Apache::ASP where we always had
+  Global in @INC.  Fixed needed by Henrik Tougaard
+
+ - ; is a valid separator like &amp; for QueryString Parameters
+  Fixed wanted by Anders
+
+ -XSMLSubsMatch doc fix in CONFIG section
+
+ +Reduces number of Session groups to 16 from 32, so 
+  session manager for small user sets will be that much faster.
+
+ +optimizations for internal database, $Application, and $Session
+  creation.
+
+ +XSLTCache must be set for XSLT caching to begin using CacheDir
+
+ +CacheDB like StateDB bug sets dbm format for caching, which
+  defaults to MLDBM::Sync::SDBM_File, which works well for caching
+  output sizes &lt; 50K
+
+ +CacheDir config for XSLT caching ... defaults to StateDir
+
+ +CacheSize in bytes determines whether the caches in CacheDir
+  are deleted at the end of the request.  A cache will be 
+  reset in this way back to 0 bytes. Defaults to 10000000 bytes
+  or about 10M.
+
+ +Caching infrastructure work that is being used in XSLT
+  can be leveraged later for output caching of includes,
+  or arbitrary user caching.
+
+ -t/server_mail.t test now uses valid email for testing
+  purposes ... doesn&#39;t actually send a mail, but for SMTP
+  runtime validation purposes it should be OK.
+
+ +fixed where POST data was read from under MOD_PERL,
+  harmless bug this was that just generated the wrong
+  system debugging message.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2029e6581ab></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.19; $DATE="7/10/2001";</b></font>
+<font face="courier new" size=3><pre>
+ +update docs in various parts
+
+ +added ./make_httpd/build_httpds.sh scripts for quick builds
+  of apache + mod_perl + mod_ssl
+
+ ++plain CGI mode available for ASP execution.  
+  cgi/asp script can now be used to execute ASP 
+  scripts in CGI mode.  See CGI perldoc section for more info.
+  The examples in ./site/eg have been set up to run
+  in cgi mode if desired.  Configuration in CGI section
+  only tested for Apache on Linux.
+
+ -Fixed some faulty or out of date docs in XML/XSLT section.
+
+ +added t/server_mail.t test for $Server-&gt;Mail(), requires
+  Net::SMTP to be configured properly to succeed.
+
+ +Net::SMTP debugging not enabled by Debug 1,2,3 configs,
+  not only when system debugging is set with Debug -1,-2,-3
+  However, a Debug param passed to $Server-&gt;Mail() will 
+  sucessfully override the Debug -1,-2,-3 setting even
+  when its Debug =&gt; 0
+
+ -Check for undef values during stats for inline includes
+  so we don&#39;t trigger unintialized warnings
+
+ +Documented &#39;;&#39; may separate many directories in the IncludesDir
+  setting for creating a more flexible includes search path.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%20282c9e25e></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.17; $DATE="6/17/2001";</b></font>
+<font face="courier new" size=3><pre>
+ +Added ASP perl mmm-mode subclass and configuration
+  in editors/mmm-asp-perl.el file for better emacs support.
+  Updated SYNTAX/Editors documentation.
+
+ +Better debugging error message for Debug 2 or 3 settings 
+  for global.asa errors.  Limit debug output for lines
+  preceding rendered script.
+
+ -In old inline include mode, there should no longer
+  be the error &quot;need id for includes&quot; when using
+  $Response-&gt;Include() ... if DynamicIncludes were
+  enabled, this problem would not have likely occured
+  anyway.  DynamicIncludes are preferrable to use so
+  that compiled includes can be shared between scripts.
+  This bug was likely introduced in version 2.11.
+
+ -Removed logging from $Response-&gt;BinaryWrite() in regular
+  debug mode 1 or 2.  Logging still enabled in system Debug mode, -1 or -2
+
+ -Removed other extra system debugging call that is really not
+  necessary.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202d4094038></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.15; $DATE="06/12/2001";</b></font>
+<font face="courier new" size=3><pre>
+ -Fix for running under perl 5.6.1 by removing parser optimization
+  introduced in 2.11.
+
+ -Now file upload forms, forms with ENCTYPE=&quot;multipart/form-data&quot;
+  can have multiple check boxes and select items marked for 
+  @params = $Request-&gt;Form(&#39;param_name&#39;) functionality.  This 
+  will be demonstrated via the <a href=eg/file_upload.asp>./site/eg/file_upload.asp</a> example.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2023614edca></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.11; $DATE="05/29/2001";</b></font>
+<font face="courier new" size=3><pre>
+ +Parser optimization from Dariusz Pietrzak
+
+ -work around for global destruction error message for perl 5.6
+  during install
+
+ +$Response-&gt;{IsClientConnected} now will be set
+  correctly with ! $r-&gt;connection-&gt;aborted after each
+  $Response-&gt;Flush()
+
+ +New XSLTParser config which can be set to XML::XSLT or
+  XML::Sablotron.  XML::Sablotron renders 10 times faster, 
+  but differently.  XML::XSLT is pure perl, so has wider
+  platform support than XML::Sablotron.  This config affects
+  both the XSLT config and the $Server-&gt;XSLT() method.
+
+ +New $Server-&gt;XSLT(\$xsl_data, \$xml_data) API which 
+  allows runtime XSLT on components instead of having to process
+  the entire ASP output as XSLT.  
+
+ -XSLT support for XML::XSL 0.32.  Things broke after .24.
+
+ -XSLTCacheSize config no longer supported.  Was a bad 
+  Tie::Cache implementation.  Should be file based cache
+  to greatly increases cache hit ratio.
+
+ ++$Response-&gt;Include(), $Response-&gt;TrapInclude(),
+  and $Server-&gt;Execute() will all take a scalar ref
+  or \&#39;asdfdsafa&#39; type code as their first argument to execute 
+  a raw script instead of a script file name.  At this time, 
+  compilation of such a script, will not be cached.  It is 
+  compiled/executed as an anonymous subroutine and will be freed
+  when it goes out of scope.
+
+ + -p argument to cgi/asp script to set GlobalPackage
+  config for static site builds
+
+ -pod commenting fix where windows clients are used for 
+  ASP script generation.
+
+ +Some nice performance enhancements, thank to submissions from
+  Ime Smits.  Added some 1-2% per request execution speed.
+
+ +Added StateDB MLDBM::Sync::SDBM_File support for faster
+  $Session + $Application than DB_File, yet still overcomes
+  SDBM_File&#39;s 1024 bytes value limitation.  Documented in 
+  StateDB config, and added Makefile.PL entry.
+
+ +Removed deprecated MD5 use and replace with Digest::MD5 calls
+
+ +PerlSetVar InodeNames 1 config which will compile scripts hashed by 
+  their device &amp; inode identifiers, from a stat($file)[0,1] call.
+  This allows for script directories, the Global directory,
+  and IncludesDir directories to be symlinked to without
+  recompiling identical scripts.  Likely only works on Unix
+  systems.  Thanks to Ime Smits for this one.
+
+ +Streamlined code internally so that includes &amp; scripts were
+  compiled by same code.  This is a baby step toward fusing
+  include &amp; script code compilation models, leading to being
+  able to compile bits of scripts on the fly as ASP subs, 
+  and being able to garbage collect ASP code subroutines.
+
+ -removed @_ = () in script compilation which would trigger warnings 
+  under PerlWarn being set, thanks for Carl Lipo for reporting this.
+
+ -StatINC/StatINCMatch fix for not undeffing compiled includes
+  and pages in the GlobalPackage namespace
+
+ -Create new HTML::FillInForm object for each FormFill
+  done, to avoid potential bug with multiple forms filled
+  by same object.  Thanks to Jim Pavlick for the tip.
+
+ +Added PREREQ_PM to Makefile.PL, so CPAN installation will
+  pick up the necessary modules correctly, without having
+  to use Bundle::Apache::ASP, thanks to Michael Davis. 
+
+ + &gt; mode for opening lock files, not &gt;&gt;, since its faster
+
+ +$Response-&gt;Flush() fixed, by giving $| = 1 perl hint
+  to $r-&gt;print() and the rest of the perl sub.
+
+ +$Response-&gt;{Cookies}{cookie_name}{Expires} = -86400 * 300;
+  works so negative relative time may be used to expire cookies.
+
+ +Count() + Key() Collection class API implementations
+
+ +Added editors/aasp.vim VIM syntax file for Apache::ASP,
+  courtesy of Jon Topper.
+
+ ++Better line numbering with #line perl pragma.  Especially
+  helps with inline includes.  Lots of work here, &amp; integrated
+  with Debug 2 runtime pretty print debugging.
+
+ +$Response-&gt;{Debug} member toggles on/off whether 
+  $Response-&gt;Debug() is active, overriding the Debug setting
+  for this purpose.  Documented.
+
+ -When Filter is on, Content-Length won&#39;t be set and compression
+  won&#39;t be used.  These things would not work with a filtering
+  handler after Apache::ASP
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202023e855d></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.09; $DATE="01/30/2001";</b></font>
+<font face="courier new" size=3><pre>
+ +Examples in ./site/eg are now UseStrict friendly.  
+  Also fixed up <a href=eg/ssi_filter.ssi>./site/eg/ssi_filter.ssi</a> example.
+
+ +Auto purge of old stale session group directories, increasing 
+  session manager performance when using Sessions when migrating
+  to Apache::ASP 2.09+ from older versions.
+
+ +SessionQueryParse now works for all $Response-&gt;{ContentType}
+  starting with &#39;text&#39; ... before just worked with text/html,
+  now other text formats like wml will work too. 
+
+ +32 groups instead of 64, better inactive site session group purging.
+
+ +Default session-id length back up to 32 hex bytes.
+  Better security vs. performance, security more important,
+  especially when performance difference was very little.
+
+ +PerlSetVar RequestParams 1 creates $Request-&gt;Params
+  object with combined contents of $Request-&gt;QueryString
+  and $Request-&gt;Form
+
+ ++FormFill feature via HTML::FillInForm.  Activate with
+  $Response-&gt;{FormFill} = 1 or PerlSetVar FormFill 1
+  See site/eg/formfill.asp for example.
+
+ ++XMLSubs tags of the same name may be embedded in each other
+  recursively now.
+
+ +No umask() use on Win32 as it seems unclear what it would do
+
+ +simpler Apache::ASP::State file handle mode of &gt;&gt; when opening 
+  lock file.  saves doing a -e $file test.
+
+ +AuthServerVariables config to init $Request-&gt;ServerVariables
+  with basic auth data as documented.  This used to be default
+  behavior, but triggers &quot;need AuthName&quot; warnings from recent
+  versions of Apache when AuthName is not set.
+
+ -Renamed Apache::ASP::Loader class to Apache::ASP::Load
+  as it collided with the Apache::ASP-&gt;Loader() function
+  namespace.  Class used internally by Apache::ASP-&gt;Loader()
+  so no public API changed here.
+
+ +-Read of POST input for $Request-&gt;BinaryRead() even
+   if its not from a form.  Only set up $Request-&gt;Form
+   if this is from a form POST.
+
+ +faster POST/GET param parsing
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2021002eb7e></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.07; $DATE="11/26/2000";</b></font>
+<font face="courier new" size=3><pre>
+ -+-+ Session Manager
+  empty state group directories are not removed, thus alleviating
+  one potential race condition.  This impacted performance
+  on idle sites severely as there were now 256 directories
+  to check, so made many performance enhancements to the 
+  session manager.  The session manager is built to handle
+  up to 20,000 client sessions over a 20 minute period.  It
+  will slow the system down as it approaches this capacity.
+
+  One such enhancement was session-ids now being 11 bytes long 
+  so that its .lock file is only 16 characters in length.  
+  Supposedly some file systems lookup files 16 characters or 
+  less in a fast hashed lookup.  This new session-id has
+  4.4 x 10^12 possible values.  I try to keep this space as
+  large as possible to prevent a brute force attack.
+
+  Another enhancement was to limit the group directories
+  to 64 by only allowing the session-id prefix to be [0-3][0-f]
+  instead of [0-f][0-f], checking 64 empty directories on an
+  idle site takes little time for the session manager, compared
+  to 256 which felt significant from the client end, especially
+  on Win32 where requests are serialized.  
+
+  If upgrading to this version, you would do well to delete
+  empty StateDir group directories while your site is idle.
+  Upgrading during an idle time will have a similar effect,
+  as old Apache::ASP versions would delete empty directories.
+
+ -$Application-&gt;GetSession($session_id) now creates
+  an session object that only lasts until the next
+  invocation of $Application-&gt;GetSession().  This is 
+  to avoid opening too many file handles at once,
+  where each session requires opening a lock file.
+
+ +added experimental support for Apache::Filter 1.013 
+  filter_register call
+
+ +make test cases for $Response-&gt;Include() and 
+  $Response-&gt;TrapInclude()
+
+ +Documented CollectionItem config.
+
+ +New $Request-&gt;QueryString(&#39;multiple args&#39;)-&gt;Count()
+  interface implemented for CollectionItem config.
+  Also $Request-&gt;QueryString(&#39;multiple args&#39;)-&gt;Item(1) method.
+  Note ASP collections start counting at 1.
+
+ --fixed race condition, where multiple processes might 
+  try creating the same state directory at the same time, with
+  one winning, and one generating an error.  Now, web process
+  will recheck for directory existence and error if 
+  it doesn&#39;t. 
+
+ -global.asa compilation will be cached correctly, not
+  sure when this broke.  It was getting reloaded every request.
+
+ -StateAllWrite config, when set creates state files
+  with a+rw or 0666 permissions, and state directories
+  with a+rwx or 0777 permissions.  This allows web servers
+  running as different users on the same machine to share a 
+  common StateDir config.  Also StateGroupWrite config
+  with perms 0770 and 0660 respectively.
+
+ -Apache::ASP-&gt;Loader() now won&#39;t follow links to 
+  directories when searching for scripts to load.
+
+ +New RegisterIncludes config which is on by default only
+  when using Apache::ASP-&gt;Loader(), for compiling includes
+  when precompiling scripts.
+
+ +Apache::ASP::CompileInclude path optimized, which underlies
+  $Response-&gt;Include()
+
+ +$Request-&gt;QueryString-&gt;(&#39;foo&#39;)-&gt;Item() syntax enabled
+  with CollectionItem config setting.  Default syntax
+  supported is $Request-&gt;QueryString(&#39;foo&#39;) which is
+  in compatible.  Other syntax like $Request-&gt;{Form}{foo}
+  and $Request-&gt;Form-&gt;Item(&#39;foo&#39;) will work in either case.
+
+ +New fix suggested for missing Apache reference in 
+  Apache::ASP handler startup for RedHat RPMs.  Added
+  to error message.
+
+ --Backup flock() unlocking try for QNX will not corrupt the 
+  normal flock() LOCK_UN usage, after trying to unlock a file
+  that doesn&#39;t exist.  This bug was uncovered from the below 
+  group deletion race condition that existed. 
+
+ -Session garbage collection will not delete new group
+  directories that have just been created but are empty.
+  There was a race condition where a new group directory would
+  be created, but then deleted by a garbage collector before
+  it could be initialized correctly with new state files.
+
+ +Better random session-id checksums for $Session creation.
+  per process srand() initialization, because srand() 
+  may be called once prefork and never called again.
+  Call without arguments to rely on perl&#39;s decent rand
+  seeding.  Then when calling rand() in Secret() we have
+  enough random data, that even if someone else calls srand()
+  to something fixed, should not mess things up terribly since
+  we checksum things like $$ &amp; time, as well as perl memory
+  references.
+
+ +XMLSubs installation make test.
+
+ -Fix for multiline arguments for XMLSubs
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202909e81ef></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.03; $DATE="08/01/2000";</b></font>
+<font face="courier new" size=3><pre>
+ +License change to GPL.  See LICENSE section.
+
+ +Setup of www.apache-asp.org site, finally!
+
+ -get rid of Apache::ASP-&gt;Loader() warning message for perl 5.6.0
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202727b0736></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.01; $DATE="07/22/2000";</b></font>
+<font face="courier new" size=3><pre>
+ +$data_ref = $Response-&gt;TrapInclude(&#39;file.inc&#39;) API
+  extension which allows for easy post processing of
+  data from includes
+
+ +<a href=eg/source.inc>./site/eg/source.inc</a> syntax highlighting improvements
+
+ +XMLSubsMatch compile time parsing performance improvement
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%202784583b1></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 2.00; $DATE="07/15/2000";</b></font>
+<font face="courier new" size=3><pre>
+ -UniquePackages config works again, broke a couple versions back
+
+ +better error handling for methods called on $Application
+  that don&#39;t exist, hard to debug before
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2010d78b35d></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 1.95; $DATE="07/10/2000";</b></font>
+<font face="courier new" size=3><pre>
+ !!!!! EXAMPLES SECURITY BUG FOUND &amp; FIXED !!!!!
+
+ --FIXED: distribution example <a href=eg/source.asp>./site/eg/source.asp</a> now parses 
+  out special characters of the open() call when reading local 
+  files.
+
+  This bug would allow a malicious user possible writing
+  of files in the same directory as the source.asp script.  This
+  writing exploit would only have effect if the web server user
+  has write permission on those files.
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ -$0 now set to transferred file, when using $Server-&gt;Transfer
+
+ -Fix for XMLSubsMatch parsing on cases with 2 or more args passed
+  to tag sub that was standalone like 
+    &lt;Apps:header type=&quot;header&quot; title=&quot;Moo&quot; foo=&quot;moo&quot; /&gt;
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%201b231718a></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 1.93; $DATE="07/03/2000";</b></font>
+<font face="courier new" size=3><pre>
+ -sub second timing with Time::HiRes was adding &lt;!-- --&gt;
+  comments by HTML by default, which would possibly
+  break specific programs looking for precise HTML output.
+  Now this behavior must be explicitly turned on with
+  the TimeHiRes config setting.
+
+  These comments will only appear in HTML only if 
+  Debug is enabled as well.
+
+  Timed log entries will only occur if 
+  system debugging is enabled, with Debug -1 or -2
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2010d8c7b1b></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 1.91; $DATE="07/02/2000";</b></font>
+<font face="courier new" size=3><pre>
+ +Documented XMLSubsMatch &amp; XSLT* configuration
+  settings in CONFIG section.
+
+ +XSLT XSL template is now first executed as an 
+  ASP script just like the XML scripts.  This is 
+  just one step away now from implementing XSP logic.
+
+ +$Server-&gt;Execute and $Server-&gt;Transfer API extensions
+  implemented.  Execute is the same as $Request-&gt;Include()
+  and $Server-&gt;Transfer is like an apache internal redirect
+  but keeps the current ASP objects for the next script.
+
+  Added examples, transfer.htm, and modified dynamic_includes.htm.
+
+ +Better compile time error debugging with Debug 2 or -2.
+  Will hilite/link the buggy line for global.asa errors, 
+  include errors, and XML/XSLT errors just like with 
+  ASP scripts before.
+
+ +Nice source hiliting when viewing source for the example
+  scripts.
+
+ +Runtime string writing optimization for static HTML going
+  through $Response.
+
+ +New version numbering just like everyone else.  Starting at 1.91
+  since I seem to be off by a factor of 10, last release would have
+  been 1.9.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200f0c93549></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.19; $DATE="NOT RELEASED";</b></font>
+<font face="courier new" size=3><pre>
+ +XMLSubsMatch and XSLT* settings documented in 
+  the XML/XSLT section of the site/README.
+
+ -XMLSubsMatch will strip parens in a pattern match
+  so it does not interfere with internal matching use.
+
+ +XSLT integration allowing XML to be rendered by XSLT
+  on the fly.  XSLT specifies XSL file to transform XML.
+  XSLTMatch is a regexp that matches XML file names, like \.xml$,
+  which will be transformed by XSLT setting, default .*
+  
+  XSLTCacheSize when specified uses Tie::Cache to cached XML DOMs 
+  internally and cache XSLT transformations output per XML/XSL 
+  combination.  XML DOM objects can take a lot of RAM, so use
+  this setting judiciously like setting to 100.  Definitely 
+  experiment with this value.
+
+ +More client info in the error mail feature, including
+  client IP, form data, query string, and HTTP_* client headers
+
+ +With Time::HiRes loaded, and Debug set to non 0, 
+  will add a &lt;!-- Apache::ASP served request in xx.xx seconds --&gt;
+  to text/html output, similar to Cocoon, per user request  
+  Will also add this to the system debug error log output
+  when Debug is &lt; 0
+
+ -bug fix on object initialization optimization earlier
+  in this release, that was introduced for faster event
+  handler execution.
+
+ +Apache::ASP::Parse() takes a file name, scalar, or
+  scalar ref for arguments of data to parse for greater
+  integration ability with other applications.
+
+ +PodComments optimization, small speed increase at
+  compilation time.
+
+ +String optimization on internal rendering that avoids 
+  unnecessary copying of static html, by using refs.  Should 
+  make a small difference on sites with large amounts of 
+  static html.
+
+ +CompressGzip setting which, when Compress::Zlib is installed,
+  will compress text/html automatically going out to the web
+  browser if the client supports gzip encoding.
+
+ ++Script_OnFlush event handler, and auxiliary work optimizing
+  asp events in general.  $Response-&gt;{BinaryRef} created which
+  is a reference to outgoing output, which can be used 
+  to modify the data at runtime before it goes out to the client. 
+
+ +Some code optimizations that boost speed from 22 to 24 
+  hits per second when using Sessions without $Application,
+  on a simple hello world benchmark on a WinNT PII300.
+
+ ++Better SessionManagement, more aware of server farms that 
+  don&#39;t have reliable NFS locking.  The key here is to have only
+  one process on one server in charge of session garbage collection
+  at any one time, and try to create this situation with a snazzy
+  CleanupMaster routine.  This is done by having a process register
+  itself in the internal database with a server key created at
+  apache start time.  If this key gets stale, another process can 
+  become the master, and this period will not exceed the period
+  SessionTimeout / StateManager.
+
+  ** Work on session manager sponsored by LRN, <a href=http://www.lrn.com>http://www.lrn.com</a>.  **
+  ** This work was used to deploy a server farm in production with  **
+  ** NFS mounted StateDir. Thanks to Craig Samuel for his belief in **
+  ** open source. :)                                                **
+
+  Future work for server farm capabilities might include breaking
+  up the internal database into one of 256 internal databases 
+  hashed by the first 2 chars of the session id.  Also on the plate
+  is Apache::Session like abilities with locking and/or data storage
+  occuring in a SQL database.  The first dbs to be done will include
+  MySQL &amp; Oracle.
+
+ +Better session security which will create a new session id for an 
+  incoming session id that does not match one already seen.  This will
+  help for those with Search engines that have bookmarked
+  pages with the session ids in the query strings.  This breaks away
+  from standard ASP session id implementation which will automatically
+  use the session id presented by the browser, now a new session id will
+  be returned if the presented one is invalid or expired.
+
+ -$Application-&gt;GetSession will only return a session if
+  one already existed.  It would create one before by default.
+
+ +Script_OnFlush global.asa event handler, and $Response-&gt;{BinaryRef}
+  member which is a scalar reference to the content about to be flushed.
+  See <a href=eg/global.asa>./site/eg/global.asa</a> for example usage, used in this case to
+  insert font tags on the fly into the output.
+
+ +Highlighting and linking of line error when Debug is set to 2 or -2.
+
+ --removed fork() call from flock() backup routine? How did 
+   that get in there?  Oh right, testing on Win32. :(
+   Very painful lesson this one, sorry to whom it may concern.
+
+ +$Application-&gt;SessionCount support turned off by default
+  must enable with SessionCount config option.  This feature
+  puts an unnecessary load on busy sites, so not default 
+  behavior now.  
+
+ ++XMLSubsMatch setting that allows the developer to 
+  create custom tags XML style that execute perl subroutines.
+  See <a href=eg/xml_subs.asp>./site/eg/xml_subs.asp</a>
+
+ +MailFrom config option that defaults the From: field for 
+  mails sent via the Mail* configs and $Server-&gt;Mail()
+
+ +$Server-&gt;Mail(\%mail, %smtp_args) API extension
+
+ +MailErrorsTo &amp; MailAlertTo now can take comma
+  separated email addresses for multiple recipients.
+
+ -tracking of subroutines defined in scripts and includes so 
+  StatINC won&#39;t undefine them when reloading the GlobalPackage, 
+  and so an warning will be logged when another script redefines 
+  the same subroutine name, which has been the bane of at least
+  a few developers.
+
+ -Loader() will now recompile dynamic includes that 
+  have changed, even if main including script has not.
+  This is useful if you are using Loader() in a 
+  PerlRestartHandler, for reloading scripts when
+  gracefully restarting apache.
+
+ -Apache::ASP used to always set the status to 200 by 
+  default explicitly with $r-&gt;status().  This would be 
+  a problem if a script was being used to as a 404 
+  ErrorDocument, because it would always return a 200 error
+  code, which is just wrong.  $Response-&gt;{Status} is now 
+  undefined by default and will only be used if set by 
+  the developer.  
+
+  Note that by default a script will still return a 200 status, 
+  but $Response-&gt;{Status} may be used to override this behavior.
+
+ +$Server-&gt;Config($setting) API extension that allows developer
+  to access config settings like Global, StateDir, etc., and is a 
+  wrapper around Apache-&gt;dir_config($setting)
+
+ +Loader() will log the number of scripts
+  recompiled and the number of scripts checked, instead
+  of just the number of scripts recompiled, which is
+  misleading as it reports 0 for child httpds after
+  a parent fork that used Loader() upon startup.  	
+
+ -Apache::ASP-&gt;Loader() would have a bad error if it didn&#39;t load 
+  any scripts when given a directory, prints &quot;loaded 0 scripts&quot; now
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2004a1da04f></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.18; $DATE="02/03/2000";</b></font>
+<font face="courier new" size=3><pre>
+ +Documented SessionQuery* &amp; $Server-&gt;URL() and 
+  cleaned up formatting some, as well as redoing
+  some of the sections ordering for better readability.
+  Document the cookieless session functionality more
+  in a new SESSIONS section.  Also documented new 
+  FileUpload configs and $Request-&gt;FileUpload collection.
+  Documented StatScripts.
+
+ +StatScripts setting which if set to 0 will not reload
+  includes, global.asa, or scripts when changed.
+
+ +FileUpload file handles cleanup at garbage collection
+  time so developer does not have to worry about lazy coding
+  and undeffing filehandles used in code.  Also set 
+  uploaded filehandles to binmode automatically on Win32 
+  platforms, saving the developer yet more typing.
+
+ +FileUploadTemp setting, default 0, if set will leave
+  a temp file on disk during the request, which may be 
+  helpful for processing by other programs, but is also
+  a security risk in that others could potentially read 
+  this file while the script is running. 
+
+  The path to the temp file will be available at
+  $Request-&gt;{FileUpload}{$form_field}{TempFile}.
+  The regular use of file uploads remains the same
+  with the &lt;$filehandle&gt; to the upload at 
+  $Request-&gt;{Form}{$form_field}.
+
+ +FileUploadMax setting, default 0, currently an 
+  alias for $CGI::POST_MAX, which determines the 
+  max size for a file upload in bytes.  
+
+ +SessionQueryParse only auto parses session-ids
+  into links when a session-id COOKIE is NOT found.
+  This feature is only enabled then when a user has
+  disabled cookies, so the runtime penalty of this
+  feature won&#39;t drag down the whole site, since most
+  users will have cookies turned on.   
+
+ -StatINC &amp; StatINCMatch will not undef Fnctl.pm flock 
+  functions constants like O_RDWR, because the code references
+  are not well trackable.  This would result in sporadic 500 server
+  errors when a changed module was reloaded that imported O_* flock 
+  functions from Fnctl.
+
+ +SessionQueryParse &amp; SessionQueryParseMatch
+  settings that enable auto parsing session ids into 
+  URLs for cookieless sessions.  Will pick up URLs in 
+  &lt;a href&gt;, &lt;area href&gt;, &lt;form action&gt;, &lt;frame src&gt;,
+  &lt;iframe src&gt;, &lt;img src&gt;, &lt;input src&gt;, &lt;link href&gt;
+  $Response-&gt;Redirect($URL) and the first URL in 
+  script tags like &lt;script&gt;*.location.href=$URL&lt;/script&gt;
+
+  These settings require that buffering be enabled, as
+  Apache::ASP will parse through the buffer to parse the URLs.
+
+  With SessionQueryParse on, it will just parse non-absolute
+  URLs, but with SessionQueryParseMatch set to some server
+  url regexp, like ^<tt>http://localhost</tt> , will also parse
+  in the session id for URLs that match that.
+
+  When testing, the performance hit from this parsing
+  a script dropped from 12.5 hits/sec on my WinNT box
+  to 11.7 hits per second for 1K of buffered output.
+  The difference is .007 of my PII300&#39;s processing power
+  per second.
+
+  For 10K of output then, my guess is that this speed
+  of script, would be slowed to 6.8 hits per second.
+  This kind of performance hit would also slow a
+  script running at 40 hits per second on a UNIX box
+  to 31 hits/sec for 1K, and to 11 hits/sec for 10K parsed.
+
+  Your mileage may vary and you will have to test the difference
+  yourself.  Get yourself a valid URL with a session-id in
+  it, and run it through ab, or Socrates, with SessionQuery
+  turned on, and then with SessionQueryParse set to see 
+  the difference.  SessionQuery just enables of session id
+  setting from the query string but will not auto parse urls.
+
+ -If buffering, Content-Length will again be set.
+  It broke, probably while I was tuning in the past 
+  couple versions.
+
+ +UseStrict setting compiles all scripts including
+  global.asa with &quot;use strict&quot; turned on for catching
+  more coding errors.  With this setting enabled,
+  use strict errors die during compilation forcing
+  Apache::ASP to try to recompile the script until
+  successful.
+
+ -Object use in includes like $Response-&gt;Write() 
+  no longer error with &quot;use strict&quot; programming.  
+
+ +SessionQuery config setting with $Server-&gt;URL($url, { %params } ) 
+  alpha API extensions to enable cookieless sessions.
+
+ +Debugging not longer produces internal debugging
+  by default.  Set to -1,-2 for internal debugging
+  for Debug settings 1 &amp; 2.
+
+ +Both StateSerializer &amp; StateDB can be changed 
+  without affecting a live web site, by storing 
+  the configurations for $Application &amp; $Session 
+  in an internal database, so that if $Session was
+  created with SDBM_File for the StateDB (default),
+  it will keep this StateDB setting until it ends.
+
+ +StateSerializer config setting.  Default Data::Dumper,
+  can also be set to Storable.  Controls how data is
+  serialized before writing to $Application &amp; $Session.
+
+ +Beefed up the make test suite.
+
+ +Improved the locking, streamlining a bit of the 
+  $Application / $Session setup process.  Bench is up to 
+  22 from 21 hits / sec on dev NT box.
+
+ +Cut more fat for faster startup, now on my dev box 
+  I get 44 hits per sec Apache::ASP vs. 48 Embperl 
+  vs. 52 CGI via Apache::Registry for the HelloWorld Scripts.
+
+ -Improved linking for the online site documentation, 
+  where a few links before were bad.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200792d4e8d></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.17; $DATE="11/15/99";</b></font>
+<font face="courier new" size=3><pre>
+ ++20%+ faster startup script execution, as measured by the 
+  HelloWorld bench.  I cut a lot of the fat out of 
+  the code, and is now at least 20% faster on startup 
+  both with and without state.
+
+  On my dev (NT, apache 1.3.6+mod_perl) machine, I now get:
+
+	42 hits per sec on Apache::ASP HelloWorld bench
+	46 hits per sec on Embperl (1.2b10) and
+	51 hits per sec for CGI Apache::Registry scripts  
+
+  Before Apache::ASP was clocking some 31 hits per sec.
+  Apache::ASP also went from 75 to 102 hits per second 
+  on Solaris.
+
+ +PerlTaintCheck On friendly.  This is mod_perl&#39;s way 
+  of providing -T taint checking.  When Apache::ASP
+  is used with state objects like $Session or $Application,
+  MLDBM must also be made taint friendly with:
+
+    $MLDBM::RemoveTaint = 1;
+
+  which could be put in the global.asa.  Documented.
+
+ +Added $Response-&gt;ErrorDocument($error_code, $uri_or_string) 
+  API extension which allows for setting of Apache&#39;s error
+  document at runtime.  This is really just a wrapper 
+  for Apache-&gt;custom_response() renamed so it syncs with
+  the Apache ErrorDocument config setting.  Updated
+  documentation, and added error_document.htm example.
+
+ =OrderCollections setting was added, but then REMOVED
+  because it was not going to be used.  It bound 
+  $Request-&gt;* collections/hashes to Tie::IxHash, so that data
+  in those collections would be read in the order the 
+  browser sent it, when eaching through or with keys.
+
+ -global.asa will be reloaded when changed.  This broke
+  when I optimized the modification times with (stat($file))[9]
+  rather than &quot;use File::stat; stat($file)-&gt;mtime&quot;
+
+ -Make Apache::ASP-&gt;Loader() PerlRestartHandler safe,
+  had some unstrict code that was doing the wrong thing.
+
+ -IncludesDir config now works with DynamicIncludes.
+
+ +DebugBufferLength feature added, giving control to 
+  how much buffered output gets shown when debugging errors.
+
+ ++Tuning of $Response-&gt;Write(), which processes all
+  static html internally, to be almost 50% faster for
+  its typical use, when BufferingOn is enabled, and 
+  CgiHeaders are disabled, both being defaults.
+
+  This can show significant speed improvements for tight
+  loops that render ASP output.
+
+ +Auto linking of ./site/eg/ text to example scripts
+  at web site.
+
+ +$Application-&gt;GetSession($session_id) API extension, useful
+  for managing active user sessions when storing session ids
+  in $Application.  Documented.
+
+ -disable use of flock() on Win95/98 where it is unimplemented
+
+ <b>&#045;&#064;&#097;&#114;&#114;&#097;&#121;</b> context of $Request-&gt;Form(&#39;name&#39;) returns
+  undef when value for &#39;name&#39; is undefined.  Put extra
+  logic in there to make sure this happens.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2003dd1597d></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.16; $DATE="09/22/99";</b></font>
+<font face="courier new" size=3><pre>
+ -$Response-&gt;{Buffer} and PerlSetVar BufferingOn
+  configs now work when set to 0, to unbuffer output,
+  and send it out to the web client as the script generates it.
+
+  Buffering is enabled by default, as it is faster, and
+  allows a script to error cleanly in the middle of execution.  
+
+ +more bullet proof loading of Apache::Symbol, changed the 
+  way Apache::ASP loads modules in general.  It used to 
+  check for the module to load every time, if it hadn&#39;t loaded
+  successfully before, but now it just tries once per httpd,
+  so the web server will have to be restarted to see new installed
+  modules.  This is just for modules that Apache::ASP relies on.
+
+  Old modules that are changed or updated with an installation
+  are still reloaded with the StatINC settings if so configured. 
+
+ +ASP web site wraps &lt;font face=&quot;courier new&quot;&gt; around &lt;pre&gt;
+  tags now to override the other font used for the text
+  areas.  The spacing was all weird in Netscape before
+  for &lt;pre&gt; sections.
+
+ -Fixed Content-Length calculation when using the Clean
+  option, so that the length is calculated after the HTML
+  is clean, not before.  This would cause a browser to 
+  hang sometimes.
+
+ +Added IncludesDir config option that if set will also be
+  used to check for includes, so that includes may easily be
+  shared between applications.  By default only Global and 
+  the directory the script is in are checked for includes.
+
+  Also added IncludesDir as a possible configuration option
+  for Apache::ASP-&gt;Loader()
+
+ -Re-enabled the Application_OnStart &amp; OnEnd events, after
+  breaking them when implementing the AllowApplicationState
+  config setting.
+
+ +Better pre-fork caching ... StatINC &amp; StatINCMatch are now 
+  args for Apache::ASP-&gt;Loader(), so StatINC symbols loading
+  may be done pre-fork and shared between httpds.  This lowers
+  the child httpd init cost of StatINC.  Documented.
+
+ +Made Apache::ASP Basic Authorization friendly so authentication
+  can be handled by ASP scripts.  If AuthName and AuthType Apache
+  config directives are set, and a $Response-&gt;{Status} is set to 
+  401, a user will be prompted for username/password authentication
+  and the entered data will show up in ServerVariables as:
+    $env = $Request-&gt;ServerVariables
+    $env-&gt;{REMOTE_USER} = $env-&gt;{AUTH_USER} = username
+    $env-&gt;{AUTH_PASSWD} = password
+    $env-&gt;{AUTH_NAME}   = your realm
+    $env-&gt;{AUTH_TYPE}   = &#39;Basic&#39;
+
+  This is the same place to find auth data as if Apache had some 
+  authentication handler deal with the auth phase separately.
+
+ -MailErrorsTo should report the right file now that generates
+  the error.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200a2fa9027></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.15; $DATE="08/24/1999";</b></font>
+<font face="courier new" size=3><pre>
+ --State databases like $Session, $Application are 
+  now tied/untied to every lock/unlock triggered by read/write 
+  access.  This was necessary for correctness issues, so that 
+  database file handles are flushed appropriately between writes
+  in a highly concurrent multi-process environment.
+
+  This problem raised its ugly head because under high volume, 
+  a DB_File can become corrupt if not flushed correctly.  
+  Unfortunately, there is no way to flush SDBM_Files &amp; DB_Files 
+  consistently other than to tie/untie the databases every access.
+
+  DB_File may be used optionally for StateDB, but the default is
+  to use SDBM_File which is much faster, but limited to 1024 byte
+  key/value pairs.
+
+  For SDBM_Files before, if there were too many concurrent 
+  writes to a shared database like $Application, some of the 
+  writes would not be saved because another process
+  might overwrite the changes with its own.
+
+  There is now a 10 fold performance DECREASE associated
+  with reading from and writing to files like $Session 
+  and $Application.  With rough benchmarks I can get about
+  100 increments (++) now per second to $Session-&gt;{count}, where
+  before I could get 1000 increments / second.  
+
+  You can improve this if you have many reads / writes happening
+  at the same time, by placing locking code around the group like
+  
+	$Session-&gt;Lock();
+	$Session-&gt;{count}++;
+	$Session-&gt;{count}++;
+	$Session-&gt;{count}++;
+	$Session-&gt;UnLock();	
+
+  This method will reduce the number of ties to the $Session database
+  from 6 to 1 for this kind of code, and will improve the performance
+  dramatically.
+
+  Also, instead of using explicit $Session locking, you can 
+  create an automatic lock on $Session per script by setting
+  SessionSerialize in your config to 1.  The danger here is
+  if you have any long running scripts, the user will have
+  to wait for it to finish before another script can be run.
+
+  To see the number of lock/unlocks or ties/unties to each database
+  during a script execution, look at the last lines of debug output
+  to your error log when Debug is set to 1.  This can help you
+  performance tweak access to these databases.
+
+ +Updated documentation with new config settings and
+  API extensions.
+
+ +Added AllowApplicationState config option which allows
+  you to leave $Application undefined, and will not
+  execute Application_OnStart or Application_OnEnd.
+  This can be a slight performance increase of 2-3% if
+  you are not using $Application, but are using $Session.
+
+ +Added $Session-&gt;Lock() / $Session-&gt;UnLock() API routines
+  necessary additions since access to session is not
+  serialized by default like IIS ASP.  Also prompted
+  by change in locking code which retied to SDBM_File
+  or DB_File each lock.  If you $Session-&gt;Lock / UnLock
+  around many read/writes, you will increase performance.
+
+ +Added StateCache config which, if set will cache
+  the file handle locks for $Application and an internal 
+  database used for tracking $Session info.  This caching can 
+  make an ASP application perform up to 10% faster,
+  at a cost of each web server process holding 2 more 
+  cached file handles open, per ASP application using
+  this configuration.  The data written to or read from
+  these state databases is not cached, just the locking 
+  file handles are held open.
+
+ -Added in much more locking in session manager 
+  and session garbage collector to help avoid collisions
+  between the two.  There were definite windows that the
+  two would collide in, during which bad things could 
+  happen on a high volume site.
+
+ -Fixed some warnings in DESTROY and ParseParams()
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200b667e0c4></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.14; $DATE="07/29/1999";</b></font>
+<font face="courier new" size=3><pre>
+ -CGI &amp; StatINC or StatINCMatch would have bad results
+  at times, with StatINC deleting dynamically compiled
+  CGI subroutines, that were imported into other scripts
+  and modules namespaces.
+
+  A couple tweaks, and now StatINC &amp; CGI play nice again ;)
+  StatINCMatch should be safe to use in production with CGI. 
+  This affects in particular environments that use file upload, 
+  since CGI is loaded automatically by Apache::ASP to handle 
+  file uploads.
+
+  This fix should also affect other seemingly random 
+  times when StatINC or StatINCMatch don&#39;t seem to do 
+  the right thing.
+
+ +use of ASP objects like $Response are now &quot;use strict&quot;
+  safe in scripts, while UniquePackages config is set.
+
+ +Better handling of &quot;use strict&quot; errors in ASP scripts.
+  The error is detected, and the developer is pointed to the 
+  Apache error log for the exact error.  
+
+  The script with &quot;use strict&quot; errors will be recompiled again.  Its seems 
+  though that &quot;use strict&quot; will only throw its error once, so that a script 
+  can be recompiled with the same errors, and work w/o any use strict
+  error messaging.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200fcc7c76f></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.12; $DATE="07/01/1999";</b></font>
+<font face="courier new" size=3><pre>
+ -Compiles are now 10 +times faster for scripts with lots of big
+  embedded perl blocks &lt;% #perl %&gt;
+
+  Compiles were slow because of an old PerlScript compatibility
+  parsing trick where $Request-&gt;QueryString(&#39;hi&#39;)-&gt;{item}
+  would be parsed to $Request-&gt;QueryString(&#39;hi&#39;) which works.
+  I think the regexp that I was using had O(n^2) characteristics
+  and it took a really big perl block to 10 +seconds to parse
+  to understand there was a problem :(
+
+  I doubt anyone needed this compatibility, I don&#39;t even see
+  any code that looks like this in the online PerlScript examples,
+  so I&#39;ve commented out this parsing trick for now.  If you 
+  need me to bring back this functionality, it will be in the 
+  form of a config setting.
+
+  For information on PerlScript compatibility, see the PerlScript
+  section in the ASP docs.
+
+ -Added UniquePackages config option, that if set brings back 
+  the old method of compiling each ASP script into its own
+  separate package.  As of v.10, scripts are compiled by default
+  into the same package, so that scripts, dynamic includes &amp; global.asa
+  can share globals.  This BROKE scripts in the same ASP Application
+  that defined the same sub routines, as their subs would redefine
+  each other.  
+
+  UniquePackages has scripts compiled into separate perl packages,
+  so they may define subs with the same name, w/o fear of overlap.
+  Under this settings, scripts will not be able to share globals.  
+
+ -Secure field for cookies in $Response-&gt;Cookies() must be TRUE to 
+  force cookie to be secure.  Before, it just had to be defined, 
+  which gave wrong behavior for Secure =&gt; 0. 
+
+ +$Response-&gt;{IsClientConnected} set to one by default.  Will
+  work out a real value when I upgrade to apache 1.3.6.  This
+  value has no meaning before, as apache aborts the perl code
+  when a client drops its connection in earlier versions.
+
+ +better compile time debugging of dynamic includes, with 
+  Debug 2 setting
+
+ +&quot;use strict&quot; friendly handling of compiling dynamic includes
+  with errors
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200bd024b52></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.11; $DATE="06/24/1999";</b></font>
+<font face="courier new" size=3><pre>
+ +Lots of documentation updates
+
+ +The MailHost config option is the smtp server used for 
+  relay emails for the Mail* config options.
+
+ +MailAlertTo config option used for sending a short administrative
+  alert for an internal ASP error, server code 500.  This is the 
+  compliment to MailErrorsTo, but is suited for sending a to a
+  small text based pager.  The email sent by MailErrorsTo would
+  then be checked by the web admin for quick response &amp; debugging
+  for the incident. 
+
+  The MailAlertPeriod config specifies the time in minutes during 
+  which only one alert will be sent, which defaults to 20.
+
+ +MailErrorsTo config options sends the results of a 500 error
+  to the email address specified as if Debug were set to 2.
+  If Debug 2 is set, this config will not be on, as it is
+  for production use only.  Debug settings less than 2 only 
+  log errors to the apache server error log.
+
+ -StatINCMatch / StatINC can be used in production and work
+  even after a server graceful restart, which is essential for 
+  a production server.
+
+ -Content-Length header is set again, if BufferingOn is set, and
+  haven&#39;t $Response-&gt;Flush()&#39;d.  This broke when I introduce
+  the Script_OnEnd event handler.
+
+ +Optimized reloading of the GlobalPackage perl module upon changes, 
+  so that scripts and dynamic includes don&#39;t have to be recompiled.  
+  The global.asa will still have to be though.  Since we started
+  compiling all routines into a package that can be named with
+  GlobalPackage, we&#39;ve been undeffing compiled scripts and includes
+  when the real GlobalPackage changed on disk, as we do a full sweep
+  through the namespace.  Now, we skip those subs that we know to 
+  be includes or scripts. 
+
+ -Using Apache::Symbol::undef() to undefine precompiled scripts
+  and includes when reloading those scripts.  Doing just an undef() 
+  would sometimes result in an &quot;active subroutine undef&quot; error.
+  This bug came out when I started thrashing the StatINC system
+  for production use.
+
+ +StatINCMatch setting created for production use reloading of
+  perl modules.  StatINCMatch allows StatINC reloading of a
+  subset of all the modules defined in %INC, those that match
+  $module =~ /$StatINCMatch/, where module is some module name
+  like Class/Struct.pm
+
+ +Reoptimized pod comment parsing.  I slowed it down to sync
+  lines numbers in the last version, but found another corner I could cut.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200c7f99fbe></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.10; $DATE="05/24/1999";</b></font>
+<font face="courier new" size=3><pre>
+ += improvement; - = bug fix
+
+ +Added index.html file to ./eg to help people wade through
+  the examples.  This one has been long overdue.
+
+ +Clean config option, or setting $Response-&gt;{Clean} to 1 - 9,
+  uses HTML::Clean to compress text/html output of ASP scripts.
+  I like the Clean 1 setting which is lightweight, stripping 
+  white space for about 10% compression, at a cost of less than
+  a 5% performance penalty.
+
+ +Using pod style commenting no longer confuses the line
+  numbering.  ASP script line numbers are almost exactly match
+  their compiled perl version, except that normal inline includes
+  (not dynamic) insert extra text which can confuse line numbering.
+  If you want perl error line numbers to entirely sync with your 
+  ASP scripts, I would suggest learning how to use dynamic includes,
+  as opposed to inline includes.
+
+ -Wrapped StatINC reloading of libs in an eval, and capturing
+  error for Debug 2 setting.  This makes changing libs with StatINC
+  on a little more friendly when there are errors. 
+
+ -$Request-&gt;QueryString() now stores multiple values for the 
+  same key, just as $Request-&gt;Form() has since v.07.  In
+  wantarray() context like @vals = $Request-&gt;QueryString(&#39;dupkey&#39;),
+  @vals will store whatever values where associated with dupkey
+  in the query string like (1,2) from: ?dupkey=1&amp;dupkey=2
+
+ +The GlobalPackage config directive may be defined
+  to explicitly set the perl module that all scripts and global.asa
+  are compiled into.
+
+ -Dynamic includes may be in the Global directory, just like
+  normal includes.
+
+ +Perl script generated from asp scripts should match line
+  for line, seen in errors, except when using inline (default) 
+  includes, pod comments, or &lt;% #comment %&gt; perl comments, which 
+  will throw off the line counts by adding text, removing
+  text, or having an extra newline added, respectively.
+
+ -Script_OnEnd may now send output to the browser.  Before
+  $main::Response-&gt;End() was being called at the end of the
+  main script preventing further output.
+</pre></font>++All scripts are compiled as routines in a namespace uniquely
+<font face="courier new" size=3><pre>  defined by the global.asa of the ASP application.  Thus,
+  scripts, includes, and global.asa routines will share
+  all globals defined in the global.asa namespace.   This means
+  that globals between scripts will be shared, and globals
+  defined in a global.asa will be available to scripts.
+
+  Scripts used to have their own namespace, thus globals
+  were not shared between them.
+
+ +a -o $output_dir switch on the ./cgi/asp script allows
+  it to execute scripts and write their output to an output
+  directory.  Useful for building static html sites, based on
+  asp scripts.  An example use would be:
+
+    asp -b -o out *.asp
+
+  Without an output directory, script output is written to STDOUT
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2005ee189f2></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.09; $DATE="04/22/1999";</b></font>
+<font face="courier new" size=3><pre>
+ +Updated Makefile.PL optional modules output for CGI &amp; DB_File
+
+ +Improved docs on $Response-&gt;Cookies() and $Request-&gt;Cookies()
+
+ +Added PERFORMANCE doc to main README, and added sub section
+  on precompiling scripts with Apache::ASP-&gt;Loader()
+
+ +Naming of CompileIncludes switched over to DynamicIncludes 
+  for greater clarity.
+
+ +Dynamic includes can now reference ASP objects like $Session
+  w/o the $main::* syntax.  These subs are no longer anonymous
+  subs, and are now compiled into the namespace of the global.asa package.
+
+ +Apache::ASP-&gt;Loader() precompiles dynamic includes too. Making this work
+  required fixing some subtle bugs / dependencies in the compiling process.
+
+ +Added Apache::ASP-&gt;Loader() similar to Apache::RegistryLoader for
+  precompiling ASP scripts.  Precompile a whole site at server 
+  startup with one function call.
+
+ +Prettied the error messaging with Debug 2.
+
+ +$Response-&gt;Debug(@args) debugging extension, which
+  allows a developer to hook into the module&#39;s debugging,
+  and only have @args be written to error_log when Debug is greater
+  than 0.
+
+ -Put write locking code around State writes, like $Session
+  and $Application.  I thought I fixed this bug a while ago.
+
+ -API change: converted $Session-&gt;Timeout() and $Session-&gt;SessionID() 
+  methods into $Session-&gt;{Timeout} and $Session-&gt;{SessionID} properties.
+  The use of these properties as methods is deprecated, but 
+  backwards compatibility will remain.  Updated ./eg/session.asp
+  to use these new properties.
+
+ +Implemented $Response-&gt;{PICS} which if set sends out a PICS-Label
+  HTTP header, useful for ratings.
+
+ +Implemented $Response-&gt;{CacheControl} and $Response-&gt;{Charset} members.
+  By default, CacheControl is &#39;private&#39;, and this value gets sent out
+  every request as HTTP header Cache-Control.  Charset appends itself
+  onto the content type header.
+
+ +Implemented $Request-&gt;BinaryRead(), $Request-&gt;{TotalBytes},
+  documented them, and updated ./eg/form.asp for an example usage. 
+
+ +Implemented $Response-&gt;BinaryWrite(), documented, and created
+  and example in ./eg/binary_write.htm
+
+ +Implemented $Server-&gt;MapPath() and created example of its use
+  in ./eg/server.htm
+
+ -$Request-&gt;Form() now reads file uploads correctly with 
+  the latest CGI.pm, where $Request-&gt;Form(&#39;file_field&#39;) returns
+  the actual file name uploaded, which can be used as a file handle
+  to read in the data.  Before, $Request-&gt;Form(&#39;file_field&#39;) would
+  return a glob that looks like *Fh::filename, so to get the file
+  name, you would have to parse it like =~ s/^\*Fh\:\://,
+  which you no longer have to do.  As long as parsing was done as
+  mentioned, the change should be backwards compatible.
+
+ +Updated  +enhanced documentation on file uploads.  Created extra
+  comments about it as an FAQ, and under $Response-&gt;Form(), the latter
+  being an obvious place for a developer to look for it.
+
+ +Updated ./eg/file_upload.asp to show use of non file form data, 
+  with which we had a bug before.
+
+ +Finished retieing *STDIN to cached STDIN contents, so that 
+  CGI input routines may be used transparently, along side with
+  use of $Request-&gt;Form()
+
+ +Cleaned up and optimized $Request code
+
+ +Updated documentation for CGI input &amp; file uploads.  Created
+  file upload FAQ.
+
+ +Reworked ./eg/cgi.htm example to use CGI input routines
+  after doing a native read of STDIN.
+
+ ++Added dynamic includes with &lt;!--include file=file args=@args--&gt;
+  extension.  This style of include is compiled as an anonymous sub &amp; 
+  cached, and then executed with @args passed to the subroutine for 
+  execution.  This is include may also be rewritten as a new API 
+  extension: $Response-&gt;Include(&#39;file&#39;, @args)
+
+ +Added ./eg/compiled_includes.htm example documenting new dynamic includes.
+
+ +Documented SSI: native file includes, and the rest with filtering 
+  to Apache::SSI
+
+ +Turned the documentation of Filter config to value of Off so 
+  people won&#39;t cut and paste the On config by default.
+
+ +Added SecureSession config option, which forces session cookie to 
+  be sent only under https secured www page requests.
+
+ +Added StateDB config option allows use of DB_File for $Session, since 
+  default use of SDBM_File is limited.  See StateDB in README.
+
+ +file include syntax w/o quotes supported like &lt;!--#include file=test.inc--&gt;
+
+ +Nested includes are supported, with includes including each other.
+  Recursive includes are detected and errors out when an include has been 
+  included 100 times for a script.  Better to quit early than 
+  have a process spin out of control. (PORTABLE ? probably not)
+
+ +Allow &lt;!--include file=file.inc--&gt; notation w/o quotes around file names
+
+ -PerlSetEnv apache conf setting now get passed through to 
+  $Request-&gt;ServerVariables. This update has ServerVariables 
+  getting data from %ENV instead of $r-&gt;cgi_env
+
+ +README FAQ for PerlHandler errors
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200ea85a09a></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.08; $DATE="02/06/1999";</b></font>
+<font face="courier new" size=3><pre>
+ ++SSI with Apache::Filter &amp; Apache::SSI, see config options &amp; ./eg files
+  Currently filtering only works in the direction Apache::ASP -&gt; Apache::SSI,
+  will not work the other way around, as SSI must come last in a set of filters
+
+ +SSI file includes may reference files in the Global directory, better 
+  code sharing
+
+ - &lt;% @array... %&gt; no longer dropped from code.
+
+ +perl =pod comments are stripped from script before compiling, and associated
+  PodComments configuration options.
+
+ +Command line cgi/asp script takes various options, and allows execution
+  of multiple asp scripts at one time.  This script should be used for
+  command line debugging.  This is also the beginning of building
+  a static site from asp scripts with the -b option, suppressing headers.
+
+ +$Response-&gt;AddHeader(&#39;Set-Cookie&#39;) works for multiple cookies.
+
+ -$Response-&gt;Cookies(&#39;foo&#39;, &#39;0&#39;) works, was dropping 0 because of boolean test
+
+ -Fixed up some config doc errors.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2003960e08a></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.07; $DATE="01/20/1999";</b></font>
+<font face="courier new" size=3><pre>
+ -removed SIG{__WARN__} handler, it was a bad idea.
+
+ -fixes file locking on QNX, work around poor flock porting
+
+ +removed message about Win32::OLE on UNIX platforms from Makefile.PL
+
+ -Better lock garbage collection.  Works with StatINC seamlessly.
+
+ -Multiple select forms now work in array context with $Response-&gt;Form()
+	@values = $Response-&gt;Form(&#39;multi&#39;);
+
+ -Better CGI.pm compatibility with $r-&gt;header_out(&#39;Content-type&#39;),
+  improved garbage collection under modperl, esp. w/ file uploads
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200394bbc7f></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.06; $DATE="12/21/1998";</b></font>
+<font face="courier new" size=3><pre>
+ +Application_OnStart &amp; Application_OnEnd event handlers support.
+
+ -Compatible with CGI.pm 2.46 headers() 
+
+ -Compatible with CGI.pm $q = new CGI({}), caveat: does not set params 
+
+ +use strict; followed by use of objects like $Session is fine.
+
+ -Multiple cookies may be set per script execution.
+
+ +file upload implemented via CGI.pm
+
+ ++global.asa implemented with events Session_OnStart and Session_OnEnd
+  working appropriately.
+
+ +StateDir configuration directive implemented.
+  StateDir allows the session state directory to be specified separately 
+  from the Global directory, useful for operating systems with caching file 
+  systems.
+
+ +StateManager config directive.  StateManager specifies how frequently
+  Sessions are cleaned up, with 10 (default) meaning that old Sessions
+  will be cleaned up 10 times per SessionTimeout period (default 20 minutes).
+
+ +$Application-&gt;SessionCount() implemented, non-portable method.
+	: returns the number of currently active sessions
+
+ -STOP button fix.  Users may hit STOP button during script 
+  execution, and Apache::ASP will cleanup with a routine registered
+  in Apache&#39;s $r-&gt;register_cleanup.  Works well supposedly.
+
+ +PerlScript compatibility work, trying to make ports smoother.
+	: Collection emulator, no -&gt;{Count} property
+	: $.*(.*)-&gt;{Item} parsed automatically, 
+	  shedding the -&gt;{Item} for Collection support (? better way ?)
+	: No VBScript dates support, just HTTP RFC dates with HTTP::Date
+	: Win32::OLE::in not supported, just use &quot;keys %{$Collection}&quot;	
+
+ +./cgi/asp script for testing scripts from the command line
+	: will be upgraded to CGI method of doing asp
+	: is not &quot;correct&quot; in anyway, so not documented for now
+	  but still useful
+
+ +strips DOS carriage returns from scripts automatically, so that
+  programs like FrontPage can upload pages to UNIX servers
+  without perl choking on the extra \r characters.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2003a5fe2db></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.05; $DATE="10/19/1998";</b></font>
+<font face="courier new" size=3><pre>
+ +Added PERFORMANCE doc, which includes benchmarks  +hints.
+
+ +Better installation warnings and errors for other modules required. 
+
+ -Turned off StatINC in eg/.htaccess, as not everyone installs Devel::Symdump
+
+ -Fixed AUTOLOAD state bug, which wouldn&#39;t let you each through state
+  objects, like %{$Session}, or each %$Session, (bug introduced in v.04)
+
+ +Parses ASP white space better.  HTML output matches author&#39;s intent
+  by better dealing with white space surrounding &lt;% perl blocks %&gt;
+
+ -Scalar insertion code &lt;%=$foo%&gt; can now span many lines.
+
+ +Added include.t test script for includes.
+
+ +Script recompiles when included files change.
+
+ +Files can be included in script with 
+  SSI &lt;!--#include file=&quot;filename&quot;--&gt; syntax, needs to be
+  done in ASP module to allow compilation of included code and html 
+  into script.  Future chaining with Apache::SSI will allow static 
+  html includes, and other SSI directives
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2009ffce1f9></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.04; $DATE="10/14/1998";</b></font>
+<font face="courier new" size=3><pre>
+ +Example script eg/cgi.htm demonstrating CGI.pm use for output.
+
+ +Optimized ASP parsing, faster and more legible executing code
+	: try &#39;die();&#39; in code with setting PerlSetVar Debug 2
+
+ +Cleaned up code for running with &#39;use strict&#39;
+
+ -Fixed directory handle leak on Solaris, from not closing after opendir()
+
+ +StatINC overhaul.  StatINC setting now works as it should, with 
+  the caveat that exported functions will not be refreshed.
+
+ +NoState setting optimization, disallows $Application &amp; $Session
+
+ +$Application-&gt;*Lock() functions implemented
+
+ -SoftRedirect setting for those who want scripts to keep running
+  after a Redirect()
+
+ +SessionSerialize setting to lock session while script is running
+	: Microsoft ASP style session locking
+	: For a session, scripts execute one at a time 
+	: NOT recommended use, please see note.
+
+ -MLDBM can be used for other things without messing up internal use
+	: before if it was used with different DB&#39;s and serializers,
+	  internal state could be lost.
+
+ --State file locking.  Corruption worries, and loss of data no more.
+
+ +CGI header support, developer can use CGI.pm for *output*, or just print()
+	: print &quot;Set-Cookie: test=cookie\n&quot;, and things will just work
+	: use CGI.pm for output
+	: utilizes $r-&gt;send_cgi_header(), thanks Doug!
+
+ +Improved Cookie implementation, more flexible and complete
+	- Domain cookie key now works
+	: Expire times now taken from time(), and relative time in sec
+	: Request-&gt;Cookies() reading more flexible, with wantarray()
+	  on hash cookie values, %hash = $Request-&gt;Cookie(&#39;test&#39;);
+
+ -make test module naming correction, was t.pm, now T.pm for Unix
+
+ +POD / README cleanup, formatting and HTML friendly.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%200ec664faf></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.03; $DATE="09/14/1998";</b></font>
+<font face="courier new" size=3><pre>
+ +Installation &#39;make test&#39; now works
+
+ +ActiveX objects on Win32 implemented with $Server-&gt;CreateObject() 
+
+ +Cookies implemented: $Response-&gt;Cookies() &amp; $Request-&gt;Cookies()
+
+ -Fixed $Response object API, converting some methods to object members.
+  Deprecated methods, but backwards compatible.
+
+ +Improved error messaging, debug output
+
+ +$, influences $Response-&gt;Write(@strings) behavior
+
+ +perl print() works, sending output to $Response object
+
+ +$Response-&gt;Write() prints scalars, arrays, and hashes.  Before only scalars.
+
+ +Begin implementation of $Server object.
+
+ +Implemented $Response-&gt;{Expires} and $Response-&gt;{ExpiresAbsolute}
+
+ +Added &quot;PerlSetVar StatINC&quot; config option
+
+ +$0 is aliased to current script filename
+
+ +ASP Objects ($Response, etc.) are set in main package
+  Thus notation like $main::Response-&gt;Write() can be used anywhere.
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%20055b248f9></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.02; $DATE="07/12/1998";</b></font>
+<font face="courier new" size=3><pre>
+ ++Session Manager, won&#39;t break under denial of service attack
+
+ +Fleshed out $Response, $Session objects, almost full implementation.
+
+ +Enormously more documentation.
+
+ -Fixed error handling with Debug = 2.
+
+ -Documentation fixed for pod2man support.  README now more man-like.
+
+ -Stripped \r\n dos characters from installation files
+
+ -755 mode set for session state directory when created
+
+ -Loads Win32/OLE properly, won&#39;t break with UNIX
+</pre></font>
+	
+	<p>
+	<a name=%24VERSION%20%3D%2009faee67f></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>$VERSION = 0.01; $DATE="06/26/1998";</b></font>
+<font face="courier new" size=3><pre>
+ Syntax Support
+ --------------
+ Initial release, could be considered alpha software.
+ Allows developers to embed perl in html ASP style.
+
+ &lt;!-- sample here --&gt;
+ &lt;html&gt;
+ &lt;body&gt;
+ &lt;% for(1..10) { %&gt;
+ 	counting: &lt;%=$_%&gt; &lt;br&gt;
+ &lt;% } %&gt;
+ &lt;/body&gt;
+ &lt;/html&gt;
+
+ ASP Objects
+ -----------
+ $Session, $Application, $Response, $Request objects available
+ for use in asp pages.
+
+ $Session &amp; $Application data is preserved using SDBM files.
+
+ $Session id&#39;s are tracked through the use of cookies.
+
+ Security
+ --------
+ Timeouts any attempt to use a session id that doesn&#39;t already 
+ exist.  Should stop hackers, since there is no wire speed guessing
+ cookies.
+</pre></font>
+	
+
+</font>
+</td>
+
+<td bgcolor=white valign=top>
+&nbsp;
+</td>
+
+</tr>
+<tr bgcolor=#063678>
+	<td colspan=3 align=center width=80%>
+	<font face=verdana color=white size=-1>
+	Copyright &copy; 1998-2008,
+	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
+	</font>
+	</td>
+</tr>
+</table>
+
+</td></tr>
+</table>
+</center>
+
+</body>
+</html>

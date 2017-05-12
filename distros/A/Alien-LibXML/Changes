@@ -1,0 +1,54 @@
+Alien-LibXML
+============
+
+Created:      2012-11-28
+Home page:    <https://metacpan.org/release/Alien-LibXML>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Alien-LibXML>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-16
+
+ [ Packaging ]
+ - Add bug tracker link.
+ - Add homepage link.
+ - Add repo link.
+ - Sign distribution.
+
+0.002	2014-09-16
+
+ [ Bug Fixes ]
+ - Win32-related fixes.
+   Graham Ollis++
+ - Work around possible libxml2 bug with uninstalled .pc file.
+   Fixes RT#90273.
+   Graham Ollis++
+   <https://rt.cpan.org/Ticket/Display.html?id=90273>
+
+ [ Packaging ]
+ - Make File::Which a test requirement rather than runtime requirement.
+
+ [ Other ]
+ - Don't build python libraries for libxml2 because they often result in
+   permissions problems at installation time. (And we don't need them.)
+   Graham Ollis++
+ - Updated: Change pattern used when searching for libxml2 tarball on
+   xmlsoft.org FTP server.
+   Graham Ollis++
+ - Use static libraries for XS.
+   Graham Ollis++
+
+0.001	2013-01-02
+
+ [ Documentation ]
+ - Add better abstract.
+ - Include example usage in SYNOPSIS.
+
+ [ Packaging ]
+ - Bundle example usage.
+
+0.000_02	2012-11-30
+
+ [ Packaging ]
+ - Include a meaty gcc test in the test suite.
+
+0.000_01	2012-11-28	Preview - just noodling really

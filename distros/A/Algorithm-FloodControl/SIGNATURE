@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4b965af34c2df36269d204281645bc48770468d7 .cvsignore
+SHA1 e4ce88dddf20a0a6e993c6e8ef5feb140806168e Changes
+SHA1 3780ab4abf4750d21fcd4c871b04dac8294690c2 MANIFEST
+SHA1 d647e10b9f231ddd4b9a4c90fb20d75e6b3f8d30 META.yml
+SHA1 1403ae17c4c344476cd8c71ec2b190fc13e64ccb Makefile.PL
+SHA1 73af7dba8096be943364f3eb0c60dfa2bfd957e5 README
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 5c9e093b0facca46d50e3c69d5569aa7a98db0b8 inc/Module/Install.pm
+SHA1 866c0e03f2c87659bb47cb5d0aa37e978b0f2ab3 inc/Module/Install/AutoInstall.pm
+SHA1 465acb50b9006ce61f58a7bd02d0bb029ddceaa6 inc/Module/Install/Base.pm
+SHA1 8356d82167fc00550b4a3ceea8bd852a374d7509 inc/Module/Install/Can.pm
+SHA1 b47ce07fa6d6e38e3daa6cfc752b23f59a64754c inc/Module/Install/Fetch.pm
+SHA1 3863d11bd88e40811755e20e680795ad2be974c8 inc/Module/Install/Include.pm
+SHA1 37ed4ccd7aba10119e6f2993b8082674ce2e5961 inc/Module/Install/Makefile.pm
+SHA1 4aa1c578faad51f31e62bed7b28d3d42b88219c3 inc/Module/Install/Metadata.pm
+SHA1 d7529d795a1304c88253b26a9089913edf31ae5e inc/Module/Install/Win32.pm
+SHA1 2a74aba5a78e7ab2776382e42106ebe941c2ac28 inc/Module/Install/WriteAll.pm
+SHA1 0b50b9f360a1dbf2bc0ef56c914ecf8647bd74e1 lib/Algorithm/FloodControl.pm
+SHA1 e0425cd6d29109f9c24de750feab1f4ff27d370e lib/Algorithm/FloodControl/Backend.pm
+SHA1 e7b94d745c3fd74a8d577e87a405705478e296ae lib/Algorithm/FloodControl/Backend/Cache/FastMmap.pm
+SHA1 cace9186acc803e9cbe1d07107dab98a85bdadc4 lib/Algorithm/FloodControl/Backend/Cache/Memcached.pm
+SHA1 77810a2f9e869d1d498219d17b7e35b139fe8b21 lib/Algorithm/FloodControl/Backend/Cache/Memcached/Fast.pm
+SHA1 c8d10105549b46cdd28c017973dffef2f60d2c4d svn-commit.tmp
+SHA1 bf4e7f0d3ab470f46a4cc03c8d243b62d07f807d t/00-load.t
+SHA1 d617edb013d9307c7981d63be26e05680702d461 t/01-cache-memcached-fast.t
+SHA1 a99637aee3eaa6477590faf9a83079b8098d1cd8 t/02-cache-memcached.t
+SHA1 8f9f65c6e8abbb3e4cd98c10ec4f10f051999418 t/03-module.t
+SHA1 fd875722935e78099d2f93dd666871d810cc8fc9 t/04-cache-fastmmap.t
+SHA1 bf48e25e6079736e710a1af60aa5f9cb473e4763 t/boilerplate.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 a71321270109f0a21bd2335bfeef27bb1c3f2fa9 t/tlib.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQEcBAEBAgAGBQJMSEJuAAoJEIJMQj8LHffVaf4IALumbdK28JM+OqDpsNTvSeuZ
+HVBStOu7gURiGTprrTEL+0HBFgGOC+IxqtIGXTxYPT5JbLMVbQ8y+c04Eoj1HW1J
+v/eUplduNJ1ANoijnMimihY77Ngrm8ztlCCLmsnOT9xGiFJ8D2Cjd+/+Lex1LB/4
+Pgf4TfX3amisOnxXUPZHz3YT70z34/7Thq8bJKhm3kuw0SZQkA/g6qvva1faX4s/
+OjyAfFr56OMx3DWgaFVbhamIgPLRd6kCI5HdtUaZ7s6Goyxj5/CPminfFdiWq5vb
+Ooxaic7ds0WYntSTlZT5rWyCsc/HuXFgTj/kL7lGc885ICcm2iuLHLa6UdMa3/I=
+=Ghip
+-----END PGP SIGNATURE-----

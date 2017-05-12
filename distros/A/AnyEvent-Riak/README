@@ -1,0 +1,385 @@
+NAME
+    AnyEvent::Riak - AnyEvent ProtocolBuffers Riak Client
+
+VERSION
+    version 0.93
+
+SYNOPSIS
+      use AnyEvent::Riak;
+      my $cv1 = AE::cv;
+      my $client = AnyEvent::Riak->new(
+        on_connect       => sub { $cv1->send },
+        on_connect_error => sub { $cv1->croak($_[1])},
+      );
+      $cv1->recv;
+
+      my $cv2
+      $client->put({ bucket  => 'bucket_name',
+                     key     => 'key_name',
+                     content => { value => 'plip',
+                                  content_type => 'text/plain',
+                                },
+                   },
+                   sub {
+                       my ($result, $error) = @_;
+                       $error and $cv2->croak(
+                         sprintf("error %d: %s",
+                         @{$error}{qw(error_code error_message)})
+                       );
+                       $cv2->send($result);
+                   });
+
+      my $put_result = $cv2->recv();
+
+      my $cv3 = AE::cv;
+      $client->get({ bucket => 'bucket_name',
+                     key => 'key_name',
+                   },
+                   sub {
+                       my ($result, $error) = @_;
+                       $error and $cv3->croak(
+                         sprintf("error %d: %s",
+                         @{$error}{qw(error_code error_message)})
+                       );
+                       $cv3->send($result);
+                   });
+
+      my $get_result = $cv3->recv();
+
+ATTRIBUTES
+  host => $hostname
+    Str, Required. Riak IP or hostname. Default to 127.0.0.1
+
+  port => $port_number
+    Int, Required. Port of the PBC interface. Default to 8087
+
+  on_connect => $cb->($handle, $host, $port, $retry->())
+    CodeRef, required. Executed on connection. Check out
+    AnyEvent::Handle#on_connect-cb--handle-host-port-retry
+
+  on_connect_error => $cb->($handle, $message)
+    CodeRef, required. Executed when the connection could not be
+    established. Check out
+    AnyEvent::Handle#on_connect_error-cb--handle-message
+
+  connect_timeout => $fractional_seconds
+    Float, Default 5. Timeout for connection operation, in seconds. Set to 0
+    for no timeout.
+
+  timeout => $fractional_seconds
+    Float, Default 5. Timeout for read/write operation, in seconds. Set to 0
+    for no timeout.
+
+  no_delay => <boolean>
+    Boolean, Default 0. If set to a true value, TCP_NODELAY will be enabled
+    on the socket, which means deactivating Nagle's algorithm. Use only if
+    you know what you're doing.
+
+METHODS
+  $client->close($cb)
+    This method will wait until everything has been written to the
+    connection, then close the connection, and then calls the callback
+    without parameters. Use this to properly close the connection, before
+    destroying the client instance.
+
+  get_bucket
+    Get bucket properties request.
+
+    bucket
+        required, string
+
+    type
+        optional, string
+
+  set_bucket
+    Set bucket properties request
+
+    bucket
+        required, string
+
+    props
+        required, RpbBucketProps
+
+    type
+        optional, string
+
+  reset_bucket
+    Reset bucket properties request
+
+    bucket
+        required, string
+
+    type
+        optional, string
+
+  get_bucket_type
+    Get bucket properties request
+
+    type
+        required, string
+
+  set_bucket_type
+    Set bucket properties request
+
+    type
+        required, string
+
+    props
+        required, RpbBucketProps
+
+  get
+    Get Request - retrieve bucket/key
+
+    bucket
+        required, string
+
+    key required, string
+
+    r   optional, number
+
+    pr  optional, number
+
+    basic_quorum
+        optional, boolean
+
+    notfound_ok
+        optional, boolean
+
+    if_modified
+        optional, string
+
+        fail if the supplied vclock does not match
+
+    head
+        optional, boolean
+
+        return everything but the value
+
+    deletedvclock
+        optional, boolean
+
+        return the tombstone's vclock, if applicable
+
+    timeout
+        optional, number
+
+    sloppy_quorum
+        optional, boolean
+
+        Experimental, may change/disappear
+
+    n_val
+        optional, number
+
+        Experimental, may change/disappear
+
+    type
+        optional, string
+
+        Bucket type, if not set we assume the 'default' type
+
+  put
+    Put request - if options.return_body is set then the updated
+    metadata/data for the key will be returned.
+
+    bucket
+        required, string
+
+    key optional, string
+
+    vclock
+        optional, string
+
+    content
+        required, RpbContent
+
+    w   optional, number
+
+    dw  optional, number
+
+    return_body
+        optional, boolean
+
+    pw  optional, number
+
+    if_not_modified
+        optional, boolean
+
+    if_none_match
+        optional, boolean
+
+    return_head
+        optional, boolean
+
+    timeout
+        optional, number
+
+    asis
+        optional, boolean
+
+    sloppy_quorum
+        optional, boolean
+
+        Experimental, may change/disappear
+
+    n_val
+        optional, number
+
+        Experimental, may change/disappear
+
+    type
+        optional, string
+
+        Bucket type, if not set we assume the 'default' type
+
+RESPONSE OBJECTS
+    Results returned from various methods are blessed response objects from
+    the following types. Their attributes can be accessed using accessors
+    (of the same name), or using the response as a HashRef.
+
+  RpbErrorResp
+    Error response - may be generated for any Req
+
+    errmsg
+        required, string
+
+    errcode
+        required, number
+
+  RpbGetServerInfoResp
+    Get server info request - no message defined, just send
+    RpbGetServerInfoReq message code
+
+    node
+        optional, string
+
+    server_version
+        optional, string
+
+  RpbGetBucketResp
+    Get bucket properties response
+
+    props
+        required, RpbBucketProps
+
+  RpbGetClientIdResp
+    Get ClientId Request - no message defined, just send RpbGetClientIdReq
+    message code
+
+    client_id
+        required, string
+
+        Client id in use for this connection
+
+  RpbGetResp
+    Get Response - if the record was not found there will be no
+    content/vclock
+
+    content
+        repeated, RpbContent
+
+    vclock
+        optional, string
+
+        the opaque vector clock for the object
+
+    unchanged
+        optional, boolean
+
+  RpbPutResp
+    Put response - same as get response with optional key if one was
+    generated
+
+    content
+        repeated, RpbContent
+
+    vclock
+        optional, string
+
+        the opaque vector clock for the object
+
+    key optional, string
+
+        the key generated, if any
+
+  RpbListBucketsResp
+    List buckets response - one or more of these packets will be sent the
+    last one will have done set true (and may not have any buckets in it)
+
+    buckets
+        repeated, string
+
+    done
+        optional, boolean
+
+  RpbListKeysResp
+    List keys in bucket response - one or more of these packets will be sent
+    the last one will have done set true (and may not have any keys in it)
+
+    keys
+        repeated, string
+
+    done
+        optional, boolean
+
+  RpbMapRedResp
+    Map/Reduce response one or more of these packets will be sent the last
+    one will have done set true (and may not have phase/data in it)
+
+    phase
+        optional, number
+
+    response
+        optional, string
+
+    done
+        optional, boolean
+
+  RpbIndexResp
+    Secondary Index query response
+
+    keys
+        repeated, string
+
+    results
+        repeated, RpbPair
+
+    continuation
+        optional, string
+
+    done
+        optional, boolean
+
+  RpbCSBucketResp
+     return for CS bucket fold
+
+    objects
+        repeated, RpbIndexObject
+
+    continuation
+        optional, string
+
+    done
+        optional, boolean
+
+  RpbCounterUpdateResp
+    Counter update response? No message | error response
+
+    value
+        optional, sint64
+
+  RpbCounterGetResp
+    Counter value response
+
+    value
+        optional, sint64
+
+AUTHOR
+    Damien Krotkine <dams@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Damien Krotkine.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

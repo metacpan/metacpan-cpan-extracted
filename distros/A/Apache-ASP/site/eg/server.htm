@@ -1,0 +1,33 @@
+#!/usr/bin/perl /usr/bin/asp-perl
+
+<!--#include file=header.inc-->
+<%
+    ;
+my $file1 = '.';
+my $file2 = '/';
+my $html = "<encode>";
+my $url = "cgi data =%&";
+my @cmds = (
+	    '$Server->MapPath("'.$file1.'")',
+	    '$Server->MapPath("'.$file2.'")',
+	    '$Server->HTMLEncode("'.$html.'")',
+	    '$Server->URLEncode("'.$url.'")',	    
+	    '$Server->Config("GlobalPackage")',
+	    );
+($^O eq 'MSWin32') && push(@cmds, '$Server->CreateObject("MSWC.AdRotator")');
+
+%>
+
+<table width=100% border=0 cellpadding=0 cellspacing=0>
+<tr><th colspan=2 align=center>The $Server methods in action</th><tr>
+<% for my $cmd (@cmds) { %>
+   <tr><td colspan=2><hr size=1></td></tr>
+   <tr>
+	<td> <tt><%= $Server->HTMLEncode($cmd) %> </tt></td>
+	<td> <font size=+0> <pre><%= eval "$cmd" %></pre> </font> </td>
+   </tr>
+<% } %>
+    <tr><td colspan=2><hr size=1></td></tr>
+</table>
+
+<!--#include file=footer.inc-->

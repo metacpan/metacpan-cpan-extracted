@@ -1,0 +1,528 @@
+<html>
+<head>
+  <script src="../../lib/Alien/GvaScript/lib/prototype.js"></script>
+  <script src="../../lib/Alien/GvaScript/lib/GvaScript.js"></script>
+  <link href="GvaScript_doc.css" rel="stylesheet" type="text/css">
+  <script>
+    document.observe('dom:loaded', function() { new GvaScript.TreeNavigator('TN_tree'); });
+    function jumpto_href(event) {
+      var label = event.controller.label(event.target);
+      if (label && label.tagName == "A") {
+        label.focus();
+        return Event.stopNone;
+      }
+    }
+  </script>
+</head>
+<body>
+<div id='TN_tree'>
+  <div class="TN_node">
+   <h1 class="TN_label">Alien::GvaScript::CustomButtons</h1>
+   <div class="TN_content">
+     <p><em>Manage buttons creation, styling and keyboard navigation
+</em></p>
+     <div class="TN_node"  onPing="jumpto_href">
+       <h3 class="TN_label">Table of contents</h3>
+       <div class="TN_content">
+         <div class="TN_leaf">
+  <a class="TN_label" href="#NAME">NAME</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DESCRIPTION">DESCRIPTION</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#GvaScript_CustomButtons_Button">GvaScript.CustomButtons.Button</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#Usage">Usage</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Javascript">Javascript</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#HTML">HTML</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Methods">Methods</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#new">new</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#GvaScript_CustomButtons_ButtonNavigation">GvaScript.CustomButtons.ButtonNavigation</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#Usage">Usage</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Javascript">Javascript</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#HTML">HTML</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Methods">Methods</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#new">new</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#GvaScript_CustomButtons_ActionsBar">GvaScript.CustomButtons.ActionsBar</a>
+  <div class="TN_content"><div class="TN_node">
+  <a class="TN_label" href="#Usage">Usage</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#Javascript">Javascript</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#HTML">HTML</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+<div class="TN_node">
+  <a class="TN_label" href="#Methodes">Methodes</a>
+  <div class="TN_content"><div class="TN_leaf">
+  <a class="TN_label" href="#new">new</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#destroy">destroy</a>
+  <div class="TN_content"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#CSS">CSS</a>
+  <div class="TN_content"></div>
+</div>
+<div class="TN_leaf">
+  <a class="TN_label" href="#DEPENDENCIES">DEPENDENCIES</a>
+  <div class="TN_content"></div>
+</div>
+
+       </div>
+     </div>
+     <hr/>
+   </div>
+  </div>
+  <div class="TN_node" id="NAME">
+    <h2 class="TN_label">NAME</h2>
+    <div class="TN_content">
+      <p>Alien::GvaScript::CustomButtons - Manage buttons creation, styling and keyboard navigation</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="DESCRIPTION">
+    <h2 class="TN_label">DESCRIPTION</h2>
+    <div class="TN_content">
+      <p>Composed of three subclasses that take care of rendering and
+displaying application buttons.</p>
+<ul>
+<li><a name="item__b_GvaScript_CustomButtons_Button__b_"></a><b><b>GvaScript.CustomButtons.Button</b></b>
+</li>
+<li><a name="item__b_GvaScript_CustomButtons_ButtonNavigation__b_"></a><b><b>GvaScript.CustomButtons.ButtonNavigation</b></b>
+</li>
+<li><a name="item__b_GvaScript_CustomButtons_ActionsBar__b_"></a><b><b>GvaScript.CustomButtons.ActionsBar</b></b>
+</li>
+</ul>
+<p>Displayed buttons will support hovering effects through custom css classnames
+and keyboard navigation using RIGHT and LEFT arrows.</p>
+<p>Buttons in their different states (idle, focus and hover) are easily
+styled using css classes.</p>
+
+    </div>
+  </div>
+  <div class="TN_node" id="GvaScript_CustomButtons_Button">
+    <h2 class="TN_label">GvaScript.CustomButtons.Button</h2>
+    <div class="TN_content">
+      <p>For rendering a Single Button</p>
+  <div class="TN_node" id="Usage">
+    <h3 class="TN_label">Usage</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="Javascript">
+    <h4 class="TN_label">Javascript</h4>
+    <div class="TN_content">
+      <pre>  var container = $('my_button_will_display_here');
+  var button_properties = {
+    id        : 'btn_'+(new Date()).getTime(),
+    callback  : Prototype.emptyFunction, // btnClickHandler
+    condition : true,                    // boolean indicating whether to render button
+    width     : 'auto',                  // string value including unit. ex: '100px', '5em' .. 
+    type      : 'button',                // button|reset|submit
+    style     : {borderWidth: '2px'}     // hash of inline style elemets to be set on the button container
+    label     : 'GVA_SCRIPT_BUTTON'      // button label
+  }
+  
+  // create a new button and display in container
+  var mybutton = new GvaScript.CustomButtons.Buttons(container, button_properties);</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="HTML">
+    <h4 class="TN_label">HTML</h4>
+    <div class="TN_content">
+      <p>The button will be rendered and resulting HTML will be placed in th designated container.</p>
+<pre>  &lt;div id="my_button_will_display_here" style="border-width: 2px;"&gt;
+    &lt;span class="gva-btn-container"&gt;
+      &lt;span class="left"/&gt;
+      &lt;span class="center"&gt;
+          &lt;button type="button" class="btn" style="width: auto;" id="btn_1227001526005"&gt;
+              GVA_SCRIPT_BUTTON
+          &lt;/button&gt;
+      &lt;/span&gt;
+      &lt;span class="right"/&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;</pre>
+
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Methods">
+    <h3 class="TN_label">Methods</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="new">
+    <h4 class="TN_label">new</h4>
+    <div class="TN_content">
+      <pre>  var mybutton = new GvaScript.CustomButtons.Buttons(container, properties);</pre>
+
+<p>The <code>properties</code> hash describes the button behavior and display, with 
+the following entries :</p>
+<ul>
+<li><a name="item_id__i__string___i_"></a><b>id <i>(string)</i></b>
+<p>unique identifier of the button - will be set to the &lt;button&gt; element.</p>
+<p>optional - system will provide one if none provided.</p>
+</li>
+<li><a name="item_tabindex__i__numeric___i_"></a><b>tabindex <i>(numeric)</i></b>
+<p>numeric value of the tabindex to set on the generated button element.</p>
+<p>optional - button will not have tabindex attribute if none provided.</p>
+</li>
+<li><a name="item_callback__i__function___i_"></a><b>callback <i>(function)</i></b>
+<p>onclick handler of the &lt;button&gt; element - will execute in the <b>button context</b>.</p>
+<p>optional - defaulted to empty function.</p>
+</li>
+<li><a name="item_condition__i__boolean_function___i_"></a><b>condition <i>(boolean|function)</i></b>
+<p>boolean value <b>or</b> a function that returns a boolean value indicating whether to render and display the button or not.
+Note that if condition is false, the button will <b>not</b> be a part of the DOM.</p>
+<p>optional - defaulted to true.</p>
+</li>
+<li><a name="item_width__i__string___i_"></a><b>width <i>(string)</i></b>
+<p>string value to set on the style.width of the &lt;button&gt; element.
+string value <b>must</b> include the unit or else will be ignored.</p>
+<p>optional - defaulted to 'auto'.</p>
+</li>
+<li><a name="item_type__i__string___i_"></a><b>type <i>(string)</i></b>
+<p>the <i>type</i> attribute of the &lt;button&gt; element. could be one of the following:</p>
+<ul>
+<li><a name="item_button"></a><b>button</b>
+<p>generic  behavior of the button.</p>
+</li>
+<li><a name="item_submit"></a><b>submit</b>
+<p>submits containing &lt;form&gt; when clicked.</p>
+</li>
+<li><a name="item_reset"></a><b>reset</b>
+<p>resets containing &lt;form&gt; when clicked.</p>
+</li>
+</ul>
+<p>optional - default to 'button'</p>
+</li>
+<li><a name="item_style__i__hash___i_"></a><b>style <i>(hash)</i></b>
+<p>hash containing style elements to be set to the inline style attribute of the button container element.</p>
+<p>optional - defaulted to {}.</p>
+</li>
+<li><a name="item_label__i__string___i_"></a><b>label <i>(string)</i></b>
+<p>label of the button.</p>
+<p>optional - defaulted to 'GVA_SCRIPT_BUTTON'.</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="destroy">
+    <h4 class="TN_label">destroy</h4>
+    <div class="TN_content">
+      <pre>  mybutton.destroy()</pre>
+
+<p>This method removes the click handler attached to the button.
+Call this method when the button is removed
+from the DOM.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="GvaScript_CustomButtons_ButtonNavigation">
+    <h2 class="TN_label">GvaScript.CustomButtons.ButtonNavigation</h2>
+    <div class="TN_content">
+      <p>For adding support of keyboard navigation over a list of buttons.
+Mostly used internally with GvaScript.CustomButtons.ActionsBar class.</p>
+<p>The class searches for &lt;button&gt; or &lt;input type="button|submit|reset"&gt; elements that has a predefined classname 
+and that are contained in a provided container.</p>
+<p><i>This class is used implicitly by the ActionsBar class</i>.</p>
+  <div class="TN_node" id="Usage">
+    <h3 class="TN_label">Usage</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="Javascript">
+    <h4 class="TN_label">Javascript</h4>
+    <div class="TN_content">
+      <pre>  // container of the buttons we are looking for
+  var container  = $('my_buttons_are_contained_here');
+  
+  // classname of the buttons we are looking for
+  var className  = 'gva-btn-container';
+  
+  // initialize ButtonNavigation to activate keyboard map
+  var mybuttonnavigator = new GvaScript.CustomButtons.ButtonNavigation(container, {
+    selectFirstBtn  : true, 
+    className       : className,
+    preventListBlur : false,
+    flashClassName  : 'flash', 
+    flashDuration   : 100
+  });</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="HTML">
+    <h4 class="TN_label">HTML</h4>
+    <div class="TN_content">
+      <p><i>class does not produce any HTML</i></p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Methods">
+    <h3 class="TN_label">Methods</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="new">
+    <h4 class="TN_label">new</h4>
+    <div class="TN_content">
+      <p>The <code>properties</code> hash has the following entries :</p>
+<ul>
+<li><a name="item_selectFirstBtn__i__boolean___i_"></a><b>selectFirstBtn <i>(boolean)</i></b>
+<p>boolean indicating whether to give focus to the first button in the found list.</p>
+<p>optional - defaulted to true</p>
+</li>
+<li><a name="item_className__i__string___i_"></a><b>className <i>(string)</i></b>
+<p>classname to match with button elements that are a part of navigation</p>
+<p>optional - defaulted to 'BN_button'</p>
+</li>
+<li><a name="item_preventListBlur__i__boolean___i_"></a><b>preventListBlur <i>(boolean)</i></b>
+<p>boolean indicating whether a user can use the TAB and S_TAB keys to prevent 
+navigation outside the button list.</p>
+<p>optional - defaulted to false</p>
+</li>
+<li><a name="item_flashClassName__i__string___i_"></a><b>flashClassName <i>(string)</i></b>
+<p>classname to give to the button when in flashing mode</p>
+<p>optional - defaulted to 'flash'</p>
+</li>
+<li><a name="item_flashDuration__i__numeric___i_"></a><b>flashDuration <i>(numeric)</i></b>
+<p>value in millis indicating how long to keep the flashClassName set on the button</p>
+<p>optional - defaulted to 100</p>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="TN_node" id="destroy">
+    <h4 class="TN_label">destroy</h4>
+    <div class="TN_content">
+      <pre>  mybuttonnavigator.destroy()</pre>
+
+<p>This method removes the different handlers attached on the buttons container.
+Call this method when the buttons container is removed
+from the DOM.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="GvaScript_CustomButtons_ActionsBar">
+    <h2 class="TN_label">GvaScript.CustomButtons.ActionsBar</h2>
+    <div class="TN_content">
+      <p>For rendering a list of Buttons and adding support of keyboard navigation</p>
+  <div class="TN_node" id="Usage">
+    <h3 class="TN_label">Usage</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="Javascript">
+    <h4 class="TN_label">Javascript</h4>
+    <div class="TN_content">
+      <pre>  var container = $('my_buttons_bar_will_display_here');
+  var actionsbar_properties = {
+    actions     : [],    // array of button_properties
+    selectfirst : false  // focus on first button
+  }
+  
+  // create a new buttons list and display next to each other in container
+  var myactionsbar = new GvaScript.CustomButtons.ActionsBar(container, actionsbar_properties);</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="HTML">
+    <h4 class="TN_label">HTML</h4>
+    <div class="TN_content">
+      <p>The list of buttons will be rendered one by one and the resulting HTML will be 
+appended sequentially into the designated container.</p>
+<pre>  &lt;div id="my_buttons_bar_will_display_here" class="gva-actionsbar"&gt;
+    &lt;span id="btn_1236083609358" class="gva-btn-container"&gt;
+      &lt;span class="left"/&gt;
+      &lt;span class="center"&gt;
+        &lt;button class="btn" style="width: auto;" type="button"&gt;Modifier&lt;/button&gt;
+      &lt;/span&gt;
+      &lt;span class="right"/&gt;
+    &lt;/span&gt;
+    &lt;span id="btn_1236083609358" class="gva-btn-container"&gt;
+      &lt;span class="left"/&gt;
+      &lt;span class="center"&gt;
+        &lt;button class="btn" style="width: auto;" type="button"&gt;Modifier&lt;/button&gt;
+      &lt;/span&gt;
+      &lt;span class="right"/&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;</pre>
+
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="Methodes">
+    <h3 class="TN_label">Methodes</h3>
+    <div class="TN_content">
+        <div class="TN_node" id="new">
+    <h4 class="TN_label">new</h4>
+    <div class="TN_content">
+      <p>The <code>properties</code> hash has the following entries :</p>
+<ul>
+<li><a name="item_actions__i_array__i_"></a><b>actions <i>array</i></b>
+<p>list of button_properties describing a Button.</p>
+<p>required.</p>
+</li>
+<li><a name="item_selectfirst__i_boolean__i_"></a><b>selectfirst <i>boolean</i></b>
+<p>boolean indicating whether to give focus to the first button in the list when the actionsbar finished rendering.</p>
+<p>optional - defaulted to false.</p>
+</li>
+</ul>
+<p>ActionsBar implicitly initializes ButtonNavigation object with following properties</p>
+<pre>  new GvaScript.CustomButtons.ButtonNavigation(this.container, {
+    selectFirstBtn : this.options.selectfirst, 
+    className      : 'gva-btn-container'
+  });</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="destroy">
+    <h4 class="TN_label">destroy</h4>
+    <div class="TN_content">
+      <pre>  myactionsbar.destory();</pre>
+
+<p>This method removes the different handlers attached on the 
+buttons and their container.
+Call this method when the buttons container is removed
+from the DOM.</p>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+
+    </div>
+  </div>
+  <div class="TN_node" id="CSS">
+    <h2 class="TN_label">CSS</h2>
+    <div class="TN_content">
+      <p>Example CSS stylesheet for styling buttons.</p>
+<p>By default, css classnames are prefixed by 'gva'.</p>
+<p>This can be overloaded by a global js variable: CSS_PREFIX
+if declared before the inclusion of this Library</p>
+<p>Notice the <b>btn-focus</b>, <b>btn-hover</b> and <b>flash</b> classnames that are used to style
+the buttons in their different states.</p>
+<pre>    /* IE fix: to the ridiculously wide buttons in IE */
+    .gva-btn-container .btn {width:1pt;overflow:visible;}
+    /* END: IE specific */
+    
+    .gva-actionsbar {background-color:#E8E8E8;border:1px solid #8c8c8c;border-width:1px 0px;height:25px;padding:4px 0 1px;}
+    .gva-btn-container {display:inline;}
+    .gva-btn-container .btn {margin:0 3px;font-size:12px;cursor:pointer;}
+    .gva-btn-container .btn {
+        font-family:verdana,geneva,lucida,'lucida grande',arial,helvetica,sans-serif;
+        background:none;
+        border:none;
+        cursor:pointer;
+        padding:1px 2px;
+        color:#000;
+        background-color:transparent !important;
+    }
+    .gva-btn-container .btn {float:left;}
+    .gva-btn-container.btn-focus .btn {color:#aa0000;}
+    .gva-btn-container span {display:block;float:left;height:21px;}
+    .gva-btn-container span.left {background:transparent url(btn_sprite.gif) no-repeat scroll 0 0;padding:0 1px 0 2px;margin-left:4px;}
+    .gva-btn-container span.center {background:transparent url(btn_sprite.gif) repeat-x scroll 0 -42px;padding:0 2px}
+    .gva-btn-container span.right {background:transparent url(btn_sprite.gif) no-repeat scroll 0 -21px;padding:0 1px 0 2px;}
+    .gva-btn-container.btn-hover span.left {background-position:0 -63px;}
+    .gva-btn-container.btn-hover span.center {background-position:0 -105px;}
+    .gva-btn-container.btn-hover span.right {background-position:0 -84px;}
+    .gva-btn-container.btn-focus span.left {background-position:0 -63px;}
+    .gva-btn-container.btn-focus span.center {background-position:0 -126px;}
+    .gva-btn-container.btn-focus span.right {background-position:0 -84px;}
+    .gva-btn-container.flash .btn {color:red !important}</pre>
+
+
+    </div>
+  </div>
+  <div class="TN_node" id="DEPENDENCIES">
+    <h2 class="TN_label">DEPENDENCIES</h2>
+    <div class="TN_content">
+      <p>This class depends on other GvaScript classes:</p>
+<ul>
+<li><a name="item_GvaScript_KeyMap"></a><b>GvaScript.KeyMap</b>
+</li>
+</ul>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

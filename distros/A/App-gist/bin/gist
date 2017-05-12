@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::gist;
+
+=head1 NAME
+
+gist - Gist command-line tool
+
+=head1 VERSION
+
+version 0.16
+
+=cut
+
+=head1 SYNOPSIS
+
+ gist [OPTIONS] FILE
+
+=over
+
+=item Create a new gist from a file
+
+   $ gist script.pl
+
+=item Create a new gist from a pipe with a description
+
+   $ cat script.pl | gist -d 'some script' -n script.pl
+
+=item Create a new gist and copy the web URL in the clipboard
+
+   $ echo "something" | gist -w | xclip
+   $ echo "something" | gist -w | pbcopy # on Mac OS X
+
+=back
+
+=cut
+
+App::gist -> run;
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--description>, B<-d> DESCRIPTION
+
+Set the description for the gist.
+
+=item B<--name>, B<-n> NAME
+
+Specify the name of the file (useful when using a pipe).
+
+=item B<--update>, B<-u> GIST_ID
+
+Update the given gist (identified by GIST_ID), with the given file.
+
+=item B<--private>, B<-p>
+
+Create a private gist.
+
+=item B<--web>, B<-w>
+
+Only output the web url.
+
+=back
+
+=head1 CONFIGURATION
+
+Configure git with your GitHub credentials:
+
+    $ git config --global github.user LoginName
+    $ git config --global github.password GitHubPassword
+
+Alternatively you can install L<Config::Identity> and write your credentials
+in the (optionally GPG-encrypted) C<~/.github> file as follows:
+
+    login LoginName
+    password GitHubpassword
+
+(if only the login name is set, the password will be asked interactively)
+
+=head1 AUTHOR
+
+Alessandro Ghedini <alexbio@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2011 Alessandro Ghedini.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

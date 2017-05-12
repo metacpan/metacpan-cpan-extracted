@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::Tree::NearestCommonAncestor.
+
+0.01  Tue Oct 29 14:32:29 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n Algorithm::Tree::NearestCommonAncestor
+

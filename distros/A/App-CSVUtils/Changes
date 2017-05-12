@@ -1,0 +1,76 @@
+0.012   2017-04-25 (PERLANCAR)
+
+	- csv-select-fields: Add --field-pat to select by regular
+	  expression.
+
+
+0.011   2016-11-17 (PERLANCAR)
+
+	- [Bugfix] csv-select-fields CLI was not generated in previous
+	  release.
+
+
+0.010   2016-11-16 (PERLANCAR)
+
+	- Add utility: csv-select-fields.
+
+	- csv-delete-field: allow deleting multiple fields in one go.
+
+
+0.009   2016-11-16 (PERLANCAR)
+
+	- Add utility: csv-concat.
+
+	- csv-add-field: add option --after, --before, --at to specify
+	  position of the new field.
+
+
+0.008   2016-11-16 (PERLANCAR)
+
+        - Add utilities: csv-select-row, csv-convert-to-hash.
+
+
+0.007   2016-11-15 (PERLANCAR)
+
+	- Add utilities: csv-sum, csv-avg.
+
+	- csv-add-field: Tweak completion: field should not be completed
+	  with existing field names.
+
+
+0.006   2016-11-03 (PERLANCAR)
+
+        - [ux] Add completion for field name (-F) and --example.
+
+
+0.005   2016-11-03 (PERLANCAR)
+
+        - csv-add-field, csv-munge-field: Don't run code for header row.
+
+        - Tweak descriptions.
+
+
+0.004   2016-11-03 (PERLANCAR)
+
+        - [Removed] Remove utility csvutil.
+
+        - Add utility csv-sort-fields.
+
+
+0.003   2016-11-02 (PERLANCAR)
+
+        - [Incompatible change] Rename script replace-newline-in-csv to
+          csv-replace-newline for consistency with the other utilities.
+
+        - Add tests.
+
+
+0.002   2016-11-02 (PERLANCAR)
+
+	- Add utilities: csvutil, csv-list-field-names, csv-add-field,
+	  csv-delete-field, csv-munge-field.
+
+
+0.001   2016-11-01 (PERLANCAR)
+
+         - First release.

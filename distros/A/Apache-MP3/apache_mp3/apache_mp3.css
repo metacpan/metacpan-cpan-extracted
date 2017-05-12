@@ -1,0 +1,93 @@
+BODY {
+  background-color: white;
+}
+
+/* Sans-serifness turned off, because it often very aggressively */
+/*  interferes with font choice in international encodings.      */
+/* Italic style disabled because it just doesn't work right */
+/*  for many scripts or fonts.                              */
+
+H1 {
+  /* font-family: sans-serif; */
+  font-size: 16pt;
+  /* font-style: italic; */
+  color: red;
+}
+
+H2 {
+  /* font-family: sans-serif; */
+  /* font-style: italic; */
+}
+
+TR.title {
+  /* font-family: sans-serif; */
+  background-color: #FFE89B;
+}
+
+TR.odd {
+   background-color: white;
+   padding: 0;
+   margin: 0;
+}
+TR.even {
+   background-color: lightcyan;
+   padding: 0;
+   margin: 0;
+}
+
+TD {
+  align: left;
+}
+
+.directory {
+  /* font-family: sans-serif; */
+  font-weight: bold;
+}
+
+.subdirectory {
+  /* font-family: sans-serif; */
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.subdirbuttons {
+  /* font-family: sans-serif; */
+  font-size: 10pt;
+}
+
+IMG.subdir {
+  vertical-align: middle;
+}
+
+P {
+  /* font-family: sans-serif; */
+  background-color: transparent;
+}
+
+A {
+  /* font-family: sans-serif; */
+  background-color: transparent;
+}
+
+INPUT {
+  /* font-family: sans-serif; */
+  background-color: white;
+}
+
+DIV  {
+  /* font-family: sans-serif; */
+  background-color: white;
+}
+
+ADDRESS {
+  /* font-family: sans-serif; */
+}
+
+.playlist {
+  background-color: #FFE89B;
+}
+A.playlist {
+  /* font-style: italic; */
+  background-color: transparent;
+}
+

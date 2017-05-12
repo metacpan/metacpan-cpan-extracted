@@ -1,0 +1,26 @@
+---
+abstract: 'Talk with medium.com using their REST API'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: API-Medium
+requires:
+  Cpanel::JSON::XS: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
+  JSON::MaybeXS: '0'
+  Log::Any: '0'
+  Moose: '0'
+resources:
+  repository: git://github.com/domm/API-Medium.git
+version: '0.900'
+x_serialization_backend: 'YAML::Tiny version 1.69'

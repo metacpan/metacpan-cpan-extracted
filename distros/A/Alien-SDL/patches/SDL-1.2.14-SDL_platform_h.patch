@@ -1,0 +1,13 @@
+--- SDL-1.2.14/include/SDL_platform.h	2009-10-12 18:07:19.000000000 -0500
++++ SDL-1.2.14/include/SDL_platform.h	2009-11-17 00:56:58.602877400 -0600
+@@ -43,6 +43,10 @@
+ #undef __BSDI__
+ #define __BSDI__	1
+ #endif
++#if defined(__CYGWIN__)
++#undef __CYGWIN__
++#define __CYGWIN__	1
++#endif
+ #if defined(_arch_dreamcast)
+ #undef __DREAMCAST__
+ #define __DREAMCAST__	1

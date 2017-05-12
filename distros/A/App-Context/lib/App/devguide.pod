@@ -1,0 +1,463 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+App::devguide - App Developer's Guide
+
+=head1 INTRODUCTION
+
+This is the Developer's Guide to the
+App (Perl 5 Enterprise Environment).
+You can find out more background to the project on the web.
+
+  http://www.officevision.com/pub/p5ee
+  http://p5ee.perl.org
+
+=head1 App DESIGN PHILOSOPHY
+
+When the App project was begun, there were already
+
+ * many outstanding Perl packages on CPAN
+ * an excellent systems architecture for Perl webapps (mod_perl)
+ * several excellent web application development frameworks
+
+So why was App needed?
+
+For a variety of reasons, there was never sufficient unity of
+purpose or direction within the Perl community to provide
+a coherent blueprint of what Enterprise Programming in Perl is
+or how to do it.
+
+ * What are the pieces?
+ * What pieces are default? standard? mandatory? optional?
+ * How do they fit together?
+ * How can I override or customize them?
+ * What techniques do I need to use to assemble them effectively?
+
+After "Enterprise Systems" were defined (see website), the field
+of existing frameworks, solutions, and components was surveyed.
+The goal was to examine everything that people were already doing,
+divide it into pieces that seemed interchangeable, and come up
+with a unified blueprint.  Pieces that people often like to do
+differently (template systems, persistence frameworks, configuration
+files) were allowed to vary, while their essential contribution
+to the working system was standardized in the framework.
+
+It should be noted that most of the work on what people might
+term "Enterprise Systems" in Perl was actually focused on
+"Web Systems" in Perl with a relational database.
+
+The goal of the App design is to unify the Perl community
+on a framework for cooperation, while providing flexibility in
+the areas that might otherwise divide the community.
+
+Essentially, everything in App is overridable and customizable,
+but good defaults are provided for everything as well.
+
+On the practical side, App was also designed to allow for gradual
+adoption and incorporation into existing projects.
+
+=head1 App Execution Flow: CGI
+
+The first step to understanding the flow of execution through
+the App framework is to understand the flow in the CGI
+Context.
+
+This is one of the most challenging contexts
+to develop for because of the stateless nature of HTTP,
+the need to initialize all resources before accessing them,
+and the need to properly shut down all resources after using
+them or in case of user abort.
+
+=head2 cgi-bin/app and the Initialization Config File
+
+All usage of App from the web can be driven through the CGI program,
+"cgi-bin/app".  (Actually, depending on the settings in the Initialization
+Config File, the "app" program might not be a CGI program at all.)
+The app program should be installed at a location which is executable
+as a CGI program such as the following.
+
+  http://www.officevision.com/cgi-bin/pub/p5ee/app
+
+The "app" progam runs with the "-wT" switches turned on for maximum
+safety, security, and enforcement of programming rigor.
+
+Then a BEGIN block is executed to read the Initialization Config File
+to get low level config settings and perhaps modify the @INC variable.
+Modification of the @INC variable in the BEGIN block through configuration
+is critical so that you can have multiple versions of modules installed
+(at various stages of development through testing, production, and support).
+and access the correct ones.
+
+The Initialization Config File (.conf) is located in the following way.
+First, the PATH_INFO is checked and a corresponding .conf file is opened.
+Thus, the following URL
+
+  http://www.officevision.com/cgi-bin/pub/p5ee/app/ecommerce/shop
+
+would open "ecommerce_shop.conf" in the directory of the "app" program. 
+
+If it is not found, "$0.conf" is opened.  That would be "app.conf"
+in this case.  However, you can see that this allows for the "app"
+program to be renamed, and (according to its configuration) it will
+behave like a completely different application.
+
+If it is still not found, "app.conf" is opened.
+If this is not found, no Initialization Config information will be
+used and all defaults will be used.
+
+Whichever .conf file was first opened, it is read for simple configuration
+variables of the form "variable = value".  Anything following a "#" is considered
+a comment.  Leading and trailing spaces are removed, and blank lines are
+ignored.  Spaces may precede or follow the "=" sign without affecting the
+"variable" or the "value".  The "variable" must be a sequence of alphabetic characters
+and ".", "_", or "-" (i.e. matches /[a-zA-Z_.-]+/).  The value may be
+any string of characters (including none), but leading and trailing spaces
+are stripped.  The variable/value pairs are saved in a global hash in %main::conf.
+
+If the "perlinc" variable is set, it is understood to be a comma-separated
+list of directories to search for Perl modules.  This list is placed
+at the beginning of the special Perl @INC variable.
+
+Some sample lines in the .conf file are:
+
+  perlinc = /usr/ov/acoc/dev/src/Appx-Blue, /usr/ov/acoc/dev/lib/perl5/5.6.0
+  debugmode = record
+  showsession = 1
+  gzip = 1
+  configFile = app.pl
+
+The meanings of these variables are:
+
+  perlinc      - directories to search for perl modules
+  debugmode    - (off|record|replay) useful for recording a failed CGI request and replaying it for debugging
+  debug        - (0|1,App::Context::CGI|6,App::Repository::DBI.select_rows)
+  showsession  - (0|1) show the contents of the session in an HTML comment
+  gzip         - (0|1) allows compression of HTML output if the client browser supports it
+
+Additional variables may be provided.  However, suitable defaults
+are usually detected if they are not supplied.
+
+  contextClass - (i.e. App::Context::CGI) class for the context
+  configClass  - (i.e. App::Config::File) class for the config
+  configFile   - (i.e. "config.pl") name of the main configuration file
+  configSerializerClass - (i.e. App::Serializer::Dumper) class for config deserialization
+  sessionClass - (i.e. App::Session::HTMLHidden) class for the session
+  defaultWname - widget name to be the first current_widget to be displayed
+  scriptUrlDir - URL of App script directory (i.e. "/cgi-bin")
+  scriptDir    - Directory corresponding to the scriptUrlDir
+  htmlUrlDir   - URL of App docs directory
+  htmlDir      - Directory corresponding to the htmlUrlDir
+
+After the Initialization Config File is read into %main::conf, the
+command line arguments are scanned for options of the form "-variable" or
+"-variable=value".  (Options may also start with double-dashes, "--".)
+Such options are removed from the command line, and the variable/value
+pair is added to the %main::conf hash, thus overriding any values from
+the Initialization Config File.  The CGI environment never passes options
+to the program in this way (with a preceding dash), so this is mainly
+useful for debugging at the command line
+(i.e. "app -debugmode=replay -debug=1 -gzip=0").
+
+=head2 use App
+
+Next, the App module is included, which does the following:
+
+  * disable "Use of uninitialized value" warnings
+  * use Exception::Class;   # enable Exception inheritance
+  * use App::Exceptions;  # define App exceptions
+
+The base class of all App exceptions is "App::Exception".
+Derived from this base exception, each component service of App
+has its own base class as follows.
+
+  App::Exception::Context
+  App::Exception::Config
+  App::Exception::Serializer
+  App::Exception::Repository
+  App::Exception::Security
+  App::Exception::Session
+  App::Exception::Widget
+  App::Exception::TemplateEngine
+  App::Exception::Procedure
+  App::Exception::Messaging
+  App::Exception::LogChannel
+
+=head2 cgi-bin/app and bootstrapping the environment
+
+The "app" program then executes the following line.
+
+  my $context = App->context(\%main::conf);
+
+This instantiates a $context object, passing the
+global %main::conf hash as an argument.
+
+Note that in other Context implementations other than
+CGI, the $context may survive to serve more than a single
+request or to dispatch many events coming from the network
+or from a user.  In that case, the
+App->context() method may return an
+already-instantiated $context object.  The $context
+is a singleton per process.
+
+=head2 App->context()
+
+If the "contextClass" variable is in the argument hash, it is used.
+Otherwise, if the "app" program is running in the CGI context
+(HTTP_USER_AGENT environment variable is set) or at the
+command line, the App::Context::CGI class
+will be assumed.
+
+The code for the selected class is loaded and a $context
+of the appropriate class is instantiated.
+For the CGI context, the App::Context::CGI->new()
+method is called, and the arguments of the context() method
+call (%main::conf, in this case) are passed on to it.
+
+=head2 App::Context::CGI->new()
+
+The constructor (new()) for App::Context::CGI is actually provided
+by its parent class, App::Context.
+
+If the "configClass" was not specified in the arguments
+(%main::conf, in this case), App::Config::File is assumed.
+It is instantiated, once again passing on the hash of initialization args,
+and the result is stored in $self->{config};
+
+Then the App::Context::CGI->init() method is called to
+complete the $context constructor.  A CGI object is created
+and added to the %args to be passed on to Session instantiation.
+
+If the "sessionClass" was not specified in the arguments,
+App::Session::HTMLHidden is assumed.
+It is instantiated, once again passing on the hash of initialization args,
+and the result is stored in $self->{session};
+
+=head2 App::Config::File->new()
+
+The constructor (new()) for App::Config::File is actually provided
+by its grand-parent class, App::Reference.
+It creates a reference by calling App::Config::File->create(),
+blesses it into the class, calls init()
+(App::Reference->init()) which does nothing,
+and then returns the constructed Config::File object.
+
+The Config::File->create() method loads data from a configuration
+file and returns the reference to a hash.  But first it has to find
+the file and deserialize it.
+
+If the "configFile" was not specified in the arguments
+(%main::conf, in this case), the following files are searched for in
+order.  (If the script were renamed to "foo", it would look for "foo"
+variants of the files instead of "app" variants of the files.)
+
+   1. app.pl           2. config.pl
+   3. app.xml          4. config.xml
+   5. app.ini          6. config.ini
+   7. app.properties   8. config.properties
+   9. app.perl        10. config.perl
+  11. app.conf        12. config.conf
+
+By convention, "config.pl" is the config file for App CGI scripts.
+However, the first file that is found is assumed to be the relevant config file.
+If no config file is found or if it cannot be opened, an exception is thrown.
+Otherwise, the text is read in from the file and deserialized into
+a hash reference.
+
+If the "configSerializerClass" was not specified in the arguments
+(%main::conf, in this case), the file suffix for the config file
+is used to determine the Serializer class to use for deserialization.
+
+  pl          # use "eval" instead of a serializer
+  perl        # App::Serializer::Dumper (like "pl" but use a serializer)
+  xml         # App::Serializer::XMLSimple
+  ini         # App::Serializer::Ini
+  properties  # App::Serializer::Properties
+  conf        # App::Serializer::Properties
+  stor        # App::Serializer::Storable
+
+If the file is a .pl file, no serializer is implied.  It is just eval'ed.
+(It must have "$var =" as the first non-whitespace text in the file,
+where "var" is any variable name.)
+
+If a Serializer is specified or implied, a serializer is instantiated
+and the config file data is deserialized into a hash reference.
+
+The resulting hash reference is returned and stored in $context->{config}.
+
+=head2 App::Context::CGI->init()
+
+The init() method is where the CGI object is created, parsing the
+environment variables and STDIN which are
+part of the CGI runtime environment.
+
+For debugging purposes, a "debugmode" variable is checked in the 
+%args (i.e. %main::conf) to see if
+special processing with the CGI object should be performed.
+If "debugmode" is "record", the CGI objects and the %ENV hash will
+be saved to files ("debug.vars" and "debug.env", respectively).
+If "debugmode" is "replay", the current %ENV and CGI will be
+cleared and loaded from the files from a previously recorded request.
+
+Another sort of debugging is initialized if the "debug"
+variable is supplied in the %args.  This turns on a global debug
+flag ($App::DEBUG) and sets the debug scope
+(which classes or methods should produce debug output).
+
+To support migration of code, the CGI object can also be passed into
+the App->context() method as an argument, and it will be used rather
+than trying to create a new one.  However, this is not the execution
+path being described here.
+
+=head2 App::Session::HTMLHidden->new()
+
+The constructor (new()) for App::Session::HTMLHidden is actually provided
+by its grand-parent class, App::Reference.
+It creates a hash reference by calling App::Reference->create(),
+blesses it into the class, calls init()
+(App::Session::HTMLHidden->init()),
+and then returns the constructed Session::HTMLHidden object.
+
+The init() method looks at the CGI variables in the request
+and restores the session state information from the variable
+named "app.sessiondata" (and "app.sessiondata[2..n]").
+When the values of these variables are concatenated, they
+form a Base64-encoded, gzipped, frozen multi-level hash of
+session state data.  To retrieve the state data, the text
+is therefore decoded, gunzipped, and thawed (a la Storable).
+This state is stored in $session->{state} and the session
+cache is initialized to an empty hashref.
+
+=head2 cgi-bin/app and dispatching events
+
+The "app" program finally executes the following line.
+
+  $context->dispatch_events();
+
+This does everything necessary to dispatch events which are
+implied in the HTTP request, loading whatever data is needed,
+modifying it, and saving it again to await the next request.
+
+Please note that other Context implementations (i.e. Context::Modperl)
+use the same API, but they may already have database connections
+initialized, data already loaded, etc.  However, the basic
+CGI Context (Context::CGI) described here must initialize
+everything at the outset and shut it all down at the completion
+of each request.
+
+=head2 App::Context::CGI->dispatch_events()
+
+The CGI variables are examined.  Variables which start with "app.event"
+are identified as events to be handled, and they are saved for later.
+These are called "event variables".
+
+All other variables are understood to be widget attributes and they
+are saved to their respective widgets. 
+
+Variables with any of the
+"{}[]" "indexing" characters (such as "table_editor{data}[1][5]") are
+called "indexed variables".  The value is saved to the "table_editor"
+widget, which evidently has an attribute called "data" which is a
+two dimensional array.
+
+Variables without the indexing characters but 
+with at least one dot (".") in them are "dotted variables"
+of the form "widgetname.attributename".  (This is a synonym for
+"widgetname{attributename}", but it is handled more efficiently.)
+Widget names may include dots, but attribute names may not.
+Thus, the last dot separates the widget name from the attribute name.
+So "app.toolbar.savebutton.width" is the "width" attribute on the
+"app.toolbar.savebutton" widget.
+
+Variables without indexing characters or dots are "plain variables".
+If the special variable "wname" was also supplied, all plain variables
+are understood to be attributes of the $wname widget.  Otherwise,
+all plain variables are stored in the "session" widget.
+
+After all variables are stored in the Session, events are handled.
+There are two kinds of events, "user events" (such as come from
+<input type=submit> and <input type=image> tags) and "callback events"
+(such as come from <input type=hidden> tags).
+
+User events have a name that looks like one of the following.
+
+  app.event.widgetname.eventname
+  app.event.widgetname.eventname(arg1)
+  app.event.widgetname.eventname(arg1,arg2,...)
+
+These events are parsed, the appropriate widget is summoned, and the
+widget is instructed to handle the event (i.e. $w->handle_event()).
+
+Callback events have a name that looks simply like "app.event".
+The "widgetname.eventname(args)" is in the value of the variable.
+
+After all events have been handled, the context calls
+$self->display_current_widget() and then calls
+$self->shutdown() which gracefully shuts down all connections
+to repositories.
+
+=head2 App::Context::CGI->display_current_widget()
+
+The display_current_widget() method is implemented in the parent
+class, App::Context::HTML.
+
+A attribute "session.current_widget" contains the name of the current
+widget to display. 
+
+If this is not set, check the CGI variable "wname"
+(and set session.current_widget if found).
+If this is not set, check the Initialization Config (i.e. the copy
+of %main::conf, stored in the $context) for a variable named
+"defaultWname".
+If this is not set, use the $PATH_INFO, with internal "/'s"
+converted to dots (i.e. "/app/selector" => "app.selector").
+Otherwise, use "default" as the current widget
+(and set session.current_widget).
+
+Then the current widget is summoned and handed to the display_items()
+method.
+
+=head2 App::Context::CGI->display_items()
+
+The job of display items is to take the list of args, convert them
+to HTML, and print them to STDOUT with the appropriate HTTP headers
+and wrapper HTML.
+Also, depending on the %main::conf and the browser capabilities,
+the content may be compressed (gzipped).
+
+If the first argument to display_items() is a widget (which it is
+in this flow of execution), the widget's attributes are checked to
+see if any of the following are specified:
+
+  title
+  bgcolor
+  text
+  link
+  vlink
+  alink
+  leftmargin
+  topmargin
+  rightmargin
+  bottommargin
+  class
+
+Any of those attributes which are set in the widget will be propagated
+into the appropriate places in the <head> and <body> tags of the HTML
+which wraps the widget HTML.
+
+That's it.  All of the processing for a single CGI request is complete.
+All application code is wrapped up in user interface widgets
+(App::Widget::HTML) and entity widgets (App::Widget::Entity).
+The user interface widgets are mostly prepackaged, but are configured
+through the configuration file, allowing for a data-driven programming
+style on the user interface.  The entity widgets store most of their state
+in Repositories.  They also get configured
+through the config file, but they are frequently subclassed to add
+additional functionality.
+
+=cut
+

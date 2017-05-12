@@ -1,0 +1,16 @@
+0.005     2016-02-22 08:45:10+11:00 Australia/Melbourne
+- Update for Test-Consul 0.003 (consul 0.6.3)
+- Use Consul error callback by default (Consul 0.016)
+
+0.004     2015-11-25 20:03:16+11:00 Australia/Melbourne
+ - Use request/response object internally (Consul 0.012)
+ - Add on_error argument for error callback
+
+0.003     2015-11-24 10:48:06+11:00 Australia/Melbourne
+ - Change req_cb to request_cb (Consul 0.011)
+
+0.002     2015-11-18 08:55:21+11:00 Australia/Melbourne
+ - Honour timeout attribute
+
+0.001     2015-11-16 17:32:37+11:00 Australia/Melbourne
+ - First release

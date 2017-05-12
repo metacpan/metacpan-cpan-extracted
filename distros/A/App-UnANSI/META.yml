@@ -1,0 +1,32 @@
+---
+abstract: 'Remove ANSI coloring from output or files'
+author:
+  - 'Sawyer X'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-UnANSI
+provides:
+  App::UnANSI:
+    file: lib/App/UnANSI.pm
+    version: '0.003'
+requires:
+  Getopt::Long: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/xsawyerx/app-unansi/issues
+  repository: git://github.com/xsawyerx/app-unansi.git
+version: '0.003'
+x_authority: cpan:XSAWYERX
+x_serialization_backend: 'YAML::Tiny version 1.69'

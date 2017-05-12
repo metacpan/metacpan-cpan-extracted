@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+#
+# Millions of years ago taken from
+# http://www.elliny.gr/image/info/geological_timescale.jpg
+#
+use strict;
+use warnings;
+
+use Array::RealSpan;
+
+my $point = defined $ARGV[0] ? shift : die "Usage: perl $0 0-4599.9~\n";
+
+my $eon = Array::RealSpan->new;
+$eon->set_range(    0,  545, 'Phanerozoic' );
+$eon->set_range(  545, 2600, 'Proterozoic' );
+$eon->set_range( 2600, 3900, 'Archaean' );
+$eon->set_range( 3900, 4600, 'Hadean' );
+
+my $era = Array::RealSpan->new;
+$era->set_range(   0,    65, 'Cenozoic' );
+$era->set_range(  65,   248, 'Mesozoic' );
+$era->set_range( 248.2, 545, 'Paleozoic' );
+$era->set_range( 545,  4600, 'Precambrian' );
+
+my $period = Array::RealSpan->new;
+$period->set_range(   0,     1.81, 'Quaternary' );
+$period->set_range(   1.81, 23.8,  'Neogene' );
+$period->set_range(  23.8,  65,    'Paleogene' );
+$period->set_range(  65,   142,    'Cretaceous' );
+$period->set_range( 142,   205.7,  'Jurassic' );
+$period->set_range( 205.7, 248.2,  'Triassic' );
+$period->set_range( 248.2, 290,    'Permian' );
+$period->set_range( 290,   354,    'Carboniferous' );
+$period->set_range( 354,   417,    'Devonian' );
+$period->set_range( 417,   443,    'Silurian' );
+$period->set_range( 443,   495,    'Ordovician' );
+$period->set_range( 495,   545,    'Cambrian' );
+
+my $epoch = Array::RealSpan->new;
+$epoch->set_range(  0,     0.01, 'Holocene' );
+$epoch->set_range(  0.01,  1.81, 'Pliestocene' );
+$epoch->set_range(  1.81,  5.32, 'Pliocene' );
+$epoch->set_range(  5.32, 23.8,  'Miocene' );
+$epoch->set_range( 23.8,  33.7,  'Oligocene' );
+$epoch->set_range( 33.7,  55,    'Eocene' );
+$epoch->set_range( 55,    65,    'Paleocene' );
+$epoch->set_range( 286, 323, 'Pennsylvanian' );
+$epoch->set_range( 323, 360, 'Mississippian' );
+
+my $age = Array::RealSpan->new;
+$age->set_range(   0,     0.7,  'Current' );
+$age->set_range(   0.7,   1.81, 'Calarbrian' );
+$age->set_range(   1.81,  2.58, 'Gelasian' );
+$age->set_range(   2.58,  3.6,  'Piacenzian' );
+$age->set_range(   3.6,   5.32, 'Zanclean' );
+$age->set_range(   5.32,  7.12, 'Messinian' );
+$age->set_range(   7.12, 11.72, 'Tortonian' );
+$age->set_range(  11.72, 14.8,  'Serravallian' );
+$age->set_range(  14.8,  16.4,  'Langhian' );
+$age->set_range(  16.4,  20.5,  'Burdigalian' );
+$age->set_range(  20.5,  23.8,  'Aquitanian' );
+$age->set_range(  23.8,  28.5,  'Chattian' );
+$age->set_range(  28.5,  33.7,  'Rupelian' );
+$age->set_range(  33.7,  37,    'Priabonian' );
+$age->set_range(  37,    41.3,  'Bartonian' );
+$age->set_range(  41.3,  49,    'Lutetian' );
+$age->set_range(  49,    55,    'Ypresian' );
+$age->set_range(  55,    57.9,  'Thanetian' );
+$age->set_range(  57.9,  61,    'Selandian' );
+$age->set_range(  61,    65,    'Danian' );
+$age->set_range(  65,    71.3,  'Maastrichtian' );
+$age->set_range(  71.3,  83.5,  'Campanian' );
+$age->set_range(  83.5,  85.8,  'Sontonian' );
+$age->set_range(  85.8,  89,    'Coniacian' );
+$age->set_range(  89,    93.5,  'Turonian' );
+$age->set_range(  93.5,  98.9,  'Cenomanian' );
+$age->set_range(  98.9, 112.2,  'Albian' );
+$age->set_range( 112.2, 121,    'Aptian' );
+$age->set_range( 121,   127,    'Barremian' );
+$age->set_range( 127,   132,    'Hauterivian' );
+$age->set_range( 132,   136.5,  'Valanginian' );
+$age->set_range( 136.5, 142,    'Ryazanian' );
+$age->set_range( 142,   150.7,  'Volganian' );
+$age->set_range( 150.7, 154.1,  'Kimmeridgian' );
+$age->set_range( 154.1, 159.4,  'Oxfordian' );
+$age->set_range( 159.4, 164.4,  'Callovian' );
+$age->set_range( 164.4, 169.2,  'Bathonian' );
+$age->set_range( 169.2, 176.5,  'Bajocian' );
+$age->set_range( 176.5, 180.1,  'Aalenian' );
+$age->set_range( 180.1, 189.6,  'Toarcian' );
+$age->set_range( 189.6, 195.3,  'Pliensbachian' );
+$age->set_range( 195.3, 201.9,  'Sinemurian' );
+$age->set_range( 201.9, 205.7,  'Hettangian' );
+$age->set_range( 205.7, 209.6,  'Rhaetian' );
+$age->set_range( 209.6, 220.7,  'Norian' );
+$age->set_range( 220.7, 227.4,  'Carnian' );
+$age->set_range( 227.4, 234.3,  'Ladinian' );
+$age->set_range( 234.3, 241.7,  'Anisian' );
+$age->set_range( 241.7, 244.8,  'Olenekian' );
+$age->set_range( 244.8, 248.2,  'Induan' );
+$age->set_range( 248.2, 252.1,  'Tartarian' );
+$age->set_range( 252.1, 256,    'Ufimian-Kazanian' );
+$age->set_range( 256,   260,    'Kungurian' );
+$age->set_range( 260,   269,    'Artinskian' );
+$age->set_range( 269,   282,    'Sakmarian' );
+$age->set_range( 282,   290,    'Asselian' );
+$age->set_range( 290,   296.5,  'Gzhelian' );
+$age->set_range( 296.5, 303,    'Kasimovian' );
+$age->set_range( 303,   311,    'Moscovian' );
+$age->set_range( 311,   323,    'Bashkirian' );
+$age->set_range( 323,   327,    'Serpukovian' );
+$age->set_range( 327,   342,    'Visean' );
+$age->set_range( 342,   354,    'Tournasian' );
+$age->set_range( 354,   364,    'Famennian' );
+$age->set_range( 364,   370,    'Frasnian' );
+$age->set_range( 370,   380,    'Givetian' );
+$age->set_range( 380,   391,    'Eifelian' );
+$age->set_range( 391,   400,    'Emsian' );
+$age->set_range( 400,   412,    'Praghian' );
+$age->set_range( 412,   417,    'Lochovian' );
+$age->set_range( 417,   419,    'Pridoli' );
+$age->set_range( 419,   423,    'Ludlow' );
+$age->set_range( 423,   428,    'Wenlock' );
+$age->set_range( 428,   443,    'Llandovery' );
+$age->set_range( 443,   449,    'Ashgill' );
+$age->set_range( 449,   458,    'Caradoc' );
+$age->set_range( 458,   464,    'Llandeilo' );
+$age->set_range( 464,   470,    'Llanvirn' );
+$age->set_range( 470,   485,    'Arenig' );
+$age->set_range( 485,   495,    'Tremadoc' );
+$age->set_range( 495,   498,    'Trempealeauan' );
+$age->set_range( 498,   502,    'Franconian' );
+$age->set_range( 502,   505,    'Dresbachian' );
+$age->set_range( 505,   518,    '?' );
+$age->set_range( 518,   524,    'Lenian' );
+$age->set_range( 524,   530,    'Atdabanian' );
+$age->set_range( 530,   534,    'Tommotian' );
+$age->set_range( 534,   545,    'Nemaakitian-Daldynian' );
+
+print "$point million years ago is the\n";
+
+print $eon->lookup($point), " eon\n"
+    if $eon->lookup($point);
+
+print "\t", $era->lookup($point), " era\n"
+    if $era->lookup($point);
+
+print "\t\t", $period->lookup($point), " period\n"
+    if $period->lookup($point);
+
+print "\t\t\t", $epoch->lookup($point), " epoch\n"
+    if $epoch->lookup($point);
+
+print "\t\t\t\t", $age->lookup($point), " age\n"
+    if $age->lookup($point);
+

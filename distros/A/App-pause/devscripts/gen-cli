@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+use File::Slurper qw(read_text write_text);
+use App::pause;
+use Perinci::CmdLine::Inline qw(gen_inline_pericmd_script);
+
+my $res = gen_inline_pericmd_script(
+    shebang => "#!perl",
+    pod => 0,
+    pack_deps => 0,
+    script_name => 'pause',
+    script_version_from_main_version => 1,
+    use_cleanser => 0,
+    %App::pause::cli_attrs,
+);
+die "Can't generate script: $res->[0] - $res->[1]"
+    unless $res->[0] == 200;
+
+my $content = $res->[2] . "\n\n" . read_text("$Bin/../devdata/pause.pod");
+
+write_text("$Bin/../bin/pause", $content);

@@ -1,0 +1,18 @@
+language: perl
+perl:
+  - "5.20"
+  - "5.18"
+  - "5.16"
+
+before_install:
+  - cpanm --quiet --notest Devel::Cover::Report::Coveralls
+
+install:
+  - cpanm --quiet --notest --installdeps .
+
+script:
+  - PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -l t
+  - cover
+
+after_success:
+  - cover -report coveralls

@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 76ed0a338fb697574625ce9f6fa1918e3428b768 Build.PL
+SHA1 dfac199a7539a404407098a2541b9482279f690d COPYING
+SHA1 0c32815f86fa78ada551c9f47f400e03cc9fa844 Changes
+SHA1 4a2957837a95c2350a149073e80399d066dc43e5 MANIFEST
+SHA1 16cbedb019dfc948f5103e3bd3bcb320d78ccf1e MANIFEST.SKIP
+SHA1 812f915accce68a148c8dfee3225d2a9d8f64e6d META.yml
+SHA1 7e9e2553e95913392d02f7841987ce8b9fb01d1d Makefile.PL
+SHA1 913c7c608c28dc35fbcb17376d3ea9633068b785 README
+SHA1 6905f8d9402079b0b0c44c0f9f289b50fbd144cc bin/kennyfy
+SHA1 244df68496a4b26533410ab94a78c07e5b67679b lib/Acme/Filter/Kenny.pm
+SHA1 ddab6c7ad6b840190b1a2f416e2be95ce6645de3 t/01.t
+SHA1 98c286891feed832b692ee3ba6c0b18c7cc97743 t/02.t
+SHA1 2213e72522380450d29b7cb55ae90efb51d67c1c t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFApKFBR47eFMOy/N4RAmHhAKDcwICCrgQu0TgatY+oiyd5sT9BKgCgsX9f
+iJPfJE+lKZQhAj0fMc7sf9U=
+=4oi+
+-----END PGP SIGNATURE-----

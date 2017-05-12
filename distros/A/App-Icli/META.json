@@ -1,0 +1,53 @@
+{
+   "abstract" : "Icinga Command Line Interface",
+   "author" : [
+      "Copyright (C) 2014 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Icli",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Command" : "0",
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "DateTime::TimeZone" : "0",
+            "Getopt::Long" : "0",
+            "List::MoreUtils" : "0",
+            "POSIX" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::Size" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "App::Icli" : {
+         "file" : "lib/App/Icli.pm",
+         "version" : "0.48"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.48"
+}

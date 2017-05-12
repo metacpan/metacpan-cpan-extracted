@@ -1,0 +1,50 @@
+Revision history for App-mkfeyorm
+
+
+0.010     2011-09-15 03:12:08 Asia/Seoul
+    - Remove needless monkey patch code, Fey::Loader fix that issue
+      from version 0.13
+
+0.009     2011-08-30 14:46:42 Asia/Seoul
+    - Work-around statistics_info() method call, since DBD::mysql 4.019
+
+0.008     2011-08-03 04:12:33 Asia/Seoul
+    - Add API
+        - process_table
+        - module_path
+    - Return generated module content if user want
+        - process_schema
+        - process_table
+
+0.007     2011-07-31 05:27:27 Asia/Seoul
+    - Use string rather than file for schema and table template
+    - Set attribute as rw
+    - Add API
+        - process_schema
+        - process_tables
+        - schema_module
+        - table_modules
+    - Change attribute type
+    - Support template parameters for who want to use their own template
+
+0.006     2011-07-28 13:15:49 Asia/Seoul
+    - Support explicit table name
+    - Make cache directory automatically
+
+0.005     2011-01-19 16:31:14 Asia/Seoul
+    - Cache schema object if user wants
+    - Support additional foreign key setting
+    - Check schema object before use to handle exception
+    - Send accurate parameters to Fey::DBIManager::Source->new
+
+0.004     2011-01-19 02:52:09 Asia/Seoul
+    - Update template: check method parameters
+
+0.003     2011-01-17 14:14:00 Asia/Seoul
+    - Fix template bugs
+
+0.002     2011-01-15 17:03:26 Asia/Seoul
+    - Add omitted documents
+
+0.001     2011-01-15 16:53:48 Asia/Seoul
+    - First release

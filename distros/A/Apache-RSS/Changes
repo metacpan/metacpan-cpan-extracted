@@ -1,0 +1,20 @@
+2002-05-30  Tatsuhiko Miyagawa <miyagawa@edge.co.jp>
+	* deprecated RSSOrderBy, RSSHTMLRegexp
+	* add autoindex style of query string options (M=A, N=D etc.)
+	* refactoring the code
+
+2002-05-17  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* DIR_MERGE works correctly.
+	* added RSSOrderBy directive.
+
+2002-05-10  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* RSSHTMLRegexp is obsolete. use subreq to determine text/html.
+	* escape some elements. (eg. title, description)
+	* fixed docs.
+
+2002-05-09  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* lib/Apache/RSS.pm: fixed docs. 
+	* original version

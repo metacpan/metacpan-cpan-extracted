@@ -1,0 +1,257 @@
+
+INTRODUCTION
+
+Fetchware is a command line program written in Perl with help from CPAN that
+brings package management to source code distributions. It is able to do this,
+because most source code distributions use GNU autoconf, and thereby use the
+exact same commands to build and install. Furthermore, everyone uses md5sums,
+shasums, and/or gpg sigs, and ftp/http mirrors. Because everyone follows the
+a similar format for their FOSS means a fairly simple but flexible command line
+program should be able provide package management for source code distributions.
+
+Fetchware is a command line perl program that supports install, uninstall (via
+make uninstall), upgrade (for just one package), upgrade-all (for all installed
+packages), and the best part a new command that is a console wizard question and
+answer interface that easily builds brand new Fetchwarefiles and packages based
+on fairly obvious information (mirrors, name, configure options, make options,
+and so on.). If you have the need for fetchware (You already know how to install
+source code distributions yourself.), then you should be able to figure out how
+to answer the questions easily.
+
+
+WHY DID YOU CREATE FETCHWARE?
+
+I wanted an automated way of installing apache's constant security fixes, which
+was necessary, because I compiled apache from source instead of using my Linux
+distribution's default build. Most sysadmins these days just use their Linux
+distribution's default packages, but Unix and Linux have a long history of
+compiling yourself the software that you install. Fetchware follows in this
+tradition, and makes managing compiled from source software easier.
+
+
+WHAT IS A FETCHWAREFILE?
+
+A Fetchwarefile is Fetchware's configuration file. Because Fetchware can be a
+package manger for any source-code distribution, it requires a file to tell it
+everything it needs to know in order to install, upgrade, and uninstall your
+source-code distribution, and that is what a Fetchwarefile does.
+
+
+AND A FETCHWARE PACKAGE?
+
+A Fetchware package is simply the original source-code distribution unarchived
+with your Fetchwarefile added to it. Then it is tared and gziped, but named with
+a .fpkg file extension instead of a .tar.gz file extension. This simple format
+is modeled after Slackware Linux's package format, which is also very simple.
+
+
+WHAT'S THE DIFFERENCE?
+
+There really isn't any other than file size and name. They both contain a
+Fetchwarefile, which is really what is needed to install, upgrade, and uninstall
+fetchware packages.
+
+
+WHY SHOULD I USE FETCHWARE INSTEAD OF MY OWN PLATFORM'S PACKAGE MANAGER?
+
+Fetchware should be used if you want to build those same software packages from
+source code, and be able to specify your own configuration options to
+configure that software as you want instead of how that package's maintainer
+wants it to be configured. Furthermore, Fetchware leaves you in control of
+creating the actual Fetchware package, because you just need the Fetchwarefile,
+and that is enough to build and install a Fetchware package. This means that
+instead of using something like Fedora/RHEL's EPEL, where you're a slave to each
+individual package maintainer's schedule and ability to release updated versions
+every time yet another security hole comes out, you can upgrade to latest,
+secure version whenever it is released. 
+
+However, Fetchware needs a full build environment on your server, and wherever
+you install the resulting Fetchware package. This may be a limitation in some
+enterprise/data center environments. However, if you set up your Fetchwarefile
+properly, you can build the Fetchware package on a testing or build server, and
+then only do the "make install" step on each of the production servers.
+
+
+CAN FETCHWARE UNINSTALL FETCHWARE PACKAGES?
+
+It can, but only if the underlying source-code distribution's build system
+supports some sort of "make uninstall" target. For example, Apache does not have
+a "make uninstall" make target, while ctags does; therfore, Fetchware can not
+uninstall Apache, but it can uninstall ctags.
+
+Other similar programs can uninstall compiled-from-source programs using some
+sort of LD_PRELOAD trick or perhaps gdb debugging hooks, but Fetchware currently
+does not support any of these methods.
+
+
+WHERE CAN I FIND A FETCHWARE PACKAGE REPOSITORY?
+
+Currently there is no official or unofficial repository of Fetchware packages.
+But perhaps I or someone else will create one in the future.
+
+Also, creating your own Fetchwarefile's to use to create your own Fetchware
+packages is quite simple and flexible. See perldoc App::Fetchware for all of the
+details after installing Fetchware.
+
+
+INSTALLATION INSTRUCTIONS
+
+(Note: currently Windows is not supported, but it may be supported in the
+future. But everything Linux or Unix is supported.)
+
+Just use your platform's cpan command to install Fetchware and Fetchware's
+dependencies.
+
+cpan App::Fetchware
+
+That should cause the CPAN client to install the App::Fetchware distribution
+from Perl's CPAN. This will also take care of installing any of Fetchware's
+dependencies, or any other external CPAN modules that don't come with Perl and
+might not be installed on your computer. This method is recommended, and the
+manual method shown below should be avoided, so you don't have to worry about
+installing Fetchware's external CPAN dependencies.
+
+Fetchware's dependencies are:
+
+Test::More version 0.98 or higher for proper subtest support.
+Path::Class
+Perl::OSType
+URI
+Getopt::Long
+Archive::Tar
+Archive::Zip
+Term::UI
+File::HomeDir
+HTTP::Tiny
+HTML::TreeBuilder
+Digest::SHA
+Digest::MD5
+Privileges::Drop, which is only a Unix module, but it simply does nothing on
+Windows; however it is still required even on Windows systems.
+Text::ParseWords
+Sub::Mage
+
+Test::Deep is required for testing, but you could skip it if you skip make test,
+which is not recommended.
+
+Win32 is needed, but only on Windows systems. It's likely already installed on
+most Windows systems.
+
+You can manaully install Fetchware (Not recommended). Using the series of
+commands below after extracting Fetchware from the archive it comes in:
+
+perl Makefile.PL
+make
+make test
+make install
+
+In either case, installation is not complete without setting up a cronjob to
+have Fetchware check each night for updates to your installed Fetchware
+packages. See STEP 6 below for how to add Fetchware to your crontab so that
+Fetchware will automatically check for updates to all of your installed software
+each day.
+
+
+HOW DO I USE FETCHWARE?
+
+STEP 1:
+Fetchware does nothing without Fetchwarefiles, so until you download some one
+elses Fetchwarefile or create one yourself, Fetechware does nothing. So, the
+first step is to create a Fetchwarefile using Fetchware's new comand:
+
+fetchware new
+
+After entering the above command and pressing Enter, Fetchware will ask you a
+series of simple questions (At least they are simple, if you're used to
+installing software from source code instead of using a package manager.).
+Answer these simple questions, and then Fetchware will ask you if you would like
+to install the program your Fetchwarefile is for. Answer yes, to go ahead, and
+install it now, or answer no, and Fetchware will just print the location of the
+Fetchwarefile it created for you. You can copy this file wherever you would like
+to keep it.
+
+
+STEP 2:
+Next, use fetchware to install the generated Fetchwarefile. Now, if you answered
+yes in STEP 1, then you can skip this step.
+
+fetchware install <path/to/Fetchwarefile>
+
+STEP 3: Miscelaneous commands
+
+Fetchware has various miscelaneous commands that are helpful when using
+Fetchware.
+
+Fetchware also lets you do various miscellaneous operations listed below:
+fetchware list - lists all installed Fetchware packages.
+fetchware clean - deletes any left over temporary directories that are no longer
+                  needed by Fetchware.
+Fetchware look - downloads and unarchives the specified software package, but
+                 does not install. Intended to help out manual installation, or
+                 to use to look at software packages.
+
+STEP 4: 
+To upgrade a package you already installed just use the command:
+
+fetchware upgrade <name of already installed Fetchware package.>
+
+As hinted at above only already installed packages can be upgraded. To see what
+is installed, and what Fetchware thinks their names are use the list command to
+print out all installed Fetchware packages:
+
+fetchware list
+
+STEP 5:
+To uninstall an already installed package just use the uninstall command:
+
+fetchware uninstall <name of already installed Fetchware package.>
+
+Like upgrade, uninstall only uninstalls already installed packages, and again
+use the list command to see what Fetchware packages you have installed.
+
+Furthermore, the uninstall command only works if the source code distribution's
+build system supports a 'make uninstall' make target. If it does not, you can
+specify one with the uninstall_commands Fetchware configuration option.
+
+STEP 6:
+Fetchware's lookup functionality, which determines if a version of your
+source-code distribution is newer than the one you have installed, can be used
+to check if new versions of your already installed Fetchware packages have been
+released. This functionality can be used to check if upgrades are available for
+all installed Fetchware packages, and upgrade all of those packages that have
+newer versions available. Just use the upgrade-all command to do this:
+
+fetchware upgrade-all
+
+To do this automatically just add it to root's or your own user account's
+crontab:
+
+crontab -e
+
+Add the lines below to your crontab after crontab -e brings it up in your editor:
+
+# Minute   Hour   Day of Month     Month          Day of Week     Command    
+# (0-59)  (0-23)     (1-31)  (1-12 or Jan-Dec) (0-6 or Sun-Sat)
+    30      2          *              *               *           fetchware upgrade-all
+
+Or for root just put the contents below in the file fetchware in the
+/etc/cron.daily directory.
+
+[start copying after this line.]
+#!/bin/sh
+# Check all installed packages for upgrades every day.
+fetchware upgrade-all
+[end copying before this line.]
+
+STEP 7:
+Read Fetchware's documentation, which after installation should be available on
+your system using perldoc. So use the commands below to view the documentation:
+
+perldoc fetchware
+perldoc App::Fetchware
+
+If you prefer reading documentation in a Web browser, then you can use CPAN's
+Web viewer to read it using the URL's below:
+
+https://metacpan.org/module/fetchware
+https://metacpan.org/module/App::Fetchware

@@ -1,0 +1,175 @@
+2012-04-06  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.7:
+	* Makefile.PL
+	- remove auto_include(_deps)
+
+2012-04-05  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.6:
+	* Makefile.PL
+	- use auto_include_deps instead of auto_include
+
+2012-04-04  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.5:
+	* Makefile.PL, lib/Atompub/Client.pm, lib/Atompub/Server.pm
+	- use Digest::SHA instead of Digest::SHA1.  thanks Salvatore
+
+2010-10-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.4:
+	* lib/Atompub/Server.pm
+	- fix a typo. thanks Naveed.
+
+2010-05-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.3:
+	* lib/Atompub/Client.pm
+	- modify argument handling in the constructor. thanks Yury.
+	- fix a bug on Slug encoding scheme. thanks Lars.
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test. thanks
+	  Serguei.
+
+2008-10-19  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.2:
+	* t/02.datetime.t
+	- skip this test if the environmental variable
+	  ATOMPUB_TEST_LIVE is not set
+
+2008-05-22  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.1:
+        * Makefile.PL
+        - use Module::Install
+	* lib/Atompub/Client.pm
+	- fix slug encoding scheme.
+	  Thanks to Vincent
+
+2008-03-13  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.3.0:
+	* lib/Atompub/Client.pm
+	- use Class::Accessor::Fast instead of Class::Accessor::Lvalue::Fast,
+	  since lvalue module doesn't work with the debugger.
+	  Thanks to Loach
+	* all perl codes
+	- change coding conventions
+
+2008-01-13  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.2.4:
+	* lib/Atompub/Server.pm
+	- fix POD. Thanks to Thorsten
+	* lib/Atompub/DateTime.pm, t/02.datetime.t
+	- catch exceptions in creating timezone object
+	* t/10.client.t
+	- skip tests unless $ATOMPUB_TEST_LIVE is not defined
+
+2007-11-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.2.3:
+	* Atompub.pm
+	- use 5.006
+	* 10.client.t
+	- use HTTP proxy if $HTTP_PROXY/$http_proxy is defined
+
+2007-10-07  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.2.2:
+	* Build.PL
+	- add Module::Build::Compat to requires
+
+2007-10-06  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.2.1:
+	* Build.PL
+	- add Time::Local to requires
+
+2007-10-01  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.2.0:
+	* Atompub/Client.pm
+	- change hash to hash reference in some internal interfaces
+	* t/02.datetime.t
+	- fix timezone bugs
+
+2007-09-29  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.9:
+	* Atompub/DateTime.pm
+	- replace Atompub::Datetime::TimeZone by DateTime::TimeZone
+	- use DateTime::Format::W3CDTF and Class::Data::Inheritable
+
+2007-09-28  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.8:
+	* Atompub/DateTime.pm
+	- add init
+
+2007-09-27  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.7:
+	* Atompub/Client.pm
+	- fix POD coverage bugs
+
+2007-09-27  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.6:
+	* Atompub/Util.pm
+	- fix a bug in is_allowed_category, which reproduced if no
+	  app:categories
+
+2007-09-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.5:
+	* Build.PL
+	- fix dependency
+
+2007-09-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.4:
+	* Build.PL
+	- add Class::Accessor::Lvalue::Fast to requires
+
+2007-09-16  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.3:
+	* Makefile.PL
+	- build_class => Module::Build
+
+2007-09-14  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.2:
+	* Atompub/Client.pm
+	- don't use If-Match and/or If-Unmodified-Since headers on DELETE
+
+2007-09-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.1:
+	* Atompub/DateTime.pm
+	- rewrite POD
+
+2007-09-10  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.0:
+	* Atompub.pm
+	- add some methods to HTTP::Headers, HTTP::Request, and HTTP::Response
+	* Atompub/Client.pm
+	- merge operations for entry and media resources internally
+	- support cache mechanizem using Last-Modified header
+	- refactoring drastically
+	* Atompub/DateTime.pm, Atompub/MediaType.pm, Atompub/Util.pm
+	- newly added
+
+2007-08-13  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.2:
+	* Build.PL
+	- add Test::Perl::Critic to requires
+
+2007-08-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.1: created by Module::Starter

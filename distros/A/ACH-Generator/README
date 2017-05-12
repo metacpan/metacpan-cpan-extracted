@@ -1,0 +1,80 @@
+NAME
+	ACH::Generator - Generates an ACH formatted file from an ACH perl object
+	
+VERSION
+	Version: 0.01
+	May 2006
+
+DESCRIPTION
+	ACH::Generator is a simple, generic subclass of ACH used to generate ACH files.
+	It's intentional use is for testing purposes ONLY.  ACH-Generator will allow a 
+	developer to create an ACH formatted file.
+
+USING ACH-Generator
+	use ACH::Generator;
+
+	my $newACH = new ACH;
+	my $newACHfile = 'newACHFile.ACH';	# The name of the ACH file to be generated
+	
+	...
+	
+	$newACH->generate($newACHfile);
+
+METHODS
+  generate
+	Generates an ACH file from the data in the ACH object
+
+CAVEATS
+	This package is created for testing purposes only.  It shouldn't be used 
+	for production programs or scripts.  There are other commercial products
+	out there that may be a more efficient solution for accomplishing your
+	goals.
+
+	All records in an ACH file must be formatted in the following sequence
+	of records.  IF the file is not formatted in this exact sequence, it
+	may be rejected.
+
+	ACH File Layout:
+	1 - File Header Record
+	5 - First Company/Batch Header Record
+	6 - First Entry Detail Record
+	7 - First Entry Detail Addenda Record (optional)
+		|
+	Multiples of Entry Detail Records
+		|
+	6 - Last Entry Detail Record
+	7 - Last Entry Detail Addenda Record (optional)
+	8 - First Company/Batch Control Record
+		|
+	Multiples of Company/Batches
+		|
+	5 - Last Company/Batch Header Record
+	6 - First Entry Detail Record
+	7 - First Entry Detail Addenda Record (optional)
+		|
+	Multiples of Entry Detail Records
+		|
+	6 - Last Entry Detail Record
+	7 - Last Entry Detail Addenda Record (optional)
+	8 - Last Company/Batch Control Record
+	9 - File Control Record
+	9999...9999 (optional)
+
+AUTHOR
+	Author: Christopher Kois
+	Date: May, 2006
+	Contact: cpkois@cpan.org
+
+COPYRIGHTS
+	The ACH-Generator module is Copyright (c) May, 2006 by Christopher Kois. 
+	http://www.christopherkois.com All rights reserved.  You may distribute this 
+	module under the terms of GNU General Public License (GPL). 
+
+SUPPORT/WARRANTY
+	ACH-Generator is free Open Source software. IT COMES WITHOUT WARRANTY OR SUPPORT OF ANY KIND.
+
+KNOWN BUGS
+	This is version 0.01 of ACH::Generator.  There are currently no known bugs.
+
+SEE ALSO
+	ACH, ACH::Parser

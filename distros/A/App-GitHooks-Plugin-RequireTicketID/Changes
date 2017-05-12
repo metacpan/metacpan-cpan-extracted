@@ -1,0 +1,22 @@
+Revision history for App-GitHooks-Plugin-RequireTicketID
+
+v1.1.0  2017-03-19
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+        - Relicensed under Perl 5 terms.
+
+v1.0.4  2015-04-03
+        - Documented configuration options.
+
+v1.0.3  2014-06-08
+        - Noted git version in tests to help troubleshooting.
+        - Required git v1.7.4.1.
+
+v1.0.2  2014-06-03
+        - Sync manifest.
+
+v1.0.1  2014-06-01
+        - Generalized the error message.
+
+v1.0.0  2014-05-31
+        - Public release.

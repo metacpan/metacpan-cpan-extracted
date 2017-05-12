@@ -1,0 +1,26 @@
+---
+name: Algorithm-BaumWelch
+version: v0.0.2
+author:
+  - 'Daniel S. T. Hughes <dsth@cantab.net>'
+abstract: Baum-Welch Algorithm for Hidden Markov Chain parameter estimation.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 1.08
+  List::Util: 1.19
+  Math::Cephes: 0.47
+  Test::More: 0
+  Text::SimpleTable: 2.0
+  version: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Algorithm::BaumWelch:
+    file: lib/Algorithm/BaumWelch.pm
+    version: v0.0.2
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

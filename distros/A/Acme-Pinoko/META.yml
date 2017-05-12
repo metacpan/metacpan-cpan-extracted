@@ -1,0 +1,39 @@
+---
+abstract: Acchonburike!
+author:
+  - 'pawa <pawapawa@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Base: 0
+  Test::Fatal: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Acme::Pinoko
+name: Acme-Pinoko
+no_index:
+  directory:
+    - benchmark
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Data::Recursive::Encode: 0
+  Lingua::JA::Halfwidth::Katakana: 0
+  Lingua::JA::Regular::Unicode: 0.09
+  Module::Load: 0.22
+  perl: 5.8.8
+resources:
+  bugtracker: https://github.com/pawa-/Acme-Pinoko/issues
+  license: http://dev.perl.org/licenses
+  repository: https://github.com/pawa-/Acme-Pinoko
+version: 0.02

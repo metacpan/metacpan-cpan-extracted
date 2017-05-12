@@ -1,0 +1,44 @@
+NAME
+    `App::MatrixClient' - a `Tickit'-based terminal UI client for Matrix
+
+EMITTED SIGNALS
+       * start()
+
+       do_upload( file => $file, content_type => $type )
+
+       do_get_displayname( ?$user_id ) => $displayname
+       do_set_displayname( $displayname )
+
+       do_set_presence( $state, ?$msg )
+
+       do_add_alias( $alias, $room_id )
+       do_del_alias( $alias )
+
+       do_room_create( $name ) => $event
+       do_room_join( $name )
+       do_room_leave( $room_id )
+       do_room_msg( $room_id, $message )
+
+CONSUMED SIGNALS
+       * log( $str )
+       * logerr( $str )
+
+       on_invite( $event )
+
+       on_user_displayname( $user, $oldname )
+       on_user_presence( $user )
+
+       on_room_new( $room )
+       on_room_del( $room )
+
+CONSTRUCTOR
+  new
+       $client = App::MatrixClient->new( %args )
+
+    Takes the following named arguments:
+
+    loop => IO::Async::Loop
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,56 @@
+Revision history for Array::Columnize
+
+1.04 - June 12, 2013
+    - botched release 1.03
+1.03 - June 12, 2013
+    - Add linesuffix, and colfmt options
+    - document all options
+    - Work around rlib limitation.
+
+1.02 - Aug 19, 2012
+    - Rerelease just for some Meta and Doc changes
+
+1.01 - Aug 13, 2012
+    - Add option arrange_array to format as an array.
+    - Use rlib more pervasivly and use it
+    - incompatible change: always end string with "\n"
+
+1.00 - Aug 12, 2012
+    - Packaging changes. Version number conforms to
+      http://perldoc.perl.org/perlmodstyle.html#Version-numbering
+    - Change Meta data to point to github repository and issue tracker
+
+0.4.2 - Jan 2, 2011
+    - Re-release to reduce dependencies
+
+0.4.1 - Dec 3, 2011
+    - Try to silence CPANTS
+
+0.4.0 - Nov 24, 2011
+    - Handle situations where text is longer than display width.
+    - More strict on tests and as per CPANTS reports
+
+0.3.9 - Nov 12, 2011
+    - rerelease with 'dev' in version number.
+      it was messing up some Module::Builds
+    - Update GNUmakefile
+    - Build.PL back to more convenient form (for worse kwalitee).
+
+0.3.8 - Oct 29, 2011
+    - Made the Build.PL non-executable (for better kwalitee:
+        - http://cpants.perl.org/kwalitee.html#buildtool_not_executable
+    - Add an environment variable - PERL_MB_NOSIGN to disable signing a package
+    (which interferes with the flow of doing ./Build disttest ).
+    - Renamed Makefile to Makefile.devel so doing perl Makefile.PL won't
+    interfere with it.
+    - Correct some typos in the README.md and added a TODO there (SHLOMIF).
+    - Add some POD to lib/Array/Columnize.pm (SHLOMIF).
+
+0.3.7 - Oct 28, 2011
+I said, no feature "say"!
+
+0.3.6 - Oct 27, 2011
+Remove feature "say" so it works on Perl pre 5.010.
+
+0.3.5 - Sept 05, 2011
+Initial revision

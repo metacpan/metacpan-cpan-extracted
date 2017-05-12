@@ -1,0 +1,5 @@
+MANIFEST			This list of files
+Makefile.PL
+README
+lib/Acme/Test.pm
+t/00_Acme-Test.t

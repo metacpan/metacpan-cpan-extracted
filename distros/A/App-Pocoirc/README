@@ -1,0 +1,153 @@
+NAME
+    App::Pocoirc - A command line tool for launching POE::Component::IRC
+    clients
+
+DESCRIPTION
+    This distribution provides a generic way to launch IRC clients which use
+    POE::Component::IRC. The main features are:
+
+    *   Prints useful status information (to your terminal and/or a log
+        file)
+
+    *   Will daemonize if you so wish
+
+    *   Supports a configuration file
+
+    *   Offers a user friendly way to pass arguments to POE::Component::IRC
+
+    *   Supports multiple IRC components and lets you specify which plugins
+        to load locally (one object per component) or globally (single
+        object)
+
+    *   Has an interactive mode where you can issue issue commands and call
+        methods on the IRC component(s).
+
+        It can be used to launch IRC bots or proxies, loaded with plugins of
+        your choice. It is very useful for testing and debugging
+        POE::Component::IRC plugins as well as IRC servers.
+
+CONFIGURATION
+     nick:     foobar1234
+     username: foobar
+     log_file: /my/log.file
+     lib:      /my/modules
+
+     global_plugins:
+       - [CTCP]
+
+     local_plugins:
+       - [BotTraffic]
+
+     networks:
+       freenode:
+         server: irc.freenode.net
+         local_plugins:
+           - [AutoJoin, { Channels: ['#foodsfdsf'] } ]
+       magnet:
+         server: irc.perl.org
+         nick:   hlagherf32fr
+
+    The configuration file is in YAML or JSON format. It consists of a hash
+    containing "global_plugins", "local_plugins", "networks", "lib",
+    "log_file", "class", and default parameters to POE::Component::IRC. Only
+    "networks" is required.
+
+    "lib" is either the name of a directory containing Perl modules (e.g.
+    plugins), or an array of such names. Kind of like Perl's *-I*.
+
+    "log_file" is the path to a log file to which status messages will be
+    written.
+
+    "class" is the IRC component class. Defaults to
+    POE::Component::IRC::State.
+
+  Networks
+    The "networks" option should be a hash of network hashes. The keys are
+    the names of the networks. A network hash can contain "local_plugins"
+    and parameters to POE::Component::IRC. None are required, except
+    "server" if not defined at the top level. The POE::Component::IRC
+    parameters specified in this hash will override the ones specified at
+    the top level.
+
+  Plugins
+    The "global_plugins" and "local_plugins" options should consist of an
+    array containing the short plugin class name (e.g. 'AutoJoin') and
+    optionally a hash of arguments to that plugin. When figuring out the
+    correct package name, App::Pocoirc will first try to load
+    POE::Component::IRC::Plugin::*YourPlugin* before trying to load
+    *YourPlugin*.
+
+    The plugins in "global_plugins" will be instantiated once and then added
+    to all IRC components. Note: not all plugins are designed to be used
+    with multiple IRC components simultaneously.
+
+    If you specify "local_plugins" at the top level, it will serve as a
+    default list of local plugins, which can be overridden in a network
+    hash.
+
+OUTPUT
+    Here is some example output from the program:
+
+     $ pocoirc -f example/config.yml
+     2011-04-18 18:10:52 Started (pid 20105)
+     2011-04-18 18:10:52 Constructing global plugins
+     2011-04-18 18:10:52 [freenode]  Constructing local plugins
+     2011-04-18 18:10:52 [freenode]  Spawning IRC component (POE::Component::IRC::State)
+     2011-04-18 18:10:52 [magnet]    Constructing local plugins
+     2011-04-18 18:10:52 [magnet]    Spawning IRC component (POE::Component::IRC::State)
+     2011-04-18 18:10:52 [freenode]  Registering plugins
+     2011-04-18 18:10:52 [magnet]    Registering plugins
+     2011-04-18 18:10:52 [freenode]  Connecting to IRC (irc.freenode.net)
+     2011-04-18 18:10:52 [magnet]    Connecting to IRC (irc.perl.org)
+     2011-04-18 18:10:52 [freenode]  Added plugin Whois3
+     2011-04-18 18:10:52 [freenode]  Added plugin ISupport3
+     2011-04-18 18:10:52 [freenode]  Added plugin DCC3
+     2011-04-18 18:10:52 [magnet]    Added plugin Whois5
+     2011-04-18 18:10:52 [magnet]    Added plugin ISupport5
+     2011-04-18 18:10:52 [magnet]    Added plugin DCC5
+     2011-04-18 18:10:52 [freenode]  Added plugin CTCP1
+     2011-04-18 18:10:52 [freenode]  Added plugin AutoJoin1
+     2011-04-18 18:10:52 [freenode]  Added plugin PocoircStatus1
+     2011-04-18 18:10:52 [magnet]    Added plugin CTCP1
+     2011-04-18 18:10:52 [magnet]    Added plugin PocoircStatus1
+     2011-04-18 18:10:52 [magnet]    Connected to server irc.perl.org
+     2011-04-18 18:10:52 [magnet]    Server notice: *** Looking up your hostname...
+     2011-04-18 18:10:52 [magnet]    Server notice: *** Checking Ident
+     2011-04-18 18:10:52 [freenode]  Connected to server irc.freenode.net
+     2011-04-18 18:10:53 [magnet]    Server notice: *** Found your hostname
+     2011-04-18 18:10:53 [freenode]  Server notice: *** Looking up your hostname...
+     2011-04-18 18:10:53 [freenode]  Server notice: *** Checking Ident
+     2011-04-18 18:10:53 [freenode]  Server notice: *** Couldn't look up your hostname
+     2011-04-18 18:11:03 [magnet]    Server notice: *** No Ident response
+     2011-04-18 18:11:03 [magnet]    Logged in to server magnet.shadowcat.co.uk with nick hlagherf32fr
+     2011-04-18 18:11:07 [freenode]  Server notice: *** No Ident response
+     2011-04-18 18:11:07 [freenode]  Logged in to server niven.freenode.net with nick foobar1234
+     2011-04-18 18:11:11 [freenode]  Joined channel #foodsfdsf
+     ^C2011-04-18 18:11:22 Exiting due to SIGINT
+     2011-04-18 18:11:22 Waiting up to 5 seconds for IRC server(s) to disconnect us
+     2011-04-18 18:11:22 [magnet]    Error from IRC server: Closing Link: 212-30-192-157.static.simnet.is ()
+     2011-04-18 18:11:22 [magnet]    Deleted plugin DCC5
+     2011-04-18 18:11:22 [magnet]    Deleted plugin ISupport5
+     2011-04-18 18:11:22 [magnet]    Deleted plugin CTCP1
+     2011-04-18 18:11:22 [magnet]    Deleted plugin Whois5
+     2011-04-18 18:11:22 [magnet]    Deleted plugin PocoircStatus1
+     2011-04-18 18:11:22 [magnet]    IRC component shut down
+     2011-04-18 18:11:22 [freenode]  Quit from IRC (Client Quit)
+     2011-04-18 18:11:22 [freenode]  Error from IRC server: Closing Link: 212.30.192.157 (Client Quit)
+     2011-04-18 18:11:22 [freenode]  Deleted plugin AutoJoin1
+     2011-04-18 18:11:22 [freenode]  Deleted plugin CTCP1
+     2011-04-18 18:11:22 [freenode]  Deleted plugin DCC3
+     2011-04-18 18:11:22 [freenode]  Deleted plugin PocoircStatus1
+     2011-04-18 18:11:22 [freenode]  Deleted plugin Whois3
+     2011-04-18 18:11:22 [freenode]  Deleted plugin ISupport3
+     2011-04-18 18:11:22 [freenode]  IRC component shut down
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

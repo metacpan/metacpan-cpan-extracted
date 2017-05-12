@@ -1,0 +1,22 @@
+Revision history for Perl extension Acme::Floral.
+
+0.01  Thu May 22 16:38:12 2003
+	- original version; created by h2xs 1.5 with options
+		-X -n Acme::Floral
+1.00  Sat Jul 5 2003
+        - now it works
+1.01  Jul 7 2003
+        - Added 5.8 requirement
+1.02  Jul 8
+        - Fixed pod syntax ('/' wasn't escaped)
+        - added t/basic.t
+        - moved Floral.pm to lib/Acme/Floral.pm
+        - updated META.yml
+        - upgraded B::Deobfuscate requirement to 0.10
+1.03  Feb 1, 2005
+        - Downgraded use of Test::More to Test::Simple and then added
+          it as a requirement to the Makefile.PL.
+1.04  ...
+        - Removed SIGNATURE
+        - Build with Dist::Zilla
+        - Update author info

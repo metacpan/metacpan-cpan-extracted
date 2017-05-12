@@ -1,0 +1,15 @@
+Changes
+lib/Address/PostCode/India.pm
+lib/Address/PostCode/India/Place.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-details.t
+t/manifest.t
+t/pod.t
+t/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

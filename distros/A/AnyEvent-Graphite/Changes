@@ -1,0 +1,18 @@
+Revision history for AnyEvent-Graphite
+
+0.08    2011/02/16
+        Fixed some pod typos and missing version numbers
+0.07    2011/02/16
+        Added Debian control files
+0.06    04/13
+        Made timeout configurable, documentation rewrites
+0.05    03/31
+        Added better error handling and a default timeout for smtp sessions
+0.04    03/22
+        Fixed small typo and added more verbose debugging when a connection to graphite couldn't be made
+0.03    03/22
+        Added Graphite::SNMPAgent module, implementing a simple bridge between SNMP/Graphite servers
+0.02    03/22
+        Added trivial test client
+0.01    03/22 
+        Initial minimalist features

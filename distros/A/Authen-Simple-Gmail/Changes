@@ -1,0 +1,8 @@
+Revision history for Authen-Simple-Gmail
+
+0.2  Fri Aug 23 16:45:17 2013
+    - Added File::Slurp dep for tests
+
+0.1  Wed Aug 21 20:33:38 2013
+       Initial release.
+

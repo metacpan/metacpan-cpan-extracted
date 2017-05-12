@@ -1,0 +1,37 @@
+---
+abstract: 'We are CPAN authors who have authored Acme::CPANAuthors modules'
+author:
+  - 'Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build::Tiny: 0.020
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPANAuthors-Acme-CPANAuthors-Authors
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Acme::CPANAuthors::Register: 0
+  perl: 5.010
+  strict: 0
+  version: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors/issues
+  homepage: https://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors
+  repository: https://github.com/sanko/acme-cpanauthors-acme-cpanauthors-authors.git
+version: v1.0.0
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Sergey Romanov <complefor@rambler.ru>'

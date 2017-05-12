@@ -1,0 +1,23 @@
+Version 2.31, Jun 04 2005, Florian Forster <octo@verplant.org>
+- Minor fixes to the included stylesheet.
+
+Version 2.30, Jun 04 2005, Florian Forster <octo@verplant.org>
+- The possibility to display line numbers has been added due to popular
+  request ;)
+
+Version 2.20, Mar 25 2005, Florian Forster <octo@verplant.org>
+- Send E-Tag and Last-Modified HTTP-header fields so caching of generated
+  output in HTTP-caches (i.e. proxies) is possible.
+
+Version 2.10, Mar 16 2005, Florian Forster <octo@verplant.org>
+- Cache::Cache is now being used as requested (RT#11883). Apache::VimColor is
+  still installable without Cache::Cache, but caching won't work without it.
+- The output has been changed a bit.
+
+Version 2.00, Mar 15 2005, Florian Forster <octo@verplant.org>
+- Implemented caching as requested (RT#11883)
+- Fixed behavior when (trying to) access non-existent files or file which are
+  unreadable (sending an ``File not found'' or ``Forbidden'' as needed..)
+
+Version 1.00, Mar 14 2005, Florian Forster <octo@verplant.org>
+- Initial release

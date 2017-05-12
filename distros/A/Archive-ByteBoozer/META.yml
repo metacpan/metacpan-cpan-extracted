@@ -1,0 +1,32 @@
+---
+abstract: unknown
+author:
+  - 'Pawel Krol <djgruby@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-ByteBoozer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0'
+  Data::Dumper: '0'
+  File::Temp: '0'
+  IO::File: '0'
+  IO::Scalar: '0'
+  Params::Validate: '1.21'
+  Scalar::Util: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

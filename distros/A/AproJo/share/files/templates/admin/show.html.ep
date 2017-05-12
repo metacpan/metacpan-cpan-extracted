@@ -1,0 +1,9 @@
+% layout 'default';
+% title 'Administration: $table';
+% content_for banner => "Administration: $table";
+
+<p><%= ucfirst $table %></p>
+<p><a href="/admin/change/<%= $table %>/0">New <%= $table %></a></p>
+
+<%=  include 'front/macros/show', table => $table %>
+

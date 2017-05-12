@@ -1,0 +1,17 @@
+Revision history for App-yamlsel
+
+0.003   2016-09-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention CSel::Examples.
+
+
+0.002   2016-09-01 (PERLANCAR)
+
+	- [Bugfix] Don't skip root node if it's the only result.
+
+
+0.001   2016-08-27 (PERLANCAR)
+
+        - First release.

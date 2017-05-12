@@ -1,0 +1,24 @@
+App::CSV - provides the "csv" command line tool
+
+This package provides a command-line tool to manipulate CSV (and other
+delimited, line-based) files.
+
+Example
+
+  csv 1 2 -1 < report.csv
+
+Reads the first two fields, as well as the last one, from "report.csv".
+Data is cleaned up and emitted as CSV.
+
+  csv --input report.csv --to_tsv
+
+Converts the whole report to TSV (tab-separated values).
+
+License
+
+MIT
+
+Copyright
+
+Copyright 2009 Gaal Yahas <gaal@forum2.org>
+

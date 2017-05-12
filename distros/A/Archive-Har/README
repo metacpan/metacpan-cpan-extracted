@@ -1,0 +1,144 @@
+NAME
+
+    Archive::Har - Provides an interface to HTTP Archive (HAR) files
+
+VERSION
+
+    Version '0.21'
+
+SYNOPSIS
+
+        use Archive::Har();
+    
+        my $http_archive_string = '"log": { "version": "1.1", .... ';
+        my $har = Archive::Har->new();
+        $har->string($http_archive_string);
+        print $har->creator()->name() . ' version ' . $har->creator()->version();
+        $har->creator()->name("new name"); # update har
+        print $har->browser()->name() . ' version ' . $har->browser()->version();
+        foreach my $page = $har->pages()) {
+            $page->comment("Something interesting here");
+            print "Page Title: " . $page->title() . "\n";
+    
+        }
+        print $har; # print har in stringified pretty form
+        ...
+
+DESCRIPTION
+
+    This Module is intended to provide an interface to create/read/update
+    entire HTTP Archive (HAR) files.
+
+SUBROUTINES/METHODS
+
+ new
+
+    Archive::Har->new() will return a new HAR object, ready to process HTTP
+    archives
+
+ string
+
+    $har->string() accepts a stringified version of an HTTP archive
+    <http://www.softwareishard.com/blog/har-12-spec/> and parses it. It
+    returns the previous state of the archive in stringified form
+
+ hashref
+
+    $har->hashref() accepts a hashref of the HTTP archive
+    <http://www.softwareishard.com/blog/har-12-spec/> and parses it. It
+    returns a hashref of the previous state of the archive
+
+ gzip
+
+    $har->gzip() accepts a gzipped version of an HTTP archive
+    <http://www.softwareishard.com/blog/har-12-spec/> and parses it. It
+    returns a gzipped version of the previous state of the archive
+
+ xml
+
+    $har->xml() accepts a stringified version of Internet Explorer's
+    Network Inspector XML export and parses it. There is no return value
+
+ version
+
+    $har->version() will return the version of the HTTP Archive ('1.1' by
+    default)
+
+ creator
+
+    $har->creator() will return the creator object for the HTTP Archive
+
+ browser
+
+    $har->browser() will return the browser object for the HTTP Archive
+
+ pages
+
+    $har->pages() will return the list of page objects for the HTTP Archive
+
+ entries
+
+    $har->entries() will return the list of entry objects for the HTTP
+    Archive
+
+ comment
+
+    $har->comment() will return the comment for the HTTP Archive
+
+DIAGNOSTICS
+
+    Failed to gzip HAR archive
+
+      An error occurred while gzipping.
+
+    Failed to gunzip HAR archive
+
+      An error occurred while gunzipping.
+
+CONFIGURATION AND ENVIRONMENT
+
+    Archive::Har requires no configuration files or environment variables.
+
+DEPENDENCIES
+
+    Archive::Har requires the following non-core Perl modules
+
+      * JSON
+
+      * IO::Compress::Gzip
+
+      * IO::Uncompress::Gunzip
+
+      * XML::LibXML
+
+INCOMPATIBILITIES
+
+    None reported
+
+SEE ALSO
+
+    HTTP Archive 1.2 Specification
+    <http://www.softwareishard.com/blog/har-12-spec/>
+
+AUTHOR
+
+    David Dick, <ddick at cpan.org>
+
+BUGS AND LIMITATIONS
+
+    Please report any bugs or feature requests to bug-archive-har at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Archive-Har. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2015 David Dick.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,15 @@
+\bRCS\b
+\bCVS\b
+^MANIFEST\.
+^Makefile$
+^Build$
+^Build.bat$
+^_build/
+\.(bak|tdy|old|tmp)$
+~$
+^blid/
+^pm_to_blib
+\.cvsignore
+\.svn
+\.gz$
+^MYMETA.yml$

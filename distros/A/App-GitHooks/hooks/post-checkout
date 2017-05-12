@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::GitHooks;
+
+
+=head1 NAME
+
+post-checkout - Call App::GitHooks for the post-checkout hook.
+
+=cut
+
+App::GitHooks->run(
+    name      => $0,
+    arguments => \@ARGV,
+);

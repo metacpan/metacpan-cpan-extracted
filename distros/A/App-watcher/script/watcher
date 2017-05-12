@@ -1,0 +1,182 @@
+#!perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Filesys::Notify::Simple;
+use Pod::Usage;
+use File::Spec;
+use App::watcher;
+use 5.008008;
+
+our $VERSION=$App::watcher::VERSION;
+
+my @dir;
+my @exclude_dir;
+# process does not die when received SIGTERM, on win32.
+my $signal=$^O eq 'MSWin32' ? 'KILL' : 'TERM';
+GetOptions(
+    'dir=s@'   => \@dir,
+    'exclude=s@' => \@exclude_dir,
+    'signal=s' => \$signal,
+    'send_only' => \my $send_only,
+    'h|help'   => \my $help,
+    'v|version' => \my $version,
+) or pod2usage;
+$version and do { print "watcher: $VERSION\n"; exit 0 };
+pod2usage(1) if $help;
+pod2usage(1) unless @ARGV;
+@dir = ('.') unless @dir;
+
+if (@exclude_dir) {
+    @exclude_dir = map { File::Spec->abs2rel($_) } @exclude_dir;
+}
+
+sub info {
+    my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+        localtime(time);
+    my $time = sprintf(
+        "%04d-%02d-%02dT%02d:%02d:%02d",
+        $year + 1900,
+        $mon + 1, $mday, $hour, $min, $sec
+    );
+
+    print "[$time] ", join(' ', @_), "\n";
+}
+
+my $pid;
+
+sub fork_and_start {
+    undef $pid;
+    $pid = fork;
+    die "Can't fork: $!" unless defined $pid;
+
+    if ( $pid == 0 ) {      # child
+        $SIG{INT} = $SIG{HUP} = $SIG{TERM} = 'DEFAULT';
+        exec @ARGV;
+        die "Cannot exec: @ARGV";
+    } else {
+        info("Forked process: @ARGV");
+    }
+}
+
+sub kill_pid {
+    $pid or return;
+
+    info("Killing the existing process by $signal (pid:$pid)");
+
+    kill $signal => $pid;
+    waitpid( $pid, 0 );
+}
+
+sub send_signal {
+    info("Sending $signal to the existing process (pid:$pid)");
+    kill $signal => $pid;
+}
+
+info("watching: @dir");
+fork_and_start();
+exit(0) unless $pid;
+
+for my $sig (qw(TERM HUP INT)) {
+    $SIG{$sig} = sub {
+        info("SIG$sig received");
+        finalize();
+    };
+}
+
+my $watcher = Filesys::Notify::Simple->new(\@dir);
+while (1) {
+    my @restart;
+    $watcher->wait(sub {
+        my @events = @_;
+           @events = grep { valid_file($_) } map { $_->{path} } @events;
+        @restart = @events;
+    });
+    next unless @restart;
+
+    info("-- $_") for @restart;
+    if ($send_only) {
+        send_signal();
+    } else {
+        kill_pid();
+        info("Successfully killed! Restarting the new process.");
+        fork_and_start();
+        unless ($pid) {
+            exit(0);
+        }
+    }
+}
+
+sub finalize {
+    my $self = shift;
+
+    if ($pid) {
+        info("Terminate process: $pid");
+        kill 'TERM' => $pid;
+        waitpid( $pid, 0 );
+    }
+    exit 0;
+}
+
+sub valid_file {
+    my ($file) = @_;
+    my $rel = File::Spec->abs2rel($file);
+
+    # default filter
+    if($rel =~ m!^\.[^\.]|[/\\][\._][^\.]|\.bak$|~$|_flymake\.(?:p[lm]|t)!) {
+        return 0;
+    }
+
+    # exclude path filter
+    if (@exclude_dir) {
+        return not grep { index($rel, $_) == 0 } @exclude_dir;
+    }
+
+    return 1;
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+watcher - watch the file updates
+
+=head1 SYNOPSIS
+
+    % watcher --dir . -- osascript -e 'tell application "Google Chrome" to reload active tab of window 1'
+
+        --dir=.      Diretory to watch.
+        --exclude    Diretory to ignore.
+        --signal=HUP Sending signal to restart(Default: TERM)(EXPERIMENTAL)
+        --send_only  Sending signal without fork/exec(EXPERIMENTAL)
+        -h --help    show this help
+
+=head1 DESCRIPTION
+
+This command watches the directory updates, and run the commands.
+
+=head1 Sending SIGHUP without restart process
+
+(EXPERIMENTAL)
+
+watcher can send SIGHUP without process restarting.
+
+    % watcher --signal=HUP --send_only -- ...
+
+=head1 AUTHOR
+
+Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>
+
+=head1 SEE ALSO
+
+L<Filesys::Notify::Simple>
+
+=head1 LICENSE
+
+Copyright (C) Tokuhiro Matsuno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,11 @@
+[%# Astro::App::Satpass2 template file to render TLE data in JSON
+    format. To use, load the TLE data, then do
+
+    satpass2> formatter format eg/tle_json.tt
+
+    -%]
+[% UNLESS data %]
+    [%- SET data = sp.tle( arg ) %]
+[%- END %]
+[%- json = instantiate( 'JSON' ).pretty.canonical.utf8.convert_blessed -%]
+[% json.encode( data.bodies ) -%]

@@ -1,0 +1,5 @@
+gz: cat
+"rpm.spec.gz": cat
+test: rm
+exit: t/resource/helpers/exit_1
+"http:": echo

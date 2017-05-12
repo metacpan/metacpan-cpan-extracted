@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<TITLE>ARSperl Manual - Container Attributes Structure</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<H2>Container Attributes Structure</H2>
+
+<P>This structure is returned by function 
+<A HREF="ars_GetContainer.html">ars_GetContainer</a>.</P>
+
+<PRE>
+{
+ "adminList"       =&gt; <i>list</i> of groups (ids) who can administer this container,
+ "changeDiary"     =&gt; <i>list</i> of references to <a href="ds_diaryentry_hash.html">Diary Entry Structures</a>
+ "groupList"       =&gt; reference to a hash of group ids and their access permissions ('hidden' or 'visible',
+ "helpText"        =&gt; help text associated with the container (string),
+ "lastChanged"     =&gt; user who made the last change to the container (string),
+ "label"           =&gt; label for this container (string),
+ "name"            =&gt; name of container (string),
+ "numReferences"   =&gt; number of objects referenced by the container (integer),
+ "objPropList"     =&gt; <I>list</I> of references to <a href="ds_prop_hash.html">Property Hash</a>,
+ "owner"           =&gt; owning user for the container (string),
+ "ownerObjList"    =&gt; <i>list</i> of the schemas that own this container. If this parameter is NULL, the container exists globally,
+ "referenceList"   =&gt; <i>list</i> of references to <a href="ds_reference.html">Reference Hash</a>,
+ "timestamp"       =&gt; time stamp identifying the last change to the container (integer),
+ "type"            =&gt; type for this container (string)
+}
+</PRE>
+
+Example:<P>
+
+<PRE>
+      $c = ars_GetContainer($ctrl,$filterGuide);
+      $help = $c-&gt;{"helpText"};
+</PRE>
+
+<P>
+<HR WIDTH="30%">
+<P>
+<A HREF="toc.html"><IMG ALT="&lt;--" SRC="arrow.gif" ALIGN=CENTER> Table of Contents </A>
+<p>
+<address>
+&#169; Ian Trimnell 2005 i.d.trimnell@open.ac.uk
+</address>
+</BODY>
+</HTML>

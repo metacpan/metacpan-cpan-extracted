@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+lib/Alien/HTSlib.pm
+t/00-compile.t
+t/basic.t

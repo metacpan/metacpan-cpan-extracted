@@ -1,0 +1,51 @@
+{
+   "abstract" : "Hook system with asynchronous capabilities",
+   "author" : [
+      "Pedro Melo <melo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Async-Hooks",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Mo" : "0.30",
+            "namespace::clean" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : 0,
+            "Test::Fatal" : 0,
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/melo/async-hooks/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Async-Hooks/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/melo/async-hooks.git",
+         "web" : "https://github.com/melo/async-hooks"
+      }
+   },
+   "version" : "0.16"
+}
+

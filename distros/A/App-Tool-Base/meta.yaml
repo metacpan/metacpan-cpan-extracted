@@ -1,0 +1,4 @@
+---
+description: helper module for rapid tool creation
+package: libapp-tool-base-perl
+requires: {}

@@ -1,0 +1,90 @@
+=head1 NAME
+
+App::Spec::Tutorial - How to write an app with App::Spec::Run
+
+=head1 LINKS
+
+=over 4
+
+=item Options and parameters
+
+See L<App::Spec::Argument> for documentation and examples on how to
+define options and parameters.
+
+=back
+
+=head1 GENERATOR
+
+You can generate a boilerplate with appspec:
+
+    appspec new --class App::Birthdays --name birthdays.pl
+
+For documentation, look at L<appspec> and L<App::AppSpec>.
+
+=head1 EXAMPLES
+
+=head1 A minimal app called birthdays.pl
+
+The smallest example would be the following app. It doesn't
+use subcommands. Please note that completion for apps without subcommands
+is still buggy.
+
+=over 4
+
+=item birthdays.pl
+
+    use strict;
+    use warnings;
+    package App::Birthdays;
+    use base 'App::Spec::Run::Cmd';
+
+    sub execute {
+        my ($self, $run) = @_;
+        my $date = $run->options->{date};
+        my $output = <<"EOM";
+    Birthdays $date:
+
+    EOM
+        $output .= "Larry Wall";
+        if ($run->options->{age}) {
+            $output .= " (Age: unknown)";
+        }
+        $output .= "\n";
+        $run->out($output);
+    }
+
+    package main;
+    use App::Spec;
+
+    App::Spec->read("$Bin/birthdays.yaml")->runner->run;
+
+=item birthdays.yaml
+
+Short version:
+
+    name: birthdays.pl
+    title: Show birthdays
+    appspec: { version: '0.001' }
+    class: App::Birthdays
+    options:
+    - date=s =today --Date
+    - age           --Show age
+
+Long version:
+
+    name: birthdays.pl
+    title: Show birthdays
+    appspec: { version: '0.001' }
+    class: App::Birthdays
+    options:
+    - name: date
+      type: string
+      default: today
+      summary: Date
+    - name: age
+      type: flag
+      summary: Show age
+
+=back
+
+=cut

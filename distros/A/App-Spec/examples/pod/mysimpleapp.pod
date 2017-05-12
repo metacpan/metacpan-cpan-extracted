@@ -1,0 +1,24 @@
+=head1 NAME
+
+mysimpleapp - a simple app
+
+=head1 ABSTRACT
+
+Just a very simple example app to document some features
+
+=head1 DESCRIPTION
+
+
+
+=head2 GLOBAL OPTIONS
+
+    --verbose -v   [] be verbose (flag; multiple)
+    --wc              word count (flag)          
+    --lc              line count (flag)          
+    --help -h         Show command help (flag)   
+
+
+=head2 SUBCOMMANDS
+
+
+

@@ -1,0 +1,21 @@
+Acme-Replica-0.01.tar.gz
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Acme/Replica.pm
+Makefile.PL
+Makefile.PL.back
+MANIFEST			This list of files
+META.yml
+README.pod
+t/000_use.t
+t/001_scalar.t
+t/002_array.t
+t/003_hash.t
+t/099_error.t

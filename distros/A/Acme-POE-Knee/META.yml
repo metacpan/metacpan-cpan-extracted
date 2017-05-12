@@ -1,0 +1,23 @@
+---
+abstract: 'Time sliced pony race using the POE kernel.'
+author:
+  - 'Jos Boumans <kane@cpan.org>'
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-POE-Knee
+requires:
+  POE: 0
+  perl: v5.6.0
+resources:
+  homepage: http://github.com/jib/acme-poe-knee
+  repository: http://github.com/jib/acme-poe-knee
+version: 1.12

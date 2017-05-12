@@ -1,0 +1,217 @@
+NAME
+    Apache2::Imager::Resize - Fixup handler that resizes and crops images on
+    the fly, caching the results, and doesn't require ImageMagick.
+
+SYNOPSIS
+      <Files "*.jpg">
+        PerlFixupHandler  Apache2::Imager::Resize
+        PerlSetVar ImgResizeCacheDir '/var/cache/AIRCache/'
+      </Files>
+
+      # or
+
+      <Location "/liveimages">
+        PerlHandler Apache2::Imager::Resize
+        PerlSetVar ImgResizeNoCache on
+        PerlSetVar ImgResizeWidthParam 'w'
+        PerlSetVar ImgResizeHeightParam 'h'
+      </Location>
+
+      # and on a web page somewhere:
+
+      <img src="image.jpg?w=300;h=200;proportional=0" width="300" height="200">
+
+INTRODUCTION
+    This is a simple fixup class that only does one job: it resizes images
+    before they're delivered. All you have to do is append either a width
+    and/or a height parameter to any image file address, and AIR will make
+    sure that an appropriately shrunken image file is returned. It caches
+    the results of each operation, so the first request might take a little
+    while but subsequent similar requests should be very quick.
+
+    This module is based on the code from Apache::Imager::Resize, which does
+    the same job for Apache 1.x. Some new parameters have been adden, but
+    preexisting parameters are backwards-compatible.
+
+PARAMETERS
+    Apache2::Imager::Resize understands four query string parameters:
+
+  w
+    width in pixels. You can specify another name with an
+    ImgResizeWidthParam directive.
+
+  h
+    height in pixels. You can specify another name with an
+    ImgResizeHeightParam directive.
+
+  reshape
+    If this is 'crop', we will crop without resizing. The default behaviour
+    is to scale first and then crop to fit the other dimension (see below).
+    If only one dimension is specified, this parameter has no effect. There
+    will be more options here in later versions.
+
+  cropto
+    This can be left, right, top or bottom, and it dictates the part of the
+    picture that is kept when we crop the image. If only one dimension is
+    specified, this parameter has no effect. Future versions will allow
+    combinations of these values.
+
+  quality
+    This should be an integer between 0 and 100. It only affects jpeg
+    images. The default is 60.
+
+  enlarge
+    By default images won't images get scaled up. If you wan't to do this,
+    set enlarge to 1.
+
+  cropAR
+    Overrides the default behaviour of configuration parameter
+    "ImgResizeCropToAspectRatio".
+
+  scaletype
+    Scale type 'min', 'max', 'nonprop'. See "scale" in
+    Imager::Transformations.
+
+  qtype
+    Quality of scaling 'normal', 'preview', 'mixing'. See "scale" in
+    Imager::Transformations.
+
+CONFIGURATION
+    In many cases, this will suffice:
+
+      <Location "/images">
+        PerlFixupHandler  Apache::Imager::Resize
+      </Location>
+
+    But you can also include one or more of these directives to modify the
+    behaviour of the handler:
+
+  ImgResizeCacheDir
+    Sets the path to a directory that will be used to hold the resized
+    versions of image files. If you don't include this directive, resized
+    images will be stored next to their originals. The supplied value should
+    be relative to your document root, eg:
+
+      <Location "/images">
+        PerlFixupHandler  Apache::Imager::Resize
+        PerlSetVar ImgResizeCacheDir '/var/cache/AIRCache/'
+      </Location>
+
+    You can put the cache inside a directory that is handled by AIR without
+    ill effects, though of course it will get a bit odd if you start serving
+    images directly from the cache.
+
+  ImgResizeNoCache
+    If true, this will mean that images are resized for each request and no
+    attempt is made to keep a copy for future use.
+
+  ImgResizeWidthParam
+    Sets the name of the parameter that will be used to specify the width
+    (in pixels) of the returned image. Default is 'w'.
+
+  ImgResizeHeightParam
+    Sets the name of the parameter that will be used to specify the height
+    (in pixels) of the returned image. Default is 'h'.
+
+  ImgResizeCropToAspectRatio
+    If true, the image will be cropped if the specified width and height
+    would lead to a new aspect ratio. Default is '1'. The parameter 'cropAR'
+    can be used to override this behaviour.
+
+  ImgResizeQtype
+    Sets the default value for "qtype".
+
+IMAGE FORMATS
+    We can work with any image format that Imager can read, which includes
+    all the usual web files and most other bitmaps.
+
+SHRINKING RULES
+    If only one dimension is specified, we will scale the image to that
+    size,keeping the aspect ratio.
+
+    If both dimensions are specified and the combination preserves the
+    aspect ratio of the image, we scale the image to that size.
+
+    If there is no 'reshape' parameter, the specified dimensions result in a
+    change of shape and the parameter "proportional" is set to 0, the aspect
+    ratio of the image will be changed.
+
+    If there is no 'reshape' parameter, and the specified dimensions result
+    in a change of shape, we will first scale the image to the correct size
+    in the dimension that is changing less, then crop in the other dimension
+    to achieve the right shape and size without distorting the image. You
+    can supply a 'cropto' parameter to specify which part of the image is
+    kept in the cropping step. You can set "ImgResizeCropToAspectRatio" to 0
+    or the parameter "cropAR" to avoid the cropping of the image.
+
+    If the reshape parameter is 'crop', we will crop in both dimensions
+    without scaling the image at all. You can supply a 'cropto' parameter to
+    specify which part of the image is kept. This is likely to yield better
+    quality than scaling, when the original size is close to the target
+    size, but will have less useful results where they're very different.
+
+CACHING AND EFFICIENCY
+    Unless you've switched the cache off, the handler keeps a copy of every
+    resized file. When a request comes in, we look first for a cached file,
+    and check that it's no older than the original image file.
+
+    By default we keep the cache files next to the originals, which can get
+    messy. You can also specify a cache directory, in which the directory
+    structure of your site will be partly recreated as resized images are
+    stored in subdirectories corresponding to the position of their
+    originals in the main filing system. This makes it much easier to prune
+    or discard the cache.
+
+    Note that at the moment it is assumed that your image cache will be
+    within your document root. There's no reason why it should have to be,
+    so at some point soon it will be possible to specify a whole page.
+
+    Either way, this request:
+
+      <img src="/images/morecambe.jpg?w=120&h=150&cropto=left">
+
+    will produce (or use) a cache file named:
+
+      [cachedir]/images/morecambe_120_150_left.jpg
+
+    If either dimension is not specified, as is common, the filename will
+    have an x in that position. The cropto parameter is also usually
+    omitted, so this:
+
+      <img src="/images/morecambe.jpg?w=120">
+
+    corresponds to this:
+
+      [cachedir]/images/morecambe_120_x.jpg
+
+    If neither width nor height is specified we bail out immediately, so the
+    original image will be returned.
+
+    There is currently no mechanism for cache cleanup, but we do touch the
+    access date of each file each time it's used (leaving the modification
+    date alone so that it can be to compare with the original file). You
+    could fairly easily set up a cron job to go through your cache directory
+    deleting all the image files that have not been touched for a week or
+    so.
+
+BUGS
+    No doubt. Reports in rt.cpan.org would be much appreciated.
+
+TODO
+    *   Accept more than one cropto parameter, eg top and left.
+
+    *   tests
+
+SEE ALSO
+    Imager Apache::ImageMagick Apache::GD::Thumbnail Apache::Imager::Resize
+
+AUTHOR
+    Alexander Keusch, "<kalex at cpan.org>"
+
+CONTRIBUTORS
+    William Ross, "<wross at cpan.org>" Jozef Kutej, "<jkutej at cpan.org>"
+
+COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

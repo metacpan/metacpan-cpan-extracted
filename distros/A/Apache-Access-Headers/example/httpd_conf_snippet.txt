@@ -1,0 +1,48 @@
+
+#
+# mod_perl configuration
+#
+
+NameVirtualHost 127.0.0.1
+
+<IfModule mod_perl.c>
+
+#
+# HeadersAccessConf must be set outside all blocks
+# since it by a PerlChildInitHandler
+#
+PerlSetVar HeadersAccessConf conf/headers_access.conf
+
+<VirtualHost 127.0.0.1>
+	ServerName perl.rulez.com
+
+	# push a path onto @INC
+	<perl>
+		use lib qw( /Users/jeffo/local/source/rulez ) ;
+	</perl>
+
+	# initialize mod_perl
+	PerlModule Apache
+	
+	# setup reloading of perl modules
+	PerlModule Apache::Reload
+	PerlInitHandler Apache::Reload
+	PerlSetVar ReloadAll Off
+	PerlSetVar ReloadModules "Apache::* Apache::Access::*"
+	
+	# devel settings
+	PerlFreshRestart On
+	PerlWarn Off
+	
+	DocumentRoot /Users/jeffo/local/sites/volcano.rulez.com/htdocs
+	<Directory "/Users/jeffo/local/sites/volcano.rulez.com/htdocs">
+		Options All
+		AllowOverride All
+		
+		PerlModule Apache::Access::Headers
+		PerlAccessHandler Apache::Access::Headers
+	</Directory>
+	
+</VirtualHost>
+</IfModule>
+

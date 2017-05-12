@@ -1,0 +1,62 @@
+package Alzabo::GUI::Mason::Config;
+
+use vars qw(%CONFIG);
+
+use strict;
+
+%CONFIG = "'CONFIG'";
+
+sub mason_web_dir
+{
+    $CONFIG{mason_web_dir} = $_[0] if defined $_[0];
+    return $CONFIG{mason_web_dir};
+}
+
+sub mason_extension
+{
+    $CONFIG{mason_extension} = $_[0] if defined $_[0];
+    return $CONFIG{mason_extension};
+}
+
+__END__
+
+=head1 NAME
+
+Alzabo::GUI::Mason::Config - Alzabo Mason GUI configuration information
+
+=head1 SYNOPSIS
+
+  use Alzabo::GUI::Mason::Config
+
+  print Alzabo::Config::mason_web_dir;
+
+=head1 DESCRIPTION
+
+This module contains functions related to Alzabo configuration
+information.
+
+=head1 FUNCTIONS
+
+=head2 mason_web_dir ($web_dir)
+
+If a value is passed to this method then the Mason component directory
+is temporarily changed.  This change lasts as long as your application
+remains in memory.  However, since changes are not written to disk it
+will have to be changed again.
+
+=head3 Returns
+
+The path to the root directory for the Alzabo Mason components.
+
+=head2 mason_extension
+
+If a value is passed to this method then the Mason extension is
+temporarily changed.  This change lasts as long as your application
+remains in memory.  However, since changes are not written to disk it
+will have to be changed again.
+
+=head3 Returns
+
+The file extension used by the Alzabo Mason components.
+
+=cut

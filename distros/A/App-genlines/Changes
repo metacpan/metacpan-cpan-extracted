@@ -1,0 +1,17 @@
+Revision history for App-genlines
+
+0.003   2016-10-01 (PERLANCAR)
+
+	- Tweak algorithm: avoid lots of sleep() with small value (<
+	  0.02s), batch print at higher speed to reduce overhead (top speed
+	  now improved from 3-5K/s to ~3M/s).
+
+
+0.002   2016-10-01 (PERLANCAR)
+
+	- Add tab completion.
+
+
+0.001   2016-10-01 (PERLANCAR)
+
+        - First release.

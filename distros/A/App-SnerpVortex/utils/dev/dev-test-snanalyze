@@ -1,0 +1,3 @@
+./snanalyze --dump thirdlobe-repos/workbench.dump | xmllint -format - > deleteme-1.xml
+./dev-test-loadsave-xml < deleteme-1.xml | xmllint -format - > deleteme-2.xml
+md5sum deleteme-[12].xml

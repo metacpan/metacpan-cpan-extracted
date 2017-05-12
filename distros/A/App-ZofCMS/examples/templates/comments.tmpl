@@ -1,0 +1,10 @@
+{
+    body    => \'comments.tmpl',
+    comments_plugin => {
+        page        => '/comments',
+        uri     => 'http://vet/index.pl?page=comments',
+        mailer      => 'testfile',
+        flood_num   => 20,
+    },
+    plugins => [ qw/Comments/ ]
+},

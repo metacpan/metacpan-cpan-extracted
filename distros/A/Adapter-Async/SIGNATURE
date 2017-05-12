@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0cd6e52e228a61c734f3e706a85e5533a25fcc49 Changes
+SHA1 866cd08b36707c581a0294592683fec23d6c85a0 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 fee95ffd63a26a1722ce41e9485f518471473837 MANIFEST
+SHA1 ce7c0ec811daa9d6322bcdec7103c4afd2c972e0 META.json
+SHA1 cbe3717bc5a01567457cd9553174933966e2dd35 META.yml
+SHA1 e14dd3fa875fe28ddba69d792636ed2ca90e2b2d Makefile.PL
+SHA1 f81faa78a43cb334dacddd0b6a6bf66267d68e82 README
+SHA1 cb1e5dc4b8306662a968168b862c4cdca30175ad cpanfile
+SHA1 c53d613babad9ef5d878fea3948541661b320bc1 dist.ini
+SHA1 c0e56c97a4fb0daa5fded91561c7538197e524da lib/Adapter/Async.pm
+SHA1 9bfdc51312df6423df280dc1a036505f25eb9445 lib/Adapter/Async/Bus.pm
+SHA1 ee6e2e5f3e65192ba75a35b5febd383acf224fdc lib/Adapter/Async/Bus.pod
+SHA1 2bb90f370db662bd91bea9f92b43a83c6966e19c lib/Adapter/Async/Model.pm
+SHA1 c35704b6020214f8741cc56c641da9fcf772ead4 lib/Adapter/Async/OrderedList.pm
+SHA1 2d22726cd9a9b50f4936e267d2f7f1d09e7f0ae8 lib/Adapter/Async/OrderedList.pod
+SHA1 61e328bebd20e9126e990e969968ec0717865cba lib/Adapter/Async/OrderedList/Array.pm
+SHA1 4100e686b6684b6574f5d4d5a96f3213d67bab33 lib/Adapter/Async/OrderedList/Array.pod
+SHA1 0122225332f4fe2c94e19f38d10b0676cbc8714d lib/Adapter/Async/UnorderedMap.pm
+SHA1 9fc4984b6d5550edf48376127e459b66883642b8 lib/Adapter/Async/UnorderedMap.pod
+SHA1 2d4fcb79727f005cec3b0d045da0a302b5d41815 lib/Adapter/Async/UnorderedMap/Hash.pm
+SHA1 3ba3d785af0c5c74568e7dc7e49ddaf66b477983 lib/Adapter/Async/UnorderedMap/Hash.pod
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 1f63660c319f8c9c467905bc36a60e73ca79d17a t/00-compile.t
+SHA1 c329b5597dadd4167b3c59c62e29dd859df5dec7 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 26ce40b0d6eb210964be1929e3a7734230cfb48e t/array.t
+SHA1 4bbaac9ad958175d025f58b50b51a8b90c005e37 t/hash.t
+SHA1 332176e24b811f5b5f27f956f1e5f0e5ac23813c t/model.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJY13KpAAoJEG2WkcbynxAl04gQAMr4pI3FrF2Ztjqdd3aQAaix
+if8sy1SS2z9bEy05m4NVkUfFarShN0TWTnsU080IHNckT4glVtb/E4r0i8Lt2w0U
+2jIYNCYTDMDGyY0DrRbwnKMD0ndqhdKE4F5YCz9CZVSu1cUOTI8KYbpuUi+m+xAF
+VvvxQBHLQi5SxoEVyTqW7S3DlbtEZ6a6nS1iLYdTMixYKSuqEavpAC45pw9XyT/r
+VDBZUlG5eaGkmXXuvIGZsTbfcjg68TGyURhEZv7H0a+THkKrZYn34EIVZaAQ5rI/
+ZRvhZEVpCTGqmMvmOh3k9tLCUU7aS7dohga9hQDpKshYpOsCwxHTIto2ZNrUxhvG
+G+d9yYq68xICLlml/YHMrU5n3g81ISikrkjz3v+NV6K5DzvtqQKyUGJrepVeV5gz
+lgj2FMIOqNFASiB+PG2nwgBP30jmOTWFbXTWxFJqpw2CZ0eT998mRojeA6c4fNpB
+vIjkSDEkmKkpRPo6nsPxJKCEXn1OgXNB/FGx+uVT4basYspdYkiCpxwIPzWP7qpy
+mzr0mLQe8sSCo3OHy9J+GEpztyWRZktGSJec0/DWm2CqnQ7bwh7A9AJ/EUgO93+L
+7EHVoUk1bHu/SWmcp9B+MmjMM7745RxNiBQe5nPe8BGKfwkrAby/lv/4aAnFHo60
+RAqLv1viTGx1tq/6rFEm
+=/1b1
+-----END PGP SIGNATURE-----

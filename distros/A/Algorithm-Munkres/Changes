@@ -1,0 +1,48 @@
+NAME
+    Revision History for Algorithm::Munkres.
+
+SYNOPSIS
+    A list of changes to the Algorithm::Munkres module.
+
+DESCRIPTION
+
+   Version 0.08 (Algorithm::Munkres-0.08 Released on 22nd Oct 2008)
+        These changes were contributed by Ken Williams (kwilliams@cpan.org):
+	1. Prefer foreach(@x){...} rather than for($i=0;$i<@x;$i++){...}
+	   because it tends to be faster and less verbose.
+ 	2. Exit early from loops when possible; this is a huge win for 
+	   the find_a_zero() function in particular.
+	3. Increase the minimum required version of perl to 5.006, 
+	   because that's when the our() construct was introduced.
+	4. Don't use a 99999999999 sentinel in find_smallest().
+
+   Version 0.07 (Algorithm::Munkres-0.07 Released on 9th Aug 2007)
+	1. Bug Fix: Added re-initialization code for global variables to the 'assign' subroutine. (Thanks to Gabriel Cardona!)
+	2. Added a test-case: t/DoubleInvoke.t
+
+   Version 0.06 (Algorithm::Munkres-0.06 Released on 14th Sep 2005)
+        1. Modified Munkres.pm to correct the version number.
+
+   Version 0.05 (Algorithm::Munkres-0.05 Released on 30th Nov 2004)
+        1. Modified Makefile.PL to remove a warning message being displayed during installation of the module.
+
+   Version 0.04 (Algorithm::Munkres-0.04 Released on 28th Nov 2004)
+        1. Modified Munkres.pm and Makefile.PL to support Perl v5.004 and higher.
+
+   Version 0.03 (Algorithm::Munkres-0.03 Released on 21th Nov 2004)
+        1. Modified Munkres.pm to handle rectangular matrices
+		2. Added test cases to check for rectangular matrices
+		3. Updated perldoc for Munkres.pm and README accordingly	
+
+    Version 0.02 (Algorithm::Munkres-0.02 Released on 17th Nov 2004)
+		1. Updated perldoc for Munkres.pm
+		2. Removed installation instructions from README and moved it to INSTALL.
+		3. Removed diagnostic messages from Munkres.pm
+		4. Rectified a bug in the steptwo subroutine of Munkres.pm
+		(The array index variable for row cover matrix was incorrect)
+		5. Added few more test cases.
+
+    Version 0.01 (Algorithm::Munkres Released on 13th Nov 2004)
+		Algorithm::Munkres released on CPAN
+		Note: This version did not have an explicit version number in its name.
+

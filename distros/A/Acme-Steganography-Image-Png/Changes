@@ -1,0 +1,25 @@
+Revision history for Perl extension Acme::Steganography::Image::Png.
+
+0.01  Fri Mar 11 22:01:05 2005
+	- original version; created by h2xs 1.19
+
+0.02  Sat Mar 12 13:33:13 GMT 2005
+	- Added RGB classes.
+
+0.03  Mon Mar 14 21:19:05 GMT 2005
+	- Use string & and | operators for about 30% speedup
+	  Ops are bad, m'kay.
+
+0.04  Mon Mar 14 22:59:27 GMT 2005
+	- Acme::Steganography::Image::Png::556FS uses Floyd-Steinberg dithering
+	  to spread around the errors caused by stuffing way too much data in.
+
+0.05  Mon Apr  3 15:20:09 BST 2006
+	- Actually give the error message on file open failure
+	- Patch from Simon Wistow to allow write_images to use an existing
+	  Imager object, which allowed support for inlining images within
+	  files.
+
+0.06  Mon Oct  2 00:33:16 BST 2006
+	- Wrap the arguments to calls to croak in (), to avoid problems with
+	  croak being misinterpreted as a method to call on an object.

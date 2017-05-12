@@ -1,0 +1,50 @@
+---
+abstract: 'An interface to make and verify bags according to the BagIt standard'
+author:
+  - 'Rob Schmidt <rjeschmi@gmail.com>'
+build_requires:
+  File::Copy: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.022, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-BagIt
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+recommends:
+  IO::AIO: '0'
+requires:
+  Data::Dumper: '0'
+  Data::Printer: '0'
+  Digest::MD5: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  IO::AIO: '0'
+  Moo: '0'
+  Moose: '0'
+  POSIX: '0'
+  String::CRC32: '0'
+  Sub::Quote: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rjeschmi/Archive-BagIt/issues
+  repository: git://github.com/rjeschmi/Archive-BagIt.git
+version: '0.052'

@@ -1,0 +1,17 @@
+Textcast
+========
+
+'Light weight text casting'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

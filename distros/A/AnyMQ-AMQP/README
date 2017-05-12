@@ -1,0 +1,29 @@
+NAME
+    AnyMQ::AMQP - AMQP binding for AnyMQ
+
+SYNOPSIS
+      use AnyMQ;
+      my $bus = AnyMQ->new_with_traits(traits => ['AMQP'],
+                                       host   => 'localhost',
+                                       port   => 5672,
+                                       user   => 'guest',
+                                       pass   => 'guest',
+                                       vhost  => '/',
+                                       exchange => 'foo',
+                                   );
+      my $client = $bus->new_listener($bus->topic("foo"));
+      $client->poll(sub { my $msg = shift;
+                          # ...
+                        });
+
+DESCRIPTION
+    AnyMQ::AMQP is AnyMQ trait to work with AMQP servers.
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

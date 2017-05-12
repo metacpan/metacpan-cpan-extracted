@@ -1,0 +1,31 @@
+Apache::AxKit::Plugin::Upload version 0.2
+===========================================
+
+This is an upload tracking plugin for AxKit. It shows an
+upload progress bar for lengthy uploads.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+After that, read 'perldoc Apache::AxKit::Plugin::Upload' to
+find out how to enable the plug in and configure your AxKit
+enabled web server for optimum operation.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  AxKit 1.6.1 or higher
+
+COPYRIGHT AND LICENCE
+
+This module is distributed under the same terms as perl itself.
+
+Copyright (C) 2002 Jörg Walter <jwalt@cpan.org>
+

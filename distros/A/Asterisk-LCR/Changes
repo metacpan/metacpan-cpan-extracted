@@ -1,0 +1,32 @@
+- 0.08
+  - Added search_rates method to generic storage module
+  - Tweaked the 'bin' script so that 'locale' is optional in the Dialer section
+  - Added countries list in /contrib directory
+  - Added ITSP-centric features such as rates generation & management
+
+- 0.07 (2006-01-24)
+  - Done lots of refactoring on the ./bin scripts
+  - Wrote an abstract persistence storage database layer
+  - Wrote Asterisk::LCR::Importer::DiskStatic (slow)
+  - Wrote Asterisk::LCR::Importer::DiskBlock (faster but non granular)
+  - Added RichMedium importer
+  - Updated documentation
+
+- 0.06 (2006-01-21)
+  - Re-wrote and cleaned up CSV import scripts
+  - Fixed target() method
+  - Added richmedia import
+
+- 0.05 (2006-01-20)
+  - Tweaked fr.txt translation table
+  - Fixed prefix normalization in asterisk-lcr-(builder|dialplan)
+  - Fixed some documentation bugs
+  - Fixed asterisk-dialplan broken output
+
+- 0.04 (2006-01-20)
+  - Fixed missing makefile exe_files parameter
+  - Added Finance::Currency::Convert::XE dependency
+
+- 0.03 (2006-01-19)
+  - CPAN release of re-write
+  - "initial" public release

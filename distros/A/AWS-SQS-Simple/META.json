@@ -1,0 +1,52 @@
+{
+   "abstract" : "This module is used to access amazon simple queue services.",
+   "author" : [
+      "Ankita <sankita.11@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AWS-SQS-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Data::Dump" : 0,
+            "Digest::HMAC_SHA1" : 0,
+            "Digest::SHA" : 0,
+            "Encode" : 0,
+            "HTTP::Headers" : 0,
+            "LWP::UserAgent" : 0,
+            "MIME::Base64" : 0,
+            "Test::More" : 0,
+            "URI::Escape" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sankita11/AWS-SQS-Simple.git",
+         "web" : "https://github.com/sankita11/AWS-SQS-Simple"
+      }
+   },
+   "version" : "0.02"
+}

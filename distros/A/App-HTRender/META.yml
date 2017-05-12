@@ -1,0 +1,28 @@
+---
+abstract: 'tool to work with HTML::Template templates from the command line'
+author:
+  - 'Andrew Johnson <lajandy at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.120351'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-HTRender
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: 2.76
+  Getopt::Long: 2.37
+  HTML::Template: 2.9
+  JSON::Tiny: 0.49
+  Pod::Usage: 1.35
+resources:
+  repository: git://github.com/lajandy/htrender.git
+version: 1.00

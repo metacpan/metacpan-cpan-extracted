@@ -1,0 +1,170 @@
+package main;
+
+use strict;
+use warnings;
+
+use lib qw{ inc };
+
+use Test::More 0.88;
+use My::Module::Test::App;
+
+BEGIN {
+
+    # Workaround for bug (well, _I_ think it's a bug) introduced into
+    # Date::Manip with 6.34, while fixing RT #78566. My bug report is RT
+    # #80435.
+    my $path = $ENV{PATH};
+    local $ENV{PATH} = $path;
+
+    eval {
+	# The following localizations are to force the Date::Manip 6
+	# backend
+	local $ENV{DATE_MANIP} = 'DM6';
+	local $Date::Manip::Backend = 'DM6';
+	require Date::Manip;
+	1;
+    } or plan skip_all => 'Date::Manip not available';
+
+    my $ver = Date::Manip->VERSION();
+    Date::Manip->import();
+    ( my $test = $ver ) =~ s/ _ //smxg;
+    $test >= 6
+	or plan skip_all =>
+	    "Date::Manip $ver installed; this test is for 6.00 or greater";
+
+    $] >= 5.010
+	or plan skip_all =>
+	    "Date::Manip version 6 backend not available under Perl $]";
+
+    require Astro::Coord::ECI::Utils;
+    Astro::Coord::ECI::Utils->VERSION( '0.077' );
+    Astro::Coord::ECI::Utils->import( qw{ time_gm time_local } );
+
+    {
+	my ( $dm_zone, $dt_zone );
+	eval {
+	    $dm_zone = Date::Manip::Date_TimeZone();
+	    require DateTime::TimeZone;
+	    $dt_zone = DateTime::TimeZone->new( name => 'local')->name();
+	    1;
+	} and lc $dm_zone ne lc $dt_zone
+	    and plan skip_all =>
+	    "Date::Manip zone is '$dm_zone' but DateTime zone is '$dt_zone'";
+    }
+
+}
+
+dump_date_manip_init();
+my $path = $ENV{PATH};
+
+require_ok 'Astro::App::Satpass2::ParseTime';
+
+note <<'EOD';
+The following test is to make sure we have worked around RT ticket
+#80435: [patch] Date::Manip clobbers $ENV{PATH} on *nix
+EOD
+
+is $ENV{PATH}, $path, 'Ensure that the PATH is prorected at load';
+
+class 'Astro::App::Satpass2::ParseTime';
+
+method new => class => 'Astro::App::Satpass2::ParseTime::Date::Manip',
+    INSTANTIATE, 'Instantiate';
+
+note <<'EOD';
+The following test is to make sure we have worked around RT ticket
+#80435: [patch] Date::Manip clobbers $ENV{PATH} on *nix
+EOD
+
+is $ENV{PATH}, $path, 'Ensure that the PATH is prorected at instantiation';
+
+method isa => 'Astro::App::Satpass2::ParseTime::Date::Manip::v6', TRUE,
+    'Object is an Astro::App::Satpass2::ParseTime::Date::Manip::v6';
+
+method isa => 'Astro::App::Satpass2::ParseTime', TRUE,
+    'Object is an Astro::App::Satpass2::ParseTime';
+
+method 'delegate',
+    'Astro::App::Satpass2::ParseTime::Date::Manip::v6',
+    'Delegate is Astro::App::Satpass2::ParseTime::Date::Manip::v6';
+
+method 'use_perltime', FALSE, 'Does not use perltime';
+
+method parse => '20100202T120000Z',
+    time_gm( 0, 0, 12, 2, 1, 2010 ),
+    'Parse noon on Groundhog Day 2010';
+
+my $base = time_gm( 0, 0, 0, 1, 3, 2009 );	# April 1, 2009 GMT;
+use constant ONE_DAY => 86400;			# One day, in seconds.
+use constant HALF_DAY => 43200;			# 12 hours, in seconds.
+
+method base => $base, TRUE, 'Set base time to 01-Apr-2009 GMT';
+
+method parse => '+0', $base, 'Parse of +0 returns base time';
+
+method parse => '+1', $base + ONE_DAY,
+    'Parse of +1 returns one day later than base time';
+
+method parse => '+0', $base + ONE_DAY,
+    'Parse of +0 now returns one day later than base time';
+
+method 'reset', TRUE, 'Reset to base time';
+
+method parse => '+0', $base, 'Parse of +0 returns base time again';
+
+method parse => '+0 12', $base + HALF_DAY,
+    q{Parse of '+0 12' returns base time plus 12 hours};
+
+method 'reset', TRUE, 'Reset to base time again';
+
+method parse => '-0', $base, 'Parse of -0 returns base time';
+
+method parse => '-0 12', $base - HALF_DAY,
+    'Parse of \'-0 12\' returns 12 hours before base time';
+
+method perltime => 1, TRUE, 'Set perltime true';
+
+my $time_local = time_local( 0, 0, 0, 1, 0, 2009 );
+method parse => '20090101T000000',
+    $time_local,
+    time_local( 0, 0, 0, 1, 0, 2009 ),
+    'Parse ISO-8601 20090101T000000'
+    or dump_date_manip( $time_local );
+
+$time_local = time_local( 0, 0, 0, 1, 6, 2009 );
+method parse => '20090701T000000',
+    $time_local,
+    'Parse ISO-8601 20090701T000000'
+    or dump_date_manip( $time_local );
+
+method perltime => 0, TRUE, 'Set perltime false';
+
+$time_local = time_local( 0, 0, 0, 1, 0, 2009 );
+method parse => '20090101T000000',
+    $time_local,
+    'Parse ISO-8601 20090101T000000, no help from perltime'
+    or dump_date_manip( $time_local );
+
+$time_local = time_local( 0, 0, 0, 1, 6, 2009 );
+method parse => '20090701T000000',
+    $time_local,
+    'Parse ISO-8601 20090701T000000, no help from perltime'
+    or dump_date_manip( $time_local );
+
+my $time_gm = time_gm( 0, 0, 0, 1, 0, 2009 );
+method parse => '20090101T000000Z',
+    $time_gm,
+    'Parse ISO-8601 20090101T000000Z'
+    or dump_date_manip( $time_gm );
+
+$time_gm = time_gm( 0, 0, 0, 1, 6, 2009 );
+method parse => '20090701T000000Z',
+    $time_gm,
+    'Parse ISO-8601 20090701T000000Z'
+    or dump_date_manip( $time_gm );
+
+done_testing;
+
+1;
+
+# ex: set textwidth=72 :

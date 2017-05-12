@@ -1,0 +1,18 @@
+<table>
+<tr><th>POD</th><th>User</th><th>Time</th><th>Note</th></tr>
+[% i = 0 %]
+[% FOR note = notes %]
+[% IF note.ref_notepos.is_visible; i = i+1 %]
+<tr class="[% i % 2 ? 'even' : 'odd' %]">
+    <td>[% link_podver(note.section.podver) %]</td>
+    <td>[% IF note.user.id %]
+        [% link_user(note.user) %]
+    [% ELSE %]
+        [% note.ip %]
+    [% END %]</td>
+    <td class="date">[% YMD_HMS.format(note.time) %]</td>
+    <td><a href="[% podver_uri(note.section.podver) %]#note_[% note.id %]">[% note.note | truncate(50) | html %]</a></td>
+</tr>
+[% END %]
+[% END %]
+</table>

@@ -1,0 +1,221 @@
+NAME
+    App::GitHub::FindRepository - Determine the right case for a GitHub
+    repository
+
+VERSION
+    Version 0.06
+
+SYNOPSIS
+        github-find-repository git://github.com/robertkrimen/Doc-Simply.git
+        # git://github.com/robertkrimen/doc-simply.git
+
+        github-find-repository robertkrimen,Doc-Simply
+        # git://github.com/robertkrimen/doc-simply.git
+
+        github-find-repository --pinger=./bin/git-ls-remote ...
+
+        # ... or ...
+
+        use App::GitHub::FindRepository
+
+        my $url = App::GitHub::FindRepository->find( robertkrimen/Doc-Simply )
+        # git://github.com/robertkrimen/doc-simply.git
+
+DESCRIPTION
+    GitHub recently made a change that now allows mixed-case repository
+    names. Unfortunately, their git daemon will not find the right
+    repository given the wrong case.
+
+    App::GitHub::FindRepository ("github-find-repository") will interrogate
+    the repository home page (HTML), looking for the "right" repository name
+    in a case insensitive manner
+
+    If LWP is not installed and curl is not available, then the finder will
+    fallback to using the git protocol (via git-ls-remote or
+    git-peek-remote). It will first attempt to ping the mixed-case version,
+    and, failing that, will attempt to ping the lowercase version.
+
+    In either case, it will return/print the valid repository url, if any
+
+CAVEAT
+    When finding via the git protocol, the following applies:
+
+    Given a mixed-case repository, the find routine will try the mixed-case
+    once, then the lowercase. It will not find anything else
+
+        github-find-repository --git-protocol robertkrimen/Doc-Simply
+
+    ...will work, as long as the real repository is
+    "robertkrimen/Doc-Simply.git" or "robertkrimen/doc-simply.git"
+
+    If the real repository is "robertkrimen/dOc-sImPlY.git" then the finder
+    will NOT see it
+
+INSTALL
+    You can install App::GitHub::FindRepository by using CPAN:
+
+        cpan -i App::GitHub::FindRepository
+
+    If that doesn't work properly, you can find help at:
+
+        http://sial.org/howto/perl/life-with-cpan/
+        http://sial.org/howto/perl/life-with-cpan/macosx/ # Help on Mac OS X
+        http://sial.org/howto/perl/life-with-cpan/non-root/ # Help with a non-root account
+
+CONTRIBUTE
+    You can contribute or fork this project via GitHub:
+
+    <http://github.com/robertkrimen/App-GitHub-FindRepository/tree/master>
+
+        git clone git://github.com/robertkrimen/App-GitHub-FindRepository.git
+
+USAGE
+  github-find-repository
+    A commandline application that will print out the the repository with
+    the right casing
+
+        Usage: github-find-repository [...] <repository>
+
+            --pinger <pinger>   The pinger to use (default is either git-ls-remote or git-peek-remote)
+
+            --getter <getter>   The getter to use (default is LWP then curl)
+
+            --git-protocol      Don't try to determine the repository by sniffing HTML, just use git://
+                                NOTE: This mode will only check the given casing then lowercase
+
+            --output <output>   One of (case insensitive):
+
+                                Given "http://github.com/robertkrimen/aPp-giTHub-findRepoSitory.git"
+
+                                URL      http://github.com/robertkrimen/App-GitHub-FindRepository.git
+                                public   git://github.com/robertkrimen/App-GitHub-FindRepository.git
+                                private  git@github.com:robertkrimen/App-GitHub-FindRepository.git
+                                base     robertkrimen/App-GitHub-FindRepository
+                                name     App-GitHub-FindRepository
+                                home     http://github.com/robertkrimen/App-GitHub-FindRepository
+
+            --help, -h, -?      This help
+
+            <repository>        The repository to test, can be like:
+
+                                git://github.com/robertkrimen/App-GitHub-FindRepository.git
+                                robertkrimen/App-GitHub-FindRepository.git
+                                robertkrimen,App-GitHub-FindRepository
+
+        For example:
+
+            github-find-repository --getter curl robertkrimen,aPp-giTHuB-findRepOsitory
+
+  $repository = AppGitHub::FindRepository->find( <repository> [, ...] )
+    Given a mixed-case repository URI, it will return the version with the
+    right case
+
+        getter  The method to use to access the repository home page (HTML)
+        pinger  The pinger to use to access the repository via the git protocol
+
+  $repository = AppGitHub::FindRepository->find_by_git( <repository> [, ...] )
+        pinger  The pinger to use to access the repository via the git protocol
+
+    Given a mixed-case repository URI, it will return the version with the
+    right case, but only using the git protocol
+
+    NOTE: This method will only check the given casing then lowercase. See
+    CAVEAT
+
+::Repository
+    The repository object that "->find" and "->find_by_git" return
+
+    The object will stringify via the "->url" method
+
+  $repository->url
+    The URL (URI) of the repository (depends on what the object was
+    instantiated with)
+
+  $repository->public
+    The public github clone URL:
+
+        git://github.com/<base>.git
+
+  $repository->private
+    The private github clone URL:
+
+        git@github.com:<base>.git
+
+  $repository->base
+    The user/project part of the repository path (WITHOUT the .git suffix):
+
+        robertkrimen/App-GitHub-FindRepository
+
+  $repository->name
+    The name of the project:
+
+        App-GitHub-FindRepository
+
+  $repository->home
+    The home page of the project on GitHub:
+
+        http://github.com/<base> # Will redirect to .../tree/master
+
+A bash function as an alternative
+    If you do not want to install App::GitHub::FindRepository, here is a
+    bash equivalent (using the git protocol, see CAVEAT):
+
+        #!/bin/bash
+
+        function github-find-repository() {
+            local pinger=`which git-ls-remote`
+            if [ "$pinger" == "" ]; then pinger=`which git-peek-remote`; fi
+            if [ "$pinger" == "" ]; then echo "Couldn't find pinger (git-ls-remote or git-peek-remote)"; return -1; fi
+            local repository=$1
+            if [ "`$pinger $repository 2>/dev/null`" ]; then echo $repository; return 0; fi
+            repository=`echo $repository | tr "[:upper:]" "[:lower:]" `
+            if [ "`$pinger $repository 2>/dev/null`" ]; then echo $repository; return 0; fi
+            return -1
+        }
+
+        github-find-repository $*
+
+SEE ALSO
+    App::GitHub::FixRepositoryName
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-app-github-findrepository at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-GitHub-FindRepositor
+    y>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::GitHub::FindRepository
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-GitHub-FindRepository>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-GitHub-FindRepository>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-GitHub-FindRepository>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-GitHub-FindRepository/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

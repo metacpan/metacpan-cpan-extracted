@@ -1,0 +1,188 @@
+#!/usr/bin/perl -CA
+
+package App::tmblr;
+
+use strict;
+use utf8;
+
+use App::tmblr;
+use CGI qw/escapeHTML/; 
+use File::Temp qw/ :POSIX /;
+use Getopt::Std;
+
+my $usage = "$0 [-aqivlChm] [-b blog] [-f config] [-d date] [-s state] [-t tags] [-u url] [-T title] [-c caption] [-e excerpt] [-A author] [FILE...]";
+
+our ($opt_b);
+our ($opt_a, $opt_q, $opt_i, $opt_v, $opt_l, $opt_C, $opt_h, $opt_m);
+our ($opt_f, $opt_d, $opt_s, $opt_T, $opt_t, $opt_u, $opt_c, $opt_e, $opt_A);
+getopts('aqivlChb:f:d:s:t:T:u:c:e:m');
+
+if($opt_h) {
+  print("$usage\n");
+  exit(0);
+}
+
+my $tumblr = init($opt_f, $opt_b);
+
+my %post;
+$post{date} = $opt_d if $opt_d;
+$post{state} = lc($opt_s) if $opt_s;
+$post{tags} = $opt_t if $opt_t;
+$post{title} = escapeHTML($opt_T) if $opt_T;
+$post{source_url} = $opt_u if $opt_u;
+$post{caption} = $opt_c if $opt_c;
+$post{excerpt} = escapeHTML($opt_e) if $opt_e;
+$post{author} = escapeHTML($opt_A) if $opt_A;
+$post{format} = 'markdown' if $opt_m;
+
+if($opt_a) {
+  $post{type} = "audio";
+} elsif($opt_q) {
+  $post{type} = "quote";
+} elsif($opt_i) {
+  $post{type} = "photo";
+} elsif($opt_v) {
+  $post{type} = "video";
+} elsif($opt_l) {
+  $post{type} = "link";
+} elsif($opt_C) {
+  $post{type} = "chat";
+} else {
+  $post{type} = "text";
+}
+
+if($post{type} =~ /^photo|video|audio$/) {
+  if(@ARGV == 1 && $ARGV[0] =~ /^http/ && !-f $ARGV[0]) {
+    $post{source} = $ARGV[0];
+  } else {
+    $post{data} = [@ARGV];
+  }
+} elsif($post{type} eq "text") {
+  $post{body} = gulp($ARGV[0]);
+} elsif($post{type} eq "quote") {
+  $post{quote} = escapeHTML(gulp($ARGV[0]));
+} elsif($post{type} eq "chat") {
+  $post{conversation} = gulp($ARGV[0]);
+} elsif($post{type} eq "link") {
+  $post{url} = $ARGV[0];
+  $post{description} = $post{caption};
+} else {
+  say STDERR "annen type post...";
+  exit(0);
+}
+
+my $posted = $tumblr->post(%post);
+if($posted) {
+  print("http://$tumblr->{base_hostname}/post/$$posted{id}\n");
+} else {
+  print("that doesn't work\n");
+}
+__END__
+
+=head1 NAME
+
+tmblr - a silly tumblr client
+
+=head1 SYNOPSIS
+
+B<tmblr> [-aqivlChm] [-b blog] [-f config] [-d date] [-s state] [-t tags]
+      [-u url] [-T title] [-c caption] [-e excerpt] [-A author]
+      [FILE...]
+
+=head1 DESCRIPTION
+
+B<tmblr> lets you post audio, video, photos, links, quotes or text to your
+tumblr.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-aqivlC>
+
+Sets the post type. Audio (B<-a>), quote (B<-q>), photo (B<-i>), video (B<-v>), 
+link (B<-l>) or chat (B<-C>). Defaults to text.
+
+=item B<-h>
+
+Display usage information and exit.
+
+=item B<-b> I<blog>
+
+Post to I<blog>.
+
+=item B<-f> I<config>
+
+Read the blog name and oauth tokens from the file -I<config>.
+Defaults to ~/.tmblr.
+
+=item B<-d> I<date>
+
+Date and time of the post.
+
+=item B<-s> I<state>
+
+State of the post: published, draft, queue or private.
+
+=item B<-t> I<tags>
+
+Comma separated list of tags.
+
+=item B<-u> I<url>
+
+Source URL.
+Not listed in the API docs, but does something...?
+
+=item B<-T> I<title>
+
+Optional title of post, or title of linked page (link posts).
+
+=item B<-c> I<caption>
+
+A caption for the post. Only for photo, video and audio posts.
+
+=item B<-e> I<excerpt>
+
+Excerpt from the page the link points to. Only for link posts.
+
+=item B<-A> I<author>
+
+Name of the author from the page the link points to. Link posts only.
+
+=item B<-m>
+
+Set the format to markdown.
+
+=back
+
+=head1 EXAMPLES
+
+Post an image with a caption and some tags:
+
+  $ tmblr -i -c "dance, dance" -t "dancing" hello.jpg
+
+Post a video:
+
+  $ tmblr -v video.mp4
+
+Post a bunch of images as drafts:
+
+  $ tmblr -s draft *.png
+
+Write a text post from your editor:
+
+  $ tmblr
+
+=head1 AUTHOR
+
+bie E<lt>bie@kyber.ioE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2015 by bie
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

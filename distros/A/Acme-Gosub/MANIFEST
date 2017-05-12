@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml # Will be created by "make dist"
+README
+TODO
+examples/japh.pl
+lib/Acme/Gosub.pm
+scripts/bump-version-number.pl
+scripts/tag-release.pl
+t/00-load.t
+t/01-basic.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t

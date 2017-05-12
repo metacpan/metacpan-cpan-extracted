@@ -1,0 +1,10 @@
+Revision history for Perl extension Asterisk::config::syntax::highlight.
+
+0.5  fix can't highlight '\;' 
+0.4  Add return_wiki_array_ref
+0.3  fix some bugs
+0.2  Add return_ubb_array_ref
+0.1  Mon Apr 20 15:40:39 2009
+	- original version; created by h2xs 1.23 with options
+		-AX -n Asterisk::config::syntax::highlight
+

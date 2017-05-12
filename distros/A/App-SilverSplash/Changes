@@ -1,0 +1,11 @@
+Revision history for Perl extension App::SilverSplash.
+
+0.02 Fri Sep 10 21:00:00 2010 PST
+    - add more setup docs
+    - correct Config::SL in startup.pl
+    - removed hardcoded iptables location [christianlouis@gmail.com]
+    - update MANIFEST
+
+0.01  Mon Aug 09 12:40:54 2010 PST
+	- forked from SL-CP 0.04
+

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+SetWWWTheme.pm
+t/test.t
+GETTING_STARTED
+templates/Configuration
+templates/LookAndFeelConfig
+templates/example.html
+README
+gpl.txt
+LICENSE

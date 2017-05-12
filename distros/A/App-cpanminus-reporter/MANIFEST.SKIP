@@ -1,0 +1,8 @@
+.travis.yml
+.git
+.git/*
+^MYMETA.yml$
+^MYMETA.json$
+^Makefile$
+^blib
+^App-cpanmninus-reporter

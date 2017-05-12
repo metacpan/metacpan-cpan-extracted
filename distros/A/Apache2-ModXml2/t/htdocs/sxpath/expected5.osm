@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="pbf2osm">
+	<node id="32973718" lat="50.7923997" lon="6.1199098" version="4" changeset="1186920" user="Bürste" uid="61341" timestamp="2009-05-14T12:28:46Z">
+		<tag k="amenity" v="fuel" />
+		<tag k="operator" v="Jet" />
+		<tag k="source" v="image" />
+	</node>
+</osm>

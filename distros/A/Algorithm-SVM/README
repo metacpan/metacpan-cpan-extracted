@@ -1,0 +1,138 @@
+Algorithm::SVM version 0.12
+===========================
+
+TABLE OF CONTENTS
+-----------------
+
+1) DESCRIPTION
+2) INSTALLATION
+3) DEPENDENCIES
+4) BUGS
+5) Algorithm::SVM COPYRIGHT AND LICENCE
+6) libsvm COPYRIGHT AND LICENCE
+7) AUTHOR INFORMATION
+8) ACKNOWLEDGEMENTS
+
+
+1) DESCRIPTION
+--------------
+
+Algorithm::SVM was originally written by Cory Spencer of the Simon Fraser
+University Brinkman Laboratory and provides Perl bindings for a Support 
+Vector Machine.  It is currently maintained by Matthew Laird and all
+inquiries, patches and comments should be sent to him.
+
+Algorithm::SVM is based on the libsvm library written by Chih-Chung Chang
+and Chih-Jen Lin.
+
+To read about the latest features, see the Changes file.
+
+The author invites feedback on SVM. If you find a bug, please send the
+information described in the BUGS section below.
+
+
+2) INSTALLATION
+---------------
+
+For Solaris installation instructions please see README.solaris
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+3) DEPENDENCIES
+---------------
+
+Algorithm::SVM does not require any additional packages or libraries to be
+installed.
+
+
+4) BUGS
+-------
+
+If you find a bug, please report it to the author along with the
+following information:
+
+    * version of Perl (output of 'perl -V' is best)
+    * version of Algorithm::SVM
+    * operating system type and version
+    * exact text of error message or description of problem
+    * example model files/data being classified
+
+If we don't have access to a system similar to yours, you may be asked
+to insert some debugging lines and report back on the results.
+The more help and information you can provide, the better.
+
+
+5) SVM COPYRIGHT AND LICENCE
+----------------------------
+The Perl Algorithm::SVM module is Copyright (C) 2002 Cory Spencer and 
+Fiona Brinkman.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+6) libsvm COPYRIGHT AND LICENCE
+-------------------------------
+
+libsvm is Copyright (c) 2000-2002 Chih-Chung Chang and Chih-Jen Lin.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3. Neither name of copyright holders nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+7) AUTHOR INFORMATION
+---------------------
+
+The Perl Algorithm::SVM module was originally written by Cory Spencer but is
+currently maintained by Matthew Laird <matt@brinkman.mbb.sfu.ca> of the
+Brinkman Laboratory at Simon Fraser University, Burnaby, BC, Canada.
+
+  http://www.pathogenomics.sfu.ca/brinkman
+
+Any questions related to the underlying library, libsvm, should be directed 
+to the authors of the libsvm package (Email contact: lincj@ccms.ntu.edu.tw). 
+The libsvm homepage is currently located at:
+
+  http://www.csie.ntu.edu.tw/~cjlin/libsvm/
+
+
+8) ACKNOWLEDGEMENTS
+-------------------
+
+Thanks go to Chih-Jen Lin, one of the libsvm authors, for being particularly
+helpful during the development process of this module.
+
+As well to Dr. Alexander K. Seewald of Seewald Solutions for many bug fixes,
+new test cases, and lowering the memory footprint by a factor of 20.  Thank
+you very much!

@@ -1,0 +1,51 @@
+Readme for Agent::TCLI::Package::Net version 0.03
+
+This suite allows one to run tests for Network device functionality.
+
+INSTALLATION
+
+Install with Module::Build, using the following commands in the directory
+that this package unipped into:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+Of course the Agent::TCLI core. You'll also need:
+
+	POE::Component::Client::Ping
+	POE::Component::Client::Traceroute
+	POE::Component::Client::HTTP
+	POE::Component::Server::SimpleHTTP
+	FormValidator::Simple::Plugin::NetAddr::IP
+	Email::MIME::Creator
+	File::Slurp
+
+USING
+
+Passive Agents:
+One creates a script, see agent_net.pl, that loads up a TCLI transport with
+users, packages and other pertinent information. The agent will log in, join
+chatrooms if in the user list, and wait for further commands from authorized
+users or in a chatroom.
+
+Test script:
+A test script is written, see ex/probe.pl, that loads up a Test Transport,
+other necessary transports, necessary local packages, and testees.
+
+Using testees, one creates tests ala Test::More with the $testee->ok or
+$testee->like_body and other Testee tests. These will run asynchronously
+after the testing starts.
+
+It is necessary to call the test_master->run at the end of the test script
+to ensure that all tests have completed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Alcatel-Lucent
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

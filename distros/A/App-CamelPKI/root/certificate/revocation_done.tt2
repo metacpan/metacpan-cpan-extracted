@@ -1,0 +1,5 @@
+[% META title = 'Revocation done' -%]
+
+<p>All certificates with the following criteria were revoked :
+[% type %] : [% data %]
+</p>

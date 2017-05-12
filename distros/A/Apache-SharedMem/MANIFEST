@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Apache/SharedMem.pm
+t/assign.t
+t/import.t
+t/smartlock.t
+bin/asdump
+bin/asclean
+bin/ipcclean

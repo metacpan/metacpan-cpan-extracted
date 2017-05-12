@@ -1,0 +1,358 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl test.pl'
+
+BEGIN { $| = 1; print "Running tests for CWB/CQP.pm:\n"; }
+
+# step 1: load the CQP/Perl library
+END {
+  unlink glob "tmp/DICKENS:*";  # clean up temporary corpus files
+  if (not $loaded) {
+    print "!! can't load CWB::CQP module (aborted)\n";
+    exit 1;
+  }
+  if (not $deleted) {
+    print "!! error deleting CWB::CQP object\n";
+    exit 1;
+  }
+}
+
+use CWB::CQP;
+$loaded = 1;
+print " - use CWB::CQP ok\n";
+
+# step 2: start CQP process with our own test init file
+$CQP = new CWB::CQP "-I data/files/init.cqp";
+if (not defined $CQP) {
+  print "!! can't start CQP process\n";
+  exit 1;
+}
+print " - spawned CQP child process\n";
+
+# step 3: we need an up-to-date version of CQP
+$ok = $CQP->check_version(2, 2, 98);		# that´s 2.2.b98 or newer
+if (not $ok) {
+  print "!! CQP version too old, consider upgrading\n";
+  exit 1;
+}
+$major = $CQP->{'major_version'};
+$minor = $CQP->{'minor_version'};
+$beta =  $CQP->{'beta_version'};
+$date =  $CQP->{'compile_date'};
+print " - CQP version $major.$minor";
+print "b$beta"
+  if $beta > 0;
+print " (compile date: $date)\n";
+
+# step 4: list available corpora (run CQP manually with -c to check output of interactive commands!)
+@corpora = $CQP->exec("show corpora");
+if ((not $CQP->ok) or (@corpora == 0) or (not grep {$_ eq "DICKENS"} @corpora)) {
+  print "!! error in 'show corpora;' command\n";
+  exit 1;
+}
+$N = @corpora;
+print " - $N corpora found, including DICKENS\n";
+
+# step 5: activate corpus
+$CQP->exec("DICKENS");
+if (not $CQP->ok) {
+  print "!! can't activate corpus DICKENS\n";
+  exit 1;
+}
+print " - corpus DICKENS activated\n";
+
+# step 6: we need a little trick to get at the corpus size
+@matches = $CQP->dump("DICKENS");		# don´t ask ...
+if (@matches != 1) {
+  print "!! error in 'dump DICKENS;' command\n";
+  exit 1;
+}
+$size = $matches[0]->[1] + 1;			# I told you not to ask ...
+if (not $size > 1_000_000) {
+  print "!! error reading corpus size\n";
+  exit 1;
+}
+print " - corpus size = $size tokens\n";
+
+# step 7: try an error condition, but don´t let the default error handler mess up the screen
+$CQP->set_error_handler('ignore');
+$CQP->exec("[lemma == ']");
+if ($CQP->ok) {
+  print "!! query syntax error not detected\n";
+  exit 1;
+}
+@msg = $CQP->error_message;
+if (not ((@msg >= 2) and grep {/<--/} @msg)) {	# the <-- is used by CQP to indicate the location of a syntax error
+  print "!! incomplete error message\n";
+  exit 1;
+}
+$N = @msg;
+print " - syntax error detected ($N-line error message)\n";
+
+# step 8: try a different error condition and check whether our custom error handler is really called
+$handler_ok = 0;
+$CQP->set_error_handler(sub { if (@_ >= 2) { $handler_ok = @_ } } );
+$CQP->exec("'('");
+if (not $handler_ok) {
+  print "!! custom error handler was not invoked\n";
+  exit 1;
+}
+print " - syntax error handled ($handler_ok-line error message)\n";
+
+# step 8b: try a query lock evaluation with an interactive command
+$handler_ok = 0;
+@nothing = $CQP->exec_query("show cd");
+if (not ($handler_ok and @nothing == 0)) {
+  print "!! query lock violation was not detected\n";
+  exit 1;
+}
+print " - query lock violation caught\n";
+
+# set stricter handler (any further CQP errors are _real_ errors ...)
+$CQP->set_error_handler('die');
+
+# step 9: check multi-line commands
+@nothing = $CQP->exec(";;;;;");			# five blank lines as end-of-command markers are swallowed by CQP.pm
+if (@nothing > 0) {
+  print "!! unexpected output from empty comands\n";
+  exit 1;
+}
+print " - command ';;;;;' ok, no output\n";
+
+# step 10: repeatedly run a macro query defined in init.cqp and save the results as named queries
+print " - executing macro ";
+for ($i = 0; $i < 8; $i++) {
+  print ".";
+  $CQP->exec("A$i = /number_of_NPs[$i]");
+}
+print " ok\n";
+
+# step 11: save results (named queries) to disk
+print " - saving named queries ";
+for ($i = 0; $i < 8; $i++) {
+  print ".";
+  $CQP->exec("save A$i");
+}
+print " ok\n";
+@saved = glob "tmp/DICKENS:A*";
+if (@saved != 8) {
+  print "!! can't find saved query results on disk\n";
+  exit 1;
+}
+
+# step 12: exit and re-start CQP
+undef $CQP;
+$deleted = 1;
+print " - CQP process terminated\n";
+$CQP = new CWB::CQP ("-I data/files/init.cqp");
+if (not defined $CQP) {
+  print "!! can't re-start CQP process\n";
+  exit 1;
+}
+print " - new CQP child process spawned\n";
+
+$CQP->set_error_handler('die'); # again, we're strict about possible errors
+
+# step 13: named queries from step 10 should now be visible within CQP
+@named = $CQP->exec("show named");
+if ((grep {/-d-\s+DICKENS:A/} @named) != 8) {
+  print "!! wrong output from 'show named;' command\n";
+  exit 1;
+}
+print " - saved query results found\n";
+
+# step 14: re-load query results and get number of matches
+@size = ();
+$total_size = 0;				# should add up to number of sentences in DICKENS
+print " - loading query results ";
+for ($i = 0; $i < 8; $i++) {
+  print ".";
+  ($s) = $CQP->exec("size A$i");		# "size" command returns just one number 
+  if (not (defined $s and $s >= 0)) {
+    print "\n!! load error\n";
+    exit 1;
+  }
+  push @size, $s;
+  $total_size += $s;
+}
+print " ok\n";
+if (not ($size[5] > 0 and $size[7] == 0)) {
+  print "!! wrong number of matches\n";
+  exit 1;
+}
+print " - number of matches: ", join(", ", @size), "\n";
+
+# step 15: check $total_size against simple query counting all sentences
+print " - counting sentences ... ";
+($size) = $CQP->exec("DICKENS; A = <s>[]; size A;"); # can execute multiple command with single call
+print "$size found\n";
+if ($total_size != $size) {
+  print "!! inconsistency detected ($size sentences vs. $total_size matches to subcategories)\n";
+  exit 1;
+}
+
+# step 16: cat the query results from A4 and A5 and check the number of lines
+$CQP->exec("show -cpos");			# don't print cpos (check absence below)
+@lines4 = $CQP->exec("cat A4");
+@lines5 = $CQP->exec("cat DICKENS:A5");		# use both short and full form of named query
+if (not (@lines4 == $size[4] and @lines5 == $size[5])) {
+  print "!! 'cat;' command failed\n";
+  exit 1;
+}
+if (grep {/^\s*[0-9]+:/ or not /<.+>/} (@lines4, @lines5)) {
+  print "!! error in 'cat;' output format\n";
+  exit 1;
+}
+print " - 'cat;' command ok, first match with 5 NPs: \n";
+print "   ``$lines5[0]''\n";
+
+# step 17: set target and keyword (trivially) ...
+print " - executing query ... ";
+$CQP->exec("NP = [pos = 'DT'] [pos = 'JJ.*']* @[pos = 'NNS?'] within s");
+print "set keyword ... ";
+$CQP->exec("set NP keyword nearest [pos = 'DT'] within left 1 s from matchend");
+print "ok\n";
+($size, $size_target, $size_keyword) =
+  $CQP->exec("size NP; size NP target; size NP keyword;"); # isn´t that just neat?
+if (not ($size == $size_target and $size == $size_keyword)) {
+  print "!! wrong number of targets/keywords\n";
+  exit 1;
+}
+print " - $size matches with target and keyword anchors\n";
+
+# step 18: ... and get them back from the dump command
+print " - checking first 50,000 matches ..";
+@matches = $CQP->dump("NP", 0, 49_999);
+if (@matches != 50_000) {
+  print "\n!! wrong number of matches in dump\n";
+  exit 1;
+}
+print "..";
+foreach $m (@matches) {
+  ($match, $matchend, $target, $keyword) = @$m;
+  if ($match != $keyword or $matchend != $target) {
+    print "\n!! anchors incorrectly set (", join(", ", @$m), ")\n";
+    exit 1;
+  }
+}
+print " ok\n";
+
+# step 19: test the group command
+print " - frequency distributions with group .";
+$CQP->exec("A = [lemma = 'girl']");
+($size) = $CQP->exec("size A");
+print ".";
+@result = $CQP->exec_rows("group A match word");	# p-attribute
+$sum = 0;
+foreach $row (@result) { $sum += $row->[1] }
+if ($sum != $size) {
+  print "\n!! group output doesn't sum to number of matches ($sum vs. $size)\n";
+  exit 1;
+}
+print ".";
+@result2 = $CQP->exec_rows("group A match novel_title"); # s-attribute
+$sum = 0;
+foreach $row (@result2) { $sum += $row->[1] }
+if ($sum != $size) {
+  print "\n!! group output doesn't sum to number of matches ($sum vs. $size)\n";
+  exit 1;
+}
+print ".";
+@result2 = $CQP->exec_rows("group A match s_len by match novel_title"); # two attributes (not inverse ordering)
+$sum = 0;
+foreach $row (@result2) { $sum += $row->[2] }
+if ($sum != $size) {
+  print "\n!! group output doesn't sum to number of matches ($sum vs. $size)\n";
+  exit 1;
+}
+print ". ok\n";
+print "   sample output:";
+foreach $row (@result) {
+  print "  ", $row->[0], " (", $row->[1], ")";
+}
+print "\n";
+
+# step 20: test the count command (a variant of sort) on a subset of the named query from step 17
+print " - frequencies of match strings ... ";
+$CQP->exec("A = NP");
+$CQP->exec("reduce A to 10000");
+($size) = $CQP->exec("size A");
+@result = $CQP->exec_rows('count A by word %c descending');
+$sum = 0;
+foreach $row (@result) { $sum += $row->[0] }
+if ($sum != $size) {
+  print "\n!! match frequencies don't sum to number of matches ($sum vs. $size)\n";
+  exit 1;
+}
+print "ok\n";
+my ($f, $first, $match) = @{$result[0]};
+printf "   most frequent simple NP:  f=%d  \"%s\"  [#%d..#%d]\n", $f, $match, $first, $first + $f - 1;
+
+# step 21: create named query with undump method and compare with subsequent dump
+@table = ([10, 20, 15],
+	  [112, 120, -1],
+	  [80, 83, 75],	       # forces CQP to create sort index automatically
+	  [147, 151, 160]);
+$rows = @table;
+print " - undumping $rows matches ... ";
+$CQP->undump("B", @table);
+print "dump ... ";
+@table2 = $CQP->dump("B");
+$rows2 = @table2;
+if ($rows2 != $rows) {
+  print "\n!! number of rows in query match ($rows2) differs from undump size ($rows)\n";
+  exit 1;
+}
+foreach $i (0 .. $rows-1) {
+  $r1 = $table[$i];
+  $r2 = $table2[$i];
+  if ($r1->[0] != $r2->[0] or 
+      $r1->[1] != $r2->[1] or 
+      $r1->[2] != $r2->[2] or 
+      $r2->[3] != -1) {
+    print "\n!! returned row #".($i+1)." [@$r2] differs from undumped table [@$r1]\n";
+    exit 1;
+  }
+}
+print "ok\n";
+
+# step 22: test asynchronous execution
+print " - testing asynchronous command execution ... ";
+$dickens_found = 0;
+$CQP->run("show corpora");
+while (defined($_ = $CQP->getline)) {
+  $dickens_found = 1 if /^DICKENS$/
+}
+if (not $dickens_found) {
+  print "\n!! corpus DICKENS not found in output of 'show corpora'\n";
+  exit 1;
+}
+print "ok\n";
+
+# step 23: test progress bar handler during query, set keyword, and group commands (should not affect other commands)
+print " - testing progress bar handler ...\n";
+sub my_progress_handler {
+  my $total = $_[0];
+  my $message = $_[3];
+  my $percent = $_[4];
+  printf "     Progress: %3d%s ", $total, '%';
+  if (not defined $percent) {
+    print $message, "\r";
+  }
+  else {
+    print " " x 30, "\r";
+  }
+}
+$CQP->set_progress_handler(\&my_progress_handler);
+$CQP->progress_on;
+$CQP->exec('A = [pos = "JJ"] []* "things?" within s');
+$CQP->exec("group A matchend word by match lemma"); # ignore output of group command
+$CQP->progress_off;
+($size) = $CQP->exec("size A");
+print "\n - got $size matches\n";
+
+# that's it -- we've passed the test
+print "Congratulations. All tests passed.\n";
+exit 0;
+
+
+

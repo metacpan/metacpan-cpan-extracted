@@ -1,0 +1,86 @@
+NAME
+    "AnyEvent::TermKey" - terminal key input using "libtermkey" with
+    "AnyEvent"
+
+SYNOPSIS
+     use AnyEvent::TermKey qw( FORMAT_VIM KEYMOD_CTRL );
+     use AnyEvent;
+ 
+     my $cv = AnyEvent->condvar;
+ 
+     my $aetk = AnyEvent::TermKey->new(
+        term => \*STDIN,
+ 
+        on_key => sub {
+           my ( $key ) = @_;
+ 
+           print "Got key: ".$key->termkey->format_key( $key, FORMAT_VIM )."\n";
+ 
+           $cv->send if $key->type_is_unicode and
+                        $key->utf8 eq "C" and
+                        $key->modifiers & KEYMOD_CTRL;
+        },
+     );
+ 
+     $cv->recv;
+
+DESCRIPTION
+    This class implements an asynchronous perl wrapper around the
+    "libtermkey" library, which provides an abstract way to read keypress
+    events in terminal-based programs. It yields structures that describe
+    keys, rather than simply returning raw bytes as read from the TTY
+    device.
+
+    It internally uses an instance of Term::TermKey to access the underlying
+    C library. For details on general operation, including the
+    representation of keypress events as objects, see the documentation on
+    that class.
+
+    Proxy methods exist for normal accessors of "Term::TermKey", and the
+    usual behaviour of the "getkey" or other methods is instead replaced by
+    the "on_key" event.
+
+CONSTRUCTOR
+  $aetk = AnyEvent::TermKey->new( %args )
+    This function returns a new instance of a "AnyEvent::TermKey" object. It
+    takes the following named arguments:
+
+    term => IO or INT
+            Optional. File handle or POSIX file descriptor number for the
+            file handle to use as the connection to the terminal. If not
+            supplied "STDIN" will be used.
+
+    on_key => CODE
+            CODE reference to the key-event handling callback. Will be
+            passed an instance of a "Term::TermKey::Key" structure:
+
+             $on_key->( $key )
+
+METHODS
+  $tk = $aetk->termkey
+    Returns the "Term::TermKey" object being used to access the "libtermkey"
+    library. Normally should not be required; the proxy methods should be
+    used instead. See below.
+
+  $flags = $aetk->get_flags
+  $aetk->set_flags( $flags )
+  $canonflags = $aetk->get_canonflags
+  $aetk->set_canonflags( $canonflags )
+  $msec = $aetk->get_waittime
+  $aetk->set_waittime( $msec )
+  $str = $aetk->get_keyname( $sym )
+  $sym = $aetk->keyname2sym( $keyname )
+  ( $ev, $button, $line, $col ) = $aetk->interpret_mouse( $key )
+  $str = $aetk->format_key( $key, $format )
+  $key = $aetk->parse_key( $str, $format )
+  $key = $aetk->parse_key_at_pos( $str, $format )
+  $cmp = $aetk->keycmp( $key1, $key2 )
+    These methods all proxy to the "Term::TermKey" object, and allow
+    transparent use of the "AnyEvent::TermKey" object as if it was a
+    subclass. Their arguments, behaviour and return value are therefore
+    those provided by that class. For more detail, see the Term::TermKey
+    documentation.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

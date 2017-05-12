@@ -1,0 +1,6 @@
+Revision history for Perl extension Apache::AuthzUserDir.
+
+0.92 - 2002/08/31 
+	- Added t/use.t for cpan-testers
+0.91 - 2002/03/31 
+	- Initial Release

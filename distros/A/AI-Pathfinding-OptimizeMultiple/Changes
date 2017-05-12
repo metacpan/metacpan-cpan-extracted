@@ -1,0 +1,85 @@
+v0.0.15     2017-05-01
+    - Skip adding ~$ files to the MANIFEST.
+        - See https://rt.cpan.org/Ticket/Display.html?id=121485 .
+        - Thanks to Toby Inkster.
+
+v0.0.14     2017-05-01
+    - Convert dist.ini to use the @SHLOMIF bundle.
+    - Fix a bug where a pdl was passed instead of an int.
+        - See https://rt.cpan.org/Ticket/Display.html?id=121478
+        - Thanks to Slaven Rezic and Toby Inkster.
+
+v0.0.13     2016-04-20
+    - Improve the exception handling due to a non-Exception::Class error:
+        - http://www.cpantesters.org/cpan/report/f631b3e2-03b5-11e6-b1a3-5205ef11d1c8
+        - Thanks also to the example code in
+        https://metacpan.org/pod/Exception::Class .
+    - Add Test::Kwalitee::Extra.
+
+v0.0.12     2015-03-26
+    - Add the stats_factors option to the
+    lib/AI/Pathfinding/OptimizeMultiple.pm constructor.
+        - Contains some factors to normalise the iters of specific scans.
+    - Add the --stats-factors option to ::CmdLine.
+    - Allow to customise the --total-iterations-limit using
+    $ENV{FC_SOLVE_RANGE_ITERS_LIMIT} .
+
+v0.0.11     2014-03-29
+    - Move the external-deps-using release tests to xt/ instead of t/
+        - Better Kwalitee.
+        - Thanks to "ether" on #distzilla for the insights on fixing it.
+
+v0.0.10     2014-03-28
+    - Convert to the Test::CPAN::Changes Dist-Zilla plugin.
+
+v0.0.9      2014-03-28
+    - Add an explicit symbol import on "use PDL"/etc.
+    - Add get_scan_ids_aref() and lookup_scan_idx_based_on_id() to
+    AI::Pathfinding::OptimizeMultiple::DataInputObj .
+    - Add the $args parameter with the 'chosen_scans' key to
+    AI::Pathfinding::OptimizeMultiple::simulate_board() .
+    - Add support for some extra required options in
+    AI::Pathfinding::OptimizeMultiple::DataInputObj’s time-scan.pl.
+
+v0.0.8      2014-02-02
+    - Made sure the =encoding directive is on top of the file in
+    bin/optimize-game-ai-multi-tasking .
+
+v0.0.7      2014-01-26
+    - Minimal version of perl - 5.012 in the prereqs (could be lower, possibly).
+        - For Kwalitee.
+    - Remove the Makefile.PL so we will have "metayml has provides".
+        - Now it's Build.PL-only.
+    - Add provides to the META.yml.
+
+v0.0.6      2014-01-25
+    - Add "use strict;" and "use warnings;" to MooX::late modules.
+        - Kwalitee
+    - Remove the ^Rejects and ^scripts sub-directories.
+        - They were confusing CPANTS and reduced our Kwalitee.
+
+v0.0.5      2013-01-22
+    - skipping compile test for scripts/bump-version-number.pl .
+        - it is for use by the module's maintainer and has
+        non-essential prereqs.
+
+v0.0.4      2013-01-20
+
+    - Add missing Prerequisites
+        - MooX::late
+        - MooX::Types::MooseLike::Base
+
+v0.0.3      2013-01-18
+
+    - Fixed broken POD for hyperlinks.
+
+v0.0.2      2013-01-17
+
+    - Fixed the POD - removed extraneous sections and added a NAME handler.
+        - Part of it was caused due to a Pod::Weaver misconfiguration
+
+v0.0.1      2013-01-17
+
+    - First version, released on an unsuspecting world.
+
+    - Everything is still subject to change and break.

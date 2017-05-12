@@ -1,0 +1,37 @@
+Apache2::AuthEnv VERSION 1.3 - mod_perl2 authentication and
+        authorisation control for Apache using only environment
+        variables.
+
+DESCRIPTION
+Apache2::AuthEnv mod_perl2 authentication and authorisation control for
+Apache using only environment variables. This is useful to control
+access with some web server single sign-on solutions.
+
+This code was written over a number of weekends to start learning
+mod_perl2 but is actually useful. It could also be used as a framework
+to build other mod_perl2 modules.
+
+COPYRIGHT
+Copyright (c) 2007-2009 Anthony Fletcher. All rights reserved. These
+modules are free software; you can redistribute them and/or modify them
+under the same terms as Perl itself.
+
+This code is supplied as-is - use at your own risk.
+
+PREREQUISITES
+Perl5
+mod_perl2
+Exporter
+
+HOW TO BUILD AND INSTALL
+perl Makefile.PL
+make
+make test
+make install
+
+TODO
+Nothing planned.
+
+SUGGESTIONS
+Send suggestions, bugs, etc. to arif@cpan.org
+

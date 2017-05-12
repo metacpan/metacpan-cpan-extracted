@@ -1,0 +1,59 @@
+package App::podweaver::TestPackage;
+
+# ABSTRACT: a test package for App::podweaver.
+
+
+our $VERSION = '1.00';
+
+
+sub a_function
+{
+    return( 1 );
+}
+
+
+1;
+
+=pod
+
+=head1 NAME
+
+App::podweaver::TestPackage - a test package for App::podweaver.
+
+=head1 SYNOPSIS
+
+This is a packge to do some testing for App:podweaver, it doesn't
+actually do anything beyond act as a placeholder for some code
+stubs and some Pod in various layouts.
+
+=head1 FUNCTIONS
+
+=over
+
+=cut
+
+=pod
+
+
+=item B<< a_function() >>
+
+This is a function.
+
+=cut
+
+=pod
+
+
+=back
+
+=head1 AUTHOR
+
+Sam Graham
+
+=cut
+
+__DATA__
+this is a data block
+data data data
+oh yes
+a data block it is

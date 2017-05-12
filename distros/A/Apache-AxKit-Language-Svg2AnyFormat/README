@@ -1,0 +1,39 @@
+Apache-AxKit-Language-Svg2AnyFormat-0.01 version 0.01
+=====================================================
+
+This is a addon module to AxKit which can be used as the last
+Transformer in the transformer chain to serialize svg to 
+jpg, png, gif and pdf. For more informations take a look at the
+man pages.
+
+In the example directory you'll find some svg-files which you can
+use to test your installation. Most of them are created by a tool
+name DrawSWF (http://drawswf.sf.net) which stores its drawings in SVG.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Axkit        - Version 1.6.1 or higher ( http://www.axkit.org )
+Image::Magick - Version 5.55 or higher ( http://www.imagemagick.org )
+Image::LibRSVG - Version 0.01 or higher ( http://search.cpan.org/~tomson/?D=D  )
+
+Please note that everything may also work by using libaries with a lower
+than the one mentionned above.
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+Copyright (C) 2003-2004 tom.schindl <tom.schindl@bestsolution.at>
+
+

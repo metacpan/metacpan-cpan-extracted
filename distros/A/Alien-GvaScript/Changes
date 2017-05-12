@@ -1,0 +1,116 @@
+Revision history for Alien-GvaScript
+
+1.44 20.08.2014
+  - fixes #98172 in POD documentation (DOLMEN++)
+
+1.43 27.09.2013
+  - autoCompleter: choiceList scrolls so that the current value is visible
+  - autoCompleter: ping event updates the current value
+  - ajax tests use port 8085 instead of 8081
+
+1.42 03.03.2013
+  - fixed Pod bug in Form.pod (caused test failure with Pod::Simple v3.26
+
+1.41 20.08.2011
+  - html doc generation : fix path to scripts
+  - removed accented chars in .js files (avoid probl. with application/script
+    in Firefox 
+
+1.40 11.08.2011
+  - specify POD =encoding so that new Pod::Simple is happy
+
+1.3
+  - upgrade to prototype.js v1.7
+
+1.21 18.01.2010
+  - bug in Builder, Gvascript.js was written to wrong location
+  
+1.20   07.01.2009
+  - Element.autoScroll : fix scroll amount when the scrolling block has
+    an offsetTop > 0
+  - removed PAGE_UP/DOWN handlers in TreeNavigator -- let the browser deal 
+    with those
+  - treeNavigator select() has an additional param "prevent_autoscroll"
+  - treeNavigator autoscroll only active through kbd, not through click
+  - treeNavigator observes "mouseup" (instead of mousedown or click)
+  - autoCompleter bug fix on detach (stop observing "click")
+  - protoExtensions : removed RegExp.escape() (now in prototype.js)
+  - autoCompleter div, display above only if enough vertical space
+  - autoCompleter : code layout improvements
+
+1.18 13.10.2009
+  - fix some minor doc glitches released in 1.17
+
+1.17 13.10.2009
+  - major revision from Mona Remlawi
+  - new Grid component
+  - new CustomButtons component
+  - new Paginator component
+  - new test suite
+
+1.11
+  - added Seb in author list
+  - repeat: ix starts at 0, count starts at 1
+            fix bug in removing "repeat" attrs
+            both add() and remove() methods
+  - many updates in doc
+
+1.10
+  treeNavigator
+    - new option noPingOnFirstClick
+    - new option treeTabIndex
+    - by default, tree element gets tabIndex 0
+    - better focus management when quick navigation through keys
+    - doubleClick handler
+    - up/down at end of tree falls back to default navigator behaviour
+  choiceList
+    - new option choiceItemTagName
+  autoCompleter
+    - multivalued
+    - click handler on drowpdown lists
+    - new options : 
+           completeOnTab
+           actionItems      
+           multivalued      
+           multivalue_separator
+           choiceItemTagName
+           htmlWrapper      
+           observed_scroll  
+           additional_params
+           http_method      
+
+1.09
+  - upgrade to prototype.js v1.6
+  - New components GvaScript.Repeat and GvaScript.Form
+  - at end of tree, arrowdown and arrowup come back to default behaviour
+
+1.08    22.05.2007
+  - Event.stop() for keypad '*' and '-' in treeNavigator
+
+1.07    02.05.2007
+  - autocompleter : support for "" in strict mode
+
+1.06    22.04.2007
+  - fix strict mode when autoSuggest=false
+
+1.05    18.04.2007
+  - fixes from Jean-Christophe (parentOffset, set_datasource)
+
+1.04    06.04.2007
+  - bug fixes && refactoring some details in autocompleter
+  - added option ANTIREGEX in KeyMap
+  - added PAGE_UP/DOWN in choiceList and option scrollCount
+
+1.03    01.04.2007
+  - added options caseSensitive in autoCompleter
+  - fixed bug in Builder.pm (dependendy on Pod:POM::View::HTML)
+
+1.02    17.03.2007
+  - bug fix, typo in examples/treeNavigator/frames/toc.html
+
+1.01    09.03.2007
+  - removed t/boilerplate.t, useless at this stage and failed on linux
+
+1.00    08.03.2007
+  - First public release
+

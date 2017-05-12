@@ -1,0 +1,25 @@
+---
+abstract: 'Integrate AnyEvent and ZeroMQ with AnyEvent::Handle like ways.'
+author:
+  - 'Cindy Wang (CindyLinz)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AnyEvent-Handle-ZeroMQ
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: 5.34
+  Scalar::Util: 0
+  Test::More: 0
+  ZeroMQ: 0.15
+version: 0.09

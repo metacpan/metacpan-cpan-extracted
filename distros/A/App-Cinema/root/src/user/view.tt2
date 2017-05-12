@@ -1,0 +1,42 @@
+[% META title = "ACCOUNT" %]
+<p>
+<table >
+	<tr align="left">
+		<th>UID</th><th>FNAME</th><th>LNAME</th><th>EMAIL</th><th></th>
+		[% IF Catalyst.check_user_roles('admin') %]	
+		<th></th>
+		[% END %]
+	</tr>
+	[% WHILE (user = users.next) %]
+	<tr>
+		<td>[% user.username%]</td>
+		<td>[% user.first_name%]</td>
+		<td>[% user.last_name%]</td>		
+		<!--
+		<td>
+		[% FOR row = user.roles %]
+			[% row.role %],
+		[% END %]
+		</td>
+		-->
+		<td>[% user.email_address%]</td>
+		[% IF user.active %]
+		<td>Active</td>			
+		[% ELSE %]
+		<td>Disabled</td>
+		[% END%]	
+		<td><a href="[% Catalyst.uri_for('/user/edit/') _ user.username %]">EDIT</a></td>
+		[%# IF Catalyst.check_user_roles('sysadmin') %]
+		<td>
+			[% IF user.active %]
+				<a href="[% Catalyst.uri_for('/user/deactivate_do/') _ user.username %]">DEACTIVATE</a>
+			[% ELSE %]
+				<a href="[% Catalyst.uri_for('/user/activate_do/') _ user.username %]">ACTIVATE</a>
+			[% END %]
+		</td>		
+		[%# END %]
+		
+	</tr>
+	[% END %]
+</table>
+</p>

@@ -1,0 +1,38 @@
+---
+abstract: 'Take a quote file and emit a standalone program that spews a random quote'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  Encode: 0
+  File::Find: 0
+  File::Slurp: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: App-QuoteCC
+no_index:
+  directory:
+    - t
+requires:
+  Data::Section: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Getopt::Dashes: 0
+  Template: 0
+  YAML::Syck: 0
+  namespace::clean: 0
+  perl: 5.010
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-QuoteCC
+  homepage: http://search.cpan.org/dist/App-QuoteCC/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/app-quotecc.git
+version: 0.10
+x_authority: cpan:AVAR

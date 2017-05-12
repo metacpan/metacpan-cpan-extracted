@@ -1,0 +1,126 @@
+This module will build on Unix, Linux, Solaris, Windows NT, Windows Server
+200x with the ACE/Server client libraries version 4.1, 5.x, 6.1 or the Auth
+Agent API client libraries version 8.1.
+
+It can be used to authenticate RSA tokens against ACE/Server or
+Authentication Manager 7.1. The instructions below assume Authentication
+Manager 7.1 and AuthSDK_C_v8.1 or later.
+
+It requires the SecurID ACE/Agent or Auth Agent client library or SDK 4.1 or
+better to be installed on your host first. The preferred version is Auth Agent
+API 8.1. You will need to get AuthSDK_C_v8.1.1.109.06_03_11_03_16_51.zip or
+later from https://knowledge.rsasecurity.com, using your RSA support contract
+details.
+
+You must first enable access to the Authentication Manager by the host where
+Authen-ACE4 will run, and generate the
+sdconf.rec file. You will also need to create a test user assign a token to them.
+
+On the Authentication Manager host:
+0. Start the RSA Security Console. Log in as an administrator.
+1. Access->Authentication Agents->Add New
+   Add IP address and hostname for the host(s) where Authen-ACE4 is to be
+   tested or run. Set the Agent type to 'Standard Agent'.
+   Caution: for Unix clients, the Hostname entered must be the same as the hostname()
+   on the client, and the /etc/hosts file on the clinet must not have multiple
+   entries for that hostname.
+2. Access->Authentication Agents->Generate Configuration File
+   Generate Config File
+   Download Now
+3. With the resulting AM_Config.zip, unzip the enclosed sdconf.rec file. You
+   will need it later.
+4. With RSA Security Console, create a test user, and assign a token to them
+
+Build instructions Windows
+On the host where Authen-ACE4 is to run:
+0. Obtain ACEAgentSDK61.zip from https://knowledge.rsasecurity.com
+1. Unzip ACEAgentSDK61.zip into C:\ Rename the unpacked directory so it appears as C:\ACEAgentSDK
+2. perl Makefile.PL
+3. nmake
+4. Copy sdconf.rec to %windir%\system32
+5. nmake test (but see Notes below first)
+   enter test username and tokencode to test authentication
+6. nmake install
+
+Build instructions for Unix, Linux, Solaris
+On the host where Authen-ACE4 is to run:
+0. Obtain AuthSDK_C_v8.1.1.109.06_03_11_03_16_51.zip or later from https://knowledge.rsasecurity.com
+1. Unzip the zip file from step 1 into /opt/ace. Rename the unpacked directory to /opt/ace/ACEAgentSDK
+2. perl Makefile.PL
+3. make
+4. sudo bash # the following commands run as root:
+5. mkdir -p /opt/ace/data
+6. cp sdconf.rec /opt/ace/data
+7. VAR_ACE=/opt/ace/data make test (but see Notes below first)
+   enter test username and tokencode to test authenticaiton
+8. make install
+
+Notes:
+
+If you are using ACE/Agent 4.4 for Windows NT, it will require you to
+copy by hand the acesupp directory from the CDROM to c:\ace on your local
+disk.
+
+If you are using ACE/Agent Authentication API for Unix, you will need
+to copy by hand the ACEAgentSDK directory from the Authentication API
+cdrom to the ACE directory, then adjust the paths in Makefile.PL
+to suit.
+
+Before you can test this package, you will need to have a working ACE or
+Authentication Manager server, and a SecurID token assigned to a username that
+you can test with. See above.
+
+The standard ACE/Agent library shipped with ACE/Server 4.1 for
+Solaris (and HPUX, it is reported)
+has a bug that prevents AceCloseAuth completing. 
+You will need to get a patched version of libaceclnt.a
+from RSA Security, or Open System Consultants, else upgrade
+to version 5. ACE/Server 4.1 in now deprecated, so we recommend 
+upgrading to version 5.
+
+The machine that you run the tests on must be a valid ACE client, and
+your username should be activated on that machine. The system you are
+going to be testing from must already have the sdconf.rec
+file installed (typically in /var/ace/sdconf.rec on Unix). On Unix
+the user that runs the program that uses Authen-ACE4 must have
+read access to the sdconf.rec file.
+
+On Windows, the sdconf.rec file must be present in %windir%\system32
+(typically C:\WINDOWS\system32). If the node secret in Authentication Manager
+changes or is cleared for that Agent, you will need to delete securid and
+sdstatus.12 files from tat same directory to force the renegotiation of the
+node secret
+
+On Unix, you will need to set the VAR_ACE environment variable to point to the
+location of a writeable directory containing the sdconf.rec file, else the
+make test portion may fail. The sdconf.rec file is a ACE/Agent configuration
+file that specifies how to contact the ACE/Server or Authentication
+Manager. You must create and download this from the Authentication Manager
+(see above). The files in that directory must be readable and writeable, and
+this generally means running Authen-ACE4 as root.
+
+Because the interactive nature of SecurID requires you to enter a
+time-sensitive token from a card, you cannot automate the test suite.
+An ACE server will never accept the same token twice, so during the
+testing, you may be prompted to wait for the token on the card
+to change before continuing with the test.
+
+The test program will display all codes in plain text.
+
+For token authentication to succeed, it is vital that the Authentication
+Manager server has the right time and timezone set.
+
+By default Authentication Manager uses port 5500 for ACE authentication.
+
+Caution: The Unix ACE4 client requires that the hostname on the client be the
+same as the Host Name entered for the Agent in Authentication
+Manager. Further it is necessary that the client's hosts database (typically
+/etc/hosts) only has one entry for the hostname and that entry is for the
+same address as the external address as entered into the Agent in
+Authentication Manager. This can be a problem with some versions of Ubunti
+for example which add multple entries into /etc/hosts, including one for
+127.0.1.1. You will need to delete any such entries.
+
+Tested on Unix with OpenSUSE 11.1 32 bit, Ubuntu 11.04 32 bit, Ubuntu 11.04
+64 bit, SPARC Solaris 8, SPARC Solaris 10, x86 Solaris, Windows Server 200x 64
+bit,  Windows Server 200x 32 bit.

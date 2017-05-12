@@ -1,0 +1,70 @@
+heartbeat configs.
+
+the idea is to send messages only if configured streams and/or attributes haven't been seen over a period of time
+
+more specifically, this wants to send to Thresholds, to leverage its ability to send different things with different values.
+
+so, that means we want to emit() on an interval for every configured instance, and add an attribute of how long its been since we have seen a configured stream or attribute or attributes.
+$message = {
+    inform_instance => 'servers.whatever.check_runner',
+    status => 'OK',  #or 'CRIT'
+    stdout => 'returned OK', #or 'returned CRIT'
+    is_std_heartbeat_check => 1,
+};
+$config = {
+    hb_groups => {
+        'hb group 1' => {
+            match => {
+                is_std_heartbeat_check => 1,
+            },
+            hb_instance => ' specials/$message->{inform_instance}',
+            changing_fields => ['status','stdout'],
+                #the idea here is that we'll keep the values of all of these
+                #fields, and remember when they changed.  The one that most
+                #recently changed is what's used to set
+                #$message->{hearbeat_last_change_ts_span}
+            emit_ts_span => 10, #how often to emit in seconds
+            transform => {  #maybe not? let Router do it?
+                foo => 'bar',
+            }
+        },
+    }
+}
+
+
+So given the above config, and the above message, every 10 seconds it will
+emit this message:
+
+$message = {
+    inform_instance => 'servers.whatever.check_runner',
+    status => 'OK',  #or 'CRIT'
+    stdout => 'returned OK', #or 'returned CRIT'
+    is_std_heartbeat_check => 1,
+    hb_group => 'hb group 1',
+    hb_instance => 'servers.whatever.check_runner',
+    foo => 'bar',
+    hearbeat_last_change_ts_span => 10, #and 20, 30, 40
+        #...until $message->{status} comes in with something besides
+        #'OK'
+};
+
+$state->{instances}->{'hb group 1'}->{'servers.whatever.check_runner'} = {
+    last_message => {
+        inform_instance => 'servers.whatever.check_runner',
+        status => 'OK',  #or 'CRIT'
+        stdout => 'returned OK', #or 'returned CRIT'
+        is_std_heartbeat_check => 1,
+    },
+    message_receive_ts => 1234567890.
+    last_emit_ts => 1234567890,
+    changed_fields => {
+        'status' => {
+            last_change_ts => 1234567890,
+            last_value => 'OK',
+        },
+        'stdout' => {
+            last_change_ts => 1234567890,
+            last_value => 'returned OK',
+        },
+    },
+}

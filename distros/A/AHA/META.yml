@@ -1,0 +1,30 @@
+---
+abstract: "Access modules for AVM's home automation system"
+author:
+  - 'Roland Huss (roland@cpan.org)'
+build_requires:
+  Module::Build: 0.34
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.34
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: AHA
+provides:
+  AHA:
+    file: lib/AHA.pm
+    version: 0.55
+  AHA::Switch:
+    file: lib/AHA/Switch.pm
+    version: 0
+requires:
+  Digest::MD5: 0
+  Encode: 0
+  LWP::UserAgent: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.55

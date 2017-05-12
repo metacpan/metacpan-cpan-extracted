@@ -1,0 +1,239 @@
+#!perl
+
+our $DATE = '2016-03-10'; # DATE
+our $VERSION = '0.03'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+my %Opts = (
+    input  => 'json',
+    output => 'text',
+);
+my $Input;
+my @Output;
+
+sub parse_cmdline {
+    require Getopt::Long;
+
+    my $res = Getopt::Long::GetOptions(
+        'input|i=s'  => \$Opts{input},
+        'output|o=s' => \$Opts{output},
+        'version|v'  => sub {
+            say "pretty-res version ", ($main::VERSION // '?');
+            exit 0;
+        },
+        'help|h'     => sub {
+            print <<USAGE;
+Usage:
+  pretty-res [OPTIONS] < INPUT
+  pretty-res --version
+  pretty-res --help
+Examples:
+  pretty-res -o yaml data.json
+Options:
+  --input=s, -i   Input format (json, yaml, perl; default is json).
+  --output=s, -o  Output format (text, text-pretty, text-simple, yaml, json,
+                  json-pretty, ruby, perl, php).
+Consult manpage/documentation for more details.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub get_input {
+    require Perinci::Result::Util;
+
+    local $/;
+    if ($Opts{input} eq 'json') {
+        require JSON::MaybeXS;
+        $Input = JSON::MaybeXS->new->allow_nonref->decode(~~<>);
+    } elsif ($Opts{input} eq 'yaml') {
+        require YAML::Syck;
+        $Input = YAML::Syck::Load(~~<>);
+    } elsif ($Opts{input} eq 'perl') {
+        $Input = eval(~~<>);
+    } else {
+        warn "Unknown input format, ".
+            "refer to documentation for available formats\n";
+        exit 99;
+    }
+
+    unless (Perinci::Result::Util::is_env_res($Input)) {
+        $Input = [200, "OK (enveloped added by pretty-res)", $Input];
+    }
+}
+
+sub show_output {
+    require Perinci::Result::Format;
+    print Perinci::Result::Format::format($Input, $Opts{output});
+}
+
+# MAIN
+
+parse_cmdline();
+get_input();
+show_output();
+
+1;
+# ABSTRACT: Format enveloped result prettily
+# PODNAME: pretty-res
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pretty-res - Format enveloped result prettily
+
+=head1 VERSION
+
+This document describes version 0.03 of pretty-res (from Perl distribution App-PrettyRes), released on 2016-03-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % pretty-res [OPTIONS] < INPUT
+
+Examples:
+
+ % echo '[200, "OK", [1..5]]' | pretty-res -i perl
+ .----.
+ |  1 |
+ |  2 |
+ |  3 |
+ |  4 |
+ |  5 |
+ `----'
+
+ % echo '[1..5]' | pretty-res -i perl ; # enveloped automatically added
+ .----.
+ |  1 |
+ |  2 |
+ |  3 |
+ |  4 |
+ |  5 |
+ `----'
+
+ % cat celine-dion-album-sales.json
+ [
+   200,
+   "OK",
+   [
+     {
+       "lang": "en",
+       "sales": 3000000,
+       "title": "unison",
+       "year": 1990
+     },
+     {
+       "lang": "en",
+       "sales": 5300000,
+       "title": "celine dion",
+       "year": 1992
+     },
+     {
+       "lang": "en",
+       "sales": 16600000,
+       "title": "the color of my love",
+       "year": 1993
+     },
+     ...
+   ]
+ ]
+
+ % pretty-res celine-dion-album-sales.json
+ .--------------------------------------------------------------.
+ | lang      sales   tags        title                     year |
+ |                                                              |
+ | en      3000000               unison                    1990 |
+ | en      5300000               celine dion               1992 |
+ | en     16600000               the color of my love      1993 |
+ | en     30300000               falling into you          1996 |
+ | en     32100000               let's talk about love     1997 |
+ | en     12100000   christmas   these are special times   1998 |
+ | en     10500000               a new day has come        2002 |
+ | en      5100000               one heart                 2003 |
+ | en      2600000               miracle                   2004 |
+ | en      3400000               taking chances            2007 |
+ | en      1300000               loved me back to life     2013 |
+ `--------------------------------------------------------------'
+
+=head1 DESCRIPTION
+
+This script formats data structure using L<Perinci::Result::Format>. If data
+structure is not detected as an enveloped result (see L<Rinci::function> for
+more information about enveloped result), it will add an envelope for you.
+
+You can use this script to reformat ouput from L<Perinci::CmdLine> (although by
+default Perinci::CmdLine already provides C<--format> to let user format the
+result) or L<Riap> response.
+
+It accepts input as JSON, or several other alternative formats (see the C<-i>
+option). It by default outputs the data using the L<text> format (use the C<-o>
+option to change the format).
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --input=STR, -i
+
+Pick input format. Available formats: json (parsed using L<JSON>), yaml (parsed
+using L<YAML::Syck>), perl. Default is json.
+
+=item * --output=STR, -o
+
+Pick output format. See L<Perinci::Result::Format> for available formats.
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PrettyRes>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PrettyRes>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PrettyRes>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::Result::Format>
+
+L<pretty>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

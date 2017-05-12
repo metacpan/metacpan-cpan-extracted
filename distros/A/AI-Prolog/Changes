@@ -1,0 +1,214 @@
+Revision history for Perl extension AI::Prolog.
+
+0.740 2008-11-12
+      t/60aiprolog.t fixed number of planned tests (RT#41154).
+
+      Fixed dependencies in some tests.
+
+      Fixed HEAD|TAIL results bug. Added test (RT#64942).
+      (Should raw_results(0) be default? or keep backward compat?).
+
+0.740 2008-11-12
+      t/60aiprolog.t loads modules in the right order now
+
+0.739 2007-05-04
+      Explicitly import Carp. This fixes a bug exposed by
+      warnings.pm. Thanks to Andreas Koenig for sending in the failing test.
+
+0.738 2007-05-01
+      Several test modules are now optional by virtue of a patch by
+      educated_foo.
+
+0.737 2007-03-21
+      Removed the Build.PL because CPAN.pm does the wrong thing here
+      and there's no additional functionality provided by
+      Module::Build that's being used.
+
+      Declared a pre-existing requirement for Hash::Util.
+
+0.736 2007-03-20
+
+      Removed the pre-req for ExtUtils::MakeMaker 6.30 because this
+      doesn't appear to be needed and doesn't have a way to boostrap
+      that requirement into place anyway.
+
+      Also, just upgrade from a "developer" version to prod because
+      none of this is really all that production quality anyway. Or
+      rather... this is just as worthy anyway.
+
+0.735_01 2006-07-31
+      Added perlcall2/2.
+      TODO: need ground/1 to constrain the 2nd arg to perlcall2/2.
+      Added Scalar::Util to the pre-reqs. It was already required.
+      Used Hash::Util::lock_keys to lock down object internals access.
+      First release by JJORE.
+
+0.734 2006-04-05
+      Added minimum requirement of ExtUtils::MakeMaker 6.30 due to bug report
+      filed on RT.  Thanks to zby for the catch.
+      Added a copy of the Perl Review article on logic programming.  Thanks to
+      brian d for and the Perl Review for allowing me to republish this
+      article.
+
+0.733 2005-10-08
+      Added POD tests (sort of)
+      Added strict to AI::Prolog
+      Converted to Module::Build
+
+0.732 Sat August 6, 2005
+      Added lib/AI/Prolog/Cookbook.pm to the MANIFEST (whoops)
+
+0.73  Sat August 6, 2005
+      Added AI::Prolog::Cookbook as an introduction to common problems
+        encountered when working with Prolog.
+      TermList->to_string now causes listings to look very similar to
+        SWI-Prolog.  Much easier to read.
+      Term->to_string now identifies variables by letter, not /_\d+/.
+      Completed decoupling of AI::Prolog::Parser from the engine.
+
+0.72  Sun July 31, 2005
+      Move builtins to their own class, AI::Prolog::Engine::Builtins
+      Non-existent predicates now issue a warning even if trace is off.
+      Added new predicates:
+        halt/0 -- currently a no-op outside of the aiprolog shell
+        help/0 -- list all builtin predicates for which help is available
+        help/1 -- list help for builtin predicate
+        write/1
+        writeln/1
+      Added ** operator (pow/1) to math preprocessor.  Leaving it out
+        earlier was an oversight.
+
+0.71  Sat June 25, 2005
+      Removed _failgoal in Engine.pm.  We now backtrack if we need
+        new results.
+      Added several new regression tests.
+      Fixed bug where code was not warning on unknown predicates.
+        (Doug Wilson)
+      Fixed bug where tracing fails when it tries to print a non-
+        existent "next_clause".  (Doug Wilson)
+      retract/1 now works correctly.  (Doug Wilson)
+      Fixed unification bug that crept in in .62.
+      Added data/sleepy.pro, a game that wasn't working because of
+        the retract/1 bug.
+
+0.7   Mon June 20, 2005 (Happy Birthday to me)
+      Parsing errors now attempt to report the line number of the
+        error.
+      Added new predicates:
+        consult/1
+        listing/1
+        ne/2
+      Updated the license information display for aiprolog shell.
+      Modified listing/0 to not show builtins.
+      Added math preprocessor.  This transforms proper Prolog math
+        into internal predicates the parser recognizes:
+
+        X is N + 1. % is(X, plus(N, 1)).
+        
+      Pushed all parsing back to the Parser class.  No more parsing
+        in TermList and Term :)
+      Added anonymous variables:  foo(bar, _, baz).  I don't have
+        any efficiency gains from this (yet) because they're just
+        variables with hidden names, but they work.
+      Added Test::Exception to the PREREQ_PM (thanks to rjray for
+        pointing that out).
+      Updated the docs and examples.
+
+0.65  Wed May 11, 2005
+      Added Term::ReadLine support to aiprolog shell.
+      Added Term::ReadKey support to aiprolog shell.
+      Minor doc corrections.
+
+0.64  Mon May 09, 2005
+      Change default behavior to AI::Prolog->raw_results(1).
+      Added quote() method to allow Perl variables to be quoted
+        and used at Prolog terms.
+      Added list() method to allow a Perl list to be turned into
+        a Prolog list.
+
+0.63  Wed May 04, 2005
+      Allow parser to properly handle positive and negative numbers
+        and decimal points.
+      Added pow(X,Y).
+      Eliminated studlyCaps methods.
+      Added trace. and notrace.
+      Added a TODO test for a failing regression test.
+
+0.62  Fri Feb 25, 2005
+      Added code to avoid bug in some Perl's where "undef" looks
+      like a number.
+      Major performance improvement.  Now runs about 40% faster.
+      Added 
+        listing.
+        println(X).
+        is(X,Y).
+        plus(X,Y).
+        minus(X,Y).
+        mult(X,Y).
+        div(X,Y).
+        mod(X,Y).
+        ge(X,Y).
+        gt(X,Y).
+        le(X,Y).
+        lt(X,Y).
+      Added towers of hanoi and a scheduler to the examples/.
+
+0.61  Mon Feb 21, 2005
+      Added var(X).
+      Disabled tracing in the aiprolog shell (whoops!)
+
+0.6   Sun Feb 20, 2005
+      Added tests for the cut, number, and clause classes.
+
+      Added stub tests for step and primitive classes.
+
+      Ensured that all classes at least had stub documentation and added
+      POD tests.
+
+      Updated the TODO list in AI::Prolog.
+
+0.5   Sun Feb 13, 2005
+      Put the database into its own class.
+
+      Pulled engine backtracking out into its own method.
+
+      Reduced the scope of many of the Engine::_run variables to ensure data
+        wasn't leaking.
+
+      Added simple "aiprolog" shell.
+
+      Added cut operator, retract(X), and assert(X).
+
+      Added more examples and simple adventure game to both demonstrate the shell
+        and how Prolog works.
+
+      Completely reworked the engine internals to allow new predicates to be
+        easily added.
+
+      * XXX Also screwed up the numbering scheme.  Grumble XXX *
+
+0.04  Sun Jan 30, 2005
+      Added support for quoting terms.  
+      
+      Added Engine->formatted method which allows results to be returned as
+        either strings or as data structures.  The latter is more useful.
+
+      When using AI::Prolog, the results() method now returns a "results"
+        object.
+
+      The AI::Prolog interface has been cleaned up and use of the supporting
+        modules is now officially discouraged.
+
+      Massive documentation update.
+
+0.03  Sun Jan 23, 2005
+      Added tests for built-in predicates.
+
+      Added query() function to AI::Logic::Engine to allow successive queries
+        without a new bootstrap.
+
+0.02  Sun Jan 23, 2005
+      First public release of AI::Prolog.
+
+0.01  Thu Jan 20 20:47:49 PST 2005
+	  original version; created by make_project 0.1

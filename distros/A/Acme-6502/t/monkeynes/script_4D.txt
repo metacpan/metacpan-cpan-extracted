@@ -1,0 +1,38 @@
+clear
+power on
+regs
+
+# Base test --------------------
+memset beef 72
+
+op a9 55
+op 4d efbe
+
+# Should be:  ACC=27
+test acc = 27
+
+# Negative test --------------------
+power on
+
+memset beef aa
+
+op a9 55
+op 4d efbe
+
+# Should be:  ACC=FF, S=1
+test acc = ff
+test s = 1
+
+# Zero test ----------------
+power on
+
+memset beef 55
+
+op a9 55
+op 4d efbe
+
+# Should be:  ACC=0, Z=1
+test acc = 0
+test z = 1
+
+save verify_4D.txt

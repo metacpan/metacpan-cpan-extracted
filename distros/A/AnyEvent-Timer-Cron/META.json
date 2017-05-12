@@ -1,0 +1,60 @@
+{
+   "abstract" : "cron based timers for AnyEvent",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Timer-Cron",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "DateTime" : "0",
+            "DateTime::Event::Cron" : "0",
+            "Moo" : "1.000007",
+            "Safe::Isa" : "0",
+            "Task::Weaken" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-AnyEvent-Timer-Cron@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=AnyEvent-Timer-Cron"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/AnyEvent-Timer-Cron.git",
+         "web" : "http://github.com/haarg/AnyEvent-Timer-Cron"
+      }
+   },
+   "version" : "0.002000",
+   "x_static_install" : 1
+}

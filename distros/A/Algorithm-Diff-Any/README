@@ -1,0 +1,48 @@
+$Id: README 10346 2009-12-03 01:53:25Z FREQUENCY@cpan.org $
+
+Algorithm::Diff::Any is a module to find differences between files
+
+Copyright 2009 by Jonathan Yu <jawnsy@cpan.org>. All rights reserved.
+
+INSTALLATION
+
+  This module depends on Module::Build for its installation mechanism.
+
+  To install this module type the following:
+  $ perl Build.PL
+  $ perl Build
+  $ perl Build test
+  $ perl Build install
+
+  Module::Build will complain if any dependencies are missing, or if
+  you can install some other modules to enhance its functionality.
+
+USAGE AND DOCUMENTATION
+
+  In order to use the module, you'll probably need the documentation. Once
+  installed, you can read that using:
+  $ perldoc Algorithm::Diff::Any
+
+COPYRIGHT AND LICENCE
+  This package is distributed with the same licensing terms as Perl
+  itself. At time of writing, this consists of a dual licensing scheme.
+  You are entitled to enjoy the covenants of, at your option:
+
+  (1) The Free Software Foundation's GNU General Public License, version 
+      1 or later; or
+
+  (2) The Artistic License, version 1 or later
+
+  This software is provided by the copyright holders and contributors
+  "AS IS" and ANY EXPRESS OR IMPLIED WARRANTIES, including, but not
+  limited to, the IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+
+  In no event shall the copyright owner or contributors be liable for 
+  any direct, indirect, incidental, special, exemplary or consequential 
+  damages (including, but not limited to, procurement of substitute
+  goods or services; loss of use, data or profits; or business
+  interruption) however caused and on any theory of liability, whether
+  in contract, strict liability or tort (including negligence or
+  otherwise) arising in any way out of the use of this software, even
+  if advised of the possibility of such damage. 

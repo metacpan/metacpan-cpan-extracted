@@ -1,0 +1,36 @@
+{
+   "recipe" : {
+      "flavor_array" : [
+         {
+            "type" : "PG",
+            "tag" : "TFA Strawberry (Ripe)",
+            "percentage" : "3"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Key Lime",
+            "percentage" : "1"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Double Kiwi",
+            "percentage" : "2"
+         },
+         {
+            "type" : "PG",
+            "tag" : "TFA Energy Drink",
+            "percentage" : "2"
+         }
+      ],
+      "target_pg" : "30",
+      "base_nic_per_ml" : 100,
+      "base_nic_type" : "PG",
+      "target_quantity" : "55",
+      "target_nic_per_ml" : "3",
+      "target_vg" : 70,
+      "notes" : [
+         "Kind of a cherry-lime taste.",
+         "Long steep to mellow out the Energy Drink."
+      ]
+   }
+}

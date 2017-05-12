@@ -1,0 +1,117 @@
+This is the README file for the Perl extension module AFS::Monitor (Version 0.3.3)
+
+
+DESCRIPTION
+    The AFS::Monitor module is a dynamically loadable extension to
+    Perl. It gives the AFS user and administrator access to most of the
+    AFS monitoring and debugging functions, allowing you to make these calls
+    directly from Perl, rather than processing the output of a command.
+
+
+REQUIREMENTS
+    Before you can build the AFS module you need to have the
+    following installed on your system:
+
+        * Perl 5.6.1 or newer (haven't tested on any older versions)
+        * system libraries for OpenAFS 1.2.x and newer (it is unknown
+	whether IBM AFS wil work)
+
+
+COMPATIBILITY
+    Please consult the 'pod/Monitor.pod' file for a complete list of AFS
+    @sys variable, OS and compiler versions this Perl module is known to
+    work with
+
+
+AVAILABILITY
+    The latest version of the AFS::Monitor module is currently available at
+
+ http://github.com/stevenjenkins/AFS-Monitor as well as CPAN.
+
+
+BUILDING & INSTALLING
+    Assuming you have met all the prerequisites, building the module
+    should be straightforward. The AFS::Monitor module is distributed as a
+    single gzipped tar archive file:
+
+            AFS-Monitor-0.3.3.tar.gz
+
+    Unpack the archive to create an AFS-Monitor installation directory:
+
+        tar zxvf AFS-Monitor-0.3.3.tar.gz
+
+    'cd' into that directory, make, test and install the modules. You
+    have to specify the location of the AFS system libraries. While
+    running the 'perl Makefile.PL' step you will be prompted for the
+    location of the AFS system libraries.  If you want to avoid that
+    query, you should specify the environment variable 'AFSPATH'
+    before you start[1].  If your AFS system type is not yet known by
+    the make file, please follow the printed message.
+
+    This is the sequence of commands to build the modules:
+
+        cd AFS-Monitor-0.3.2
+
+        [1] this step is optional
+        setenv AFSPATH 'path_to_the_AFS_system_libraries' # tcsh-shell
+        export AFSPATH='path_to_the_AFS_system_libraries' # sh-shell
+
+        perl Makefile.PL
+             ---->  Which AFS system libraries should be used? [/usr/afsws]
+        make
+        make test
+        make install
+
+
+DOCUMENTATION
+    POD-format documentation can be found in the directory 'pod'.
+    The POD documentation gets automatically installed to the system wide
+    Perl documentation. It is readable with the 'perldoc' utility.
+
+    To create a HTML version of the documentation, execute
+
+ cd pod
+ make html
+
+
+EXAMPLES
+    The 'examples' directory contains example how to use the
+    AFS::Monitor module. The scripts contain almost all ways how to call
+    the different functions. We have used these scripts as regression tests
+    during development. They should ive you enough ideas how to use the
+    different functions.
+
+
+BUGS
+    Please send all bug reports and suggestions for improvements to
+    Steven Jenkins <steven.jenkins@gmail.com>. When reporting
+    bugs/problems please include information about operating system
+    version, perl version, AFS version, AFS::Monitor module version.
+    Comments, suggestions and patches are always welcome.
+
+
+CREDITS
+    See the 'CHANGES' file for details.
+
+
+COPYRIGHT AND DISCLAIMER
+    Copyright 2004-2006 Alf Wachsmann <alfw@slac.stanford.edu> and
+                        Elizabeth Cassell <e_a_c@mailsnare.net>.
+    Copyright 2011 Steven Jenkins <steven.jenkins@gmail.com>
+    All rights reserved.
+
+    Most of the explanations in the documentation are taken from the original
+    AFS documentation and the AFS Perl module.
+
+    AFS-3 Programmer's Reference:
+    Volume Server/Volume Location Server Interface
+    Edward R. Zayas
+    (c) 1991 Transarc Corporation.
+    All rights reserved.
+
+    IBM AFS Administration Reference
+    (c) IBM Corporation 2000.
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

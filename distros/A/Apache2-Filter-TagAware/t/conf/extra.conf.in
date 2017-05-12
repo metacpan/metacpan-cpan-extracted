@@ -1,0 +1,26 @@
+
+PerlSwitches -I@ServerRoot@/../lib
+
+PerlModule My::TestFilter50
+PerlModule My::TestFilter200
+PerlModule My::TestFilter2048
+
+Alias /50 @DocumentRoot@
+<Location /50>
+    PerlOutputFilterHandler My::TestFilter50
+</Location>
+
+Alias /200 @DocumentRoot@
+<Location /200>
+    PerlOutputFilterHandler My::TestFilter200
+</Location>
+
+Alias /2048 @DocumentRoot@
+<Location /2048>
+    PerlOutputFilterHandler My::TestFilter2048
+</Location>
+
+Alias /normal_filtered @DocumentRoot@
+<Location /normal>
+    PerlOutputFilterHandler My::NormalFilter
+</Location>

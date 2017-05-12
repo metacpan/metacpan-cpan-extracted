@@ -1,0 +1,71 @@
+commit efcd11b87d196e6f2d0ed1f14f77cdda7d941748 (HEAD, a_tag, master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Nov 2 00:50:50 2009 +0100
+
+    ADDED: install document
+
+commit 889ab944d3ea78299063440b04d6ed91edd970d9
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Oct 31 23:34:58 2009 +0100
+
+    CHANGED: generate commande copies elements to temporary directory
+
+commit e90c2a98ff0ed8e78138ef7b93dc3677d4797c3e
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Oct 29 00:47:20 2009 +0100
+
+    ADDED: test dot_plog/perl configuration
+
+commit 43571c9fae9762697bf9485f4d5efa3bf0dc0d18
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Oct 28 13:09:05 2009 +0100
+
+    CHANGED: passes most perl critics
+
+commit 3696405a0393bc92c788a83b1578dc473401046f
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Oct 16 13:32:12 2009 +0200
+
+    ADDED: architecture documentation~
+
+commit a35b2785b1717a0187371a408eb8242b1a12898d
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Oct 11 20:26:56 2009 +0200
+
+    CHANGED: command handler is user defined
+
+commit 9a19023d776a1d96b60ae80685ea566c89731930
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Oct 8 14:26:40 2009 +0200
+
+    CHANGED: documentation
+
+commit ce4e00c44ff73cd96d1b75dfe9342b1267388ee7
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Oct 6 09:53:20 2009 +0200
+
+    ADDED: Asciidoc support
+
+commit 0d2f5acec2821d8a3e7dc6ce7a0c0c6f325e7c84
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Oct 5 10:44:36 2009 +0200
+
+    ADDED: commands
+
+commit 7d19ac8bcda399d868726819ea8546681f088859
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Oct 2 13:56:24 2009 +0200
+
+    ADDED: Feed support
+
+commit 1149cbd95cdbe0771a1b399fbfc31d49c28acdda
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Oct 1 13:30:09 2009 +0200
+
+    ADDED: code to handle update script
+
+commit c6d40e5846c24310b30cc8fa19eec7d8126d10bb
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Oct 1 11:06:47 2009 +0200
+
+    Initial commit

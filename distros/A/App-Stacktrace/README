@@ -1,0 +1,18 @@
+NAME
+    App::Stacktrace - Stack trace
+
+SYNOPSIS
+      perl-stacktrace [option] pid
+
+        -m      Prints a gdb script
+        --help  Show this help
+
+DESCRIPTION
+    perl-stacktrace prints Perl stack traces of Perl threads for a given
+    Perl process. For each Perl frame, the full file name and line number
+    are printed.
+
+API
+    new
+    run
+

@@ -1,0 +1,22 @@
+// Copyright (c) 2008 AdCopy
+// Author: Jeff Weisberg
+// Created: 2008-Dec-15 19:23 (EST)
+// Function: 
+//
+// $Id$
+
+message ACPHeartBeat {
+	required int32		status_code	= 1;
+	optional string		status_message	= 2;
+	optional fixed32	ipv4		= 3;
+	optional int32		port		= 4;
+	optional fixed64	timestamp	= 5;
+	required string		subsystem	= 6;
+	optional string		environment	= 7;
+	optional int32		sort_metric	= 8;
+        optional string         hostname        = 9;
+        required string         server_id       = 10;
+        required int32          process_id      = 11;
+        optional int32          capacity_metric = 12;
+}
+

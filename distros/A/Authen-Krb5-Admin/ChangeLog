@@ -1,0 +1,272 @@
+VERSION 0.17
+============
+
+2013-02-20  Stephen Quinney <squinney@inf.ed.ac.uk>
+
+	* Added basic support for KADM5_API_VERSION_4 (which is in krb5
+	   1.11). Thanks to Christian Krause for the bug report, this
+	   closes: #83459
+	* Reworked the db_args method to avoid a double free bug.
+	   Thanks to Dorian Taylor for hunting down the cause of the
+	   problem.
+	* Added an error_code() function which simply returns the integer
+ 	   value of the error from the most recent function call. Thanks
+	   to D. Thomas for the suggestion, closes: #81110
+
+VERSION 0.16
+============
+
+2012-12-13  Stephen Quinney <squinney@inf.ed.ac.uk>
+
+	* Makefile.PL: Renamed the KRB5_CONFIG environment variable to
+	   KRB5_CONFTOOL to avoid potential for confusion. Thanks to Tom
+	   Poage for the bug report, this closes: #81146.
+
+VERSION 0.15
+============
+
+2012-11-01  Stephen Quinney <squinney@inf.ed.ac.uk>
+
+	* Added a db_args method to Authen::Krb5::Admin::Principal, thanks
+	   to Dorian Taylor for the patch. This closes: #80205. This is
+	   only available with MIT Kerberos version 1.7 and newer.
+
+VERSION 0.14 (not released)
+============
+
+2012-08-06  Stephen Quinney <squinney@inf.ed.ac.uk>
+
+	* Implemented support for the new administrative lockout options
+           ( pw_max_fail, pw_failcnt_interval and pw_lockout_duration)
+	   see http://k5wiki.kerberos.org/wiki/Projects/Lockout
+	   for full details. This closes #76830.
+
+VERSION 0.13
+============
+
+2012-04-26  Stephen Quinney <squinney@inf.ed.ac.uk>
+
+	* Use the Kerberos admin.h rather than a local copy where
+	   possible. Closes: #49964
+	* Handle the API change which requires the context argument be
+	   passed to the various init functions. There may be a better way
+	   to do this but it requires a change to Authen::Krb5.
+	* Reduced the set of libraries we link against as we do not use
+  	   libkrb5 and libk5crypto directly, patch taken from Debian.
+	* Applied patch from Kevan Carstensen to export the
+	   KRB5_KDB_ACCESS_ERROR constant. Closes: #77093.
+
+VERSION 0.12
+============
+
+2012-03-12  Stephen Quinney <squinney@inf.ed.ac.uk>
+
+	* New maintainer, thanks to Andrew Korty for all his good work.
+	* No code changes in this release.
+	* Closes: #69831
+
+VERSION 0.11
+============
+
+2008-02-25  Andrew J. Korty  <ajk@iu.edu>
+
+	* Makefile.PL: Exit 0 if Kerberos 5 can't be found so as not to
+	produce a FAIL from CPAN Testers.
+
+VERSION 0.10
+============
+
+2008-01-30  Andrew J. Korty  <ajk@iu.edu>
+
+	* MANIFEST, MANIFEST.SKIP, META.yml, Makefile.PL: Include and
+	verify a module signature.
+
+	* t/34-cpw.t: Skip tests that tickle what might be an
+	incompatibility between Authen::Krb5 1.7 and MIT 1.6.3 that causes
+	get_in_tkt_with_password to segfault.
+
+	* Makefile.PL: Using $KRB5_EXTRAINCS, include files from
+	$PREFIX/include/et.  On RHEL 5, this directory is where com_err.h
+	is kept.
+
+VERSION 0.09
+============
+
+2007-01-05  Andrew Korty  <ajk@iu.edu>
+
+	* ppport.h: new version, complete with INT2PTR()
+	* Admin.xs, typemap: Convert to four-column indent.
+	* Admin.xs: Copy the policy name we get from kadm5_get_principal()
+	into memory allocated with New() and then free() what was given to
+	us.  That way, we can just Safefree() it in DESTROY().
+
+2006-12-28  Andrew J. Korty  <ajk@iu.edu>
+
+	* Admin.xs, typemap: Use INT2PTR() and friends to make sure void *
+	and Perl values are compatible when perl is built with
+	-Duse64bitint.
+
+	* Makefile.PL, t/01-config.t, t/10-getprivs.t, t/20-addpol.t,
+	t/21-getpol.t, t/22-getpols.t, t/23-modpol.t, t/30-addprinc.t,
+	t/31-getprinc.t, t/32-getprincs.t, t/33-modprinc.t, t/34-cpw.t,
+	t/35-randkey.t, t/36-rename.t, t/91-delprinc.t, t/92-delpol.t: Let
+	us specify a credentials cache with the $PERL_KADM5_TEST_CACHE
+	environment variable.
+
+	* t/91-delprinc.t, t/92-delpol.t: Test to see if the
+	principal/policy is gone after we delete it.
+
+	* Admin.pm, Admin.xs, admin.h: Attempt to detect MIT Kerberos 5
+	Release 1.5 and later, whose kadm5_init_with_* functions take an
+	extra argument (char **db_args) and whose kadm5_config_params
+	structure doesn't have a profile field.
+
+VERSION 0.07
+============
+
+2005-02-19  Andrew J. Korty  <ajk@iu.edu>
+
+	* Makefile.PL: Red Hat installs Kerberos in /usr/kerberos/, so
+	look there too.
+
+	* Admin.xs: Initialize structs correctly.  Calling Newz() is wrong
+	because it sets all bits to zero, which doesn't guarantee that any
+	element but those of type int are properly initialized.
+
+	* Admin.pm, Admin.xs, typemap: Authen::Krb5 now has a keyblock
+	class, so use that instead of a fake one.
+
+2004-02-18  Andrew J. Korty  <ajk@iu.edu>
+
+	* Admin.pm: Add an EXAMPLES section pointing out that examples can
+	be found in the unit tests.  Add a FILES section referring to
+	krb5.conf.  Add a BUGS section explaining missing functionality
+	that probably belongs in Authen::Krb5.  Add perlvar(1) to the SEE
+	ALSO section since it's referenced elsewhere.
+
+VERSION 0.06
+============
+
+2004-02-12  Andrew Korty  <ajk@iu.edu>
+
+	* Admin.pm: Document rename_principal method.
+
+2003-07-21  Andrew Korty  <ajk@iu.edu>
+
+	* Makefile.PL: Require Admin::Krb5 1.2.
+
+2003-02-05  Andrew Korty  <ajk@iu.edu>
+
+	* Makefile.PL: Add another test principal name for
+	krb5_rename_principal().
+
+	* Admin.xs: Add interface to krb5_rename_principal().
+
+	* t/36-rename.t: Tests for rename_principal.
+
+2003-01-30  Andrew Korty  <ajk@iu.edu>
+
+	* Admin.pm: Principal and policy methods return TRUE or undef, not
+	error codes.
+
+	* Admin.pm, Admin.xs, admin.h: Add error table constants.
+
+2002-10-09  Andrew Korty  <ajk@iu.edu>
+
+	* Admin.xs: Overwrite key contents before reallocating memory.
+
+	* Admin.pm, Admin.xs, COPYING, Makefile.PL, admin.h,
+	t/00-loadme.t, t/01-config.t, t/02-policy.t, t/03-principal.t,
+	t/04-key.t, t/10-getprivs.t, t/20-addpol.t, t/21-getpol.t,
+	t/22-getpols.t, t/23-modpol.t, t/30-addprinc.t, t/31-getprinc.t,
+	t/32-getprincs.t, t/33-modprinc.t, t/34-cpw.t, t/35-randkey.t,
+	t/91-delprinc.t, t/92-delpol.t: Copyright notices.
+
+	* Admin.pm, Admin.xs: Add documentation for recent changes.
+
+2002-10-08  Andrew Korty  <ajk@iu.edu>
+
+	* Admin.xs, typemap: Use Kerberos 5 types.
+
+2002-10-04  Andrew Korty  <ajk@iu.edu>
+
+	* Admin.xs: Do a better job of mortalizing stack values and
+	freeing data.
+
+	* Admin.xs, admin.h, t/04-key.t, t/35-randkey.t, typemap,
+	Admin.pm: Add support for krb5_key_data in the form of an
+	Authen::Krb5::Admin::Key class.
+
+2002-10-03  Andrew Korty  <ajk@iu.edu>
+
+	* t/33-modprinc.t, t/34-cpw.t: Allow authentication to our test
+	principal temporarily so we can change passwords.
+
+	* t/33-modprinc.t: Check status of second get_principal.
+
+	* t/30-addprinc.t, t/33-modprinc.t, t/31-getprinc.t: Set
+	KRB5_KDB_DISALLOW_ALL_TIX so no one can authenticate as our test
+	principal.
+
+	* t/34-cpw.t, t/30-addprinc.t: Don't embed NULs in password.
+
+2002-10-01  Andrew J. Korty  <ajk@iu.edu>
+
+	* Makefile.PL: Explicitly get a ticket for the kadmin/admin
+	service in case TGTs are disallowed for that principal.
+
+VERSION 0.04
+============
+
+2002-09-18  Andrew J. Korty  <ajk@iu.edu>
+
+	* Admin.pm, Admin.xs: Add support for kadm5_init_with_skey(),
+	which authenticates using a service key stored in a keytab.
+	Thanks to Kevin Meltzer.
+
+	* Admin.xs, ppport.h: Use ppport.h for backward compatibility with
+	older Perl versions.
+
+VERSION 0.03
+============
+
+2002-06-05  Andrew J. Korty  <ajk@iu.edu>
+
+	* README: Added.
+
+2002-05-29  Andrew J. Korty  <ajk@iu.edu>
+
+	* Admin.pm: Use OO notation in documentation.  Mention :constants
+	tag.
+
+VERSION 0.02
+============
+
+2002-05-28  Andrew J. Korty  <ajk@iu.edu>
+
+	* Admin.xs: Like Authen::Krb5, return truth value rather than
+	error.  Set static value for err always so that error function
+	works.
+
+	* Admin.pm: Add POD.
+
+	* t/*.t: Take advantage of magical nature of Authen::Krb5::error
+	and Authen::Krb5::Admin::error return values.
+
+2002-05-25  Andrew J. Korty  <ajk@iu.edu>
+
+	* Admin.xs: In accessor methods, don't automatically set flags
+	that would later result in a bad mask error.  In kadmin methods,
+	automatically unset flags that would cause a bad mask error.
+	(Also updated test scripts).
+
+VERSION 0.01
+============
+
+2002-05-23  Andrew J. Korty  <ajk@iu.edu>
+
+	* Admin.xs: Fixed the way we reference Authen::Krb5::Principal
+	objects, I think.
+
+VERSION 0.00
+============

@@ -1,0 +1,21 @@
+/* mode: c; c-basic-offset: 8; c-indentation-style: "K&R" */
+
+#include <stdio.h>
+
+struct aconst {
+	char const *name;
+	int value;
+} consts[] = {
+/* INSERT CONSTANTS HERE */
+	{ NULL, -1 }
+};
+
+int main()
+{
+	struct aconst *i;
+
+	for (i = consts; i->name != NULL; ++i) {
+		printf("%s:0x%08x\n", i->name, i->value);
+	}
+	return 0;
+}

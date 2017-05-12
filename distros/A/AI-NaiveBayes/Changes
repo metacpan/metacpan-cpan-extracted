@@ -1,0 +1,15 @@
+Revision history for AI::NaiveBayes
+
+0.04      2017-01-20
+   Some doc fixes
+   Moved do my personal github repo
+
+0.03
+   Synopsis example fixed
+
+0.02
+   added 'train' class method for quick start
+
+0.01
+   initial release 
+

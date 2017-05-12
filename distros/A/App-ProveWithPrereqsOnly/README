@@ -1,0 +1,12 @@
+SYNOPSIS
+
+    This distribution includes the following CLI utilities:
+
+    #INSERT_EXECS_LIST
+
+SEE ALSO
+
+    prove, App::prove, lib::prereqs::only
+
+    Dist::Zilla
+

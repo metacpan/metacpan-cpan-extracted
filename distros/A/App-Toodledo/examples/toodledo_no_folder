@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use App::Toodledo;
+
+my $todo = App::Toodledo->new( app_id => 'psdtnofolder' );
+$todo->login_from_rc;
+
+my %srch_opts = ( folder => 0, notcomp => 1 );
+my @tasks = $todo->get_tasks_with_cache;
+for my $task ( $todo->select( \@tasks => "folder == 0" ) )
+{
+  printme( $task );
+}
+
+my $printed;
+sub printme
+{
+  my $task = shift;
+
+  $printed++ or print "Tasks in no folder:\n";
+  print $task->title, "\n";
+}
+
+__END__
+
+=head1 NAME
+
+toodledo_no_folder
+
+=head1 SYNOPSIS
+
+  toodledo_no_folder
+
+=head1 DESCRIPTION
+
+Print out tasks that are not allocated to any folder yet,
+so you can get notified when something's been assigned to
+you by a collaborator.
+
+=head1 AUTHOR
+
+Peter J. Scott, C<< <cpan at psdt.com> >>
+
+=cut

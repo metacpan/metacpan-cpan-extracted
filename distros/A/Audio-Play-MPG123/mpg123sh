@@ -1,0 +1,378 @@
+#!/usr/bin/perl
+
+# most of this file is dedicated to work around the braindead ReadLine
+# implementation.
+
+#BEGIN { $ENV{PERL_RL} |= "Perl o=0" }
+BEGIN { $ENV{PERL_RL} |= " o=0" }
+BEGIN { eval "use Time::HiRes 'time'" }
+
+$RC = "$ENV{HOME}/.mpg123shrc";
+
+use Audio::Play::MPG123;
+use Term::ReadLine;
+use Fcntl; # required by MPG123 anyway
+use Cwd;
+use File::Basename;
+
+sub mglob {
+   eval { require File::Glob } ? &File::Glob::glob : glob $_[0];
+}
+
+$|=1;
+
+do $RC;
+
+# contains tuples of the form [url, repeat]
+@playlist=();
+$p_url;
+$p_repeat;
+
+$player = new Audio::Play::MPG123 mpg123args => ["-b4096"];
+
+# do uri-style escaping PLUS escape space to · and back (sorry for that :()
+sub uri_esc($) {
+   local $_ = shift;
+   s/([^\x21-\x24\x26-\x7e\xa0-\xb6\xb8-\xff])/sprintf "%c%02x", 0x25, ord($1)/ge;
+   s/%20/·/g;
+   $_;
+}
+
+sub uri_unesc($) {
+   local $_ = shift;
+   s/·/%20/g;
+   s/%([0-9a-f][0-9a-f])/chr(hex($1))/gei;
+   $_;
+}
+
+sub write_rc {
+   require Data::Dumper;
+   print "writing $RC... ";
+   open RC, ">$RC" or die "$RC: $!";
+   print RC Data::Dumper->Dump([\%conf], ['*conf']);
+   close RC;
+   print "ok\n";
+}
+
+sub oconf {
+   my ($cmd, $value) = @_;
+   if ($cmd eq "log") {
+      if ($value =~ /^\s*$/) {
+         delete $conf{log};
+      } else {
+         $conf{log} = $value;
+      }
+      write_rc;
+   } elsif ($cmd eq "conf") {
+      while (my ($k, $v) = each %conf) {
+         printf "%-10s => %s\n", $k, $v;
+      }
+   } else {
+      print "unknown o command, use <log> or <conf>.\n";
+   }
+}
+
+sub mp3log {
+   my ($cmd, @args) = @_;
+   if (defined $conf{log}) {
+      if (open LOG, ">>$conf{log}") {
+         print LOG "$cmd ", (join " ", map uri_esc($_), @args), "\n";
+         close LOG;
+      } else {
+         warn "$conf{log}: $!\n";
+      }
+   }
+}
+
+my $current_url;
+my $current_time;
+
+sub load_url {
+   my $url = shift;
+   if (defined $current_url && $current_time) {
+      mp3log "T", $current_url, sprintf ("%0.2f", time - $current_time);
+   }
+   $current_url = $url;
+   if (defined $url) {
+      $current_time = time;
+      $player->load($url);
+   }
+}
+
+sub pause_url {
+   my $pause = shift;
+   if ($pause) {
+      mp3log "T", $current_url, sprintf ("%0.2f", time - $current_time) if defined $current_url;
+      $current_time = 0;
+   } else {
+      $current_time = time;
+   }
+}
+
+sub next_song {
+   if ($p_repeat <= 0 && @playlist) {
+      my $p = shift @playlist;
+      push @playlist, $p if $p;
+      $p_url    = $playlist[0][0];
+      $p_repeat = $playlist[0][1];
+   }
+   if ($p_url) {
+      $p_repeat--;
+      load_url($p_url);
+      mp3log("+", $p_url);
+      $player->stat;
+   }
+}
+
+sub add_url($) {
+   my $url = shift;
+   push @playlist, [$url, 1];
+   next_song unless $player->state;
+   mp3log("a", $url);
+}
+
+sub shuffle {
+   for (my $i = @playlist; $i--; ) {
+      my $j = int rand $i+1;
+      @playlist[$j, $i] = @playlist[$i, $j];
+   }
+}
+
+END {
+   load_url();
+}
+
+sub file_completion {
+   mglob "$_[0]*", GLOB_MARK|GLOB_TILDE;
+}
+
+sub mfav {
+   my ($cmd, $value) = @_;
+   if ($cmd eq "f" or $cmd eq "l") {
+      if (defined $conf{log}) {
+         my %time;
+         local *LOG;
+         open LOG, "<$conf{log}" and do {
+            while (<LOG>) {
+               if (/^[al] (\S+)/) {
+                  $time{$1} += 0.2;
+               } elsif (/^[ds] (\S+)/) {
+                  $time{$1} -= 0.2;
+               } elsif (/^T (\S+) (\S+)/) {
+                  $time{$1} += $2;
+               }
+            }
+         };
+         my @time;
+         my %base;
+         for (keys %time) {
+            next if -f uri_unesc $_;
+            my $base = basename $_;
+            $base{$base} += delete $time{$_};
+         }
+         while (my ($k, $v) = each %time) {
+            push @time, [$k, $v + $base{basename $k}];
+         }
+         $value ||= 5;
+         for (sort { $b->[1] <=> $a->[1] } @time) {
+            printf "%10.2f %s\n", $_->[1], $_->[0];
+            add_url uri_unesc $_->[0] if $cmd eq "f";
+            last if --$value <= 0;
+         }
+      } else {
+         print "this command requires a logfile\n";
+      }
+   } else {
+      print "unknown m command, use <f> or <l>.\n";
+   }
+}
+
+$SIG{INT} =
+$SIG{HUP} =
+$SIG{PIPE} =
+$SIG{TERM} = sub { exit };
+
+# terribly fool the Term::ReadLine packages..
+sub Tk::DoOneEvent { }
+sub Term::ReadLine::Tk::Tk_loop { &event_loop }
+sub Term::ReadLine::Tk::register_Tk { }
+
+$rl = new Term::ReadLine "mpg123sh";
+$rl->tkRunning(1);
+
+$rl->Attribs->{completion_function} = sub {
+   my ($word,$line,$pos) = @_;
+   $word ||= ""; $line ||= ""; $pos ||= 0;
+   $p = "";
+   $c = $word;
+   $rl->Attribs->{completer_terminator_character}="";
+   if ($pos==0) {
+      if ($word=~/^(l(?:oad)?|a(?:dd)?|cd?)(\S.*)?/) {
+         $p = $1." ";
+         $c = $2;
+      }
+   }
+   @r = file_completion uri_unesc($c);
+   if ($line =~ /^c/) {
+      @r = grep -d "$_/.", @r;
+   }
+   if (@r == 1) {
+      if (-f $r[0]) {
+         $rl->Attribs->{completer_terminator_character}=" ";
+      } elsif (-d $r[0]) {
+         $rl->Attribs->{completer_terminator_character}="/";
+      }
+   }
+   #print "\n<$word|$line|$pos> = ",join(":",@r)," #",scalar@r,"\n";
+   map $p.uri_esc($_),@r;
+};
+
+my $pwr_state = 1;
+sub pwr_change {
+   $SIG{PWR} = \&pwr_change;
+   $pwr_state = !$pwr_state;
+
+};
+$SIG{PWR} = \&pwr_change;
+
+sub event_loop {
+   my $r;
+   my $rlin = $rl->IN;
+   # most ugly workaround for perl-readline bug
+   if ($rl->ReadLine eq "Term::ReadLine::Perl") {
+      require IO::Handle;
+      my $o = (fcntl $rlin,F_GETFL,0) & (O_APPEND | O_NONBLOCK);
+      fcntl $rlin,F_SETFL,$o | O_NONBLOCK;
+      my $eof = eof($rlin);
+      fcntl $rlin,F_SETFL,$o;
+      return unless $eof;
+   }
+   do {
+      next_song if $player->state == 0 && $pwr_state;
+      $player->stop if $player->state && !$pwr_state;
+      vec($r, fileno($rlin), 1)       = 1;
+      vec($r, fileno($player->IN), 1) = 1;
+      (select $r, undef, undef, undef) < 0 and $r = "";
+      if (vec($r,fileno($player->IN),1)) {
+         $player->poll(0);
+      }
+   } until vec($r, fileno($rlin), 1);
+}
+
+$player->statfreq(20);
+
+print "\nmpg123sh, version $Audio::Play::MPG123::VERSION\n";
+print "enter 'help' for a command list\n\n";
+
+for(;;) {
+   my $prompt=fastcwd." ";
+   if ($player->state) {
+      $player->stat;
+      $prompt.=$player->title." ".$player->{frame}[2]."/".($player->{frame}[2]+$player->{frame}[3]);
+   } else {
+      $prompt.=$p_url;
+   }
+   $_=$rl->readline("$prompt> ");
+   if (/^l(?:oad)?\s*(.*?)\s*$/i) {
+      my $url = $player->canonicalize_url(uri_unesc $1);
+      load_url($url) or print "ERROR: ",$player->error,"\n";
+      mp3log("l", $url);
+      $player->stat;
+   } elsif (/^a(?:dd)?\s*(.*?)\s*$/i) {
+      for (mglob uri_unesc $1, GLOB_TILDE|GLOB_NOMAGIC) {
+         add_url $player->canonicalize_url($_);
+      }
+   } elsif (/^r(?:epeat)?\s*(\d+)\s*$/) {
+      $playlist[-1][1] = $1;
+   } elsif (/^p/i) {
+      $player->pause;
+      pause_url ($player->paused);
+   } elsif (/^DD$/) {
+      $p_repeat = 0;
+      $player->stop;
+      next_song;
+      unlink @{pop @playlist}[0];
+   } elsif (/^d(?:el)?\s*(\d*)\s*$/i) {
+      for (do {
+         if ($1) {
+            splice @playlist,$1-1,1;
+         } else {
+            $p_repeat = 0;
+            $player->stop;
+            next_song;
+            pop @playlist;
+         }
+      }) {
+         mp3log("d", $_->[0]);
+      }
+   } elsif (/^sh/i) {
+      shuffle;
+   } elsif (/^s/i) {
+      $p_repeat=0;
+      $player->stop;
+      mp3log("s", $playlist[0][0]);
+      next_song;
+   } elsif (/^c(?:d)?\s*(.*?)\s*$/i) {
+      chdir uri_unesc $1 or print "Unable to change to '$1': $!\n";
+   } elsif (/^j(?:ump)?\s*([0-9.]+)\s*$/i) {
+      eval { $player->jump(int($1/$player->tpf)) };
+   } elsif (/^o\s*([a-z]+)\s*(.*)/i) {
+      oconf($1,$2);
+   } elsif (/^m\s*([a-z]+)\s*(.*)/i) {
+      mfav($1,$2);
+   } elsif (/^q/i) {
+      last;
+   } elsif (/^i(nfo)?/i) {
+      print "\n";
+      if ($player->state) {
+         print "currently playing: ",$player->url,"\n";
+         printf "title:   %-32s artist: %-30s\n",$player->title,$player->artist;
+         printf "album:   %-32s year:   %-30s\n",$player->album,$player->year;
+         printf "comment: %-32s genre:  %-30s\n",$player->comment,$player->genre;
+         print "\n";
+         printf "MPEG %s layer %s, %d samples/s, %s, mode_extension is %d, %d bytes/frame\n".
+                "%d channels, %s, %s, emphasis is %s, %d kbit/s\n",
+                "I" x $player->type, $player->layer, $player->samplerate, $player->mode, $player->mode_extension,
+                $player->bpf, $player->channels, $player->copyrighted ? "copyrighted" : "not copyrighted",
+                $player->error_protected ? "error protection" : "no error protection", $player->emphasis ? "on" : "off",
+                $player->bitrate;
+         print "\n";
+      }
+      for (my $i=0; $i<=$#playlist; $i++) {
+         printf "%2d: %-30s repeat %d\n",$i+1,"'$playlist[$i][0]'",$playlist[$i][1];
+      }
+      print "\n";
+   } elsif (/^h(help)?/i) {
+      print <<EOF;
+
+load <file or url>     loads the specified file and plays it immediately.
+add <file or url>      pushes the specified song to the end of the playlist
+quit                   quits the program
+info                   print information about the song and the playlist.
+pause                  pause/unpause
+stop                   stop current song (and play next)
+shuffle                shuffle currently selected songs once
+cd <path>              change current directory
+del <num>              remove song number <num> from the playlist
+del                    remove the currently playing song
+DD                     like del, but physically deleted the file(!!!)
+jump <second>          seek to the specified position
+repeat <count>         repeat the last recently added song <count times>
+help                   this listing
+o                      manipulate configuration
+o conf                 show current configuration
+o log <path>           log all playing actions into file <path>
+m                      playlist management (not much there, yet)
+m f <num>              add <num> favourite songs
+m l <num>              list <num> favourite songs
+
+- most commands can be shortened to a one-letter form
+- most whitespace between command and arguments is optional
+
+EOF
+   } elsif (/\S/) {
+      print "unknown command, try 'help'\n";
+   }
+}
+
+

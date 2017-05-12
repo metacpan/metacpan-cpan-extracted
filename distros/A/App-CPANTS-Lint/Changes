@@ -1,0 +1,19 @@
+Revision history for App-CPANTS-Lint
+
+0.05 2014/12/23
+    - Added metrics_path option to use extra metrics modules
+      (such as modules under Module::CPANTS::SiteKwalitee::)
+    - Fixed README
+
+0.04 2014/07/14
+    - Added colo(u)r option (TOBYINK++)
+
+0.03 2014/07/01
+    - Not to show experimental fails unless 'experimental' option
+      is set (NEILB++)
+
+0.02 2014/06/29
+    - Typo in pod (=open instead of =over) (NEILB++)
+
+0.01 2014/06/29
+    - initial release

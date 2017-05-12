@@ -1,0 +1,9 @@
+Revision history for Perl extension AI::NeuralNet::Kohonen::Demo::RGB.
+
+0.011 Thu Mar 13 18:21:37 2003
+	Added unified distance matrix display.
+
+0.01  Thu Mar 13 12:21:37 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n AI::NeuralNet::Kohonen::Demo::RGB
+

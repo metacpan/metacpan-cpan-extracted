@@ -1,0 +1,25 @@
+Changes
+lib/Algorithm/DBSCAN.pm
+lib/Algorithm/DBSCAN/Dataset.pm
+lib/Algorithm/DBSCAN/Point.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-clustering.t
+t/02-module-synopsis-code.t
+t/03-region-index.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test_datasets/dbscan_test_dataset_1.txt
+t/test_datasets/dbscan_test_dataset_1_result.txt
+t/test_datasets/dbscan_test_dataset_2.txt
+t/test_datasets/dbscan_test_dataset_2_result.txt
+t/test_datasets/dbscan_test_dataset_module_synopsis.txt
+t/test_datasets/dbscan_test_dataset_module_synopsis_result.txt
+t/test_datasets/region_index_dataset_2.txt
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

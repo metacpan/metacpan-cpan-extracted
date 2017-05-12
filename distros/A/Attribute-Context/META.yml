@@ -1,0 +1,25 @@
+---
+name: Attribute-Context
+version: 0.042
+author:
+  - 'Curtis "Ovid" Poe <moc.oohay@eop_divo_sitruc>'
+abstract: |-
+  Perl extension for automatically altering subroutine behavior
+  based upon context
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Attribute::Handlers: 0.78
+  Sub::Uplevel: 0.09
+build_requires:
+  Test::Exception: 0.21
+  Test::More: 0.6
+provides:
+  Attribute::Context:
+    file: lib/Attribute/Context.pm
+    version: 0.042
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

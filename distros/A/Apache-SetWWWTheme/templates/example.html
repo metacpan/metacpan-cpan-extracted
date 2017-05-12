@@ -1,0 +1,44 @@
+<HTML>
+<HEAD><TITLE>A Sample HTML File...</TITLE>
+</HEAD>
+
+<!--  THIS IS THE BEGINNING OF THE EMBEDDED CONFIGURATION
+
+    # first, we'll turn on the sidebar.
+
+	@NOSIDEBAR=0;
+
+    # and we'll turn on the top/bottom navbar...
+
+	@NAVBAR=1;
+
+    # since we have a navbar at the top and bottom, we should really
+    # set the LAST/UP/NEXTLINKS, since they really only make sense in a 
+    # file-by-file situation (like if you had online books or something)
+
+	@LASTLINK=<A HREF="previous.html">The previous page</a>;
+        @UPLINK=<A HREF="top.html"       >The top page</a>;
+        @NEXTLINK=<A HREF="next.html"    >The next page</a>;
+
+    # we'll set an awful link colour, but thankfully its deactivated!
+    # (as usual, separating the "@" and the directive name deactivates
+    # the directive so the program doesn't notice it
+
+	@ LINK=#FF0000;
+
+    # and we'll use the searchbox
+
+	@SIDEBARSEARCHBOX=1;
+
+   THIS IS THE END OF THE EMBEDDED CONFIGURATION
+-->
+
+<BODY>
+
+	<H1>Boy, do I ever hope this works.</h1>
+	<p>Wouldn't it be nice if this was executing flawlessly?</P>
+	<P>Now you're seeing your pages modified by Apache.</P>
+
+</BODY>
+
+</HTML>

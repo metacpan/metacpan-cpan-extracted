@@ -1,0 +1,51 @@
+Revision history for Alien-Libarchive-Installer
+
+0.15      2016-09-27 14:29:08 -0400
+  - patch 3.2.1 which has problems with some versions of lzma (gh#5)
+
+0.14      2016-04-11 16:58:56 -0400
+  - Strawberry fixes
+
+0.12      2015-05-16 18:54:36 -0400
+  - Fix for cygwin: sometimes // was being prepended to
+    what was supposed NOT to be a UNC path
+
+0.11      2015-03-25 21:28:08 -0400
+  - Make HTTP::Tiny an explicit requirement for older Perls
+
+0.10      2014-11-05 22:08:43 -0500
+  - reduce noisy diagnostics when pkg-config or PkgConfig.pm fails
+
+0.09      2014-10-10 08:26:40 -0400
+  - Test for archive.h in addition to -larchive for tests
+    Hopefully fixes regression on OS X
+
+0.08      2014-06-22 09:25:19 -0400
+  - promote to production
+
+0.07_01   2014-06-21 07:58:36 -0400
+  - more robust dll / dylib / .so file detection (GH#2)
+
+0.07      2014-06-19 07:43:55 -0400
+  - only use Alien::Libarchive if it is 0.21 or better
+    as 0.19-0.20 may result in infinite recursion
+
+0.06      2014-06-18 15:45:11 -0400
+  - fix system_install / Alien::Libarchive combination
+  - tests do not require internet connection
+
+0.05      2014-06-11 05:23:31 -0400
+  - make t/versions_available.t contingent on HTTP::Tiny
+
+0.04      2014-06-10 12:48:25 -0400
+  - fix test failure when HTTP::Tiny is not installed
+
+0.03      2014-06-10 09:41:05 -0400
+  - fix version for Alien::MSYS
+
+0.02      2014-06-10 06:09:09 -0400
+  - added alien option for system_install
+  - keep symbolic links as symbolic links when copy to dll directory
+
+0.01      2014-06-09 16:46:04 -0400
+  - initial version

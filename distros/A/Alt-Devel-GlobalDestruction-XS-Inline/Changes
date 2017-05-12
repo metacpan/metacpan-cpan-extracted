@@ -1,0 +1,15 @@
+0.06  2014-12-29
+  * Use latest Alt best practices
+0.05  2014-12-24
+  * Build in .inline
+0.04  2014-12-23
+  * Fix Smoker bug with Inline::Module 0.29
+0.03  2014-12-22
+  * Don't skip our C code file
+0.02  2014-12-22
+  * Add MANIFEST.SKIP to MANIFEST.SKIP
+0.01  2014-12-22
+  * Converted to Inline::Module
+  * Original git://git.shadowcat.co.uk/p5sagit/Devel-GlobalDestruction-XS.git
+  * https://metacpan.org/release/Devel-GlobalDestruction-XS
+  * Release as Alt::Devel::GlobalDestruction::XS::Inline

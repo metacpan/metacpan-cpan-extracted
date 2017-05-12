@@ -1,0 +1,179 @@
+#!/usr/local/bin/perl
+
+use 5.010;
+use strict;
+use warnings;
+
+our $VERSION = '0.004'; # VERSION
+# This file is part of App-BarnesNoble-WishListMinder 0.004 (December 20, 2014)
+
+use App::BarnesNoble::WishListMinder;
+
+App::BarnesNoble::WishListMinder->new->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+bn-wishlist - Monitor a Barnes & Noble wishlist for price changes
+
+=head1 VERSION
+
+This document describes C<bn-wishlist>, released December 20, 2014
+as part of App-BarnesNoble-WishListMinder version 0.004.
+
+=head1 SYNOPSIS
+
+Configure your wishlist URL: S<C<bn-wishlist --configure>>
+
+In your crontab: S<C<bn-wishlist --email --quiet>>
+
+To display the price history of a book: S<C<bn-wishlist EAN>>
+
+To list books by title or author: S<C<bn-wishlist SEARCH_TERM>>
+
+=head1 DESCRIPTION
+
+Barnes & Noble allows you to create wishlists on their website, but
+they don't notify you when an item on your wishlist is on sale or
+otherwise reduced in price.  C<bn-wishlist> can be added to your F<crontab>
+to monitor your wishlists and email you Price Drop Alerts.  I suggest
+running it once a day at a time of your choice.  I've seen sales that
+lasted only 1 day, so I don't recommend running it less often.
+
+The history of price changes is stored in a SQLite database.  You can
+use C<bn-wishlist> to list books by title or author, and display the
+price history of any book on your wishlist.
+
+To list books by title or author, just specify any part of the title
+or author name on the command line.  Spaces must be quoted; each
+argument is treated as a separate search.  The output of a search is the
+International Article Number (EAN), current price, title, and author.
+(For books, the EAN is also called the ISBN-13.)
+
+If only one book is matched by a search, then the full price history
+for that book is displayed.  This shows the EAN, title, and author,
+followed by one line for each price change.  For each price it shows,
+the first date that price was seen, the last date it was seen, the
+price, and (if applicable) the list price and percentage discount as
+shown on the wishlist.
+
+You can also see the price history by specifying the EAN.
+
+=head1 OPTIONS
+
+=over
+
+=item C<--all-history> (abbreviated C<-a>)
+
+By default, when listing books by title or author, if multiple books
+match the search term, bn-wishlist displays only the EAN, current
+price, title, and author of each matching book.  If only one book
+matches, it displays the full price history of that book.  This option
+causes it to display the full price history for each match.
+
+=item C<--configure>
+
+Display the location of the F<config.ini> file, and open it in a text
+editor if possible.  If the config file does not exist, a skeleton one
+will be created.
+
+=item C<--email> (abbreviated C<-e>)
+
+Send a Price Drop Alert email if any books have been reduced in price
+since the last update.  Implies C<--update>.
+
+=item C<--help>
+
+Display the usage message.
+
+=item C<--quiet> (abbreviated C<-q>)
+
+Normally, when current prices are downloaded from Barnes & Noble,
+C<bn-wishlist> prints a list of all changes since the last update.
+This option suppresses that output (useful for cron jobs).
+
+=item C<--since=DATE> (abbreviated C<-sDATE>)
+
+This prints a list of all books whose price changed on or after
+C<DATE> (in C<YYYY-MM-DD> format).
+
+=item C<--update> (abbreviated C<-u>)
+
+Connect to the Barnes & Noble website, download all configured
+wishlists, and record current prices.  Unless this option (or an
+option that implies it) is used, C<bn-wishlist> will not make any web
+requests.
+
+=item C<--version>
+
+Display the version of L<App::BarnesNoble::WishListMinder>.
+
+=back
+
+=head1 SEE ALSO
+
+L<http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29>
+
+L<http://www.barnesandnoble.com/>
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+The F<config.ini> file is stored in App-BarnesNoble-WishListMinder's data
+directory as defined by L<File::HomeDir>.  Run S<C<bn-wishlist --configure>>
+to see the actual location on your system.
+
+The SQLite database (F<wishlist.sqlite>) tracking price changes is
+stored in the same directory as F<config.ini>.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+Christopher J. Madsen  S<C<< <perl AT cjmweb.net> >>>
+
+Please report any bugs or feature requests
+to S<C<< <bug-App-BarnesNoble-WishListMinder AT rt.cpan.org> >>>
+or through the web interface at
+L<< http://rt.cpan.org/Public/Bug/Report.html?Queue=App-BarnesNoble-WishListMinder >>.
+
+You can follow or contribute to App-BarnesNoble-WishListMinder's development at
+L<< https://github.com/madsen/App-BarnesNoble-WishListMinder >>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

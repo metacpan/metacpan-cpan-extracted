@@ -1,0 +1,45 @@
+Revision history for Plack-App-AutoCRUD
+
+0.13 08.06.2016
+  - Added a readonly mode
+
+0.12 29.01.2016
+  - RT#111511 : Missing last line in Excel view.
+
+0.11 06.04.2015
+  - support for multicolum keys is now in SQL::Abstract::More v1.27
+
+0.10 23.03.2015
+  - support for multicolum keys
+  - the clone form gets populated from database, no longer from URL
+  - use JSON::MaybeXS as an entry point supporting various JSON implementations
+  - make sure that url-encoded accented characters are in utf8 representation
+  - fix propagation of checkbox clics (now using standard DOM event instead of MSIE-specific)
+
+0.09 08.02.2015
+  - adaptations to allow the Ajax call to also work on MSIE9
+
+0.08 08.02.2015
+  - RT#101986 : add Ajax calls to count how many records would be affected
+                by a bulk operation
+
+0.07 05.01.2015
+  - won't allow update/delete without any 'where' criteria
+
+0.06 05.01.2015
+  - fixed missing url-encoding in internal links
+  - redirect through HTTP 1.1 303 instead of 302 
+     (see http://en.wikipedia.org/wiki/303_See_Other)
+
+0.05 08.08.2014
+  - renamed to App::AutoCRUD
+
+0.04 20.05.2014
+  - supply a minimal SQLite database in the distrib for tests
+
+0.03 19.05.2014
+  - refactoring & doc improvements
+
+0.01 05.01.2014
+  - First release
+

@@ -1,0 +1,180 @@
+Revision history for Asm-X86
+
+2017-05-06	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.25
+	* X86.pm: Updated the register and instruction list from NASM version
+	  2.13.01. Updated copyright inside the module.
+	* README: updated copyright inside the file, quoted module names.
+
+2016-03-22	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.24
+	* X86.pm: Updated the register and instruction list from FASM version
+	  1.71.51 and NASM version 2.12.01. Updated copyright inside the
+	  module.
+	* README: updated copyright inside the file, quoted module names.
+
+2015-11-01	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.23
+	* X86.pm: Updated the register and instruction list from FASM version
+	  1.71.46. Updated copyright inside the module.
+
+2014-11-15	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.22
+	* X86.pm: Updated the register and instruction list from NASM version
+	  2.11.06.
+
+2014-03-01	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.21
+	* X86.pm: Updated the register and instruction list from NASM version
+	  2.11.02.
+
+2014-01-11	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.20
+	* X86.pm: Updated the register and instruction list from NASM version
+	  2.11. Added more XMM and YMM registers, added ZMM and opmask
+	  (K[0-7]) registers. Added subroutines to check for opmask registers.
+	  Upgraded tests.
+
+2013-12-07	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.16
+	* X86.pm: Updated the register list with YMM registers.
+
+2012-09-16	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.15
+	* X86.pm: Updated the instruction list from NASM version 2.10.05.
+
+2012-07-21	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.14
+	* X86.pm: Updated the instruction list from NASM version 2.10.02.
+
+2012-03-31	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.13
+	* X86.pm: Updated the instruction list from NASM version 2.10 and
+	  FASM version 1.69.50. Made is_addressable32_intel,
+	  is_addressable32_att, is_addressable32, is_r32_in64_intel
+	  is_r32_in64_att, is_r32_in64, is_att_suffixed_instr
+	  is_att_suffixed_instr_fpu and add_att_suffix_instr public.
+	* X86.pm (conv_intel_instr_to_att): corrected removing double percent
+	  character that may be created during the conversion.
+	* X86.pm (conv_intel_addr_to_att): removing double percent character
+	  that may be created during the conversion.
+
+2012-01-22	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.12
+	* X86.pm: Removed duplicates from the instruction and mnemonic list.
+	  Fixed the private subroutine add_att_suffix_instr (some AT&T
+	  instructions were not generated). Added one new register, CR8
+	  (available only in 64-bit mode).
+	* X86.pm, README: Bump the year in the copyright notices.
+	* README: Update with external dependencies required during manual
+	  installation.
+	* zz_duplicates.t: a new test to detect duplicate entries in all the
+	  arrays exported by the module.
+
+2011-12-30	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.11:
+	  Updated the instruction and mnemonic list from FASM version 1.69.35.
+
+2010-09-08	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.10:
+	  Updated the instruction list from NASM version 2.09.01.
+
+2010-04-18	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.09:
+	  Updated the instruction list from NASM version 2.08.01. Minor
+	  whitespace changes in the source, for better readbility.
+
+2009-07-05	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.08:
+	  Updated the instruction list from NASM version 2.06. Changed one
+	  private procedure's name.
+
+2008-11-09	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.07:
+	  Documentation fixes.
+	  Verified instruction list to be complete with fasm-1.67.28 and
+	  updated it from nasm-2.05.01.
+
+2008-10-24	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.06:
+	  Updated instruction list from fasm-1.67.27. Changed double to
+	  single quotes in one place.
+
+2008-05-18	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.05:
+	  A bit better coding style.
+	  Added the tests to the package.
+
+2008-04-17	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.04:
+	  Added functions checking if the given string represents a register
+	   in AT&T syntax. Renamed the previous functions with an "_intel"
+	   suffix and the new functions with an "_att" suffix. Old
+	   functions (the ones with no suffixes) now check for either Intel
+	   or AT&T syntax, so they remain valid.
+	  Added return value to function descriptions.
+	  Added arrays with AT&T-style register names.
+	  Updated instruction list from the latest FASM source.
+	  Added AT&T-style instruction mnemonic array.
+	  Added functions for checking if a given string represents a
+	   valid 16-/32-/64-bit addressing mode in AT&T syntax.
+	   Renamed the previous functions with an "_intel" suffix and the
+	   new functions with an "_att" suffix. Old functions (the ones
+	   with no suffixes) now check for either Intel or AT&T syntax,
+	   so they remain valid.
+	  Changed Intel syntax addressing analysis to check if the whole given
+	   string is correct (using ^ and $ in regular expressions).
+	  Added functions to convert an addressing mode or instruction (with
+	   all its operands) between AT&T and Intel syntaxes.
+	  Added functions to convert an instruction or memory addressing mode
+	   between Intel and AT&T syntaxes.
+	  Converted subroutine names to prototypes.
+	  Added the compile-once flag where applicable.
+	  Added PRIVATE to documentation of private non-exported subroutines.
+
+2008-03-29	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.03:
+	  Fixed a bug with 64-bit addressing, where valid addresses of the
+	   form [ebx+r10d] were not recognised properly.
+	  Added the "SUPPORT AND DOCUMENTATION" section from the README file
+	   to the module.
+
+2008-03-27	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.02:
+	  Fixed a bug with the 'fs' segment register.
+	  Added a list of segment registers and a function for checking
+	   if a given string represents a segment register.
+	  Added functions for checking if a given string represents a
+	   valid 16-/32-/64-bit addressing mode.
+	  Added a list of FPU registers and a function for checking
+	   if a given string represents an FPU register.
+
+2008-03-08	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.01:
+	  Includes all known by FASM instruction mnemonics and registers.
+	  Includes functions that check if a given string is a register
+	  (any type or explicit: 8-, 16-, 32-, 64-bit or multimedia) and
+	  functions that check if a given string is a mnemonic.
+

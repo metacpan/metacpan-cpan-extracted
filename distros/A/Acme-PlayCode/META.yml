@@ -1,0 +1,42 @@
+---
+abstract: 'Code transforming to avoid typical typing mistakes'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-PlayCode
+provides:
+  Acme::PlayCode:
+    file: lib/Acme/PlayCode.pm
+    version: 0.12
+  Acme::PlayCode::Plugin::Averything:
+    file: lib/Acme/PlayCode/Plugin/Averything.pm
+    version: 0.10
+  Acme::PlayCode::Plugin::DoubleToSingle:
+    file: lib/Acme/PlayCode/Plugin/DoubleToSingle.pm
+    version: 0.10
+  Acme::PlayCode::Plugin::ExchangeCondition:
+    file: lib/Acme/PlayCode/Plugin/ExchangeCondition.pm
+    version: 0.10
+  Acme::PlayCode::Plugin::NumberPlus:
+    file: lib/Acme/PlayCode/Plugin/NumberPlus.pm
+    version: 0.11
+  Acme::PlayCode::Plugin::PrintComma:
+    file: lib/Acme/PlayCode/Plugin/PrintComma.pm
+    version: 0.10
+requires:
+  List::MoreUtils: 0
+  Moose: 0.57
+  MooseX::Object::Pluggable: 0.0008
+  PPI: 1.201
+  Path::Class: 0.16
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.12

@@ -1,0 +1,240 @@
+#!/usr/bin/perl
+#
+# This file is part of Audio-MPD
+#
+# This software is copyright (c) 2007 by Jerome Quelin.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use strict;
+use warnings;
+
+# PODNAME: mpd-dynamic
+# ABSTRACT: a dynamic playlist for mpd
+
+use Audio::MPD;
+use DB_File;
+use Encode;
+use Getopt::Euclid qw[ :minimal_keys ];
+use List::AllUtils qw{ shuffle };
+use Proc::Daemon;
+use Time::HiRes    qw[ usleep ];
+
+
+#
+my $song     = 0; # song currently playing
+my $playlist = 0; # playlist version
+my $mpd = Audio::MPD->new;
+
+Proc::Daemon::Init unless $ARGV{debug};
+
+# fetch list of songs known by mpd.
+
+while (1) { # endless loop
+    my $status;
+    eval { $status = $mpd->status };
+    next if $@; # error while peaking status
+
+    # do playlist and/or current song have changed?
+    next unless $status->playlist > $playlist
+        || defined $status->song && $status->song != $song;
+    debug("checking playlist...\n");
+
+    # yup - update playlist & song.
+    $playlist = $status->playlist;
+    $song     = $status->song // 0;
+
+    # keep at most $ARGV{old} songs.
+    if ( $song > $ARGV{old} ) {
+        my $old = $song - $ARGV{old};
+        debug( "need to remove $old songs\n" );
+        eval { $mpd->playlist->delete(0) for 1..$old };
+    }
+
+    # add at most $ARGV{new} songs.
+    my @pl = $mpd->playlist->as_items;
+    if ( $#pl - $song < $ARGV{new} ) {
+        my $new = $ARGV{new} - ( $#pl - $song );
+        debug("need to add $new songs\n");
+
+        my %ratings;
+        my $istied =
+            tie( %ratings, 'DB_File', $ARGV{ratings}, O_RDONLY )
+            ? 1 : 0;
+
+        my @files = $mpd->collection->all_pathes;
+        die "Please set up mpd's audio collection before running mpd-dynamic"
+            unless @files;
+
+        my @oksongs;
+        if ( $istied ) {
+            @oksongs =
+                shuffle
+                grep { $ratings{$_} >= $ARGV{min} }
+                grep { $ratings{$_} != 0 }
+                grep { exists $ratings{$_} }
+                @files;
+        } else {
+            @oksongs = shuffle @files;
+        }
+        my @newones = splice @oksongs, 0, $new;
+        foreach my $path (@newones) {
+            my $song = encode('utf-8', $path);
+            debug("adding [$song]\n");
+            eval { $mpd->playlist->add($path) };
+            debug("error: $@\n") if $@;
+        }
+        untie %ratings if $istied;
+    }
+
+} continue {
+    usleep $ARGV{sleep} * 1000 * 1000; # microseconds
+}
+
+exit; # should not be there...
+
+sub debug {
+    return unless $ARGV{debug};
+    my ($msg) = @_;
+    my ($s,$m,$h) = ( localtime(time) )[0,1,2,3,6];
+    my $date = sprintf "%02d:%02d:%02d", $h, $m, $s;
+    warn "$date $msg";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mpd-dynamic - a dynamic playlist for mpd
+
+=head1 VERSION
+
+version 2.004
+
+=head1 DESCRIPTION
+
+This program implements a dynamic playlist for MPD, build on top of the
+L<Audio::MPD> perl module.
+
+MPD (music player daemon) is a cool music player, but it lacks a dynamic
+playlist. A dynamic playlist is a playlist that will change
+automatically over time. In particular, it will remove already played
+songs (keeping at most a given number of songs) and add new songs to the
+playlist so it never fall short of songs.
+
+Note that since mpd is a daemon needing no gui to work, C<mpd-dynamic> is
+also a daemon. That is, it will fork and do all its work from the background.
+This way, you can fire C<mpd> and C<mpd-dynamic> and forget completely
+about your music (especially since C<mpd-dynamic> is a low-resource program):
+it will just be there! :-)
+
+=head1 USAGE
+
+    mpd-dynamic [options]
+
+=head1 OPTIONS
+
+=head2 General behaviour
+
+You can customize the usage of mpd-dynamic with the following options:
+
+=over 4
+
+=item -o[ld] <old>
+
+Number of old tracks to keep in the backlog. Defaults to 10.
+
+=for Euclid: old.type:     integer >= 0
+    old.default:  10
+
+=item -n[ew] <new>
+
+Number of new tracks to keep in the to-be-played playlist. Defaults to 10.
+
+=for Euclid: new.type:     integer > 0
+    new.default:  10
+
+=item -s[leep] <sleep>
+
+Time spent sleeping (in seconds) before checking if playlist should be
+updated. Default to 5 seconds.
+
+=for Euclid: sleep.type:     number > 0
+    sleep.default:  5
+
+=item -d[ebug]
+
+Run mpd-dynamic in debug mode. In particular, the program will not daemonize
+itself. Default to false.
+
+=item -e[ncoding] <encoding>
+
+Print debug messages with this encoding. Since mpd-dynamic is meant to be a
+silent daemon, this option will not be used outside of debug mode. Default
+to C<utf-8>.
+
+=for Euclid: encoding.type:     string
+    encoding.default:  'utf-8'
+
+=item --version
+
+=item --usage
+
+=item --help
+
+=item --man
+
+Print the usual program information
+
+=back
+
+Note however that those flags are optional: since C<mpd-dynamic> comes with
+some sane defaults, you can fire C<mpd-dynamic> as is.
+
+=head2 Ratings
+
+You can also take advantage of ratings if you want. With those options, songs
+need to have at least a given rating (or no rating yet) to be inserted: this
+way, you will only listen to your favorite songs!
+
+Ratings can be created / updated with C<mpd-rate>.
+
+Note that if you supply a non-existant rating db-file, the rating mechanism
+will be ignored. The following options control the rating mechanism:
+
+=over 4
+
+=item -r[atings] <ratings>
+
+The path of a db file with the ratings per song. The keys are the song path
+(relative to MPD root), and the value is an integer (the rating). Default to
+C<~/.mpd/ratings.db>.
+
+=for Euclid: ratings.type:     readable
+    ratings.default:  "$ENV{HOME}/.mpd/ratings.db"
+
+=item -m[in[imum]] <min>
+
+The minimum rating for a song to be inserted in the playlist. Default to 4.
+
+=for Euclid: min.type:     integer > 0
+    min.default:  4
+
+=back
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

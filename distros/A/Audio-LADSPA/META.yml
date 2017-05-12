@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Audio-LADSPA
+version:      0.021
+version_from: LADSPA.pm
+installdirs:  site
+requires:
+    Class::Publisher:              0
+    Data::Uniqid:                  0
+    Graph:                         0.5
+    Scalar::Util:                  0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

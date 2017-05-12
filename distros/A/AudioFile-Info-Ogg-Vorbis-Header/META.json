@@ -1,0 +1,58 @@
+{
+   "abstract" : "Perl extension to get info from",
+   "author" : [
+      "Dave Cross, E<lt>dave@dave.org.ukE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AudioFile-Info-Ogg-Vorbis-Header",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "YAML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AudioFile::Info" : "0",
+            "Ogg::Vorbis::Header" : "0.04",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "AudioFile::Info::Build" : {
+         "file" : "lib/AudioFile/Info/Build.pm"
+      },
+      "AudioFile::Info::Ogg::Vorbis::Header" : {
+         "file" : "lib/AudioFile/Info/Ogg/Vorbis/Header.pm",
+         "version" : "v1.8.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header.git",
+         "web" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header"
+      }
+   },
+   "version" : "v1.8.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

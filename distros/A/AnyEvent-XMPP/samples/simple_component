@@ -1,0 +1,46 @@
+#!/opt/perl/bin/perl
+use strict;
+use utf8;
+use AnyEvent;
+use AnyEvent::XMPP::Component;
+use AnyEvent::XMPP::Util qw/install_default_debug_dump/;
+
+my $j = AnyEvent->condvar;
+my $c = AnyEvent::XMPP::Component-> new (
+           domain => 'test.jabber.ta-sa.org',
+           server => 'localhost',
+           port   => 5347,
+           secret => 'lolfe',
+        );
+
+install_default_debug_dump ($c);
+
+$c->reg_cb (
+   connect => sub {
+      warn "connected...\n";
+   },
+   error => sub {
+      my ($c, $e) = @_;
+      warn "ERROR: " . $e->string . "\n";
+      1
+   },
+   disconnect => sub {
+      my ($c, $h, $p, $r) = @_;
+      warn "DISCON @_\n";
+      1
+   },
+   session_ready => sub {
+      my ($c) = @_;
+
+      print "component ready!\n";
+
+      $c->send_message (
+         '*dev@ve.symlynx.com', 'chat', undef,
+         body => "Hi!",
+         from => 'test@test.jabber.ta-sa.org'
+      );
+   }
+);
+$c->connect;
+
+$j->wait;

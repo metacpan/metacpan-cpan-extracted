@@ -1,0 +1,7 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+lib/Acme/Flip.pm
+t/use.t
+META.yml                                 Module meta-data (added by MakeMaker)

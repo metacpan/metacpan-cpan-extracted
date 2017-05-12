@@ -1,0 +1,466 @@
+Version 2.6.3 (released 25 Oct 2012, revision 1142)
+http://www.mpa-garching.mpg.de/~nog/perl/AFS-2.6.3.tar.gz
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+ * This release does not support any features and interfaces from
+   AFSPerl "version 1"
+
+ User-visible changes:
+ * added patch for OpenAFS to create "PIC" type system libraries on
+   64-bit platforms
+ * compiles with OpenAFS system libraries version 1.4.X on 32-bit and
+   on 64-bit platforms
+ * added installation description for 64-bit platforms
+ * released the BOS methods
+   - addhost
+   - removehost
+   - adduser
+   - removeuser
+   - setrestart
+ * updated POD documentation of AFS::VLDB
+   updated argument description for VOLUME in several
+   methods: "(volume name or volume ID number)"
+ * fixed method AFS::VOS->create
+ * extended method AFS::VOS->dump: added "omitdir" option
+ * added new method AFS::ACL->is_clean
+ * modified AFS::ACL->cleanacl: uses method "is_clean" to check if
+   there is anything to do
+ * method AFS::VOS->listvolume provides also the values "copyDate",
+   "backupDate", and "accessDate"
+ * patched example for AFS::KTC_TOKEN->SetToken to handle several
+   tokens
+ * updated example scripts for all AFS modules
+
+
+ Developer-visible changes:
+ * rewrite of method AFS::VOS->backupsys
+ * concatenate compiler flags in Makefile.PL
+ * cleaned up compiler warnings
+ * cleaned up memory allocation for the AFS::PTS, AFS::VOS, AFS::VLDB,
+   and AFS::BOS modules
+ * closed memory leaks because of multiple calls to "rx_Init" in the
+   AFS::PTS, AFS::VOS, AFS::VLDB, and AFS::BOS modules
+ * converted "integer" checks to "Scalar::Util(looks_like_number)"
+   utility for all AFS::VOS methods and all AFS::VOS examples
+
+
+
+Version 2.6.2 (released 31 Mar 2010, revision 961)
+http://www.mpa-garching.mpg.de/~nog/perl/AFS-2.6.2.tar.gz
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+ * Two of the hash key names returned by the VLDB method "listaddrs" have
+   changed in version 2.4.1 (see POD doku AFS::VLDB)
+ * This release does not support any features and interfaces from
+   AFSPerl "version 1"
+
+ User-visible changes:
+ * compiles with OpenAFS system libraries version 1.4.12
+ * fixed method AFS::VLDB->listvldb: fixed segmentation error
+ * improved Makefile.PL script for Perl 5.10.0 and "threaded PIC" libraries
+ * updated example scripts for the modules AFS::VLDB and AFS::VOS
+ * improved test drivers for the modules AFS::VLDB and AFS::VOS;
+
+
+ Developer-visible changes:
+ * convertet all VERSION variables to "dotted decimal version" with leading "v"
+ * changed argument type from "int" to "string" for method AFS::VLDB->removeaddr
+
+
+
+Version 2.6.1 (released 17 Nov 2008, revision 906)
+http://www.mpa-garching.mpg.de/~nog/perl/AFS-2.6.1.tar.gz
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+ * Two of the hash key names returned by the VLDB method "listaddrs" have
+   changed in version 2.4.1 (see POD doku AFS::VLDB)
+ * This release does not support any features and interfaces from
+   AFSPerl "version 1"
+
+ User-visible changes:
+ * fixed method AFS::KAS->getentry: fixed return value for passwd_reuse
+ * fixed method AFS::VLDB->listvldb: fixed segmentation error
+ * updated example scripts for the modules AFS::KAS
+ * fixed Makefile.PL to recognize Transarc/IBM system libraries
+
+
+ Developer-visible changes:
+ * cleaned up Makefile.PL
+
+
+
+Version 2.6.0 (released 27 Oct 2008, revision 888)
+http://www.mpa-garching.mpg.de/~nog/perl/AFS-2.6.0.tar.gz
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+ * Two of the hash key names returned by the VLDB method "listaddrs" have
+   changed in version 2.4.1 (see POD doku AFS::VLDB)
+ * This release does not support any features and interfaces from
+   AFSPerl "version 1"
+
+ User-visible changes:
+ * compiles now with Perl 5.10.0
+ * HTML documentation updated in order to include cross-references
+
+
+ Developer-visible changes:
+ * runs some tests only for module author
+ * recognizes "automated tests" from CPAN testers
+
+
+
+Version 2.4.1 (released 23 Oct 2008, revision 836/863)
+http://www.mpa-garching.mpg.de/~nog/perl/AFS-2.4.1.tar.gz
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+ * Two of the hash key names returned by the VLDB method "listaddrs" have
+   changed (see POD doku AFS::VLDB)
+
+ User-visible changes:
+ * improved several test drivers;
+ * updated example scripts for the modules AFS:VOS, AFS::VLDB,
+   AFS::Cell, AFS::CM, AFS::FS, AFS::BOS, and AFS::KTC_EKEY
+ * improved POD documentation for AFS::FS and AFS
+ * POD documentation gets installed automatically
+ * fixed method AFS::VLDB->listaddrs: lists now all servers
+ * fixed method AFS::VOS->listvol: returns correct name and volid when
+   volume is busy
+ * fixed method AFS::VOS->listvldb: returns proper "release" strings
+ * improved error messages when OpenAFS configuration files are missing
+ * compiles now with OpenAFS system libraries newer than 1.4.4
+ * improved Makefile.PL script to avoid interactive queries
+
+
+ Developer-visible changes:
+ * modified initialization of the "cell" variable for "fs" functions
+ * cleaned up source code and error handling for "vos" functions, "vldb"
+   functions, and "bos" functions
+
+
+
+Version 2.4.0 (released 20 Feb 2006, revision 777)
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+
+ User-visible changes:
+ * implementation of most commands of the BOS command suite
+ * POD documentation for the module AFS::BOS
+ * compiles now with OpenAFS 1.4 system libraries
+ * improved several test drivers;
+ * fixed method AFS::VOS->listvolume: returns volume name when
+   volume id number is given
+ * patched function fs_getquota
+ * improved POD documentation for AFS::VOS
+
+
+ Developer-visible changes:
+ * all unit test drivers are now using Test::More
+ * modified the computing of the VERSION numbers
+ * added dummy function "GetUInt32"
+ * modified internal function set_code
+
+
+
+Version 2.2.3 (released 17 Feb 2005, revision 679)
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+
+ User-visible changes:
+ * now supports Perl "threaded" version on several platforms
+ * fixed method AFS::VOS->backupsys: fixed segmentation error and
+   added some error handling
+ * fixed method AFS::VLDB->delentry: added some error handling
+
+
+ Developer-visible changes:
+ * modified AFS.xs functions "SendFile", "ReceiveFile",
+   and "DoSalvage" to handle "threaded" and "unthreaded" case
+ * modified AFS.xs: added dummy functions for "threaded" case
+ * redesigned the computing of the VERSION numbers
+
+
+
+Version 2.2.2 (released 07 May 2004, revision 627)
+
+ NOTICE:
+ * This release does not support AFS system libraries version 3.4 or
+   version 3.5
+ * This release does ONLY work with Perl "unthreaded" versions (this
+   is true for all versions 2.2.X)
+
+ User-visible changes:
+ * improved most test drivers;
+ * included checks for Perl "unthreaded" version;
+
+
+ Developer-visible changes:
+ * modified AFS.xs function "isafs": patched error handling
+
+
+
+
+Version 2.2.1 (released 09 March 2004, revision 594)
+
+ NOTICE: This release does not support AFS system libraries
+         version 3.4 or version 3.5
+
+ User-visible changes:
+ * fixed method DESTROY for the modules AFS::KAS, AFS::PTS,
+   AFS::VLDB, and AFS::VOS; under certain circumstances they caused
+   segmentation faults;
+
+
+ Developer-visible changes:
+ * none
+
+
+
+
+Version 2.2.0 (released 03 February 2004, revision 571)
+
+ NOTICE: This release does not support AFS system libraries
+         version 3.4 or version 3.5
+
+ User-visible changes:
+ * implementation of the VOS command suite
+ * POD documentation for the modules AFS::VLDB and AFS::VOS
+ * changed VERSION numbering schema.  Beginning with version 2.2.0,
+   the version number convention has been changed to a "dotted
+   integer" scheme that is more commonly found in open source
+   projects.  Maintenance versions of v2.2.0 will be released as
+   v2.2.1, v2,2.2 etc.  The next development series following v2.2.0
+   will be numbered v2.3.x, beginning with v2.3.0, and the next major
+   production release following v2.2.0 will be v2.4.0.
+ * improved Makefile.PL script
+ * improved several test drivers by generalizing test cases.
+ * extended POD documentation for AFS::CM; now enumerates the hash key
+   names for the C structure "VolumeStatus".
+ * support for the CM function 'getvolstats'
+ * fixed kas->getentry method because the returned values for the
+   packed variable were wrong
+
+
+ Developer-visible changes:
+ * rewrite of the DESTROY function for KAS and PTS
+ * changed memcpy and bcopy to Copy for most XS functions
+ * modified AFS.xs functions "myDisplayFormat", "myXDisplayFormat",
+   and "myEnumerateEntry": patched several hash key names
+ * patched pts->DESTROY method
+ * new modules AFS::VLDB and AFS::VOS
+ * changed VERSION numbering schema
+
+
+
+Version 2.04 (never released, revision 297)
+
+ User-visible changes:
+ * fixed function "constant"
+
+
+ Developer-visible changes:
+ * switched test drivers to Test::More
+ * rewrite of several test drivers
+   ACL.t, CM.t, Cell.t, FS.t, Utils.t
+ * VERSION variable now under SVN control
+ * fixed function AUTOLOAD
+
+
+
+Version 2.03 (released 15 October 2002, revision 230)
+
+ User-visible changes:
+ * Makefile.PL
+   now we can recognize 'Devel' versions too
+
+
+ Developer-visible changes:
+ *closed memory leak because of wrong ref-counter in
+  fs_getvolstats
+  fs_getacl
+  pts_listentry
+  pts_PR_ListEntry
+  pts_dumpentry
+  pts_PR_DumpEntry
+  kas_KAM_GetEntry
+  kas_KAM_Debug
+  kas_KAM_GetStats
+
+
+
+Version 2.02 (released 12 July 2002, revision 221)
+
+ User-visible changes:
+ * fixed bug in method AFS::KAS->setfields resp. AFS::KAS->KAM_SetFields
+   introduced in version 2.01
+
+
+ Developer-visible changes:
+ * modified 'typemap' file: added type 'uint32'
+
+
+
+Version 2.01 (released 8 July 2002, revision 211)
+
+ User-visible changes:
+ * improved Makefile.PL script
+ * new method '-AFS::KTC_TOKEN->FromString'
+
+
+ Developer-visible changes:
+ * removed perl-5.6 features from several modules for backward
+   compatibility
+
+
+
+Version 2.0 (released 2 July 2002, revision 184)
+
+ User-visible changes:
+ * compiles now with IBM AFS 3.6 and OpenAFS system libraries.  This
+   module bundle compiles now with the AFS system libraries for IBM
+   AFS version 3.4.x, 3.5.x, 3.6.x and with the AFS system libraries
+   for all OpenAFS versions.
+ * number of available platforms have increased. Since OpenAFS is
+   running on an increasingly number of platforms so does the AFS Perl
+   module.  Everywhere you can compile OpenAFS and Perl you should be
+   able to install the ASF Perl module.
+ * corrected Constructor Methods for all AFS classes.  The constructor
+   methods for all AFS classes have been corrected to conform with the
+   Perl OO conventions.
+ * module structure has been changed.  In order to have clean Perl
+   interfaces the AFS Perl code has been separated into several
+   logical modules.  All modules have been implemented as OO classes.
+ * compatibility mode for version 1.X.  All old variables and
+   functions from version 1 are still available for compatibility, but
+   are deprecated.  These cases have been marked in the documentation.
+ * numerous example scripts for version 2.0
+ * new functions 'XSVERSION', 'get_syslib_version', 'get_server_version',
+   'getcrypt' and 'setcrypt'
+ * new set of POD documentations for version 2.0
+
+
+
+ Developer-visible changes:
+ * compiles with OpenAFS
+ * constructor methods for all AFS classes have been corrected to
+   conform with the Perl OO conventions.
+ * modified 'typemap' file: renamed following types
+   AFS::PTS_SERVER         AFS::PTS
+   AFS::KA_AUTHSERVER      AFS::KAS
+   AFS::KTC_ENCRYPTIONKEY  AFS::KTC_EKEY
+
+
+
+
+Version 1.11 (released 6 December 2001, revision 80)
+
+ User-visible changes:
+ * major rewrite of the Make.PL script
+ * patched functions lsmount, rmmount (the values of an input argument
+   got corrupted)
+ * improved test driver for module AFS.pm
+ * updated README
+
+ Developer-visible changes:
+ * ACL->length, ACL->nlength, ACL->keys, ACL->nkeys:
+   keyword "keys" changed to CORE::keys
+
+
+Version 1.10 (released 24 July 2001, revision 71)
+
+ User-visible changes:
+ * updated and corrected README
+
+
+ Developer-visible changes:
+ * VERSION variable now under CVS control
+
+
+
+Version 1.09 (released 27 October 2000, revision 60)
+
+ User-visible changes:
+ * none
+
+
+ Developer-visible changes:
+ * applied Patches from Perl Pollution Portability V1.0007
+
+
+
+Version 1.08 beta (released 16 June 1999, revision 57)
+
+ User-visible changes:
+ * added example for function ka_setfields
+
+
+ Developer-visible changes:
+ * none
+
+
+
+Version 1.08 alpha (released 3 May 1999, revision 55)
+
+ User-visible changes:
+ * updated and corrected README
+
+
+ Developer-visible changes:
+ * none
+
+
+
+Version 1.08 (released 27 April 1999, revision 54)
+
+ User-visible changes:
+ * patched function fs_setquota
+ * added function flushcb
+
+
+ Developer-visible changes:
+ * none
+
+
+
+Version 1.07 (released 8 April 1999, revision 44)
+
+ User-visible changes:
+ * added support for AIX machines
+ * patched function fs_setquota
+
+
+ Developer-visible changes:
+ * none
+
+
+
+Version 1.06 (released 6 April 1999, revision 40)
+
+ User-visible changes:
+ * renamed function 'access' to 'cm_access'
+ * introduced variable AFS::VERSION
+ * fixed bug in kas_KAM_SetFields
+
+
+ Developer-visible changes:
+ * fixed problems in internal_pts_new and in pts_name
+
+
+
+Version 1.05 (dated 2 November 1996, revision 21)
+
+ * oldest available version, extracted from the original tar 
+   package, compiled by Roland Schemers

@@ -1,0 +1,264 @@
+#!/usr/bin/perl -w
+#
+# Copyright © 2004 Alf Wachsmann <alfw@slac.stanford.edu> and
+#                  Elizabeth Cassell <e_a_c@mailsnare.net>
+#
+# $Revision: 1.8 $ $Date: 2004/10/22 15:04:40 $ $Author: alfw $
+#
+
+use blib;
+use strict;
+use AFS::Monitor qw(udebug constant);
+use Data::Dumper;
+
+my $server          = "virtue.openafs.org";
+my $non_sync_server = "andrew.e.kth.se";
+my $port            = 7003;
+
+my @tests;      # choose which tests to run
+$tests[1] = 0;  # test of server $server, port $port, long output
+$tests[2] = 0;  # test of server $non_sync_server, port $port, short output
+$tests[3] = 0;  # test of server $non_sync_server, port $port, long output
+$tests[4] = 0;  # test of server $server, no port
+$tests[5] = 1;  # test of nonexistant server
+$tests[6] = 1;  # test of server $server, bad port
+$tests[7] = 0;  # test of server $server, port $port
+
+my $all = 0;
+
+my $showdump = 0;   # print entire contents of hash for each test
+my $formatted = 1;  # print output formatted like the C udebug program
+
+
+print "# Starting now... #\n";
+my $result;
+
+if ($all || $tests[1]) {
+  print "\n******** TEST 1: ********\n";
+
+  print "\nudebug -server $server -port $port -long\n\n";
+
+  $result = udebug(server => $server,
+                   port   => $port
+                  );
+  parse_result($result);
+}
+
+if ($all || $tests[2]) {
+  print "\n******** TEST 2: ********\n";
+
+  print "\nudebug -server $non_sync_server -port $port\n\n";
+
+  $result = udebug(server => $non_sync_server,
+                   port   => $port
+                  );
+  parse_result($result);
+}
+
+if ($all || $tests[3]) {
+  print "\n******** TEST 3: ********\n";
+
+  print "\nudebug -server $non_sync_server -port $port -long\n\n";
+
+  $result = udebug(server => $non_sync_server,
+                   port   => $port,
+                   long   => 1
+                  );
+  parse_result($result);
+}
+
+if ($all || $tests[4]) {
+  print "\n******** TEST 4: ********\n";
+
+  print "\nudebug -server $server\n\n";
+
+  $result =udebug(server => $server);
+  parse_result($result);
+}
+
+if ($all || $tests[5]) {
+  print "\n******** TEST 5: ********\n";
+
+  print "\nudebug -server nonexistant\n\n";
+
+  $result = udebug(server => "nonexistant");
+  parse_result($result);
+}
+
+if ($all || $tests[6]) {
+  print "\n******** TEST 6: ********\n";
+
+  print "\nudebug -server $server -port 7001\n\n";
+
+  $result = udebug(server => $server,
+                   port   => 7001
+                  );
+  parse_result($result);
+}
+
+if ($all || $tests[7]) {
+  print "\n******** TEST 7: ********\n";
+
+  print "\nudebug -server $server -port $port\n\n";
+
+  $result = udebug(server => $server,
+                   port   => $port
+                  );
+  parse_result($result);
+}
+
+
+sub parse_result {
+  my $info = shift;
+
+  if ($AFS::CODE) {
+    print "Error case: ", ref($info), "\n" if (defined($info));
+    # die("Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n");
+    print "Error: AFS::CODE = $AFS::CODE (", ($AFS::CODE+0), ")\n";
+    return;
+  }
+
+  if ($showdump) {
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Sortkeys = 1;
+    print Dumper($info);
+  }
+
+  if ($formatted) {
+    my $diff;
+
+    if (exists $info->{interfaceAddr}) {
+      print "Host's addresses are: ", join(" ", @{$info->{interfaceAddr}}),
+            "\n";
+    }
+    printf("Host's %s time is %s\n",
+           $info->{host},
+           scalar localtime($info->{now}));
+
+    $diff = time - $info->{now};
+    printf("Local time is %s (time differential %d secs)\n",
+           scalar localtime(time),
+           $diff);
+    if (abs($diff) >= constant("MAXSKEW")) {
+      print "****clock may be bad\n";
+    }
+    if (exists $info->{lastYesHost}) {
+      $diff = $info->{now} - $info->{lastYesTime};
+      printf("Last yes vote for %s was %d secs ago (%ssync site); \n",
+             $info->{lastYesHost}, $diff, $info->{lastYesState} ? "" : "not ");
+      $diff = $info->{now} - $info->{lastYesClaim};
+      printf("Last vote started %d secs ago (at %s)\n",
+              $diff,
+              scalar localtime(time - $diff));
+    } else {
+      print "Last yes vote not cast yet \n";
+    }
+
+    printf "Local db version is %d.%d\n",
+            $info->{localVersion}->{epoch},
+            $info->{localVersion}->{counter};
+    if ($info->{amSyncSite}) {
+      if ($info->{syncSiteUntil} == 0x7fffffff) {
+        printf("I am sync site forever (%d server%s)\n",
+		$info->{nServers},
+                $info->{nServers} > 1 ? "s" : "");
+      } else {
+        $diff = $info->{syncSiteUntil} - $info->{now};
+        printf("I am sync site until %d secs from now (at %s) (%d server%s)\n",
+                $diff,
+                scalar localtime(time + $diff),
+                $info->{nServers},
+                $info->{nServers} > 1 ? "s" : "");
+      }
+      printf("Recovery state %x\n", $info->{recoveryState});
+      if ($info->{activeWrite}) {
+        printf("I am currently managing write trans %d.%d\n",
+                $info->{epochTime},
+                $info->{tidCounter});
+      }
+    } else {
+      if ($info->{isClone}) {
+        print "I am a clone and never can become sync site\n";
+      } else {
+        print "I am not sync site\n";
+      }
+      $diff = $info->{now} - $info->{lowestTime};
+      printf("Lowest host %s was set %d secs ago\n",
+              $info->{lowestHost}, $diff);
+
+      $diff = $info->{now} - $info->{syncTime};
+      printf("Sync host %s was set %d secs ago\n",
+              $info->{syncHost}, $diff);
+    }
+
+    printf("Sync site's db version is %d.%d\n",
+	    $info->{syncVersion}->{epoch},
+            $info->{syncVersion}->{counter});
+    printf("%d locked pages, %d of them for write\n",
+	    $info->{lockedPages},
+            $info->{writeLockedPages});
+
+    if ($info->{anyReadLocks}) {
+      print "There are read locks held\n";
+    }
+    if ($info->{anyWriteLocks}) {
+      print "There are write locks held\n";
+    }
+
+    if ($info->{currentTrans}) {
+      if ($info->{writeTrans}) {
+        print "There is an active write transaction\n";
+      } else {
+        print "There is at least one active read transaction\n";
+      }
+      printf("Transaction tid is %d.%d\n",
+              $info->{syncTid}->{epoch},
+              $info->{syncTid}->{counter});
+    }
+    if ($info->{epochTime}) {
+      $diff = $info->{now} - $info->{epochTime};
+      printf("Last time a new db version was labelled was:\n\t %d secs ago (at %s)\n",
+	      $diff, scalar localtime(time - $diff));
+    }
+
+    if (exists $info->{servers}) {
+      foreach my $current (@{$info->{servers}}) {
+        printf("\nServer (%s", $current->{addr});
+        if (exists $current->{altAddr}) {
+          print " ", join(" ", @{$current->{altAddr}});
+        }
+        printf("): (db %d.%d)",
+                $current->{remoteVersion}->{epoch},
+                $current->{remoteVersion}->{counter});
+        if ($current->{isClone}) {
+          print "    is only a clone!";
+        }
+        print "\n";
+
+        if ($current->{lastVoteTime} == 0) {
+          print "    last vote never rcvd \n";
+        } else {
+          $diff = $info->{now} - $current->{lastVoteTime};
+          printf("    last vote rcvd %d secs ago (at %s),\n",
+                  $diff, scalar localtime(time - $diff));
+        }
+
+        if ($current->{lastBeaconSent} == 0) {
+          print "    last beacon never sent \n";
+        } else {
+          $diff = $info->{now} - $current->{lastBeaconSent};
+          printf("    last beacon sent %d secs ago (at %s), last vote was %s\n",
+                 $diff,
+                 scalar localtime(time - $diff),
+                 $current->{lastVote} ? "yes" : "no");
+        }
+
+        printf("    dbcurrent=%d, up=%d beaconSince=%d\n",
+                $current->{currentDB},
+                $current->{up},
+                $current->{beaconSinceDown});
+      }
+    }
+  }
+}

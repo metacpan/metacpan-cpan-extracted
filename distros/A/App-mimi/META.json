@@ -1,0 +1,86 @@
+{
+   "abstract" : "Migrations for small home projects",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<viacheslav.t@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.9",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-mimi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBD::Pg" : "0",
+            "DBD::SQLite" : "0"
+         },
+         "requires" : {
+            "DBI" : "0",
+            "Docopt" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98",
+            "Test::TempDir::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::mimi" : {
+         "file" : "lib/App/mimi.pm",
+         "version" : "0.03"
+      },
+      "App::mimi::db" : {
+         "file" : "lib/App/mimi/db.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/app-mimi/issues"
+      },
+      "homepage" : "https://github.com/vti/app-mimi",
+      "repository" : {
+         "url" : "git://github.com/vti/app-mimi.git",
+         "web" : "https://github.com/vti/app-mimi"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:VTI",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

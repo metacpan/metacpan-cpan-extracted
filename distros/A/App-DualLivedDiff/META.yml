@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                App-DualLivedDiff
+version:             1.07
+abstract:            Diff between the perl core and dual-lived modules' CPAN distributions
+license:             perl
+author:              
+    - Steffen Mueller <smueller@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Archive::Extract:              0
+    File::Find:                    0
+    File::Spec:                    0
+    File::Temp:                    0
+    Getopt::Long:                  0
+    LWP::Simple:                   0
+    Parse::CPAN::Meta:             0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

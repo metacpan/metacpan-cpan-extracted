@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/locket
+lib/App/locket.pm
+lib/App/locket/Locket.pm
+lib/App/locket/Moose.pm
+lib/App/locket/Store.pm
+lib/App/locket/TextRandomart.pm
+lib/App/locket/Util.pm
+t/01-basic.t
+t/02-search.t
