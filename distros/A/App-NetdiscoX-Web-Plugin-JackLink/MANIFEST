@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/App/NetdiscoX/Web/Plugin/JackLink.pm
+share/views/plugin/jacklink/device_port_column.tt
+share/views/plugin/jacklink/jacklink.css
+share/views/plugin/jacklink/jacklink.js

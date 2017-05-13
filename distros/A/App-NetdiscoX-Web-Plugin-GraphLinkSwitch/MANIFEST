@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/App/NetdiscoX/Web/Plugin/GraphLinkSwitch.pm
+share/views/plugin/graphlinkswitch/device_details.tt
+share/views/plugin/graphlinkswitch/graphlinkswitch.js
+share/views/plugin/graphlinkswitch/graphlinkswitch.css

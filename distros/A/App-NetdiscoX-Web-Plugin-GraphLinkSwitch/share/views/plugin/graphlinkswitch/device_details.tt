@@ -1,0 +1,31 @@
+[<a href="[% settings.plugin_graphlinkswitch.location_traffic %]?ip=[% deviceip | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlinkswitch.open_in_same_window %]
+  class="nd_graphlinkswitch"
+  data-content='
+    Traffic'
+>Traffic</a>] [<a href="[% settings.plugin_graphlinkswitch.location_errors %]?ip=[% deviceip | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlinkswitch.open_in_same_window %]
+  class="nd_graphlinkswitch"
+  data-content='
+    Errors'
+>Errors</a>] [<a href="[% settings.plugin_graphlinkswitch.location_discards %]?ip=[% deviceip | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlinkswitch.open_in_same_window %]
+  class="nd_graphlinkswitch"
+  data-content='
+    Discards'
+>Discards</a>] - [<a href="[% settings.plugin_graphlinkswitch.location_cpuload %]?DEVICE=[% deviceip | uri %]&DNS=[% devicedns | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlinkswitch.open_in_same_window %]
+  class="nd_graphlinkswitch"
+  data-content='
+    CPU load'
+>CPU load</a>] [<a href="[% settings.plugin_graphlinkswitch.location_cam_overflows %]?DEVICE=[% deviceip | uri %]&DNS=[% devicedns | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlinkswitch.open_in_same_window %]
+  class="nd_graphlinkswitch"
+  data-content='
+    Switch CAM overflows'
+>Switch CAM overflows</a>] [<a href="[% settings.plugin_graphlinkswitch.location_igmp_status %]?host=[% devicedns | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlinkswitch.open_in_same_window %]
+  class="nd_graphlinkswitch"
+  data-content='
+    IGMP status'
+>IGMP status</a>]

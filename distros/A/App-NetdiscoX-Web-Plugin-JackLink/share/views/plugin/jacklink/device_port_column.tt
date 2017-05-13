@@ -1,0 +1,5 @@
+<a href="[% uri_for('/report/jackreport') %]?q=[% device.dns || device.name | uri %]&f=[% row.port %]"
+ class="nd_jacklink"
+   data-content='
+     Jack Search'
+>View <i class="icon-circle-arrow-right"></i></a>

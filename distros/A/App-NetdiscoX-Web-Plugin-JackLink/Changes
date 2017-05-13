@@ -1,0 +1,6 @@
+Revision history for Perl extension App::NetdiscoX::Web::Plugin::JackLink.
+
+0.01  Thu Sep  4 10:27:50 2014
+	- original version; created by h2xs 1.23 with options
+		-XA -n App::NetdiscoX::Web::Plugin::JackLink
+

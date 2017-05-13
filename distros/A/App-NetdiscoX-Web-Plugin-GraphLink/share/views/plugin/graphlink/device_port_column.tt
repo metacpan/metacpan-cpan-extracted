@@ -1,0 +1,16 @@
+<a href="[% settings.plugin_graphlink.location_traffic %]?DEVICE=[% device.ip | uri %]&PORT=[% row.port | replace('[\/\ :]', '-') %]&DNS=[% device.dns | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlink.open_in_same_window %]
+  class="nd_graphlink"
+  data-content='
+    Traffic'
+>T</a>/<a href="[% settings.plugin_graphlink.location_errors %]?DEVICE=[% device.ip | uri %]&PORT=[% row.port | replace('[\/\ :]', '-') %]&DNS=[% device.dns | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlink.open_in_same_window %]
+  class="nd_graphlink"
+  data-content='
+    Errors'
+>E</a>/<a href="[% settings.plugin_graphlink.location_all %]?DEVICE=[% device.ip | uri %]&PORT=[% row.port | replace('[\/\ :]', '-') %]&DNS=[% device.dns | uri %]"
+  [% 'target="_blank"' UNLESS settings.plugin_graphlink.open_in_same_window %]
+  class="nd_graphlink"
+  data-content='
+    All (24h)'
+>A(24h)</a>

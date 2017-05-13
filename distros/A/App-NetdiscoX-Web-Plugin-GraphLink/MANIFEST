@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/App/NetdiscoX/Web/Plugin/GraphLink.pm
+share/views/plugin/graphlink/device_port_column.tt
+share/views/plugin/graphlink/graphlink.css
+share/views/plugin/graphlink/graphlink.js
