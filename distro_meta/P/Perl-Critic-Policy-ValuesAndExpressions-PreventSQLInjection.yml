@@ -1,0 +1,4 @@
+---
+distro: Perl-Critic-Policy-ValuesAndExpressions-PreventSQLInjection
+version: v1.4.0
+author_path: A/AU/AUBERTG/Perl-Critic-Policy-ValuesAndExpressions-PreventSQLInjection-v1.4.0.tar.gz
